@@ -689,7 +689,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     host.hidden=false; loginScreen.inert=true; }
   function backToLogin(){ host.hidden=true; loginScreen.inert=false;
     document.querySelectorAll('.actions [data-a]').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false')}); }
-  document.querySelectorAll('.actions [data-a]').forEach(b=>b.addEventListener('click',()=>{b.classList.add('on');setTimeout(openApp,650)}));
+  document.querySelectorAll('.actions [data-a]').forEach(b=>b.addEventListener('click',(e)=>{e.preventDefault();b.classList.add('on');openApp();}));
   $$('.hbtn').forEach(b=>b.onclick=()=>{ if(b.disabled)return;
     $$('.hbtn').forEach(x=>x.classList.remove('on')); b.classList.add('on');
     setTimeout(()=>{ b.classList.remove('on');
