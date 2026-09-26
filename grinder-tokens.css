@@ -1,0 +1,14 @@
+/* Padrão GRINDER — tokens oficiais. Fonte única de cores, fontes, vidro e formas. */
+:root{
+  --font-ui:'Bebrush',sans-serif; --font-brand:'Road Rage',sans-serif;
+  --fs:12px; --ls-label:1px; --ls-desc:.5px; --ls-faixa:2px;
+  --bg-top:#000; --bg-bottom:#040e2a;
+  --ink:#fff; --ink-muted:#a8a49e; --accent:#155bbd; --accent-text:#6fa4ff;
+  --glass-fill:rgba(255,255,255,.06); --glass-fill-strong:rgba(255,255,255,.08);
+  --glass-border:1px solid rgba(255,255,255,.38);
+  --glass-blur:blur(14px) saturate(140%);
+  --glass-highlight:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.06);
+  --on-fill:rgba(21,91,189,.32); --on-border:1px solid #155bbd; --on-blur:blur(14px) saturate(150%);
+  --on-glow:inset 0 1px 0 rgba(140,185,255,.35),0 0 14px rgba(21,91,189,.35);
+  --radius-card:16px; --gap:8px; --icon:40px; --gutter:22px;
+}
