@@ -709,11 +709,15 @@ button,.btn,.btn *,[class*="card"],[class*="card"] *{font-size:14px!important}
 })();
 </script>
 
-<style id="overlock-force-final">
-/* Override final: Overlock em toda a interface do Grinder EVO. */
-html,body,body *,button,input,select,textarea{font-family:'Overlock',sans-serif!important}
-/* Cards e botoes: 14px conforme solicitado. */
-button,button *,.btn,.btn *,[class*="card"],[class*="card"] *{font-size:14px!important}
+
+
+<style id="grinder-evo-typography-final">
+/* Tipografia final solicitada. */
+@font-face{font-family:'Bebrush';src:url('assets/Bebrush.otf') format('opentype');font-style:normal;font-weight:400;font-display:swap}
+html,body,body *{font-family:'Overlock',sans-serif!important;text-transform:uppercase!important}
+body *{font-size:16px!important}
+/* O titulo GRINDER permanece Bebrush e conserva sua escala de titulo. */
+.title,.brandtxt .title{font-family:'Bebrush',sans-serif!important;text-transform:uppercase!important;font-size:clamp(64px,21vw,92px)!important}
 </style>
 </body>
 </html>
