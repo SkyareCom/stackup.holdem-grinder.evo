@@ -4,7 +4,7 @@ Regras visuais obrigatórias do app GRINDER. Toda tela nova ou alteração segue
 
 ## 1. Fontes
 - Bebrush em todo o app. Road Rage somente na palavra "GRINDER".
-- Todo texto em 12px: botões, cards, abas, seções, descrições, avisos e faixas de título. Única exceção: o bloco da marca (logo + STACKUP HOLD'EM + GRINDER).
+- Exceções de cor nos ícones do login: Google com o "G" colorido oficial, WhatsApp verde (#25D366), Biometria roxa (#a877ff) e Idioma amarelo (#f5c542). As cores valem nos dois estados; ao clicar, só o card fica azul.
 - Peso sempre normal (400), nunca bold.
 - O 12px vale mesmo com o tamanho de fonte do celular aumentado: o app mede a ampliação do sistema e compensa no token --fs. Todo texto deve usar var(--fs), nunca 12px fixo.
 - Espaço entre letras: títulos/rótulos 1px, descrições 0.5px, faixas de título 2px.
