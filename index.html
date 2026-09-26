@@ -693,7 +693,6 @@ button,.btn,.btn *,[class*="card"],[class*="card"] *{font-size:14px!important}
   function show(t,push){
     cur=t;
     $$('.tab').forEach(x=>{const on=x.dataset.t===t;x.classList.toggle('on',on);on?x.setAttribute('aria-current','page'):x.removeAttribute('aria-current')});
-    const pg=$('#page');pg.style.animation='none';pg.offsetHeight;pg.style.animation='';
     tr(); syncBack();
   }
   function openApp(){ host.hidden=false; loginScreen.inert=true; hist=[]; $('.hbtn').forEach(x=>x.classList.remove('on')); try{show('home',false)}catch(e){console.error('GRINDER openApp render error',e);} }
@@ -702,10 +701,9 @@ button,.btn,.btn *,[class*="card"],[class*="card"] *{font-size:14px!important}
   document.querySelectorAll('.actions [data-a]').forEach(b=>b.addEventListener('click',()=>{b.classList.add('on');requestAnimationFrame(openApp)}));
   $$('.hbtn').forEach(b=>b.onclick=()=>{ if(b.disabled)return;
     $$('.hbtn').forEach(x=>x.classList.remove('on')); b.classList.add('on');
-    setTimeout(()=>{ b.classList.remove('on');
-      if(b.dataset.h==='back'){ if(sub[cur].length){ sub[cur].pop(); show(cur,false); } }
-      else { Object.keys(sub).forEach(k=>sub[k]=[]); show('home',false); }
-    },250);
+    b.classList.remove('on');
+    if(b.dataset.h==='back'){ if(sub[cur].length){ sub[cur].pop(); show(cur,false); } }
+    else { Object.keys(sub).forEach(k=>sub[k]=[]); show('home',false); }
   });
   $$('.tab').forEach(t=>t.onclick=()=>show(t.dataset.t,true));
 })();
