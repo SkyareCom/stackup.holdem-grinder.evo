@@ -46,6 +46,16 @@ Formas:
 - Posições da mesa (UTG, UTG+1, MP, HJ, CO, BTN, SB, BB): ícone próprio de mini mesa oval com 8 assentos, o assento da posição destacado (maior e sólido), os demais apagados, e o botão do dealer como um pontinho na mesa, bem na frente do BTN. Assentos em sentido horário a partir do BTN (embaixo): SB, BB, UTG, UTG+1, MP, HJ, CO. "Todas" = todos os assentos acesos.
 - Única exceção: o "G" colorido do Google no botão de login (exigência da marca Google). O WhatsApp aparece em branco.
 
+## Mesa de treino (Spots)
+- Mesa oval em pé (formato estádio), em vidro azul GRINDER, ocupando a área de conteúdo.
+- Herói sempre fixo no centro de baixo, com avatar em estado ativo (vidro azul, borda #155bbd).
+- Número de lugares vem de Ajustes → Jogadores na mesa (2, 3, 6, 8, 9 ou 10), distribuídos por igual no contorno da mesa, em sentido horário a partir do herói, na ordem real da ação.
+- Cada jogador: posição dentro do avatar e stack logo abaixo (em BB ou em moeda, conforme Ajustes → Stack exibido em; moeda = $ no cash e fichas no torneio).
+- Oponentes com cartas fechadas (verso azul GRINDER); herói com cartas abertas. Quantidade de cartas conforme Ajustes → Modalidade (Hold'em 2, PLO 4/5/6).
+- Centro da mesa, de cima para baixo: board (5 espaços), pote e, em all-ins múltiplos, side pots abaixo do pote. Nada pode se sobrepor.
+- Botão do dealer (D) branco ao lado do BTN, virado para o centro.
+- Cartas abertas usam baralho de 4 cores (♠ preto, ♥ vermelho, ♦ azul, ♣ verde) — exceção à paleta, por legibilidade no poker.
+
 ## 5. Estrutura de toda tela interna
 1. Cabeçalho: logo StackUp (sempre quadrado, sem distorcer) + STACKUP HOLD'EM + GRINDER (Road Rage, azul GRINDER com efeito vidro)
 2. Botões "Voltar" e "Menu principal", com linha divisória 1px rgba(255,255,255,.16) embaixo
