@@ -6,6 +6,7 @@ Regras visuais obrigatórias do app GRINDER. Toda tela nova ou alteração segue
 - Bebrush em todo o app. Road Rage somente na palavra "GRINDER".
 - Todo texto em 12px: botões, cards, abas, seções, descrições, avisos e faixas de título. Única exceção: o bloco da marca (logo + STACKUP HOLD'EM + GRINDER).
 - Peso sempre normal (400), nunca bold.
+- O 12px vale mesmo com o tamanho de fonte do celular aumentado: o app mede a ampliação do sistema e compensa no token --fs. Todo texto deve usar var(--fs), nunca 12px fixo.
 - Espaço entre letras: títulos/rótulos 1px, descrições 0.5px, faixas de título 2px.
 - Título e descrição se diferenciam só pela cor, nunca pelo tamanho.
 - Nomes longos quebram uma palavra por linha dentro do card; nunca cortar texto.
@@ -32,15 +33,18 @@ CLICADO / ATIVO:
 Formas:
 - Cantos de 16px em todo botão, card, aba, cabeçalho de seção e caixa de conteúdo.
 - Formatos regulares (retângulos arredondados); nada orgânico.
-- Card de torre: ícone de 40px em cima, título embaixo, centralizados; grade de 3 colunas com espaço de 8px.
+- Card de torre: sempre QUADRADO (proporção 1:1) e sempre em grade de 3 colunas com espaço de 8px, em todas as telas — todos os cards têm exatamente o mesmo tamanho. Ícone de 40px em cima, título embaixo, centralizados.
 - Botão de linha (login, cabeçalho de seção): ícone à esquerda, título + descrição, seta à direita.
 - Faixa de título das telas (HOME, TREINO…): fundo rgba(255,255,255,.08), borda de vidro 1px, cantos retos, girada -1.5°.
-- Seções expansíveis (gavetas): só o cabeçalho é botão; o conteúdo aberto aparece direto sobre o fundo, sem borda envolvendo.
+- Telas de ajustes (ex.: Ajustes do treino): sem cards de cabeçalho nem gavetas. Cada seção mostra o título em texto simples e os cards de torre direto na tela. Entre uma seção e outra, linha de 1px no azul GRINDER (#155bbd), de ponta a ponta.
 
 ## 4. Ícones
-- Material Symbols Outlined (peso 400), na cor do texto. No rodapé, ícones de traço 2px.
-- Todo card interno tem ícone + título.
-- O mesmo conceito usa sempre o mesmo ícone.
+- Material Symbols Outlined (peso 400) em TODO o app: rodapé, Voltar/Menu principal, cards, cabeçalhos de seção e botões do login. Nada de ícones de traço desenhados à mão.
+- Sempre na cor do texto (branco); clicado/ativo = #6fa4ff.
+- Tamanhos: 40px nos cards de torre, 24px no rodapé e nos botões do login, 22px nos botões do cabeçalho.
+- O mesmo conceito e o mesmo destino usam sempre o mesmo ícone: Home = home, Perfil = account_circle, Spots = playing_cards, Ajustes/Treino = settings, Run = monitoring.
+- Posições da mesa (UTG, UTG+1, MP, HJ, CO, BTN, SB, BB): ícone próprio de mini mesa oval com 8 assentos, o assento da posição destacado (maior e sólido), os demais apagados, e o botão do dealer como um pontinho na mesa, bem na frente do BTN. Assentos em sentido horário a partir do BTN (embaixo): SB, BB, UTG, UTG+1, MP, HJ, CO. "Todas" = todos os assentos acesos.
+- Única exceção: o "G" colorido do Google no botão de login (exigência da marca Google). O WhatsApp aparece em branco.
 
 ## 5. Estrutura de toda tela interna
 1. Cabeçalho: logo StackUp (sempre quadrado, sem distorcer) + STACKUP HOLD'EM + GRINDER (Road Rage, azul GRINDER com efeito vidro)
