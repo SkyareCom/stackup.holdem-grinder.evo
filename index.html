@@ -871,6 +871,50 @@ html body .btn[data-a="bio"] .ic svg,html body .btn[data-a="bio"].on .ic svg{col
 html body #langBtn .ic svg,html body .lang .btn#langBtn[aria-expanded="true"] .ic svg{color:#f5c542!important}
 </style>
 <script>
+/* PADRAO VISUAL GLOBAL: exibir o digito 0 como letra O, sem alterar valores internos. */
+(function(){
+  const SKIP=new Set(['SCRIPT','STYLE','INPUT','TEXTAREA','SELECT','OPTION']);
+  const seen=new WeakSet();
+
+  function convertTextNode(node){
+    const p=node.parentElement;
+    if(!p||SKIP.has(p.tagName))return;
+    if(node.nodeValue&&node.nodeValue.includes('0')){
+      node.nodeValue=node.nodeValue.replace(/0/g,'O');
+    }
+  }
+
+  function convertTree(root){
+    if(!root)return;
+    const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+    let n;
+    while((n=w.nextNode()))convertTextNode(n);
+  }
+
+  function watch(root){
+    if(!root||seen.has(root))return;
+    seen.add(root);
+    convertTree(root);
+    new MutationObserver(ms=>{
+      for(const m of ms){
+        if(m.type==='characterData'){
+          convertTextNode(m.target);
+          continue;
+        }
+        for(const n of m.addedNodes){
+          if(n.nodeType===Node.TEXT_NODE) convertTextNode(n);
+          else if(n.nodeType===Node.ELEMENT_NODE||n.nodeType===Node.DOCUMENT_FRAGMENT_NODE) convertTree(n);
+        }
+      }
+    }).observe(root,{subtree:true,childList:true,characterData:true});
+  }
+
+  watch(document.body);
+  const host=document.getElementById('app2');
+  if(host&&host.shadowRoot)watch(host.shadowRoot);
+})();
+</script>
+<script>
 /* ENTRY GUARD: a abertura do app nao depende da inicializacao das telas internas. */
 (function(){
   function enterGrinder(){
