@@ -862,6 +862,24 @@ html body .btn[data-a].on .ic svg,html body .lang .btn#langBtn[aria-expanded="tr
 html body .btn[data-a="wa"] .ic svg,html body .btn[data-a="wa"].on .ic svg{color:#25D366!important}
 html body .btn[data-a="bio"] .ic svg,html body .btn[data-a="bio"].on .ic svg{color:#a877ff!important}
 html body #langBtn .ic svg,html body .lang .btn#langBtn[aria-expanded="true"] .ic svg{color:#f5c542!important}
-\n.tsec[data-s="ttype"] .tbody{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important}\n.tsec[data-s="ttype"] .tbody>.towers{display:contents!important}\n</style>
+
+/* Ajustes responsivos — Settings/Field */
+.tsec[data-s="ttype"] .tbody{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px!important}
+.tsec[data-s="ttype"] .tbody>.towers{display:contents!important}
+.tsec[data-s="field"] .towers{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+.tsec[data-s="opponents"] .towers{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.tsec[data-s="field"] .tower,.tsec[data-s="opponents"] .tower{min-width:0!important;padding:8px 3px!important}
+.tsec[data-s="field"] .tower{min-height:72px!important}
+.tsec[data-s="opponents"] .tower{min-height:112px!important}
+.tsec[data-s="opponents"] .tower b{white-space:pre-line!important;line-height:1.35!important}
+@media(max-width:520px){
+ .tsec[data-s="ttype"] .tbody{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ .tsec[data-s="ttype"] .tower{min-width:0!important;padding-left:3px!important;padding-right:3px!important}
+ .tsec[data-s="field"] .towers{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px!important}
+ .tsec[data-s="field"] .tower{min-width:0!important;min-height:64px!important;padding:6px 1px!important}
+ .tsec[data-s="opponents"] .towers{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}
+ .tsec[data-s="opponents"] .tower{min-width:0!important;min-height:108px!important;padding:7px 2px!important}
+}
+</style>
 </body>
 </html>
