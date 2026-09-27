@@ -33,7 +33,7 @@ CLICADO / ATIVO:
 Formas:
 - Cantos de 16px em todo botão, card, aba, cabeçalho de seção e caixa de conteúdo.
 - Formatos regulares (retângulos arredondados); nada orgânico.
-- Card de torre: sempre QUADRADO (proporção 1:1) e sempre em grade de 3 colunas com espaço de 8px, em todas as telas — todos os cards têm exatamente o mesmo tamanho. Ícone de 40px em cima, título embaixo, centralizados.
+- Card de torre: sempre QUADRADO (proporção 1:1) e sempre em grade de 3 colunas com espaço de 8px, em todas as telas — todos os cards têm exatamente o mesmo tamanho. Ícone de 40px em cima, título embaixo, centralizados. Exceção: grupos com exatamente 4 opções curtas (ex.: Nível do treino) podem usar 4 colunas, com cards quadrados menores e ícone de 32px.
 - Botão de linha (login, cabeçalho de seção): ícone à esquerda, título + descrição, seta à direita.
 - Faixa de título das telas (HOME, TREINO…): fundo rgba(255,255,255,.08), borda de vidro 1px, cantos retos, girada -1.5°.
 - Telas de ajustes (ex.: Ajustes do treino): sem cards de cabeçalho nem gavetas. Cada seção mostra o título em texto simples e os cards de torre direto na tela. Entre uma seção e outra, linha de 1px no azul GRINDER (#155bbd), de ponta a ponta.
@@ -51,7 +51,7 @@ Formas:
 - Herói sempre fixo no centro de baixo, com avatar em estado ativo (vidro azul, borda #155bbd).
 - Número de lugares vem de Ajustes → Jogadores na mesa (2, 3, 6, 8, 9 ou 10), distribuídos por igual no contorno da mesa, em sentido horário a partir do herói, na ordem real da ação.
 - Cada jogador: posição dentro do avatar e stack logo abaixo (em BB ou em moeda, conforme Ajustes → Stack exibido em; moeda = $ no cash e fichas no torneio).
-- Oponentes com cartas fechadas (verso azul GRINDER); herói com cartas abertas. Quantidade de cartas conforme Ajustes → Modalidade (Hold'em 2, PLO 4/5/6).
+- O app é só Texas Hold'em: 2 cartas por jogador. Oponentes com cartas fechadas (verso azul GRINDER); herói com cartas abertas.
 - Centro da mesa, de cima para baixo: board (5 espaços), pote e, em all-ins múltiplos, side pots abaixo do pote. Nada pode se sobrepor.
 - Botão do dealer (D) branco ao lado do BTN, virado para o centro.
 - Cartas abertas usam baralho de 4 cores (♠ preto, ♥ vermelho, ♦ azul, ♣ verde) — exceção à paleta, por legibilidade no poker.
