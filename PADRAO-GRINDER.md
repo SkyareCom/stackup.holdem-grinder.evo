@@ -42,7 +42,7 @@ Formas:
 - Material Symbols Outlined (peso 400) em TODO o app: rodapé, Voltar/Menu principal, cards, cabeçalhos de seção e botões do login. Nada de ícones de traço desenhados à mão.
 - Sempre na cor do texto (branco); clicado/ativo = #6fa4ff.
 - Tamanhos: 40px nos cards de torre, 24px no rodapé e nos botões do login, 22px nos botões do cabeçalho.
-- O mesmo conceito e o mesmo destino usam sempre o mesmo ícone: Home = home, Perfil = account_circle, Spots = playing_cards, Ajustes/Treino = settings, Run = monitoring.
+- O mesmo conceito e o mesmo destino usam sempre o mesmo ícone: Home = home, Alvo = target, Perfil = account_circle, Spots = playing_cards, Ajustes/Treino = settings, Run = monitoring.
 - Posições da mesa (UTG, UTG+1, MP, HJ, CO, BTN, SB, BB): ícone próprio de mini mesa oval com 8 assentos, o assento da posição destacado (maior e sólido), os demais apagados, e o botão do dealer como um pontinho na mesa, bem na frente do BTN. Assentos em sentido horário a partir do BTN (embaixo): SB, BB, UTG, UTG+1, MP, HJ, CO. "Todas" = todos os assentos acesos.
 - Única exceção: o "G" colorido do Google no botão de login (exigência da marca Google). O WhatsApp aparece em branco.
 
@@ -61,7 +61,7 @@ Formas:
 2. Botões "Voltar" e "Menu principal", com linha divisória 1px rgba(255,255,255,.16) embaixo
 3. Faixa de título da tela
 4. Conteúdo (grade de cards de torre ou seções expansíveis), margem lateral de 22px
-5. Rodapé com 5 abas: Home · Perfil · Spots · Treino · Run (fundo rgba(0,0,0,.35) com blur 16px; aba ativa no estado clicado)
+5. Rodapé com 5 abas: Home · Alvo · Spots · Ajustes · Run (fundo rgba(0,0,0,.35) com blur 16px; aba ativa no estado clicado)
 
 ## 6. Comportamento
 - Todo grupo de opções tem sempre uma opção ativa; nos grupos de múltipla escolha, "Todas" cobre o caso vazio. Exceção: seção inativa (ex.: no modo Cash, Tipo de torneio, Informações do field e Fase do torneio ficam inativas).
