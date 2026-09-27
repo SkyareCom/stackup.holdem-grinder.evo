@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "product": {
+    "id": "grinder",
+    "brand": "STACKUP HOLD'EM",
+    "name": "STACKUP HOLD'EM GRINDER",
+    "commercial_model": "independent_subscription",
+    "identity_provider": "stackup_id"
+  },
+  "plans": {
+    "free": {
+      "id": "grinder_free",
+      "positioning": "entry",
+      "billing": "free",
+      "entitlements": [
+        "training.core",
+        "spots.basic",
+        "stats.basic"
+      ]
+    },
+    "edge": {
+      "id": "grinder_edge",
+      "positioning": "main_paid",
+      "billing": ["monthly", "annual"],
+      "entitlements": [
+        "training.core",
+        "spots.basic",
+        "stats.basic",
+        "training.advanced",
+        "history",
+        "goals",
+        "stats.advanced",
+        "recommendations"
+      ]
+    },
+    "full": {
+      "id": "grinder_full",
+      "positioning": "maximum",
+      "billing": ["monthly", "annual"],
+      "entitlements": [
+        "training.core",
+        "spots.basic",
+        "stats.basic",
+        "training.advanced",
+        "history",
+        "goals",
+        "stats.advanced",
+        "recommendations",
+        "training.full",
+        "personalization.advanced",
+        "premium.content",
+        "early_access"
+      ]
+    }
+  },
+  "cross_sell": {
+    "allowed_destinations": ["academy", "evo"],
+    "never_grant_destination_full_plan": true,
+    "benefit_types": ["trial", "free_plus", "discount", "limited_premium_access"]
+  },
+  "analytics": {
+    "required_dimensions": ["product", "app_version", "plan", "session_id"],
+    "product_value": "grinder"
+  },
+  "rollout": {
+    "feature_gating_enabled": false,
+    "billing_enforcement_enabled": false,
+    "remote_flags_enabled": false
+  }
+}
