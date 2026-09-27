@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "product": "grinder",
+  "rules": {
+    "event_names": "snake_case",
+    "product_required": true,
+    "plan_required_when_commercial": true,
+    "pii_in_properties_forbidden": true
+  },
+  "events": {
+    "app_loaded": ["surface"],
+    "app_open": [],
+    "training_started": ["training_type", "sample_size"],
+    "training_completed": ["training_type", "sample_size", "correct", "score"],
+    "spot_viewed": ["spot_id", "street"],
+    "spot_answered": ["spot_id", "street", "correct"],
+    "pricing_viewed": ["plan"],
+    "subscription_started": ["plan", "billing_period"],
+    "subscription_renewed": ["plan", "billing_period"],
+    "subscription_cancelled": ["plan", "reason"],
+    "plan_upgraded": ["from_plan", "to_plan"],
+    "plan_downgraded": ["from_plan", "to_plan"],
+    "cross_sell_viewed": ["origin_product", "destination_product"],
+    "cross_sell_trial_started": ["origin_product", "destination_product", "destination_plan"],
+    "cross_sell_converted": ["origin_product", "destination_product", "destination_plan"]
+  },
+  "funnels": {
+    "activation": [
+      "app_open",
+      "training_started",
+      "training_completed"
+    ],
+    "free_to_edge": [
+      "pricing_viewed",
+      "subscription_started"
+    ],
+    "edge_to_full": [
+      "pricing_viewed",
+      "plan_upgraded"
+    ],
+    "cross_sell": [
+      "cross_sell_viewed",
+      "cross_sell_trial_started",
+      "cross_sell_converted"
+    ]
+  }
+}
