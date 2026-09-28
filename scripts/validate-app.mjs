@@ -34,10 +34,14 @@ if(auth?.providers?.google?.enabled!==true) failures.push('Google must be enable
 for(const provider of ['stackup_id','whatsapp','biometrics']){
   if(auth?.providers?.[provider]?.enabled!==false) failures.push(provider+' must remain disabled during closed testing');
 }
-if(!html.includes('id="googleSignInMount"')) failures.push('official Google sign-in mount is missing');
-if(/data-a="(?:wa|stackid|bio|google)"/.test(html.slice(0,html.indexOf('<script>\nconst T=')))){
-  failures.push('legacy/custom auth action detected on closed-test login screen');
+if(!html.includes('id="googleLoginCard"')) failures.push('Grinder Google login card is missing');
+const loginHtml=html.slice(0,html.indexOf('<script>\nconst T='));
+if(/data-a="(?:wa|stackid|bio|google)"/.test(loginHtml)){
+  failures.push('legacy active auth action detected on closed-test login screen');
 }
+if(!loginHtml.includes('class="btn login-disabled bio"')) failures.push('disabled biometric card must remain visible during closed testing');
+if(!loginHtml.includes('class="btn login-disabled wa"')) failures.push('disabled WhatsApp card must remain visible during closed testing');
+if(loginHtml.includes('stackid')) failures.push('Stack ID must remain hidden during closed testing');
 if(!html.includes('<script src="core/stackup-auth.js"></script>')) failures.push('StackUp auth runtime is missing');
 if(!auth?.providers?.google?.client_id){
   console.warn('GRINDER AUTH WARNING: Google Client ID is not configured yet; real Google sign-in will remain disabled.');
