@@ -738,16 +738,24 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(requested)return requested;
     return pos[Math.floor(spotRandomHero*pos.length)%pos.length];
   }
-  function seatPointOnFelt(feltLeft,top,feltW,feltH,k,n){
-    const cx=feltLeft+feltW/2,cy=top+feltH/2;
-    const rx=feltW/2,ry=feltH/2;
-    const angle=Math.PI/2+(Math.PI*2*k/n);
-    return [cx+Math.cos(angle)*rx,cy+Math.sin(angle)*ry];
-  }
-  function spotBetPoint(x,y,W,H,hero){
-    const cx=W/2,cy=H*.47,vx=cx-x,vy=cy-y,dl=Math.hypot(vx,vy)||1;
-    const dist=hero?72:48;
-    return [x+(vx/dl)*dist,y+(vy/dl)*dist];
+  function seatPointOutside(feltLeft,top,feltW,feltH,k,n,W,H){
+    const cx=feltLeft+feltW/2,bottom=top+feltH;
+    const sideX=Math.max(28,Math.min(W-28,feltLeft-28));
+    const rightX=Math.max(28,Math.min(W-28,feltLeft+feltW+28));
+    if(k===0)return [cx,Math.min(H-38,bottom+22)];
+    if(n===2)return [cx,Math.max(38,top-22)];
+    const sideTotal=n-2;
+    const leftCount=Math.ceil(sideTotal/2);
+    const rightCount=Math.floor(sideTotal/2);
+    if(k<=leftCount){
+      const i=k-1;
+      const y=bottom-(i+1)*(feltH/(leftCount+1));
+      return [sideX,y];
+    }
+    if(k===leftCount+1)return [cx,Math.max(38,top-22)];
+    const i=k-(leftCount+2);
+    const y=top+(i+1)*(feltH/(rightCount+1));
+    return [rightX,y];
   }
   const sectionHead=document.createElement('div');sectionHead.className='sectionhead';
   sectionHead.innerHTML='<img src="assets/logo-stackup-200.png" alt="StackUp Holdem"><div class="sectiontitle" id="sectiontitle">HOME</div>';
@@ -774,31 +782,22 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const W=tb.clientWidth,H=tb.clientHeight;if(!W||!H)return;
     const n=resolveSpotCount(),pos=POSN[n]||POSN[9];
     const heroPos=resolveHeroPosition(pos),h0=Math.max(0,pos.indexOf(heroPos));
-    const feltLeft=Math.max(46,W*.15),feltRight=W-feltLeft,top=Math.max(54,H*.14),bot=H-Math.max(64,H*.15);
+    const feltLeft=Math.max(78,W*.23),feltRight=W-feltLeft,top=Math.max(52,H*.11),bot=H-Math.max(54,H*.11);
     const feltW=feltRight-feltLeft,feltH=bot-top;
 
     let html=`<div class="felt" style="left:${feltLeft}px;top:${top}px;width:${feltW}px;height:${feltH}px"></div>`;
 
     for(let k=0;k<n;k++){
-      const p=pos[(h0+k)%n],hero=k===0,[x,y]=seatPointOnFelt(feltLeft,top,feltW,feltH,k,n);
-      const backs=hero?'':`<div class="backs"><i></i><i></i></div>`;
+      const p=pos[(h0+k)%n],hero=k===0,[x,y]=seatPointOutside(feltLeft,top,feltW,feltH,k,n,W,H);
       const hand=hero?`<div class="herohand">${HERO_CARDS.map(card).join('')}</div>`:'';
-      html+=`<div class="seat${hero?' hero':''}" style="left:${x}px;top:${y}px">${backs}${hand}<div class="playerbox"><div class="av">${p}</div><div class="stk">${fmtStack(DEMO_STK[k%DEMO_STK.length])}</div></div></div>`;
+      html+=`<div class="seat${hero?' hero':''}" style="left:${x}px;top:${y}px">${hand}<div class="playerbox"><div class="av">${p}</div><div class="stk">${fmtStack(DEMO_STK[k%DEMO_STK.length])}</div></div></div>`;
 
-      if(DEMO_BETS[k]){
-        const bp=spotBetPoint(x,y,W,H,hero),bx=bp[0],by=bp[1];
-        html+=`<div class="seatbet" style="left:${bx}px;top:${by}px">${fmtStack(DEMO_BETS[k])}</div>`;
-      }
-      if(p==='BTN'){
-        const cx=W/2,cy=H*.47,vx=cx-x,vy=cy-y,dl=Math.hypot(vx,vy)||1;
-        const nx=-vy/dl,ny=vx/dl;
-        const dx=x+nx*31+(vx/dl)*10,dy=y+ny*31+(vy/dl)*10;
-        html+=`<div class="dealer" style="left:${dx}px;top:${dy}px">D</div>`;
-      }
+
     }
 
     const cy=top+feltH*.45,sidePot=0;
-    const pots=[`<div class="potline">${TR[L()].pot}: ${fmtStack(4)}</div>`];
+    const potValue=DEMO_BETS.reduce((sum,v)=>sum+v,0);
+    const pots=[`<div class="potline">${TR[L()].pot}: ${fmtStack(potValue)}</div>`];
     if(sidePot>0)pots.push(`<div class="potline side">${TR[L()].side} 1: ${fmtStack(sidePot)}</div>`);
     html+=`<div class="centerbox" style="top:${cy}px"><div class="board">${DEMO_BOARD.map(card).join('')}</div>${pots.join('')}</div>`;
     tb.innerHTML=html;
