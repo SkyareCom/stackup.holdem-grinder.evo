@@ -26,6 +26,22 @@ scripts.forEach((s,i)=>{
 
 const config=JSON.parse(fs.readFileSync(new URL('../config/grinder.product.json',import.meta.url),'utf8'));
 if(config?.product?.id!=='grinder') failures.push('product config must identify grinder');
+
+const auth=JSON.parse(fs.readFileSync(new URL('../config/auth.json',import.meta.url),'utf8'));
+if(auth?.environment!=='closed_test') failures.push('auth environment must remain closed_test during the 14-day test phase');
+if(auth?.policy!=='google_only') failures.push('closed-test auth policy must remain google_only');
+if(auth?.providers?.google?.enabled!==true) failures.push('Google must be enabled for closed testing');
+for(const provider of ['stackup_id','whatsapp','biometrics']){
+  if(auth?.providers?.[provider]?.enabled!==false) failures.push(provider+' must remain disabled during closed testing');
+}
+if(!html.includes('id="googleSignInMount"')) failures.push('official Google sign-in mount is missing');
+if(/data-a="(?:wa|stackid|bio|google)"/.test(html.slice(0,html.indexOf('<script>\nconst T=')))){
+  failures.push('legacy/custom auth action detected on closed-test login screen');
+}
+if(!html.includes('<script src="core/stackup-auth.js"></script>')) failures.push('StackUp auth runtime is missing');
+if(!auth?.providers?.google?.client_id){
+  console.warn('GRINDER AUTH WARNING: Google Client ID is not configured yet; real Google sign-in will remain disabled.');
+}
 for(const plan of ['free','edge','full']){
   if(!config?.plans?.[plan]) failures.push('missing plan '+plan);
 }
@@ -49,3 +65,5 @@ console.log('- inline scripts:',scripts.length);
 console.log('- index bytes:',Buffer.byteLength(html,'utf8'));
 console.log('- plans: FREE / EDGE / FULL');
 console.log('- product analytics: grinder');
+console.log('- auth policy: closed-test Google only');
+console.log('- Google Client ID:',auth?.providers?.google?.client_id?'configured':'PENDING');
