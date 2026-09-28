@@ -48,14 +48,14 @@
       if(!id){id=uuid();set('anonymous_id',id);}
       return id;
     },
-    get(){return get('identity',{stackupId:null,anonymousId:this.anonymousId(),token:null});},
+    get(){return get('identity',{stackupId:null,anonymousId:this.anonymousId(),token:null,authProvider:null,providerSubject:null,email:null,displayName:null,picture:null,verifiedAt:null});},
     set(snapshot){
       const prev=this.get();
       return set('identity',Object.assign({},prev,snapshot||{},{anonymousId:prev.anonymousId||this.anonymousId()}));
     },
     clear(){
       const anonymousId=this.anonymousId();
-      set('identity',{stackupId:null,anonymousId,token:null});
+      set('identity',{stackupId:null,anonymousId,token:null,authProvider:null,providerSubject:null,email:null,displayName:null,picture:null,verifiedAt:null});
     }
   };
 
