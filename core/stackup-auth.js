@@ -4,9 +4,10 @@
 (function(global){
   'use strict';
 
-  const STATE={config:null,ready:false,initializing:false};
+  const STATE={config:null,ready:false,initializing:false,client:null,bound:false};
   const CONFIG_URL='config/auth.json';
   const GIS_URL='https://accounts.google.com/gsi/client';
+  const USERINFO_URL='https://openidconnect.googleapis.com/v1/userinfo';
 
   function runtime(){return global.StackUpGrinder||null;}
   function q(sel){return document.querySelector(sel);}
@@ -28,20 +29,17 @@
       'pt-BR':{
         configuring:'Configure o Google Client ID para ativar o login real.',
         loading:'Carregando login do Google…',
-        failed:'Não foi possível entrar com Google.',
-        expired:'A sessão do Google expirou. Tente novamente.'
+        failed:'Não foi possível entrar com Google.'
       },
       en:{
         configuring:'Configure the Google Client ID to enable real sign-in.',
         loading:'Loading Google sign-in…',
-        failed:'Could not sign in with Google.',
-        expired:'The Google session expired. Please try again.'
+        failed:'Could not sign in with Google.'
       },
       es:{
         configuring:'Configura el Google Client ID para activar el acceso real.',
         loading:'Cargando acceso con Google…',
-        failed:'No se pudo entrar con Google.',
-        expired:'La sesión de Google venció. Inténtalo de nuevo.'
+        failed:'No se pudo entrar con Google.'
       }
     };
     return (dict[l]||dict.en)[key]||key;
@@ -56,7 +54,7 @@
   }
   function loadScript(src){
     return new Promise((resolve,reject)=>{
-      if(global.google&&global.google.accounts&&global.google.accounts.id)return resolve();
+      if(global.google&&global.google.accounts&&global.google.accounts.oauth2)return resolve();
       const existing=document.querySelector('script[data-stackup-gis="1"]');
       if(existing){
         existing.addEventListener('load',()=>resolve(),{once:true});
@@ -70,25 +68,18 @@
       document.head.appendChild(s);
     });
   }
-  function decodePayload(jwt){
-    try{
-      const part=String(jwt||'').split('.')[1];
-      if(!part)return null;
-      const b64=part.replace(/-/g,'+').replace(/_/g,'/');
-      const pad=b64+'='.repeat((4-b64.length%4)%4);
-      const raw=atob(pad);
-      const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
-      return JSON.parse(new TextDecoder().decode(bytes));
-    }catch(_){return null;}
+  async function fetchUser(accessToken){
+    const res=await fetch(USERINFO_URL,{
+      method:'GET',
+      headers:{Authorization:'Bearer '+accessToken,Accept:'application/json'},
+      credentials:'omit'
+    });
+    if(!res.ok)throw new Error('google_userinfo_'+res.status);
+    const user=await res.json();
+    if(!user||!user.sub)throw new Error('google_userinfo_invalid');
+    return user;
   }
-  function validClientPayload(payload,clientId){
-    if(!payload||!payload.sub)return false;
-    const iss=payload.iss==='https://accounts.google.com'||payload.iss==='accounts.google.com';
-    const aud=Array.isArray(payload.aud)?payload.aud.includes(clientId):payload.aud===clientId;
-    const exp=Number(payload.exp||0)*1000>Date.now()-30000;
-    return iss&&aud&&exp;
-  }
-  async function establishSession(credential,payload){
+  async function establishSession(accessToken,user){
     const cfg=STATE.config.providers.google;
     const core=runtime();
 
@@ -96,33 +87,31 @@
       if(!core)throw new Error('runtime_missing');
       const out=await core.api.request(cfg.exchange_path||'/v1/auth/google',{
         method:'POST',
-        body:{credential},
+        body:{access_token:accessToken},
         retry:false
       });
       if(!out.ok||!out.data)throw new Error('google_exchange_failed');
-      const user=out.data.user||{};
+      const remote=out.data.user||{};
       core.identity.set({
-        stackupId:out.data.stackup_id||user.stackup_id||null,
+        stackupId:out.data.stackup_id||remote.stackup_id||null,
         token:out.data.token||null,
         authProvider:'google',
-        providerSubject:payload.sub,
-        email:user.email||payload.email||null,
-        displayName:user.name||payload.name||null,
-        picture:user.picture||payload.picture||null,
+        providerSubject:user.sub,
+        email:remote.email||user.email||null,
+        displayName:remote.name||user.name||null,
+        picture:remote.picture||user.picture||null,
         verifiedAt:new Date().toISOString()
       });
       return;
     }
 
-    // Temporary closed-test mode: Google verifies the credential delivery in-browser.
-    // No paid entitlements or server authorization may depend on this local snapshot.
     if(core){
       core.identity.set({
         authProvider:'google',
-        providerSubject:payload.sub,
-        email:payload.email||null,
-        displayName:payload.name||null,
-        picture:payload.picture||null,
+        providerSubject:user.sub,
+        email:user.email||null,
+        displayName:user.name||null,
+        picture:user.picture||null,
         verifiedAt:new Date().toISOString(),
         token:null
       });
@@ -140,18 +129,15 @@
     app.removeAttribute('hidden');
     if(login){login.inert=true;login.style.display='none';}
   }
-  async function onCredential(response){
+  async function onToken(response){
+    const card=q('#googleLoginCard');
     try{
-      const credential=response&&response.credential;
-      const cfg=STATE.config.providers.google;
-      const payload=decodePayload(credential);
-      if(!validClientPayload(payload,cfg.client_id)){
-        status(msg('expired'),'error');
-        runtime()?.analytics?.track('auth_failed',{provider:'google',reason:'invalid_client_payload'});
-        return;
-      }
-      await establishSession(credential,payload);
-      runtime()?.analytics?.track('auth_succeeded',{provider:'google',mode:cfg.verification_mode});
+      if(response&&response.error)throw new Error(response.error);
+      const accessToken=response&&response.access_token;
+      if(!accessToken)throw new Error('missing_access_token');
+      const user=await fetchUser(accessToken);
+      await establishSession(accessToken,user);
+      runtime()?.analytics?.track('auth_succeeded',{provider:'google',mode:STATE.config.providers.google.verification_mode});
       runtime()?.analytics?.track('app_open',{entry_method:'google'});
       global.dispatchEvent(new CustomEvent('stackup:auth:success',{detail:{provider:'google'}}));
       status('');
@@ -159,64 +145,57 @@
     }catch(error){
       status(msg('failed'),'error');
       runtime()?.analytics?.track('auth_failed',{provider:'google',reason:String(error&&error.message||'unknown')});
+    }finally{
+      if(card)card.classList.remove('on');
     }
   }
-  function renderPlaceholder(){
-    const mount=q('#googleSignInMount');
-    if(!mount)return;
-    mount.innerHTML='';
-    const b=document.createElement('button');
-    b.type='button';
-    b.className='google-config-required';
-    b.disabled=true;
-    b.textContent='GOOGLE';
-    mount.appendChild(b);
-    status(msg('configuring'),'warning');
+  function configureCard(enabled){
+    const card=q('#googleLoginCard');
+    if(!card)return;
+    card.disabled=!enabled;
+    card.setAttribute('aria-disabled',enabled?'false':'true');
+    if(!enabled)card.classList.add('login-disabled');
+    else card.classList.remove('login-disabled');
   }
-  function renderGoogle(){
-    const mount=q('#googleSignInMount');
-    if(!mount||!global.google?.accounts?.id)return;
-    mount.innerHTML='';
-    const cfg=STATE.config.providers.google;
-    global.google.accounts.id.initialize({
-      client_id:cfg.client_id,
-      callback:onCredential,
-      auto_select:Boolean(cfg.auto_select)
+  function bindGoogleCard(){
+    const card=q('#googleLoginCard');
+    if(!card||STATE.bound)return;
+    STATE.bound=true;
+    card.addEventListener('click',()=>{
+      if(!STATE.ready||!STATE.client)return;
+      card.classList.add('on');
+      status(msg('loading'),'');
+      runtime()?.analytics?.track('auth_started',{provider:'google'});
+      STATE.client.requestAccessToken({prompt:'select_account'});
     });
-    const width=Math.max(220,Math.min(380,Math.floor(mount.getBoundingClientRect().width||360)));
-    global.google.accounts.id.renderButton(mount,{
-      type:'standard',
-      theme:'filled_black',
-      size:'large',
-      text:'signin_with',
-      shape:'rectangular',
-      logo_alignment:'left',
-      width,
-      locale:locale()
-    });
-    status('');
   }
   async function init(){
     if(STATE.initializing)return;
     STATE.initializing=true;
     try{
+      configureCard(false);
       status(msg('loading'),'');
       const cfg=await loadConfig();
       const google=cfg.providers&&cfg.providers.google;
       if(!google||!google.enabled)throw new Error('google_disabled');
       if(!google.client_id){
-        renderPlaceholder();
+        status(msg('configuring'),'warning');
         return;
       }
       await loadScript(GIS_URL);
-      renderGoogle();
-      STATE.ready=true;
-      const observer=new MutationObserver(()=>{
-        if(STATE.ready)renderGoogle();
+      if(!global.google?.accounts?.oauth2)throw new Error('gis_oauth_unavailable');
+      STATE.client=global.google.accounts.oauth2.initTokenClient({
+        client_id:google.client_id,
+        scope:'openid email profile',
+        callback:onToken,
+        error_callback:()=>onToken({error:'google_popup_error'})
       });
-      observer.observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
-      global.addEventListener('resize',()=>{if(STATE.ready)renderGoogle();},{passive:true});
+      bindGoogleCard();
+      STATE.ready=true;
+      configureCard(true);
+      status('');
     }catch(error){
+      configureCard(false);
       status(msg('failed'),'error');
       runtime()?.analytics?.track('auth_failed',{provider:'google',reason:String(error&&error.message||'init_failed')});
     }finally{
