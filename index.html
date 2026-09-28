@@ -853,7 +853,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   function renderHome(){ hg.innerHTML=HORD.map(k=>`<button class="tower" data-k="${k}">${HICONS[k]}<b>${k==='ia'?T2[L()][k].replace(' ','\n'):k==='api'?T2[L()][k]:brk(T2[L()]['card_'+k]||T2[L()][k])}</b></button>`).join(''); }
   hg.addEventListener('click',e=>{ const c=e.target.closest('.tower'); if(!c)return; const k=c.dataset.k;
     c.classList.add('on'); setTimeout(()=>{ if(HSUB.includes(k)){ sub.home.push(k); show('home',false);} else show(k,true); },250); });
-  function tr(){ $('[data-i]').forEach(el=>el.textContent=T2[L()][el.dataset.i]);
+  function tr(){ $$('[data-i]').forEach(el=>el.textContent=T2[L()][el.dataset.i]);
     const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null, key=hs||cur;
     const as=cur==='profile'&&sub.profile.length?sub.profile[sub.profile.length-1]:null;
     const title=as?TR[L()].sec[as]:T2[L()]['ti_'+key];
