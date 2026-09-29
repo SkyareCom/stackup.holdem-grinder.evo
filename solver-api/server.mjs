@@ -10,6 +10,7 @@ const SOLVER_BIN=process.env.STACKUP_DCFR_BIN||"/usr/local/bin/dcfr-solver";
 const CHARTS_PATH=process.env.STACKUP_PREFLOP_CHARTS||"/opt/stackup/preflop_charts.json";
 const MATCHUPS_PATH=process.env.STACKUP_PREFLOP_MATCHUPS||"/opt/stackup/matchups.json";
 const POSTFLOP_ITERATIONS=Math.max(50,Number(process.env.STACKUP_POSTFLOP_ITERATIONS||120));
+const RANGE_MIN_WEIGHT=Math.max(0,Math.min(0.25,Number(process.env.STACKUP_RANGE_MIN_WEIGHT||0.02)));
 const ALLOWED_ORIGINS=new Set(
   String(process.env.CORS_ORIGINS||"https://skyarecom.github.io,http://localhost:3000,http://127.0.0.1:5500")
     .split(",").map(v=>v.trim()).filter(Boolean)
@@ -87,7 +88,7 @@ function chartPosition(name){
 }
 function rangeString(range){
   return Object.entries(range||{})
-    .filter(([,w])=>Number(w)>0)
+    .filter(([,w])=>Number(w)>=RANGE_MIN_WEIGHT)
     .sort(([a],[b])=>a.localeCompare(b))
     .map(([hand,w])=>hand+":"+Number(w).toFixed(8).replace(/0+$/,"").replace(/\.$/,""))
     .join(",");
@@ -241,7 +242,8 @@ async function solvePostflop(filters,street){
     "--raise-sizes","50,100",
     "--max-raises","2",
     "--allin-threshold","0.67",
-    "--allin-pot-ratio","3"
+    "--allin-pot-ratio","3",
+    "--skip-cum-strategy"
   ];
 
   await run(SOLVER_BIN,args,{timeoutMs:Number(process.env.STACKUP_SOLVER_TIMEOUT_MS||20_000)});
