@@ -1,0 +1,59 @@
+name: Build Solver Bank
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-solver-bank.yml"
+      - "scripts/generate-solver-bank.mjs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: solver-bank
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ".stackup/DCFR-SOLVER -> target"
+
+      - name: Build DCFR-SOLVER
+        run: |
+          mkdir -p .stackup
+          git clone --depth 1 https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          cargo build --release --manifest-path .stackup/DCFR-SOLVER/Cargo.toml
+          cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-solver
+          chmod +x .stackup/dcfr-solver
+
+      - name: Generate solver-backed bank
+        env:
+          STACKUP_DCFR_BIN: ${{ github.workspace }}/.stackup/dcfr-solver
+          STACKUP_PREFLOP_ITERATIONS: "10000000"
+          STACKUP_POSTFLOP_ITERATIONS: "250"
+        run: node scripts/generate-solver-bank.mjs
+
+      - name: Commit solver bank
+        run: |
+          git config user.name "StackUp Solver Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/solver/preflop.json data/solver/postflop.json data/solver/manifest.json
+          if git diff --cached --quiet; then
+            echo "Solver bank unchanged."
+            exit 0
+          fi
+          git commit -m "Generate production DCFR solver bank"
+          git push
