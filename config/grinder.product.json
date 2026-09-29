@@ -7,8 +7,8 @@
     "commercial_model": "independent_subscription",
     "identity_provider": "stackup_id",
     "authentication": {
-      "current_phase": "closed_test",
-      "current_provider": "google",
+      "current_phase": "development",
+      "current_provider": null,
       "canonical_identity": "stackup_id",
       "post_test_multi_provider_ready": true
     }
