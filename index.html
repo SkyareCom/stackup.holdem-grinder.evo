@@ -1249,13 +1249,14 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 
     const cy=top+feltH*.45-18;
     const boardCards=solved?solved.board:DEMO_BOARD;
+    const boardSlots=solved?[...boardCards,...Array(Math.max(0,5-boardCards.length)).fill(null)].slice(0,5):boardCards;
     const potValue=solved?Number(solved.pot)||0:DEMO_BETS.reduce((sum,v)=>sum+v,0);
     const sidePots=solved&&Array.isArray(solved.sidePots)?solved.sidePots:[];
     const pots=[`<div class="potline">${TR[L()].pot}: ${fmtStack(potValue)}</div>`];
     sidePots.forEach((value,i)=>{
       if(Number(value)>0)pots.push(`<div class="potline side">${TR[L()].side} ${i+1}: ${fmtStack(Number(value))}</div>`);
     });
-    html+=`<div class="centerbox" style="top:${cy}px"><div class="board">${boardCards.map(card).join('')}</div>${pots.join('')}</div>`;
+    html+=`<div class="centerbox" style="top:${cy}px"><div class="board">${boardSlots.map(card).join('')}</div>${pots.join('')}</div>`;
     tb.innerHTML=html;
   }
   try{new ResizeObserver(()=>{if(!tb.hidden)renderTable();}).observe(tb);}catch(e){}
