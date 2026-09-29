@@ -12,7 +12,7 @@ permissions:
 
 concurrency:
   group: solver-bank
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -56,4 +56,5 @@ jobs:
             exit 0
           fi
           git commit -m "Generate production DCFR solver bank"
+          git pull --rebase origin main
           git push
