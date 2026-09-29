@@ -792,53 +792,51 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const chev='<svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M480-344 240-584l43-43 197 197 197-197 43 43-240 240Z"/></svg>';
   const SPECIAL_ICON={"limping":"iso","bb_ep":"bbdef","bb_mp":"bbdef","bb_lp":"bbdef","sb_ep":"bbdef","sb_mp":"bbdef","sb_cobtn":"bbdef","attack_cobtn":"steal","cobtn_vs_raise":"3bet","cobtn":"open","open_by_pos":"open","vs_open_ip":"open","vs_open_oop":"bbdef","cold_call":"bbdef","blind_war":"steal","bb_limpers":"bbdef","sb_limp_call":"iso","sb_limp_raise":"iso","iso_limpers":"iso","limp_raise":"iso","heads_up_2max":"bbdef","squeeze":"squeeze","facing_4bet":"4bet","cold_call_4bet":"4bet","pot_4bet":"4bet","raise_vs_3bet":"3bet","3bet_ip":"3bet","3bet_oop":"3bet","call_3bet":"3bet","fold_to_3bet":"3bet","4bet_bluff":"4bet","4bet_value":"4bet","call_4bet":"4bet","cold_4bet":"4bet","chip_up":"open","open_shove":"pf","call_shove":"pf","reshove":"pf","multi_shove":"pf","push_fold":"pf","icm_5_8":"pf","icm_9_12":"pf","icm_13_18":"pf","icm_19_25":"pf","icm_bubble":"bubble","icm_pay_jump":"itm","icm_final_table":"ft","icm_3handed":"ft","big_stack_pressure":"100+ bb","mid_stack_pressure":"40–60 bb","short_stack_survival":"<10 bb","pko_math":"pko","bounty_call":"pko","bounty_shove":"pko","bounty_iso":"pko","covering_stack":"pko","covered_stack":"pko","multiway_bounty":"pko","postflop_multiway":"cbet","check_raise":"cbet","sequential_lines":"open","donk_bet":"cbet","delayed_cbet":"cbet","probe_bet":"cbet","check_back_flop":"flop","double_barrel":"cbet","triple_barrel":"cbet","turn_check_raise":"cbet","float_flop":"flop","miss_cbet":"cbet","vs_missed_cbet":"cbet","river_bluff_catch":"river","vs_overbet":"cbet","block_bet_20_25":"cbet","river_check_raise":"river","bet_fold":"cbet","thin_value":"river","value_river":"river","board_dry":"flop","board_connected":"flop","board_paired":"flop","board_monotone":"flop","board_twotone":"flop","board_high_card":"flop","board_low":"flop","board_dynamic":"turn","board_static":"turn","bet_25":"cbet","bet_33":"cbet","bet_50":"cbet","bet_66":"cbet","bet_75":"cbet","pot_bet":"cbet","overbet_125":"cbet","overbet_150":"cbet","pot_odds":"money","implied_odds":"money","reverse_implied_odds":"money","mdf":"cbet","breakeven_bluff":"cbet","breakeven_call":"cbet","combos":"all","blockers":"all","equity_realization":"all"};
 
-  // ADVANCE: icones semanticos e variados, usando Google Material Symbols.
-  const ADV_MATERIAL_ICON={
-    "limping":"directions_walk","bb_ep":"security","bb_mp":"shield","bb_lp":"verified_user",
-    "sb_ep":"south","sb_mp":"filter_alt","sb_cobtn":"radar","attack_cobtn":"bolt",
-    "cobtn_vs_raise":"call_made","cobtn":"north_east","open_by_pos":"location_on",
-    "vs_open_ip":"login","vs_open_oop":"logout","cold_call":"ac_unit",
+  // ADVANCE: icones locais e sem dependencia externa.
+  // Reaproveita os SVGs embutidos no proprio GRINDER para evitar ligatures/texto gigante.
+  const ADV_LOCAL_ICON={
+    "limping":"iso","bb_ep":"BB","bb_mp":"bbdef","bb_lp":"blind_special",
+    "sb_ep":"SB","sb_mp":"BB","sb_cobtn":"steal","attack_cobtn":"aggr_special",
+    "cobtn_vs_raise":"3bet","cobtn":"CO","open_by_pos":"pos_all",
+    "vs_open_ip":"open","vs_open_oop":"bbdef","cold_call":"freeze",
 
-    "blind_war":"sports_martial_arts","bb_limpers":"groups","sb_limp_call":"call_received",
-    "sb_limp_raise":"call_made","iso_limpers":"person_search","limp_raise":"trending_up",
-    "heads_up_2max":"group",
+    "blind_war":"blind_special","bb_limpers":"iso","sb_limp_call":"SB",
+    "sb_limp_raise":"steal","iso_limpers":"iso","limp_raise":"aggr_special",
+    "heads_up_2max":"hu",
 
-    "squeeze":"compress","facing_4bet":"looks_4","cold_call_4bet":"ac_unit",
-    "pot_4bet":"local_fire_department","raise_vs_3bet":"trending_up",
-    "3bet_ip":"arrow_forward","3bet_oop":"arrow_back","call_3bet":"call",
-    "fold_to_3bet":"undo","4bet_bluff":"theater_comedy","4bet_value":"diamond",
-    "call_4bet":"phone_in_talk","cold_4bet":"severe_cold",
+    "squeeze":"squeeze","facing_4bet":"4bet","cold_call_4bet":"freeze",
+    "pot_4bet":"money","raise_vs_3bet":"3bet","3bet_ip":"open","3bet_oop":"bbdef",
+    "call_3bet":"3bet","fold_to_3bet":"pre","4bet_bluff":"aggr_special",
+    "4bet_value":"pro","call_4bet":"4bet","cold_4bet":"freeze",
 
-    "chip_up":"stacked_bar_chart","open_shove":"rocket_launch","call_shove":"call_received",
-    "reshove":"replay","multi_shove":"groups","push_fold":"alt_route",
+    "chip_up":"big","open_shove":"pf","call_shove":"all","reshove":"reentry",
+    "multi_shove":"mixed","push_fold":"short_special",
 
-    "icm_bubble":"bubble_chart","icm_pay_jump":"payments","icm_final_table":"emoji_events",
-    "icm_3handed":"group","big_stack_pressure":"vertical_align_top",
-    "mid_stack_pressure":"drag_handle","short_stack_survival":"health_and_safety",
+    "icm_bubble":"bubble","icm_pay_jump":"money","icm_final_table":"ft",
+    "icm_3handed":"hu","big_stack_pressure":"big","mid_stack_pressure":"mid",
+    "short_stack_survival":"small",
 
-    "pko_math":"calculate","bounty_call":"paid","bounty_shove":"attach_money",
-    "bounty_iso":"person_pin_circle","covering_stack":"umbrella",
-    "covered_stack":"shield","multiway_bounty":"groups",
+    "pko_math":"math_special","bounty_call":"pko","bounty_shove":"aggr_special",
+    "bounty_iso":"iso","covering_stack":"big","covered_stack":"small",
+    "multiway_bounty":"mixed",
 
-    "postflop_multiway":"hub","check_raise":"swap_vert","sequential_lines":"route",
-    "donk_bet":"campaign","delayed_cbet":"schedule","probe_bet":"search",
-    "check_back_flop":"keyboard_return","double_barrel":"looks_two",
-    "triple_barrel":"looks_3","turn_check_raise":"sync_alt",
-    "float_flop":"air","miss_cbet":"close","vs_missed_cbet":"crisis_alert",
+    "postflop_multiway":"post_special","check_raise":"aggr_special",
+    "sequential_lines":"int","donk_bet":"steal","delayed_cbet":"turn",
+    "probe_bet":"open","check_back_flop":"flop","double_barrel":"turn",
+    "triple_barrel":"river","turn_check_raise":"aggr_special","float_flop":"flop",
+    "miss_cbet":"cbet","vs_missed_cbet":"bbdef",
 
-    "river_bluff_catch":"front_hand","vs_overbet":"priority_high",
-    "block_bet_20_25":"block","river_check_raise":"swap_vert",
-    "bet_fold":"fork_right","thin_value":"line_weight","value_river":"diamond",
+    "river_bluff_catch":"river_special","vs_overbet":"big","block_bet_20_25":"bbdef",
+    "river_check_raise":"aggr_special","bet_fold":"pre","thin_value":"money",
+    "value_river":"pro",
 
-    "board_dry":"water_drop","board_connected":"link","board_paired":"content_copy",
-    "board_monotone":"contrast","board_twotone":"gradient",
-    "board_high_card":"arrow_upward","board_low":"arrow_downward",
-    "board_dynamic":"bolt","board_static":"pause",
+    "board_dry":"flop","board_connected":"texture_special","board_paired":"all",
+    "board_monotone":"pre_special","board_twotone":"mixed","board_high_card":"big",
+    "board_low":"small","board_dynamic":"hyper","board_static":"freeze",
 
-    "pot_odds":"percent","implied_odds":"trending_up",
-    "reverse_implied_odds":"trending_down","mdf":"shield",
-    "breakeven_bluff":"balance","breakeven_call":"call",
-    "combos":"grid_view","blockers":"block","equity_realization":"monitoring"
+    "pot_odds":"money","implied_odds":"int","reverse_implied_odds":"reentry",
+    "mdf":"bbdef","breakeven_bluff":"math_special","breakeven_call":"money",
+    "combos":"all","blockers":"freeze","equity_realization":"adv"
   };
   const ADV_ICON_BADGE={
     "icm_5_8":"5–8","icm_9_12":"9–12","icm_13_18":"13–18","icm_19_25":"19–25",
@@ -846,9 +844,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     "pot_bet":"POT","overbet_125":"125%","overbet_150":"150%"
   };
   const advIcon=o=>{
-    if(o==='all')return '<span class="msi" aria-hidden="true">shuffle</span>';
     if(ADV_ICON_BADGE[o])return '<span class="advibadge" aria-hidden="true">'+ADV_ICON_BADGE[o]+'</span>';
-    return '<span class="msi" aria-hidden="true">'+(ADV_MATERIAL_ICON[o]||'casino')+'</span>';
+    const key=o==='all'?'random':(ADV_LOCAL_ICON[o]||SPECIAL_ICON[o]||'all');
+    return ICONS[key]||ICONS.all||ICONS.random;
   };
   const ADV_SECTION_ICON={"pre_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M180-180v-520q0-33 23.5-56.5T260-780h320q33 0 56.5 23.5T660-700v40h40q33 0 56.5 23.5T780-580v400q0 33-23.5 56.5T700-100H260q-33 0-56.5-23.5T180-180Zm80-480h320v-40H260v40Zm0 480h440v-400h-40v320H260v-80h-20v-400h20v360h320v-400H260v520Z\"/></svg>","blind_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q150 0 255 105t105 255q0 150-105 255T480-120Zm0-60q125 0 212.5-87.5T780-480q0-125-87.5-212.5T480-780q-125 0-212.5 87.5T180-480q0 125 87.5 212.5T480-180Zm0-120q-75 0-127.5-52.5T300-480q0-75 52.5-127.5T480-660q75 0 127.5 52.5T660-480q0 75-52.5 127.5T480-300Zm0-60q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0-60q-25 0-42.5-17.5T420-480q0-25 17.5-42.5T480-540q25 0 42.5 17.5T540-480q0 25-17.5 42.5T480-420Z\"/></svg>","aggr_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M180-220v-60h458L514-404l42-42 196 196-196 196-42-42 124-124H180Zm600-520v60H322l124 124-42 42-196-196 196-196 42 42-124 124h458Z\"/></svg>","short_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M220-160v-120h520v120H220Zm60-180v-120h400v120H280Zm60-180v-120h280v120H340Zm60-180v-120h160v120H400Z\"/></svg>","icm_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M450-120v-540H270l150 220v80H120v-80l150-220H120v-60h330v-120h60v120h330v60H690l150 220v80H540v-80l150-220H510v540h160v60H290v-60h160ZM180-420h180l-90-132-90 132Zm420 0h180l-90-132-90 132Z\"/></svg>","pko_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M480-80 360-240H220q-25 0-42.5-17.5T160-300v-500q0-25 17.5-42.5T220-860h520q25 0 42.5 17.5T800-800v500q0 25-17.5 42.5T740-240H600L480-80Zm0-100 90-120h170v-500H220v500h170l90 120Zm0-200 62-122 138-20-100-98 24-138-124 65-124-65 24 138-100 98 138 20 62 122Z\"/></svg>","post_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M120-260v-440q0-25 17.5-42.5T180-760h120q25 0 42.5 17.5T360-700v440q0 25-17.5 42.5T300-200H180q-25 0-42.5-17.5T120-260Zm240 0v-440q0-25 17.5-42.5T420-760h120q25 0 42.5 17.5T600-700v440q0 25-17.5 42.5T540-200H420q-25 0-42.5-17.5T360-260Zm240 0v-440q0-25 17.5-42.5T660-760h120q25 0 42.5 17.5T840-700v440q0 25-17.5 42.5T780-200H660q-25 0-42.5-17.5T600-260Z\"/></svg>","river_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M80-240q80-80 160-80t160 80q80 80 160 80t160-80q80-80 160-80v80q-80 0-160 80t-160 80q-80 0-160-80t-160-80q-80 0-160 80v-80Zm0-220q80-80 160-80t160 80q80 80 160 80t160-80q80-80 160-80v80q-80 0-160 80t-160 80q-80 0-160-80t-160-80q-80 0-160 80v-80Zm0-220q80-80 160-80t160 80q80 80 160 80t160-80q80-80 160-80v80q-80 0-160 80t-160 80q-80 0-160-80t-160-80q-80 0-160 80v-80Z\"/></svg>","texture_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M140-140v-680h680v680H140Zm60-60h250v-250H200v250Zm310 0h250v-250H510v250ZM200-510h250v-250H200v250Zm310 0h250v-250H510v250Z\"/></svg>","math_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M180-100q-25 0-42.5-17.5T120-160v-640q0-25 17.5-42.5T180-860h600q25 0 42.5 17.5T840-800v640q0 25-17.5 42.5T780-100H180Zm0-60h600v-640H180v640Zm100-460h160v-60H280v60Zm30 200h100v-60H310v60Zm320-200h60v-60h-60v60Zm0 200h60v-60h-60v60ZM300-250l42-42 58 58 58-58 42 42-58 58 58 58-42 42-58-58-58 58-42-42 58-58-58-58Zm320 58h100v-60H620v60Zm0-116h100v-60H620v60Z\"/></svg>"};
   const sel={}; [...SECS,...ADV_SECS].forEach(s=>s.groups.forEach(g=>sel[g.id]=new Set(g.def)));
@@ -948,10 +946,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return nf(bb,bb%1?1:0)+' BB';
   }
   function resolveSpotCount(){
-    const raw=sel.seats?[...sel.seats][0]:'random';
-    if(!raw||raw==='random')return spotRandomCount;
-    const n=Number(String(raw).replace(/^s/,''));
-    return POSN[n]?n:9;
+    // SPOTS usa mesa cheia: dez jogadores distribuidos ao redor do feltro.
+    return 10;
   }
   function resolveHeroPosition(pos){
     const requested=sel.pos?[...sel.pos].find(p=>p!=='all'&&pos.includes(p)):null;
@@ -959,23 +955,15 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return pos[Math.floor(spotRandomHero*pos.length)%pos.length];
   }
   function seatPointOutside(feltLeft,top,feltW,feltH,k,n,W,H){
-    const cx=feltLeft+feltW/2,bottom=top+feltH;
-    const sideX=Math.max(28,Math.min(W-28,feltLeft-28));
-    const rightX=Math.max(28,Math.min(W-28,feltLeft+feltW+28));
-    if(k===0)return [cx,Math.min(H-38,bottom+22)];
-    if(n===2)return [cx,Math.max(38,top-22)];
-    const sideTotal=n-2;
-    const leftCount=Math.ceil(sideTotal/2);
-    const rightCount=Math.floor(sideTotal/2);
-    if(k<=leftCount){
-      const i=k-1;
-      const y=bottom-(i+1)*(feltH/(leftCount+1));
-      return [sideX,y];
-    }
-    if(k===leftCount+1)return [cx,Math.max(38,top-22)];
-    const i=k-(leftCount+2);
-    const y=top+(i+1)*(feltH/(rightCount+1));
-    return [rightX,y];
+    // Distribuicao uniforme em elipse: HERO embaixo e os demais em sentido horario.
+    const cx=W/2,cy=H*.48;
+    const rx=Math.min(W*.39,feltW/2+68);
+    const ry=Math.min(H*.40,feltH/2+58);
+    const a=Math.PI/2+(Math.PI*2*k/n);
+    const rawX=cx+Math.cos(a)*rx,rawY=cy+Math.sin(a)*ry;
+    const x=Math.max(36,Math.min(W-36,rawX));
+    const y=Math.max(42,Math.min(H-42,rawY));
+    return [x,y];
   }
   const sectionHead=document.createElement('div');sectionHead.className='sectionhead';
   sectionHead.innerHTML='<img src="assets/logo-stackup-200.png" alt="StackUp Holdem"><div class="sectiontitle" id="sectiontitle">HOME</div>';
@@ -1002,7 +990,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const W=tb.clientWidth,H=tb.clientHeight;if(!W||!H)return;
     const n=resolveSpotCount(),pos=POSN[n]||POSN[9];
     const heroPos=resolveHeroPosition(pos),h0=Math.max(0,pos.indexOf(heroPos));
-    const feltLeft=Math.max(78,W*.23),feltRight=W-feltLeft,top=Math.max(52,H*.11),bot=H-Math.max(54,H*.11);
+    const feltLeft=Math.max(74,W*.22),feltRight=W-feltLeft;
+    const top=Math.max(58,H*.14),bot=H-Math.max(66,H*.14);
     const feltW=feltRight-feltLeft,feltH=bot-top;
 
     let html=`<div class="felt" style="left:${feltLeft}px;top:${top}px;width:${feltW}px;height:${feltH}px"></div>`;
