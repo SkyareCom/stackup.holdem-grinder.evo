@@ -6,8 +6,154 @@
 <meta name="theme-color" content="#000000">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
+
+<style id="grinderSplashStyle">
+/* ===== GRINDER animated splash — isolated from the app ===== */
+@font-face{font-family:'GrinderSplashBrush';src:url('assets/bebrush.otf') format('opentype');font-display:block}
+@font-face{font-family:'GrinderSplashRage';src:url('assets/road-rage.woff2') format('woff2');font-display:block}
+
+#grinderSplash{
+  position:fixed;inset:0;z-index:2147483647;
+  width:100%;height:100vh;height:100dvh;
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,
+    rgb(0,0,0) 0%,rgb(0,1,2) 10%,rgb(0,2,5) 20%,rgb(1,3,8) 30%,
+    rgb(1,4,12) 40%,rgb(2,5,16) 50%,rgb(2,7,21) 60%,rgb(2,9,26) 70%,
+    rgb(3,10,31) 80%,rgb(3,12,36) 90%,rgb(4,14,42) 100%);
+  opacity:1;isolation:isolate;overscroll-behavior:none;
+  -webkit-tap-highlight-color:transparent;
+}
+#grinderSplash::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 42%,
+    rgba(0,0,0,.08) 0%,rgba(0,0,0,.18) 46%,rgba(0,0,0,.48) 72%,rgba(0,0,0,.78) 100%);
+}
+#grinderSplash .gs-cards{
+  position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  opacity:0;animation:gsCardsIn .9s .15s ease forwards;
+}
+#grinderSplash .gs-card{
+  position:absolute;left:50%;
+  --w:min(128vw,58vh,540px);
+  width:var(--w);height:calc(var(--w)*1.4);
+  top:calc(92% - var(--w)*1.4);margin-left:calc(var(--w)/-2);
+  transform-origin:50% 100%;overflow:hidden;border-radius:24px;
+  background:linear-gradient(155deg,rgba(13,20,36,.78) 0%,rgba(5,10,22,.76) 46%,rgba(0,2,8,.82) 100%);
+  border:1.5px solid rgba(21,91,189,.48);
+  box-shadow:-12px 0 40px rgba(0,0,0,.72),0 0 26px rgba(21,91,189,.12),
+    inset 0 1px 0 rgba(140,185,255,.10),inset 0 0 52px rgba(0,0,0,.42);
+  color:rgba(111,164,255,.30);
+  text-shadow:0 0 16px rgba(21,91,189,.18),0 -1px 0 rgba(0,0,0,.7);
+}
+#grinderSplash .gs-card i{
+  position:absolute;left:6%;top:4%;
+  font:700 calc(var(--w)*.13)/.92 Georgia,'Times New Roman',serif!important;
+  font-style:normal!important;text-align:center!important;color:rgba(111,164,255,.46)!important;
+}
+#grinderSplash .gs-card i.gs-r{left:auto;right:6%}
+#grinderSplash .gs-card b{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font:700 calc(var(--w)*.55)/1 Georgia,'Times New Roman',serif!important;
+  opacity:.42!important;color:rgba(111,164,255,.40)!important;
+}
+#grinderSplash .gs-c1{transform:rotate(-24deg) translateX(-12%)}
+#grinderSplash .gs-c2{transform:rotate(-8deg) translateX(-5%)}
+#grinderSplash .gs-c3{transform:rotate(8deg) translateX(5%)}
+#grinderSplash .gs-c4{transform:rotate(24deg) translateX(12%)}
+
+#grinderSplash .gs-center{
+  position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;
+  width:min(100%,430px);padding:0 18px;transform-origin:50% 50%;
+}
+#grinderSplash .gs-logo{
+  width:180px;height:180px;display:block;object-fit:contain;
+  border-radius:50%;clip-path:circle(49.2% at 50% 50%);
+  background:transparent!important;
+  filter:drop-shadow(0 9px 16px rgba(0,0,0,.62)) drop-shadow(0 0 10px rgba(21,91,189,.18));
+  will-change:transform,rotate,opacity;backface-visibility:hidden;
+  animation:gsLogoPop 1s cubic-bezier(.2,1.4,.4,1) both,
+            gsLogoSpin 1.4s .1s ease-out both;
+}
+#grinderSplash .gs-brand{
+  margin-top:clamp(12px,2.6vh,26px);display:flex;flex-direction:column;align-items:center;
+  transform:rotate(-5deg);transform-origin:50% 50%;
+  opacity:0;animation:gsBrandIn .6s .9s cubic-bezier(.2,1.2,.4,1) forwards;
+  will-change:transform,opacity;
+}
+#grinderSplash .gs-stackup{
+  font-family:'GrinderSplashBrush','Bebrush',sans-serif!important;
+  font-size:clamp(28px,9vw,40px)!important;font-weight:400!important;
+  line-height:.9!important;letter-spacing:1.5px!important;white-space:nowrap!important;
+  color:#ece9e4!important;text-shadow:0 4px 12px rgba(0,0,0,.65)!important;
+}
+#grinderSplash .gs-grinder{
+  margin-top:.04em!important;
+  font-family:'GrinderSplashRage','Road Rage','GrinderSplashBrush',sans-serif!important;
+  font-size:clamp(64px,21vw,92px)!important;font-weight:400!important;
+  line-height:.85!important;letter-spacing:2px!important;white-space:nowrap!important;
+  background:linear-gradient(180deg,rgba(95,150,235,.98) 0%,rgba(21,91,189,.90) 42%,rgba(14,66,145,.72) 58%,rgba(55,120,215,.94) 100%)!important;
+  -webkit-background-clip:text!important;background-clip:text!important;
+  color:transparent!important;-webkit-text-fill-color:transparent!important;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.30)) drop-shadow(0 6px 14px rgba(21,91,189,.42))!important;
+}
+
+@keyframes gsCardsIn{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:none}
+}
+@keyframes gsLogoPop{
+  from{transform:scale(.3);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+@keyframes gsLogoSpin{
+  from{rotate:-180deg}
+  to{rotate:0deg}
+}
+@keyframes gsBrandIn{
+  from{opacity:0;transform:rotate(-5deg) translateY(14px) scale(.9)}
+  to{opacity:1;transform:rotate(-5deg)}
+}
+@keyframes gsSimpleFade{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+@media (max-width:390px){
+  #grinderSplash .gs-logo{width:172px;height:172px}
+}
+@media (max-width:360px){
+  #grinderSplash .gs-logo{width:164px;height:164px}
+}
+@media (prefers-reduced-motion:reduce){
+  #grinderSplash .gs-cards,
+  #grinderSplash .gs-logo,
+  #grinderSplash .gs-brand{
+    animation:gsSimpleFade .35s ease both!important;
+  }
+  #grinderSplash .gs-logo{transform:none!important;rotate:0deg!important}
+  #grinderSplash .gs-brand{transform:rotate(-5deg)!important}
+}
+</style>
+
 </head>
 <body>
+
+<div id="grinderSplash" aria-hidden="true">
+  <div class="gs-cards" id="grinderSplashCards">
+    <div class="gs-card gs-c1"><i>A<br>♣</i><b>♣</b><i class="gs-r">A<br>♣</i></div>
+    <div class="gs-card gs-c2"><i>A<br>♦</i><b>♦</b><i class="gs-r">A<br>♦</i></div>
+    <div class="gs-card gs-c3"><i>A<br>♥</i><b>♥</b><i class="gs-r">A<br>♥</i></div>
+    <div class="gs-card gs-c4"><i>A<br>♠</i><b>♠</b><i class="gs-r">A<br>♠</i></div>
+  </div>
+  <div class="gs-center" id="grinderSplashCenter">
+    <img class="gs-logo" id="grinderSplashLogo" src="assets/logo-stackup-440.png" alt="">
+    <div class="gs-brand" id="grinderSplashBrand">
+      <div class="gs-stackup">STACKUP HOLD'EM</div>
+      <div class="gs-grinder">GRINDER</div>
+    </div>
+  </div>
+</div>
+
 
 
 <style>
@@ -1123,5 +1269,67 @@ html body #googleLoginCard.on .chev{color:#6fa4ff!important}
   });
 })();
 </script>
+
+<script id="grinderSplashScript">
+/* GRINDER splash timing mirrors the WRAPS opening while remaining isolated. */
+(function(){
+  var splash=document.getElementById('grinderSplash');
+  if(!splash)return;
+
+  var center=document.getElementById('grinderSplashCenter');
+  var logo=document.getElementById('grinderSplashLogo');
+  var brand=document.getElementById('grinderSplashBrand');
+  var cards=document.getElementById('grinderSplashCards');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var exitAt=reduce?900:2300;
+
+  function beginExit(){
+    if(!splash||!splash.isConnected)return;
+
+    /* Freeze the final entry state before removing animations so they cannot
+       override the exit transition. Then force reflow, as in the WRAPS logic. */
+    if(logo){
+      logo.style.opacity='1';
+      logo.style.transform='scale(1)';
+      logo.style.rotate='0deg';
+      logo.style.animation='none';
+    }
+    if(brand){
+      brand.style.opacity='1';
+      brand.style.transform='rotate(-5deg)';
+      brand.style.animation='none';
+    }
+    if(cards){
+      cards.style.opacity='1';
+      cards.style.transform='none';
+      cards.style.animation='none';
+    }
+
+    void splash.offsetWidth;
+
+    if(center){
+      center.style.transition=reduce?'opacity .35s ease':'opacity .35s ease,transform .35s ease';
+      center.style.opacity='0';
+      if(!reduce)center.style.transform='scale(.94)';
+    }
+
+    window.setTimeout(function(){
+      splash.style.transition='opacity .5s ease';
+      splash.style.opacity='0';
+
+      window.setTimeout(function(){
+        if(splash&&splash.parentNode)splash.parentNode.removeChild(splash);
+        var style=document.getElementById('grinderSplashStyle');
+        var script=document.getElementById('grinderSplashScript');
+        if(style&&style.parentNode)style.parentNode.removeChild(style);
+        if(script&&script.parentNode)script.parentNode.removeChild(script);
+      },500);
+    },320);
+  }
+
+  window.setTimeout(beginExit,exitAt);
+})();
+</script>
+
 </body>
 </html>
