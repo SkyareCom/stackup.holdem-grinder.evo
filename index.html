@@ -997,7 +997,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     // limites só evitam corte do avatar pela tela; não alteram a mesa.
     return [
       Math.max(23,Math.min(W-23,x)),
-      Math.max(23,Math.min(H-23,y))
+      Math.max(23,Math.min(H-23,y-(k===0?22:0)))
     ];
   }
   const sectionHead=document.createElement('div');sectionHead.className='sectionhead';
