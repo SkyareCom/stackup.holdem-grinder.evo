@@ -1211,15 +1211,14 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
 
     window.setTimeout(async()=>{
+      let advanced=false;
       try{
         if(window.StackUpSpotsClient?.available()){
-          await loadSolverSpot(true);
+          advanced=!!(await loadSolverSpot(true));
         }
       }finally{
         setSpotActionsBusy(false);
-        if(!tb.hidden&&(!SOLVER_SPOT||!window.StackUpSpotsClient?.available())){
-          renderTable();
-        }
+        if(!tb.hidden&&!advanced)renderTable();
       }
     },animationMs);
   });
