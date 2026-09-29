@@ -10,7 +10,8 @@ const BIN=process.env.STACKUP_DCFR_BIN||join(ROOT,".stackup","dcfr-solver");
 const WORK=join(ROOT,".stackup","solver-bank");
 const OUT=join(ROOT,"data","solver");
 const PREFLOP_ITERATIONS=Math.max(100_000,Number(process.env.STACKUP_PREFLOP_ITERATIONS||10_000_000));
-const POSTFLOP_ITERATIONS=Math.max(50,Number(process.env.STACKUP_POSTFLOP_ITERATIONS||250));
+const POSTFLOP_ITERATIONS=Math.max(50,Number(process.env.STACKUP_POSTFLOP_ITERATIONS||120));
+const RANGE_MIN_WEIGHT=Math.max(0,Math.min(0.25,Number(process.env.STACKUP_RANGE_MIN_WEIGHT||0.02)));
 const POSITION_ORDER=["SB","BB","UTG","HJ","CO","BTN"];
 const TABLE_POSITIONS=["BTN","SB","BB","UTG","UTG+1","UTG+2","MP","LJ","HJ","CO"];
 const BOARDS={
@@ -56,7 +57,7 @@ function normalizeActionLabel(label){
 }
 function rangeString(range){
   return Object.entries(range||{})
-    .filter(([,w])=>Number(w)>0)
+    .filter(([,w])=>Number(w)>=RANGE_MIN_WEIGHT)
     .sort(([a],[b])=>a.localeCompare(b))
     .map(([hand,w])=>hand+":"+Number(w).toFixed(8).replace(/0+$/,"").replace(/\.$/,""))
     .join(",");
@@ -172,7 +173,8 @@ for(const matchup of selected){
         "--raise-sizes","50,100",
         "--max-raises","2",
         "--allin-threshold","0.67",
-        "--allin-pot-ratio","3"
+        "--allin-pot-ratio","3",
+        "--skip-cum-strategy"
       ],{maxBuffer:16*1024*1024});
       const raw=JSON.parse(await readFile(rawPath,"utf8"));
       const normalized=normalizeRaw(raw);
