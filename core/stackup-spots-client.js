@@ -193,11 +193,17 @@
   async function answer(payload){
     state.lastAnswer=payload||null;
     try{
-      global.StackUpGrinder?.storage?.set?.('last_solver_answer',{
+      const entry={
         ...(payload||{}),
         source:state.source,
         answeredAt:new Date().toISOString()
-      });
+      };
+      const storage=global.StackUpGrinder?.storage;
+      storage?.set?.('last_solver_answer',entry);
+      const previous=storage?.get?.('solver_answer_history',[]);
+      const history=Array.isArray(previous)?previous:[];
+      history.push(entry);
+      storage?.set?.('solver_answer_history',history.slice(-1000));
     }catch(_){}
     if(baseUrl())return rawRequest(cfg.answerPath,{method:'POST',body:payload||{}});
     return {ok:true,status:200,data:{accepted:true,source:'static'}};
