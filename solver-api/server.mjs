@@ -9,7 +9,7 @@ const PORT=Number(process.env.PORT||3000);
 const SOLVER_BIN=process.env.STACKUP_DCFR_BIN||"/usr/local/bin/dcfr-solver";
 const CHARTS_PATH=process.env.STACKUP_PREFLOP_CHARTS||"/opt/stackup/preflop_charts.json";
 const MATCHUPS_PATH=process.env.STACKUP_PREFLOP_MATCHUPS||"/opt/stackup/matchups.json";
-const POSTFLOP_ITERATIONS=Math.max(50,Number(process.env.STACKUP_POSTFLOP_ITERATIONS||250));
+const POSTFLOP_ITERATIONS=Math.max(50,Number(process.env.STACKUP_POSTFLOP_ITERATIONS||120));
 const ALLOWED_ORIGINS=new Set(
   String(process.env.CORS_ORIGINS||"https://skyarecom.github.io,http://localhost:3000,http://127.0.0.1:5500")
     .split(",").map(v=>v.trim()).filter(Boolean)
