@@ -955,17 +955,50 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return pos[Math.floor(spotRandomHero*pos.length)%pos.length];
   }
   function seatPointOutside(feltLeft,top,feltW,feltH,k,n,W,H){
-    // 10 jogadores em pontos igualmente espaçados numa elipse externa à mesa.
-    // A mesa grande permanece exatamente do mesmo tamanho.
+    // 10 jogadores igualmente distribuidos ao redor da elipse.
+    // O CENTRO de cada avatar nasce na borda e e empurrado para fora
+    // pela normal local o suficiente para o circulo inteiro ficar fora.
     const cx=feltLeft+feltW/2,cy=top+feltH/2;
+    const rx=feltW/2,ry=feltH/2;
 
-    // Centro dos avatares sempre fora do aro, sem sair do viewport.
-    const rx=Math.min(feltW/2+34,cx-34,W-cx-34);
-    const ry=Math.min(feltH/2+40,cy-46,H-cy-46);
+    // aproxima angulos por comprimento de arco para espacamento visual uniforme
+    const steps=720;
+    const pts=[];
+    let total=0,px=cx,py=cy+ry;
+    for(let i=0;i<=steps;i++){
+      const a=Math.PI/2+(Math.PI*2*i/steps);
+      const x=cx+Math.cos(a)*rx,y=cy+Math.sin(a)*ry;
+      if(i>0)total+=Math.hypot(x-px,y-py);
+      pts.push([a,total]);
+      px=x;py=y;
+    }
+    const target=(total*k)/n;
+    let lo=0,hi=pts.length-1;
+    while(lo<hi){
+      const mid=(lo+hi)>>1;
+      if(pts[mid][1]<target)lo=mid+1;else hi=mid;
+    }
+    const a=pts[Math.min(lo,pts.length-1)][0];
+    const ca=Math.cos(a),sa=Math.sin(a);
 
-    // HERO começa embaixo; os demais avançam em passos iguais de 36 graus.
-    const a=Math.PI/2+(Math.PI*2*k/n);
-    return [cx+Math.cos(a)*rx,cy+Math.sin(a)*ry];
+    // ponto exato no arco da mesa
+    const bx=cx+ca*rx,by=cy+sa*ry;
+
+    // normal externa da elipse
+    let nx=ca/Math.max(rx,1),ny=sa/Math.max(ry,1);
+    const nl=Math.hypot(nx,ny)||1;
+    nx/=nl;ny/=nl;
+
+    // avatar = 44px (raio 22). Aro/glow ~11px + 7px de respiro.
+    const clearance=40;
+    const x=bx+nx*clearance;
+    const y=by+ny*clearance;
+
+    // limites só evitam corte do avatar pela tela; não alteram a mesa.
+    return [
+      Math.max(23,Math.min(W-23,x)),
+      Math.max(23,Math.min(H-23,y))
+    ];
   }
   const sectionHead=document.createElement('div');sectionHead.className='sectionhead';
   sectionHead.innerHTML='<img src="assets/logo-stackup-200.png" alt="StackUp Holdem"><div class="sectiontitle" id="sectiontitle">HOME</div>';
