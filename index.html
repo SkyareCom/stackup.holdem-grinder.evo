@@ -767,6 +767,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 #app2{position:fixed;inset:0;z-index:100;background:#1a1a1a;display:flex;justify-content:center}
 #app2[hidden]{display:none!important}
 </style>
+<script src="core/stackup-spots-engine.js"></script>
+<script src="core/stackup-spots-client.js"></script>
 <script>
 (function(){
   /* REGRA DE TRADUCAO: todo novo item deve ser criado simultaneamente em PT, EN e ES. */
@@ -936,6 +938,69 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const spotRandomCount=RANDOM_COUNTS[Math.floor(Math.random()*RANDOM_COUNTS.length)];
   const spotRandomHero=Math.random();
 
+  // Solver-backed SPOTS: a camada visual existente continua intacta.
+  // Sem endpoint configurado, o app usa exatamente os dados fallback acima.
+  let SOLVER_SPOT=null;
+  let solverSpotLoading=false;
+
+  function selectedValues(id){
+    const S=sel[id];
+    if(!S)return [];
+    return [...S].filter(v=>v!=='all'&&v!=='random');
+  }
+  function selectedOne(id){
+    const v=selectedValues(id);
+    return v.length===1?v[0]:null;
+  }
+  function buildSolverSpotFilters(){
+    const mode=selectedOne('mode');
+    const street=selectedOne('street');
+    const phase=selectedOne('phase');
+    const pos=selectedOne('pos');
+    const stack=selectedOne('stack');
+    const special={};
+    ADV_SECS.forEach(s=>{
+      const values=selectedValues(s.id);
+      if(values.length)special[s.id]=values;
+    });
+    return {
+      gameType:mode==='cash'?'CASH':mode==='mtt'?'TOURNAMENT':null,
+      street:street==='pre'?'PRE-FLOP':street==='flop'?'FLOP':street==='turn'?'TURN':street==='river'?'RIVER':null,
+      phase:phase||null,
+      heroPosition:pos||null,
+      effectiveStack:stack?Number(String(stack).replace(/bb$/i,'')):null,
+      tableSize:10,
+      special:Object.keys(special).length?JSON.stringify(special):null
+    };
+  }
+  function solverSpotView(pos){
+    if(!SOLVER_SPOT||!window.StackUpSpotsEngine)return null;
+    try{
+      return window.StackUpSpotsEngine.toViewModel(SOLVER_SPOT,{positions:pos,fallbackStacks:DEMO_STK});
+    }catch(_){
+      return null;
+    }
+  }
+  async function loadSolverSpot(force){
+    const client=window.StackUpSpotsClient;
+    if(!client||!client.available()||solverSpotLoading)return null;
+    if(SOLVER_SPOT&&!force)return SOLVER_SPOT;
+    solverSpotLoading=true;
+    try{
+      const spot=await client.next(buildSolverSpotFilters());
+      if(spot){
+        SOLVER_SPOT=spot;
+        if(!tb.hidden){
+          renderSpotActions();
+          requestAnimationFrame(renderTable);
+        }
+      }
+      return spot;
+    }finally{
+      solverSpotLoading=false;
+    }
+  }
+
   const nf=(v,d)=>v.toLocaleString(L()==='en'?'en-US':'pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
   function spotMode(){
     if(sel.mode&&sel.mode.has('cash'))return 'cash';
@@ -950,6 +1015,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return 10;
   }
   function resolveHeroPosition(pos){
+    const solved=solverSpotView(pos);
+    if(solved&&pos.includes(solved.heroPosition))return solved.heroPosition;
     const requested=sel.pos?[...sel.pos].find(p=>p!=='all'&&pos.includes(p)):null;
     if(requested)return requested;
     return pos[Math.floor(spotRandomHero*pos.length)%pos.length];
@@ -1019,11 +1086,49 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const a=SPOT_ACTION_LABELS[L()]||SPOT_ACTION_LABELS.pt;
     spotActions.innerHTML='<div class="spotactionrow primary">'+a.slice(0,4).map((x,i)=>'<button class="spotaction" data-spot-action="'+['check','call','fold','raise'][i]+'">'+x+'</button>').join('')+'</div><div class="spotactionrow raise">'+a.slice(4).map((x,i)=>'<button class="spotaction" data-spot-action="'+['raise1','raise2','allin'][i]+'">'+x+'</button>').join('')+'</div>';
   }
-  spotActions.addEventListener('click',e=>{const b=e.target.closest('.spotaction');if(!b)return;b.classList.add('on');setTimeout(()=>b.classList.remove('on'),180);});
+  spotActions.addEventListener('click',e=>{
+    const b=e.target.closest('.spotaction');if(!b)return;
+    b.classList.add('on');setTimeout(()=>b.classList.remove('on'),180);
+
+    const pos=POSN[resolveSpotCount()]||POSN[10];
+    const view=solverSpotView(pos);
+    const engine=window.StackUpSpotsEngine;
+    if(!SOLVER_SPOT||!view||!engine)return;
+
+    const result=engine.evaluate(SOLVER_SPOT,view.handKey,b.dataset.spotAction);
+    try{
+      window.StackUpGrinder?.analytics?.track?.('solver_spot_answered',{
+        spot_id:view.id,
+        solver:view.solver,
+        solve_id:view.solveId,
+        street:view.street,
+        hero_position:view.heroPosition,
+        hand:view.handKey,
+        ui_action:b.dataset.spotAction,
+        solver_action:result.selected?.action||null,
+        solver_frequency:Number(result.frequency)||0
+      });
+    }catch(_){}
+
+    const client=window.StackUpSpotsClient;
+    if(client&&client.available()){
+      client.answer({
+        spotId:view.id,
+        solveId:view.solveId,
+        solver:view.solver,
+        hand:view.handKey,
+        uiAction:b.dataset.spotAction,
+        solverAction:result.selected?.action||null,
+        frequency:Number(result.frequency)||0
+      }).catch(()=>{});
+      window.setTimeout(()=>loadSolverSpot(true),220);
+    }
+  });
 
   function renderTable(){
     const W=tb.clientWidth,H=tb.clientHeight;if(!W||!H)return;
     const n=resolveSpotCount(),pos=POSN[n]||POSN[9];
+    const solved=solverSpotView(pos);
     const heroPos=resolveHeroPosition(pos),h0=Math.max(0,pos.indexOf(heroPos));
     // Mesa GRANDE: ocupa o centro; jogadores usam a faixa externa, sem reduzir o feltro.
     const feltLeft=Math.max(64,W*.17),feltRight=W-feltLeft;
@@ -1031,20 +1136,28 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const feltW=feltRight-feltLeft,feltH=bot-top;
 
     let html=`<div class="felt" style="left:${feltLeft}px;top:${top}px;width:${feltW}px;height:${feltH}px"></div>`;
+    const heroCards=solved&&solved.heroCards.length>=2?solved.heroCards:HERO_CARDS;
 
     for(let k=0;k<n;k++){
       const p=pos[(h0+k)%n],hero=k===0,[x,y]=seatPointOutside(feltLeft,top,feltW,feltH,k,n,W,H);
-      const hand=hero?`<div class="herohand">${HERO_CARDS.map(card).join('')}</div>`:'';
-      html+=`<div class="seat${hero?' hero':''}" style="left:${x}px;top:${y}px">${hand}<div class="playerbox"><div class="av" data-pos="${p}">${p}</div><div class="stk">${fmtStack(DEMO_STK[k%DEMO_STK.length])}</div></div></div>`;
+      const hand=hero?`<div class="herohand">${heroCards.map(card).join('')}</div>`:'';
+      const stack=solved&&Number.isFinite(Number(solved.stackForPosition[p]))
+        ?Number(solved.stackForPosition[p])
+        :DEMO_STK[k%DEMO_STK.length];
+      html+=`<div class="seat${hero?' hero':''}" style="left:${x}px;top:${y}px">${hand}<div class="playerbox"><div class="av" data-pos="${p}">${p}</div><div class="stk">${fmtStack(stack)}</div></div></div>`;
 
 
     }
 
-    const cy=top+feltH*.45-18,sidePot=0;
-    const potValue=DEMO_BETS.reduce((sum,v)=>sum+v,0);
+    const cy=top+feltH*.45-18;
+    const boardCards=solved?solved.board:DEMO_BOARD;
+    const potValue=solved?Number(solved.pot)||0:DEMO_BETS.reduce((sum,v)=>sum+v,0);
+    const sidePots=solved&&Array.isArray(solved.sidePots)?solved.sidePots:[];
     const pots=[`<div class="potline">${TR[L()].pot}: ${fmtStack(potValue)}</div>`];
-    if(sidePot>0)pots.push(`<div class="potline side">${TR[L()].side} 1: ${fmtStack(sidePot)}</div>`);
-    html+=`<div class="centerbox" style="top:${cy}px"><div class="board">${DEMO_BOARD.map(card).join('')}</div>${pots.join('')}</div>`;
+    sidePots.forEach((value,i)=>{
+      if(Number(value)>0)pots.push(`<div class="potline side">${TR[L()].side} ${i+1}: ${fmtStack(Number(value))}</div>`);
+    });
+    html+=`<div class="centerbox" style="top:${cy}px"><div class="board">${boardCards.map(card).join('')}</div>${pots.join('')}</div>`;
     tb.innerHTML=html;
   }
   try{new ResizeObserver(()=>{if(!tb.hidden)renderTable();}).observe(tb);}catch(e){}
@@ -1058,6 +1171,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       $('#page .slot').hidden=true;
       renderSpotActions();
       requestAnimationFrame(renderTable);
+      loadSolverSpot(false).catch(()=>{});
     }
   }
 
