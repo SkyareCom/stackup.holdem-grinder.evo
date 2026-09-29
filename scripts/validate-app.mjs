@@ -28,23 +28,31 @@ const config=JSON.parse(fs.readFileSync(new URL('../config/grinder.product.json'
 if(config?.product?.id!=='grinder') failures.push('product config must identify grinder');
 
 const auth=JSON.parse(fs.readFileSync(new URL('../config/auth.json',import.meta.url),'utf8'));
-if(auth?.environment!=='closed_test') failures.push('auth environment must remain closed_test during the 14-day test phase');
-if(auth?.policy!=='google_only') failures.push('closed-test auth policy must remain google_only');
-if(auth?.providers?.google?.enabled!==true) failures.push('Google must be enabled for closed testing');
-for(const provider of ['stackup_id','whatsapp','biometrics']){
-  if(auth?.providers?.[provider]?.enabled!==false) failures.push(provider+' must remain disabled during closed testing');
-}
-if(!html.includes('id="googleLoginCard"')) failures.push('Grinder Google login card is missing');
 const loginHtml=html.slice(0,html.indexOf('<script>\nconst T='));
-if(/data-a="(?:wa|stackid|bio|google)"/.test(loginHtml)){
-  failures.push('legacy active auth action detected on closed-test login screen');
-}
-if(!loginHtml.includes('class="btn login-disabled bio"')) failures.push('disabled biometric card must remain visible during closed testing');
-if(!loginHtml.includes('class="btn login-disabled wa"')) failures.push('disabled WhatsApp card must remain visible during closed testing');
-if(loginHtml.includes('stackid')) failures.push('Stack ID must remain hidden during closed testing');
 if(!html.includes('<script src="core/stackup-auth.js"></script>')) failures.push('StackUp auth runtime is missing');
-if(!auth?.providers?.google?.client_id){
-  console.warn('GRINDER AUTH WARNING: Google Client ID is not configured yet; real Google sign-in will remain disabled.');
+if(!html.includes('id="googleLoginCard"')) failures.push('Grinder Google login card is missing');
+
+if(auth?.environment==='development'){
+  if(auth?.policy!=='development_bypass') failures.push('development auth policy must be development_bypass');
+  if(auth?.require_auth!==false) failures.push('development must allow direct app entry');
+}else if(auth?.environment==='closed_test'){
+  if(auth?.policy!=='google_only') failures.push('closed-test auth policy must be google_only');
+  if(auth?.require_auth!==true) failures.push('closed test must require authentication');
+  if(auth?.providers?.google?.enabled!==true) failures.push('Google must be enabled for closed testing');
+  for(const provider of ['stackup_id','whatsapp','biometrics']){
+    if(auth?.providers?.[provider]?.enabled!==false) failures.push(provider+' must remain disabled during closed testing');
+  }
+  if(/data-a="(?:wa|stackid|bio|google)"/.test(loginHtml)){
+    failures.push('legacy active auth action detected on closed-test login screen');
+  }
+  if(!loginHtml.includes('class="btn login-disabled bio"')) failures.push('disabled biometric card must remain visible during closed testing');
+  if(!loginHtml.includes('class="btn login-disabled wa"')) failures.push('disabled WhatsApp card must remain visible during closed testing');
+  if(loginHtml.includes('stackid')) failures.push('Stack ID must remain hidden during closed testing');
+  if(!auth?.providers?.google?.client_id){
+    failures.push('Google Client ID must be configured for closed testing');
+  }
+}else{
+  failures.push('unsupported auth environment: '+String(auth?.environment));
 }
 for(const plan of ['free','edge','full']){
   if(!config?.plans?.[plan]) failures.push('missing plan '+plan);
@@ -69,5 +77,6 @@ console.log('- inline scripts:',scripts.length);
 console.log('- index bytes:',Buffer.byteLength(html,'utf8'));
 console.log('- plans: FREE / EDGE / FULL');
 console.log('- product analytics: grinder');
-console.log('- auth policy: closed-test Google only');
-console.log('- Google Client ID:',auth?.providers?.google?.client_id?'configured':'PENDING');
+console.log('- auth environment:',auth?.environment);
+console.log('- auth policy:',auth?.policy);
+console.log('- require auth:',auth?.require_auth);
