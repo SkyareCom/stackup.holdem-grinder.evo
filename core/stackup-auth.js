@@ -1,6 +1,7 @@
 /* StackUp Hold'em Grinder — authentication boundary.
+   Development: direct entry by config.
    Closed testing: Google only.
-   Post-test providers stay disabled in config and can be enabled without rebuilding the login UI. */
+   Post-test providers stay disabled until explicitly enabled. */
 (function(global){
   'use strict';
 
@@ -48,7 +49,7 @@
     const res=await fetch(CONFIG_URL,{cache:'no-store',credentials:'same-origin'});
     if(!res.ok)throw new Error('auth_config_'+res.status);
     const cfg=await res.json();
-    if(!cfg||cfg.policy!=='google_only')throw new Error('invalid_auth_policy');
+    if(!cfg||!cfg.environment||!cfg.policy)throw new Error('invalid_auth_config');
     STATE.config=cfg;
     return cfg;
   }
@@ -174,8 +175,15 @@
     STATE.initializing=true;
     try{
       configureCard(false);
-      status(msg('loading'),'');
       const cfg=await loadConfig();
+      if(cfg.require_auth===false||cfg.policy==='development_bypass'){
+        status('');
+        runtime()?.analytics?.track('app_open',{entry_method:'development_bypass'});
+        global.dispatchEvent(new CustomEvent('stackup:auth:bypass',{detail:{environment:cfg.environment}}));
+        enterApp();
+        return;
+      }
+      status(msg('loading'),'');
       const google=cfg.providers&&cfg.providers.google;
       if(!google||!google.enabled)throw new Error('google_disabled');
       if(!google.client_id){
