@@ -28,11 +28,13 @@ scripts.forEach((s,i)=>{
 
 const tournamentMathPath=new URL('../core/stackup-tournament-math.js',import.meta.url);
 const catalogPath=new URL('../core/stackup-scenario-catalog.js',import.meta.url);
+const aiPlannerPath=new URL('../core/stackup-ai-scenario-planner.js',import.meta.url);
 const sequencerPath=new URL('../core/stackup-training-sequencer.js',import.meta.url);
 const spotsClientPath=new URL('../core/stackup-spots-client.js',import.meta.url);
 const serverPath=new URL('../solver-api/server.mjs',import.meta.url);
 const tournamentMath=fs.readFileSync(tournamentMathPath,'utf8');
 const catalog=fs.readFileSync(catalogPath,'utf8');
+const aiPlanner=fs.readFileSync(aiPlannerPath,'utf8');
 const sequencer=fs.readFileSync(sequencerPath,'utf8');
 try{
   const mathWindow={};
@@ -56,6 +58,20 @@ try{
   if(counts?.advance!==104)failures.push('scenario catalog must contain exactly 104 ADVANCE cards, found '+String(counts?.advance));
   if(fakeWindow.StackUpScenarioCatalog?.MIN_SPOTS!==1500)failures.push('scenario catalog minimum must be 1500 spots per card');
 }catch(error){failures.push('scenario catalog syntax/runtime error: '+error.message);}
+try{
+  const plannerWindow={};
+  new Function('window',catalog)(plannerWindow);
+  new Function('window',aiPlanner)(plannerWindow);
+  const contract=plannerWindow.StackUpScenarioCatalog.get('aggr_special','squeeze');
+  const filters={heroPositions:['BTN'],effectiveStacks:[20],streets:['PRE-FLOP']};
+  const prompt=plannerWindow.StackUpAIScenarioPlanner.buildPrompt(contract,filters,[]);
+  if(!prompt||!prompt.includes('É PROIBIDO')||!prompt.includes('SQUEEZE'))failures.push('AI planner prompt guardrail missing');
+  const bad=plannerWindow.StackUpAIScenarioPlanner.validateProposal({
+    heroPosition:'BTN',villainPositions:['BB'],street:'PRE-FLOP',effectiveStack:20,potType:'SRP',
+    phase:'LATE',tournamentType:'REGULAR',actionHistory:[],bestAction:'RAISE'
+  },contract,filters);
+  if(bad!==null)failures.push('AI planner must reject proposed correct actions');
+}catch(error){failures.push('AI scenario planner syntax/runtime error: '+error.message);}
 try{new Function(sequencer);}
 catch(error){failures.push('training sequencer syntax error: '+error.message);}
 try{new Function(spotsClient);}
@@ -65,6 +81,12 @@ if(!html.includes('<script src="core/stackup-tournament-math.js"></script>')){
 }
 if(!html.includes('<script src="core/stackup-scenario-catalog.js"></script>')){
   failures.push('scenario catalog script is missing from index');
+}
+if(!html.includes('<script src="core/stackup-ai-scenario-planner.js"></script>')){
+  failures.push('AI scenario planner script is missing from index');
+}
+if(html.indexOf('stackup-scenario-catalog.js')>html.indexOf('stackup-ai-scenario-planner.js')){
+  failures.push('scenario catalog must load before AI scenario planner');
 }
 if(!html.includes('<script src="core/stackup-training-sequencer.js"></script>')){
   failures.push('training sequencer script is missing from index');
