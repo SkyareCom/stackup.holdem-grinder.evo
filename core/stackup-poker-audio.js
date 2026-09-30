@@ -3,7 +3,7 @@
 (function(global){
   'use strict';
 
-  let ctx=null, master=null, unlocked=false, pendingHero=false;
+  let ctx=null, master=null, unlocked=false;
 
   function audioContext(){
     if(ctx)return ctx;
@@ -12,7 +12,7 @@
     try{
       ctx=new Ctx();
       master=ctx.createGain();
-      master.gain.value=.16;
+      master.gain.value=.38;
       master.connect(ctx.destination);
       return ctx;
     }catch(_){ return null; }
@@ -96,27 +96,41 @@
   async function unlock(){
     const c=audioContext();
     if(!c)return false;
-    try{ if(c.state==='suspended')await c.resume(); }catch(_){}
+    try{
+      if(c.state!=='running')await c.resume();
+    }catch(_){}
     unlocked=c.state==='running';
-    if(unlocked&&pendingHero){pendingHero=false;cue('hero');}
     return unlocked;
   }
 
   function play(kind){
     const c=audioContext();
     if(!c)return false;
-    if(!unlocked||c.state!=='running'){
-      if(String(kind||'').toLowerCase()==='hero'||String(kind||'').toLowerCase()==='turn')pendingHero=true;
-      return false;
-    }
-    cue(kind);
-    return true;
+    const fire=()=>{
+      if(c.state!=='running')return false;
+      unlocked=true;
+      cue(kind);
+      return true;
+    };
+    if(fire())return true;
+    try{
+      const resumed=c.resume();
+      if(resumed&&typeof resumed.then==='function'){
+        resumed.then(()=>{fire();}).catch(()=>{});
+      }
+    }catch(_){}
+    return false;
   }
 
   function setVolume(value){
     const v=Math.max(0,Math.min(1,Number(value)||0));
-    if(master)master.gain.value=.16*v;
+    if(master)master.gain.value=.38*v;
   }
+
+  const gestureUnlock=()=>{unlock().catch(()=>{});};
+  global.addEventListener?.('pointerdown',gestureUnlock,{capture:true});
+  global.addEventListener?.('touchstart',gestureUnlock,{capture:true,passive:true});
+  global.addEventListener?.('keydown',gestureUnlock,{capture:true});
 
   global.StackUpPokerAudio=Object.freeze({unlock,play,setVolume});
 })(window);
