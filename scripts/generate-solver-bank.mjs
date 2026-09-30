@@ -73,6 +73,29 @@ function displayBoard(raw){
     return rank==="T"?"10"+c.slice(-1).toLowerCase():rank+c.slice(-1).toLowerCase();
   })||[];
 }
+function matchupContext(matchup,heroPosition){
+  const name=String(matchup?.matchup||"");
+  const tags=[];
+  let potType="SRP";
+  if(/open vs .* 3bet/i.test(name)){
+    potType="3BET";
+    const m=name.match(/^(\S+) open vs (\S+) 3bet/i);
+    if(m){
+      const opener=m[1].toUpperCase(),bettor=m[2].toUpperCase();
+      if(heroPosition===opener)tags.push("call_3bet");
+      if(heroPosition===bettor){
+        const roles=postflopRoles(opener,bettor);
+        tags.push(roles?.ip===bettor?"3bet_ip":"3bet_oop");
+      }
+    }
+  }else if(/4bet vs .* call/i.test(name)){
+    potType="4BET";
+    tags.push("pot_4bet");
+    const m=name.match(/^(\S+) 4bet vs (\S+) call/i);
+    if(m&&heroPosition===m[2].toUpperCase())tags.push("call_4bet");
+  }
+  return {potType,tags};
+}
 function hashId(value){
   return createHash("sha256").update(value).digest("hex").slice(0,24);
 }
@@ -134,16 +157,13 @@ const preflop=charts.map(chart=>{
   };
 });
 
-const byOop=new Map();
-for(const matchup of matchups){
-  const roles=postflopRoles(matchup.opener?.position,matchup.caller?.position);
-  if(roles&&!byOop.has(roles.oop))byOop.set(roles.oop,matchup);
-}
-const selected=[...byOop.entries()]
-  .filter(([pos])=>["SB","BB","UTG","HJ","CO"].includes(pos))
-  .map(([,m])=>m);
+const MAX_MATCHUPS=Math.max(1,Math.min(matchups.length,Number(process.env.STACKUP_MAX_MATCHUPS||30)));
+const selected=matchups
+  .filter(m=>postflopRoles(m.opener?.position,m.caller?.position))
+  .slice(0,MAX_MATCHUPS);
 
-console.log("Selected postflop matchups:",selected.map(m=>m.matchup).join(" | "));
+console.log("Selected postflop matchups:",selected.length);
+console.log(selected.map(m=>m.matchup).join(" | "));
 
 const postflop=[];
 for(const matchup of selected){
@@ -184,6 +204,7 @@ for(const matchup of selected){
       const stackBb=Number(matchup.eff_stack_chips)/2;
       const potBb=Number(matchup.pot_chips)/2;
       const id="dcfr-"+street.toLowerCase()+"-"+hashId(key);
+      const context=matchupContext(matchup,roles.oop);
       postflop.push({
         id,
         solver:"DCFR_SOLVER",
@@ -204,7 +225,9 @@ for(const matchup of selected){
           villainRange:rangeString(ip.range),
           actionHistory:[],
           positions:["UTG","HJ","CO","BTN","SB","BB"],
-          playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,stackBb]))
+          playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,stackBb])),
+          potType:context.potType,
+          tags:context.tags
         },
         strategy:normalized.strategy
       });
@@ -230,7 +253,9 @@ const manifest={
   postflop:{
     iterations:POSTFLOP_ITERATIONS,
     spots:postflop.length,
+    matchupCount:selected.length,
     matchups:selected.map(m=>m.matchup),
+    potTypes:["SRP","3BET","4BET"],
     streets:["FLOP","TURN","RIVER"]
   }
 };
