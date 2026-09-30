@@ -242,8 +242,122 @@
     if(chosen>=20&&chosen>=best*.65)return 'correct';
     return 'adjustable';
   }
+  const INDICATOR_IMPACT={
+    pt:[
+      'Define a profundidade da árvore e quanto espaço existe para decisões nas streets seguintes.',
+      'IP/OOP altera realização de equity, frequência de check e capacidade de pressionar o range adversário.',
+      'A iniciativa determina quem representa melhor as mãos fortes e quem tende a carregar mais checks.',
+      'SRP, 3-bet e 4-bet mudam drasticamente a largura dos ranges e os sizings eficientes.',
+      'Quanto mais jogadores ativos, menor tende a ser a frequência de blefes e maior a exigência de força/equity.',
+      'A matriz de abertura delimita quais combos chegam legitimamente ao nó pré-flop.',
+      '3-bets e 4-bets comprimem os ranges e aumentam o valor de blockers e mãos robustas.',
+      'A propensão de fold diante de 3-bet define o quanto a pressão pré-flop pode ser ampliada.',
+      'Limps alteram a composição dos ranges e a relação entre mãos fortes, médias e especulativas.',
+      'Pot odds definem a equity mínima necessária para um call ser imediatamente justificável.',
+      'Implied odds adicionam valor quando ainda há fichas que podem ser ganhas em streets futuras.',
+      'SPR mostra o quanto do stack resta em relação ao pote e orienta compromisso, pressão e sizings.',
+      'A textura do board determina conectividade, draws, distribuição de nuts e frequência de apostas.',
+      'Nut advantage permite sustentar sizings grandes porque um range contém mais combinações muito fortes.',
+      'Range advantage influencia a frequência com que um jogador pode apostar pequenas frações do range.',
+      'Donk bet altera a ordem estratégica padrão e só é valorizado quando a árvore do spot o suporta.',
+      'A frequência de c-bet mostra quanto o agressor pode continuar pressionando naquele flop.',
+      'Delayed c-bet mede a pressão transferida para turn depois de o flop passar em check.',
+      'O sizing altera diretamente risco, recompensa, alpha do blefe e MDF do adversário.',
+      'Realização de equity mede quanto da equity teórica realmente pode ser convertida em valor.',
+      'Outs indicam quantas cartas futuras melhoram a mão para uma classe relevante de showdown.',
+      'A regra dos 2 e 4 é uma aproximação rápida da chance de completar draws no turn/river.',
+      'Card removal muda a quantidade de combinações fortes, draws e bluff-catchers disponíveis.',
+      'Fold equity é a parcela do EV agressivo que vem de o adversário abandonar imediatamente.',
+      'Double/triple barrel avalia se a história de agressão permanece coerente em streets futuras.',
+      'Aggression factor contextualiza tendências populacionais; sem amostra, não deve ser inventado.',
+      'A força absoluta da mão separa value, showdown value, bluff-catcher e blefes/draws.',
+      'Blockers ajudam a escolher combos de aposta/blefe que removem continuações fortes do adversário.',
+      'Alpha mostra o percentual mínimo de folds necessário para um blefe puro empatar no sizing usado.',
+      'MDF oferece uma referência teórica da fração mínima do range que deve continuar contra a aposta.',
+      'Check-raise combina proteção de range, value e blefes; sua frequência depende da textura e do range.',
+      'WTSD ajuda a estimar propensão de levar mãos ao showdown, mas exige histórico populacional.',
+      'W$SD ajuda a medir qualidade média das mãos que chegam ao showdown, também exigindo amostra.',
+      'EV é o critério final do solver: entre linhas comparáveis, a estratégia maximiza valor esperado.',
+      'Exploit só deve desviar do baseline GTO quando houver evidência confiável do comportamento adversário.'
+    ],
+    en:[
+      'Defines tree depth and how much decision space remains on later streets.',
+      'IP/OOP changes equity realization, checking frequency and the ability to pressure the opponent range.',
+      'Initiative shapes which player can represent strong hands more naturally and who carries more checks.',
+      'SRP, 3-bet and 4-bet pots materially change range width and efficient sizing.',
+      'More active players usually reduce bluffing frequency and demand stronger value/equity.',
+      'The opening matrix defines which combinations legitimately reach the preflop node.',
+      '3-bets and 4-bets compress ranges and increase the importance of blockers and robust hands.',
+      'Fold-to-3-bet tendency determines how much preflop pressure can be applied.',
+      'Limping changes range composition and the balance of strong, medium and speculative hands.',
+      'Pot odds define the minimum equity needed for an immediate call.',
+      'Implied odds add value when future streets can still win additional chips.',
+      'SPR shows remaining stack relative to the pot and guides commitment, pressure and sizing.',
+      'Board texture determines connectivity, draws, nut distribution and betting frequency.',
+      'Nut advantage supports larger sizing because one range contains more very strong combinations.',
+      'Range advantage influences how often a player can bet a broad portion of the range.',
+      'Donk betting changes the normal strategic order and matters only when the spot tree supports it.',
+      'C-bet frequency shows how often the aggressor can keep applying pressure on that flop.',
+      'Delayed c-bet measures pressure moved to the turn after checking the flop.',
+      'Sizing directly changes risk, reward, bluff alpha and the opponent MDF.',
+      'Equity realization measures how much theoretical equity can actually be converted into value.',
+      'Outs count future cards that improve the hand into a relevant showdown class.',
+      'The rule of 2 and 4 is a quick approximation for completing draws by turn/river.',
+      'Card removal changes the number of strong hands, draws and bluff-catchers available.',
+      'Fold equity is the part of aggressive EV created by immediate folds.',
+      'Double/triple barrels test whether continued aggression stays coherent across later streets.',
+      'Aggression factor is a population statistic and should not be fabricated without a sample.',
+      'Absolute hand class separates value, showdown value, bluff-catchers and bluffs/draws.',
+      'Blockers help choose betting/bluffing combos that remove strong opponent continuations.',
+      'Alpha is the minimum fold percentage required for a pure bluff to break even at that sizing.',
+      'MDF is a theoretical reference for the minimum portion of range that should continue.',
+      'Check-raise frequency balances protection, value and bluffs according to board and ranges.',
+      'WTSD estimates showdown tendency but requires historical population data.',
+      'W$SD estimates the quality of hands reaching showdown and also requires a sample.',
+      'EV is the solver objective: among comparable lines, strategy maximizes expected value.',
+      'Exploit should depart from the GTO baseline only when reliable opponent evidence exists.'
+    ],
+    es:[
+      'Define la profundidad del árbol y cuánto espacio de decisión queda en las siguientes calles.',
+      'IP/OOP cambia la realización de equity, la frecuencia de check y la capacidad de presionar el rango rival.',
+      'La iniciativa define quién representa mejor manos fuertes y quién carga más checks.',
+      'SRP, 3-bet y 4-bet cambian de forma importante el ancho de rangos y los sizings eficientes.',
+      'Más jugadores activos suele reducir los bluffs y exigir más fuerza/equity.',
+      'La matriz de apertura delimita qué combos llegan legítimamente al nodo preflop.',
+      '3-bets y 4-bets comprimen rangos y aumentan el valor de blockers y manos robustas.',
+      'Fold to 3-bet define cuánto puede ampliarse la presión preflop.',
+      'Los limps cambian la composición de rangos y el balance entre manos fuertes, medias y especulativas.',
+      'Pot odds definen la equity mínima necesaria para que un call sea justificable de inmediato.',
+      'Implied odds agregan valor cuando aún se pueden ganar fichas en calles futuras.',
+      'SPR muestra el stack restante respecto al bote y guía compromiso, presión y sizings.',
+      'La textura del board determina conectividad, draws, distribución de nuts y frecuencia de apuesta.',
+      'Nut advantage permite sizings grandes porque un rango contiene más combinaciones muy fuertes.',
+      'Range advantage influye en cuánto puede apostarse una parte amplia del rango.',
+      'Donk bet cambia el orden estratégico normal y sólo pesa cuando el árbol del spot lo soporta.',
+      'La frecuencia de c-bet indica cuánto puede seguir presionando el agresor en ese flop.',
+      'Delayed c-bet mide la presión trasladada al turn después de checkear el flop.',
+      'El sizing cambia directamente riesgo, recompensa, alpha del bluff y MDF del rival.',
+      'Realización de equity mide cuánta equity teórica puede convertirse realmente en valor.',
+      'Outs cuentan cartas futuras que mejoran la mano a una clase relevante de showdown.',
+      'La regla del 2 y 4 aproxima rápidamente la probabilidad de completar draws.',
+      'Card removal cambia la cantidad de manos fuertes, draws y bluff-catchers disponibles.',
+      'Fold equity es la parte del EV agresivo generada por folds inmediatos.',
+      'Double/triple barrel comprueba si la agresión sigue siendo coherente en calles futuras.',
+      'Aggression factor es una estadística poblacional y no debe inventarse sin muestra.',
+      'La fuerza absoluta separa value, showdown value, bluff-catchers y bluffs/draws.',
+      'Blockers ayudan a elegir combos que eliminan continuaciones fuertes del rival.',
+      'Alpha es el porcentaje mínimo de folds necesario para que un bluff puro quede break-even.',
+      'MDF es una referencia teórica de la fracción mínima del rango que debería continuar.',
+      'Check-raise equilibra protección, value y bluffs según textura y rangos.',
+      'WTSD estima tendencia a llegar al showdown, pero exige datos históricos.',
+      'W$SD estima la calidad de las manos que llegan al showdown y también exige muestra.',
+      'EV es el objetivo del solver: entre líneas comparables, maximiza el valor esperado.',
+      'Exploit sólo debe apartarse del baseline GTO cuando exista evidencia fiable del rival.'
+    ]
+  };
+
   function indicator(index,name,value,note,source,applicable=true){
-    return {index,name,value:value??'—',note:note||'',source:source||'spot',applicable};
+    return {index,name,value:value??'—',note:note||'',calculation:note||'',source:source||'spot',applicable};
   }
   function makeIndicators(ctx){
     const {spot,view,result,uiAction,tableState,language}=ctx;
@@ -306,7 +420,13 @@
     arr.push(indicator(33,names[32],na,'W$SD é estatística populacional/histórica, não saída deste nó','population',false));
     arr.push(indicator(34,names[33],selectedEv!==null?String(selectedEv.toFixed(4)):(handEv!==null?String(handEv.toFixed(4))+' (EV do combo/nó)':na),selectedEv!==null?'EV da ação':handEv!==null?'o arquivo expõe EV do combo, não EV individual por ação':'','solver',selectedEv!==null||handEv!==null));
     arr.push(indicator(35,names[34],exploitProfile?('perfil '+exploitProfile+' selecionado; baseline solver mantida'):'baseline GTO/solver','ajuste exploit só é afirmado quando o solver/backend devolve essa camada','solver'));
-    return arr;
+
+    const impacts=INDICATOR_IMPACT[lang(language)]||INDICATOR_IMPACT.pt;
+    return arr.map((x,i)=>Object.freeze({
+      ...x,
+      calculation:x.calculation||x.note||(x.applicable?'leitura direta do cenário/solver':'sem dados suficientes para cálculo confiável'),
+      interpretation:impacts[i]||'Indicador incorporado à decisão junto da frequência e do EV do solver.'
+    }));
   }
 
   function analyze(input){
