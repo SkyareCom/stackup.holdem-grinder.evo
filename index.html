@@ -1405,9 +1405,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const spotActions=document.createElement('div');spotActions.className='spotactions';spotActions.hidden=true;$('#page').appendChild(spotActions);
 
   const SPOT_SUPPORT_TEXT={
-    pt:{review:'REVER SPOT',next:'PRÓXIMO SPOT',save:'SALVAR TREINO',name:'NOME DO TREINO',cancel:'CANCELAR',confirm:'CONFIRMAR',waiting:'AGUARDANDO A AÇÃO DO HERÓI',analysis:'ANÁLISE DA DECISÃO',indicators:'35 INDICADORES CONSIDERADOS',saved:'TREINO SALVO NO HISTÓRICO',needName:'INFORME UM NOME PARA O TREINO',loading:'CARREGANDO SPOT...'},
-    en:{review:'REVIEW SPOT',next:'NEXT SPOT',save:'SAVE TRAINING',name:'TRAINING NAME',cancel:'CANCEL',confirm:'CONFIRM',waiting:'WAITING FOR HERO ACTION',analysis:'DECISION ANALYSIS',indicators:'35 INDICATORS CONSIDERED',saved:'TRAINING SAVED TO HISTORY',needName:'ENTER A TRAINING NAME',loading:'LOADING SPOT...'},
-    es:{review:'REVISAR SPOT',next:'SIGUIENTE SPOT',save:'GUARDAR ENTRENO',name:'NOMBRE DEL ENTRENO',cancel:'CANCELAR',confirm:'CONFIRMAR',waiting:'ESPERANDO LA ACCIÓN DEL HÉROE',analysis:'ANÁLISIS DE LA DECISIÓN',indicators:'35 INDICADORES CONSIDERADOS',saved:'ENTRENO GUARDADO EN HISTORIAL',needName:'INGRESA UN NOMBRE PARA EL ENTRENO',loading:'CARGANDO SPOT...'}
+    pt:{review:'REVER SPOT',next:'PRÓXIMO SPOT',save:'SALVAR TREINO',name:'NOME DO TREINO',cancel:'CANCELAR',confirm:'CONFIRMAR',waiting:'AGUARDANDO A AÇÃO DO HERÓI',analysis:'ANÁLISE DA DECISÃO',indicators:'35 INDICADORES CONSIDERADOS',saved:'TREINO SALVO NO HISTÓRICO',needName:'INFORME UM NOME PARA O TREINO',loading:'CARREGANDO SPOT...',coverageTitle:'CENÁRIO AINDA NÃO LIBERADO',coverageBody:'Cobertura validada: {have}/{need} spots únicos. Faltam {short}.'},
+    en:{review:'REVIEW SPOT',next:'NEXT SPOT',save:'SAVE TRAINING',name:'TRAINING NAME',cancel:'CANCEL',confirm:'CONFIRM',waiting:'WAITING FOR HERO ACTION',analysis:'DECISION ANALYSIS',indicators:'35 INDICATORS CONSIDERED',saved:'TRAINING SAVED TO HISTORY',needName:'ENTER A TRAINING NAME',loading:'LOADING SPOT...',coverageTitle:'SCENARIO NOT RELEASED YET',coverageBody:'Validated coverage: {have}/{need} unique spots. {short} remaining.'},
+    es:{review:'REVISAR SPOT',next:'SIGUIENTE SPOT',save:'GUARDAR ENTRENO',name:'NOMBRE DEL ENTRENO',cancel:'CANCELAR',confirm:'CONFIRMAR',waiting:'ESPERANDO LA ACCIÓN DEL HÉROE',analysis:'ANÁLISIS DE LA DECISIÓN',indicators:'35 INDICADORES CONSIDERADOS',saved:'ENTRENO GUARDADO EN HISTORIAL',needName:'INGRESA UN NOMBRE PARA EL ENTRENO',loading:'CARGANDO SPOT...',coverageTitle:'ESCENARIO AÚN NO LIBERADO',coverageBody:'Cobertura validada: {have}/{need} spots únicos. Faltan {short}.'}
   };
   const spotSupportStyle=document.createElement('style');
   spotSupportStyle.textContent=`
@@ -1527,6 +1527,16 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const line1=fb.querySelector('.line1'),line2=fb.querySelector('.line2');
     if(solverSpotLoading&&!SOLVER_SPOT){
       fb.className='spotfeedback waiting';line1.textContent=tx.loading;line2.textContent='';
+      spotSupport.querySelector('.spotanalysis').hidden=true;return;
+    }
+    const coverage=window.StackUpSpotsClient?.state?.coverageError;
+    if(!SOLVER_SPOT&&coverage){
+      fb.className='spotfeedback waiting';
+      line1.textContent=tx.coverageTitle;
+      line2.textContent=tx.coverageBody
+        .replace('{have}',String(coverage.candidates||0))
+        .replace('{need}',String(coverage.required||1500))
+        .replace('{short}',String(coverage.shortfall||0));
       spotSupport.querySelector('.spotanalysis').hidden=true;return;
     }
     if(entry?.answer?.analysis){
