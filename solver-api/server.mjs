@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import { readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { randomUUID } from "node:crypto";
+import { randomUUID, randomInt } from "node:crypto";
 
 const PORT=Number(process.env.PORT||3000);
 const SOLVER_BIN=process.env.STACKUP_DCFR_BIN||"/usr/local/bin/dcfr-solver";
@@ -70,6 +70,67 @@ function cleanStreet(value){
   const s=String(value||"").trim().toUpperCase().replace("PREFLOP","PRE-FLOP");
   return ["PRE-FLOP","FLOP","TURN","RIVER"].includes(s)?s:null;
 }
+function csv(value,map=v=>v){
+  return [...new Set(String(value||"").split(",").map(v=>v.trim()).filter(Boolean).map(map).filter(Boolean))];
+}
+function parseSpecial(value){
+  if(!value)return {};
+  try{
+    const parsed=JSON.parse(value);
+    return parsed&&typeof parsed==="object"&&!Array.isArray(parsed)?parsed:{};
+  }catch{return {};}
+}
+function boardTags(raw){
+  const cards=displayBoard(raw);
+  if(cards.length<3)return [];
+  const rv={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,T:10,"10":10,J:11,Q:12,K:13,A:14};
+  const ranks=cards.map(x=>rv[x.slice(0,-1).toUpperCase()]||0);
+  const suits=cards.map(x=>x.slice(-1));
+  const tags=[];
+  const unique=new Set(ranks);
+  const counts={};suits.forEach(s=>counts[s]=(counts[s]||0)+1);
+  if(unique.size<ranks.length)tags.push("board_paired");
+  if(Math.max(...Object.values(counts))>=3)tags.push("board_monotone");
+  else if(Object.values(counts).some(n=>n===2))tags.push("board_twotone");
+  const max=Math.max(...ranks),min=Math.min(...ranks);
+  if(max>=12)tags.push("board_high_card");
+  if(max<=9)tags.push("board_low");
+  const sorted=[...unique].sort((a,b)=>a-b);
+  let span=99;
+  for(let i=0;i<sorted.length;i++)for(let j=i+2;j<sorted.length;j++)span=Math.min(span,sorted[j]-sorted[i]);
+  if(span<=4||(max-min<=5&&unique.size>=3))tags.push("board_connected","board_dynamic");
+  else tags.push("board_dry","board_static");
+  return tags;
+}
+function matchupTags(hero,villain,matchup){
+  const tags=[];
+  if(hero==="BB"){
+    if(villain==="UTG")tags.push("bb_ep");
+    else if(villain==="HJ"||villain==="CO")tags.push("bb_mp");
+    else if(villain==="BTN"||villain==="SB")tags.push("bb_lp");
+  }
+  if(hero==="SB"){
+    if(villain==="UTG")tags.push("sb_ep");
+    else if(villain==="HJ")tags.push("sb_mp");
+    else if(villain==="CO"||villain==="BTN")tags.push("sb_cobtn");
+  }
+  if(/CO vs BTN/i.test(String(matchup||"")))tags.push("attack_cobtn");
+  return tags;
+}
+function specialMatches(tags,special){
+  const set=new Set(tags||[]);
+  const groups=Object.entries(special||{}).filter(([,v])=>Array.isArray(v)&&v.length);
+  return groups.every(([,values])=>values.some(v=>set.has(String(v))));
+}
+function stackMatches(actual,requested){
+  if(!requested?.length)return true;
+  const n=Number(actual);
+  return requested.some(v=>Math.abs(n-Number(v))<=5);
+}
+function randomPick(array){
+  if(!array?.length)return null;
+  return array[randomInt(array.length)];
+}
 function normalizeActionLabel(label){
   const text=String(label||"").trim();
   const compact=text.toLowerCase().replace(/[ _-]+/g,"");
@@ -110,16 +171,20 @@ function chooseStrategyHand(strategy,index=counter){
 }
 
 function preflopSpot(filters){
-  let pool=charts;
-  if(filters.heroPosition){
-    const filtered=pool.filter(c=>chartPosition(c.spot_name)===filters.heroPosition);
-    if(filtered.length)pool=filtered;
-  }
-  const chart=pick(pool);
-  if(!chart)throw new Error("preflop_charts_unavailable");
+  if(filters.phases.length)throw new Error("phase_filter_requires_icm_solver_family");
+  if(!stackMatches(100,filters.effectiveStacks))throw new Error("preflop_stack_not_available");
+  let pool=charts.filter(chart=>{
+    const hero=chartPosition(chart.spot_name);
+    if(filters.heroPositions.length&&!filters.heroPositions.includes(hero))return false;
+    const tags=["open_by_pos"];
+    if(hero==="SB")tags.push("blind_war");
+    return specialMatches(tags,filters.special);
+  });
+  const chart=randomPick(pool);
+  if(!chart)throw new Error("preflop_filter_family_unavailable");
   const heroPosition=chartPosition(chart.spot_name);
   const hands=(chart.hands||[]).filter(h=>Array.isArray(h.actions)&&h.actions.length);
-  const chosen=pick(hands,counter*17+3);
+  const chosen=randomPick(hands);
   if(!chosen)throw new Error("preflop_chart_empty");
 
   const strategy=hands.map(h=>({
@@ -150,22 +215,30 @@ function preflopSpot(filters){
       villainRange:"solver-blueprint",
       actionHistory:[],
       positions:["UTG","HJ","CO","BTN","SB","BB"],
-      playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,100]))
+      playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,100])),
+      tags:[..."open_by_pos",...(heroPosition==="SB"?["blind_war"]:[])]
     },
     strategy
   };
 }
 
-function chooseMatchup(filters){
-  let pool=matchups;
-  if(filters.heroPosition){
-    const f=pool.filter(m=>{
-      const roles=postflopRoles(m.opener?.position,m.caller?.position);
-      return roles?.oop===filters.heroPosition;
-    });
-    if(f.length)pool=f;
-  }
-  return pick(pool,counter*11+5);
+function chooseMatchup(filters,street){
+  if(filters.phases.length)throw new Error("phase_filter_requires_icm_solver_family");
+  const pool=matchups.filter(m=>{
+    const roles=postflopRoles(m.opener?.position,m.caller?.position);
+    if(!roles)return false;
+    if(filters.heroPositions.length&&!filters.heroPositions.includes(roles.oop))return false;
+    const stackBb=Number(m.eff_stack_chips)/2;
+    if(!stackMatches(stackBb,filters.effectiveStacks))return false;
+    const baseTags=[
+      ...matchupTags(roles.oop,roles.ip,m.matchup),
+      ...(street==="FLOP"?["bet_33","bet_66","overbet_125"]:[])
+    ];
+    const nonTexture={...filters.special};
+    delete nonTexture.texture_special;
+    return specialMatches(baseTags,nonTexture);
+  });
+  return randomPick(pool);
 }
 
 function run(command,args,{timeoutMs=20_000}={}){
@@ -213,11 +286,21 @@ function normalizeDcfr(raw,scenario){
 }
 
 async function solvePostflop(filters,street){
-  const matchup=chooseMatchup(filters);
-  if(!matchup)throw new Error("postflop_matchup_unavailable");
+  const matchup=chooseMatchup(filters,street);
+  if(!matchup)throw new Error("postflop_filter_family_unavailable");
   const roles=postflopRoles(matchup.opener.position,matchup.caller.position);
   if(!roles)throw new Error("postflop_roles_invalid");
-  const boardRaw=pick(BOARDS[street],counter*7+1);
+  const textureRequested=filters.special?.texture_special||[];
+  const boardPool=(BOARDS[street]||[]).filter(board=>{
+    if(!textureRequested.length)return true;
+    const tags=[
+      ...boardTags(board),
+      ...(street==="FLOP"?["bet_33","bet_66","overbet_125"]:[])
+    ];
+    return textureRequested.some(v=>tags.includes(String(v)));
+  });
+  const boardRaw=randomPick(boardPool);
+  if(!boardRaw)throw new Error("postflop_board_filter_unavailable");
   const key=[street,matchup.matchup,boardRaw,POSTFLOP_ITERATIONS].join("|");
   if(solveCache.has(key))return solveCache.get(key);
 
@@ -277,7 +360,19 @@ async function solvePostflop(filters,street){
       villainRange:rangeString(ip.range),
       actionHistory:[],
       positions:["UTG","HJ","CO","BTN","SB","BB"],
-      playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,stackBb]))
+      playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,stackBb])),
+      tags:[
+        ...matchupTags(roles.oop,roles.ip,matchup.matchup),
+        ...boardTags(boardRaw),
+        ...(street==="FLOP"?["bet_33","bet_66","overbet_125"]:[])
+      ],
+      trainingContext:{
+        phase:filters.phases,
+        tournamentType:filters.tournamentType,
+        fieldSize:filters.fieldSize,
+        opponentProfile:filters.opponentProfile,
+        extras:filters.extras
+      }
     },
     strategy:normalized.strategy
   };
@@ -294,15 +389,30 @@ function enqueuePostflop(filters,street){
 
 function parseFilters(url){
   const q=url.searchParams;
-  const street=cleanStreet(q.get("street"));
-  const heroPosition=String(q.get("heroPosition")||"").toUpperCase()||null;
+  const streets=csv(q.get("streets")||q.get("street"),cleanStreet);
+  const heroPositions=csv(q.get("heroPositions")||q.get("heroPosition"),v=>String(v).toUpperCase());
+  const effectiveStacks=csv(q.get("effectiveStacks")||q.get("effectiveStack"),v=>{
+    const n=Number(v);return Number.isFinite(n)&&n>0?n:null;
+  });
+  const phases=csv(q.get("phases")||q.get("phase"),String);
   return {
-    street,
-    heroPosition,
+    street:streets.length===1?streets[0]:null,
+    streets,
+    heroPosition:heroPositions.length===1?heroPositions[0]:null,
+    heroPositions,
     gameType:String(q.get("gameType")||"").toUpperCase()||null,
-    phase:q.get("phase")||null,
-    effectiveStack:Number(q.get("effectiveStack"))||null,
-    special:q.get("special")||null
+    phase:phases.length===1?phases[0]:null,
+    phases,
+    effectiveStack:effectiveStacks.length===1?effectiveStacks[0]:null,
+    effectiveStacks,
+    tableSize:Number(q.get("tableSize"))||null,
+    seats:q.get("seats")||null,
+    tournamentType:q.get("tournamentType")||null,
+    fieldSize:q.get("fieldSize")||null,
+    opponentProfile:q.get("opponentProfile")||null,
+    sampleSize:Number(q.get("sampleSize"))||null,
+    extras:csv(q.get("extras"),String),
+    special:parseSpecial(q.get("special"))
   };
 }
 
@@ -356,8 +466,8 @@ const server=http.createServer(async(req,res)=>{
       const filters=parseFilters(url);
       let street=filters.street;
       if(!street){
-        const rotation=["PRE-FLOP","FLOP","TURN","RIVER"];
-        street=rotation[counter%rotation.length];
+        const allowed=filters.streets.length?filters.streets:["PRE-FLOP","FLOP","TURN","RIVER"];
+        street=randomPick(allowed);
       }
       const spot=street==="PRE-FLOP"
         ?preflopSpot(filters)
