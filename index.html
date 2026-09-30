@@ -2237,8 +2237,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(a) $('.content').scrollTop=0;
     tr(); syncBack();
   }
-  function openApp(){ hist=[]; $$('.hbtn').forEach(x=>x.classList.remove('on')); show('home',false);
-    host.hidden=false; loginScreen.inert=true; }
+  function openApp(){
+    hist=[];
+    Object.keys(sub).forEach(k=>sub[k]=[]);
+    $('.hbtn').forEach(x=>x.classList.remove('on'));
+    host.hidden=false;
+    loginScreen.inert=true;
+    show('home',false,0);
+    const content=$('.content');
+    if(content)content.scrollTop=0;
+    renderHome();
+    requestAnimationFrame(()=>tr());
+  }
   host.grinderEnter=openApp;
   function backToLogin(){ host.hidden=true; loginScreen.inert=false;
     document.querySelectorAll('.actions [data-a]').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false')}); }
@@ -2247,10 +2257,35 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     $$('.hbtn').forEach(x=>x.classList.remove('on')); b.classList.add('on');
     setTimeout(()=>{ b.classList.remove('on');
       if(b.dataset.h==='back'){ if(sub[cur].length){ sub[cur].pop(); show(cur,false); } else if(cur!=='home'){ show('home',false); } else { backToLogin(); } }
-      else { Object.keys(sub).forEach(k=>sub[k]=[]); show('home',false); }
+      else {
+        Object.keys(sub).forEach(k=>sub[k]=[]);
+        historySelectedId=null;
+        historyPendingAction=null;
+        const content=$('.content');
+        if(content)content.scrollTop=0;
+        show('home',false,0);
+        renderHome();
+        requestAnimationFrame(()=>tr());
+      }
     },250);
   });
-  $$('.tab').forEach(t=>t.onclick=()=>show(t.dataset.t,true));
+  $('.tab').forEach(t=>t.onclick=()=>{
+    const target=t.dataset.t;
+    if(target==='home'){
+      // HOME no rodapé é sempre a raiz: limpa qualquer subtela antiga e
+      // força nova renderização mesmo quando HOME já está selecionado.
+      sub.home.length=0;
+      historySelectedId=null;
+      historyPendingAction=null;
+      const content=$('.content');
+      if(content)content.scrollTop=0;
+      show('home',false,0);
+      renderHome();
+      requestAnimationFrame(()=>tr());
+      return;
+    }
+    show(target,true);
+  });
   // ===== arrastar para o lado entre as telas do rodapé =====
   const TORDER=['home','train','profile','spots','menu'];
   (function(){
