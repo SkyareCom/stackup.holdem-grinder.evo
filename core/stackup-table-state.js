@@ -175,12 +175,45 @@
     state.currentBet=currentBet(state);
     return state;
   }
+  function sizingFraction(action){
+    const label=String(action?.action||action?.label||'').toLowerCase();
+    let m=label.match(/(\d+(?:\.\d+)?)\s*%/);
+    if(m)return Number(m[1])/100;
+    m=label.match(/bet\s+(\d+)\s*\/\s*(\d+)/);
+    if(m&&Number(m[2]))return Number(m[1])/Number(m[2]);
+    m=label.match(/bet\s+(\d+(?:\.\d+)?)x/);
+    if(m)return Number(m[1]);
+    return null;
+  }
+  function resolveActionTarget(state,position,action){
+    if(!state)return null;
+    const p=byPos(state,position);
+    if(!p)return null;
+    const kind=kindOf(action);
+    if(kind!=='raise'&&kind!=='jam')return null;
+    if(kind==='jam')return p.committed+p.stack;
+    const beforeBet=currentBet(state);
+    const frac=sizingFraction(action);
+    if(Number.isFinite(frac)){
+      if(beforeBet<=p.committed){
+        return Math.min(p.committed+p.stack,p.committed+Math.max(.01,frac*state.pot));
+      }
+      const toCall=Math.max(0,beforeBet-p.committed);
+      const potAfterCall=state.pot+toCall;
+      return Math.min(p.committed+p.stack,beforeBet+Math.max(.01,frac*potAfterCall));
+    }
+    const direct=amountOf(action);
+    return Number.isFinite(direct)?Math.min(p.committed+p.stack,direct):null;
+  }
+
   function applyHeroUiAction(state,result,uiAction){
     if(!state)return null;
     const selected=result?.selected||{};
     let action={kind:selected.kind||uiAction,action:selected.action||uiAction};
-    if(Number.isFinite(Number(selected.to)))action.to=Number(selected.to);
     if(uiAction==='allin')action.kind='jam';
+    const target=resolveActionTarget(state,state.heroPosition,action);
+    if(Number.isFinite(target))action.to=target;
+    else if(Number.isFinite(Number(selected.to)))action.to=Number(selected.to);
     return apply(state,state.heroPosition,action);
   }
   function snapshot(state){
@@ -198,6 +231,7 @@
     currentBet,
     apply,
     applyHeroUiAction,
+    resolveActionTarget,
     normalizeActionKind:kindOf
   });
 })(window);
