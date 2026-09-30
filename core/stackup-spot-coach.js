@@ -70,7 +70,7 @@
 
   function lang(value){ return I18N[value]?value:'pt'; }
   function t(value){ return I18N[lang(value)]; }
-  function n(value,fallback=null){ const x=Number(value); return Number.isFinite(x)?x:fallback; }
+  function n(value,fallback=null){ if(value===null||value===undefined||value==='')return fallback; const x=Number(value); return Number.isFinite(x)?x:fallback; }
   function pct(value,d=1){ return Number.isFinite(Number(value))?Number(value).toFixed(d).replace('.',',')+'%':'—'; }
   function bb(value,d=1){ return Number.isFinite(Number(value))?Number(value).toFixed(d).replace('.',',')+' BB':'—'; }
   function esc(value){ return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -125,8 +125,8 @@
     }
     if(which==='hero'&&Array.isArray(spot?.strategy)){
       const active=spot.strategy.map(h=>{
-        const best=[...(h.actions||[])].sort((a,b)=>n(b.frequency,0)-n(a.frequency,0))[0];
-        return best&&n(best.frequency,0)>=2?String(h.hand):null;
+        const aggressive=(h.actions||[]).filter(a=>['raise','jam'].includes(actionKind(a))).reduce((sum,a)=>sum+(n(a.frequency,0)||0),0);
+        return aggressive>=2?String(h.hand):null;
       }).filter(Boolean);
       if(active.length)return {explicit:false,count:active.length,weight:null,text:active.slice(0,18).join(', ')+(active.length>18?'…':'')};
     }
@@ -212,15 +212,18 @@
     const currentBet=n(tableState?.currentBet,0)||0;
     const committed=n(hero?.committed,0)||0;
     const callCost=Math.max(0,currentBet-committed);
-    const potOdds=callCost>0?(callCost/(pot+callCost))*100:null;
+    const hasCall=(result?.strategy||[]).some(a=>actionKind(a)==='call');
+    const potOdds=hasCall&&callCost>0?(callCost/(pot+callCost))*100:null;
     const sel=result?.selected||null;
     const kind=actionKind(sel||{kind:result?.uiAction});
     const target=n(sel?.to);
     let risk=null;
     if(kind==='raise'&&target!==null)risk=Math.max(0,target-committed);
     if(kind==='jam')risk=Math.max(0,n(hero?.stack,eff)||eff);
-    const sizingPct=risk!==null&&pot>0?(risk/pot)*100:null;
-    const alpha=risk!==null&&risk>0&&pot>=0?(risk/(pot+risk))*100:null;
+    const street=String(view?.street||scenario.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
+    const postflop=street!=='PRE-FLOP';
+    const sizingPct=postflop&&risk!==null&&pot>0?(risk/pot)*100:null;
+    const alpha=postflop&&risk!==null&&risk>0&&pot>=0?(risk/(pot+risk))*100:null;
     const mdf=alpha!==null?100-alpha:null;
     return {pot,eff,spr,currentBet,committed,callCost,potOdds,target,risk,sizingPct,alpha,mdf};
   }
@@ -268,7 +271,8 @@
     const arr=[];
     arr.push(indicator(1,names[0],bb(s.effectiveStack),m.eff?('pote '+bb(m.pot)+' · SPR '+(m.spr?.toFixed(2)??'—')):'', 'scenario'));
     const hi=POS_ORDER.indexOf(String(view?.heroPosition||s.heroPosition||'').toUpperCase()),vi=POS_ORDER.indexOf(String(view?.villainPosition||s.villainPosition||'').toUpperCase());
-    arr.push(indicator(2,names[1],(view?.heroPosition||s.heroPosition||'—')+' vs '+(view?.villainPosition||s.villainPosition||'—'),hi>=0&&vi>=0?(hi>vi?'posição posterior na ordem nominal':'posição anterior na ordem nominal'):'','scenario'));
+    const relNote=hi>=0&&vi>=0?(street==='PRE-FLOP'?'ordem pré-flop depende da posição e blinds':(hi>vi?'herói tende a agir depois pós-flop (IP)':'herói tende a agir antes pós-flop (OOP)')):'';
+    arr.push(indicator(2,names[1],(view?.heroPosition||s.heroPosition||'—')+' vs '+(view?.villainPosition||s.villainPosition||'—'),relNote,'scenario'));
     arr.push(indicator(3,names[2],init?('iniciativa: '+init):(street==='PRE-FLOP'?'nó sem ação agressiva anterior':nap),'', 'actionHistory',street==='PRE-FLOP'||!!init));
     arr.push(indicator(4,names[3],inferPotType(s),'','scenario'));
     arr.push(indicator(5,names[4],active?String(active)+' ativos / '+String(tableCount||active)+' lugares':na,active&&active>2?'potencial multiway':'heads-up / não multiway','tableState'));
