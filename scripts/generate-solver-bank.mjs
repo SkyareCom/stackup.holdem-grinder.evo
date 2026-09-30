@@ -207,28 +207,34 @@ function normalizeRaw(raw){
     version:raw.version||"dcfr-cli"
   };
 }
-function nodeSemanticTags({node,player,street,matchup,roles}){
+function nodeSemanticTags({node,player,street,matchup,roles,strategy}){
   const actions=nodeActionLabels(node);
   const tags=[];
-  const lower=actions.map(x=>x.toLowerCase());
   const actingPos=player==="IP"?roles.ip:roles.oop;
   const opener=String(matchup?.opener?.position||"").toUpperCase();
   const caller=String(matchup?.caller?.position||"").toUpperCase();
-  const facingBet=actions.length>0&&normalizeActionLabel(actions[actions.length-1]).kind==="raise";
+  const pathKinds=actions.map(x=>normalizeActionLabel(x).kind);
+  const lastPath=actions[actions.length-1]||"";
+  const facingBet=pathKinds.length>0&&pathKinds[pathKinds.length-1]==="raise";
+  const available=[...new Set((strategy||[]).flatMap(h=>(h.actions||[]).map(a=>String(a.action||a.label||""))))];
+
   if(node==="root"&&actingPos===caller)tags.push("donk_bet");
-  if(actions.length===1&&normalizeActionLabel(actions[0]).kind==="check"){
+  if(actions.length===1&&pathKinds[0]==="check"){
     if(actingPos===opener)tags.push("miss_cbet");
     else tags.push("vs_missed_cbet");
   }
-  if(actions.length>=2){
-    const a=actions.map(x=>normalizeActionLabel(x).kind);
-    const last2=a.slice(-2).join(">");
+  if(pathKinds.length>=2){
+    const last2=pathKinds.slice(-2).join(">");
     if(last2==="check>raise")tags.push("check_raise");
-    if(a.length>=2&&a[a.length-2]==="raise"&&a[a.length-1]==="raise")tags.push("bet_fold");
+    if(last2==="raise>raise")tags.push("bet_fold");
   }
   if(street==="RIVER"&&facingBet)tags.push("river_bluff_catch");
   if(street==="RIVER"&&tags.includes("check_raise"))tags.push("river_check_raise");
-  for(const label of [...actions,...((node&&node!=="root")?[]:[])]){
+
+  const facedPct=actionFraction(lastPath);
+  if(facingBet&&Number.isFinite(facedPct)&&facedPct>1.05)tags.push("vs_overbet");
+
+  for(const label of available){
     const pct=actionFraction(label);
     if(!Number.isFinite(pct))continue;
     if(Math.abs(pct-.25)<.02)tags.push("bet_25");
@@ -239,8 +245,8 @@ function nodeSemanticTags({node,player,street,matchup,roles}){
     if(Math.abs(pct-1)<.04)tags.push("pot_bet");
     if(Math.abs(pct-1.25)<.06)tags.push("overbet_125");
     if(Math.abs(pct-1.5)<.06)tags.push("overbet_150");
-    if(pct>1.05&&facingBet)tags.push("vs_overbet");
   }
+  if(street==="RIVER"&&node==="root"&&actingPos===roles.oop&&tags.includes("bet_25"))tags.push("block_bet_20_25");
   return [...new Set(tags)];
 }
 
@@ -302,6 +308,8 @@ for(const matchup of selected){
       const key=[street,matchup.matchup,boardRaw,POSTFLOP_ITERATIONS].join("|");
       const rawPath=join(WORK,hashId(key)+".json");
       console.log("Solving",key);
+      const betSizes=street==="RIVER"?"25,33,50,66,75,100,125,150":"33,75";
+      const raiseSizes=street==="RIVER"?"50,75,100":"75";
       await execFileAsync(BIN,[
         "solve",
         "--street",street.toLowerCase(),
@@ -313,48 +321,68 @@ for(const matchup of selected){
         "--iterations",String(POSTFLOP_ITERATIONS),
         "--format","json",
         "--output",rawPath,
-        // Memory-safe postflop tree for GitHub-hosted bank generation. The live API can use
-        // deeper trees; the static bank prioritizes reliability and representative training spots.
-        "--bet-sizes","33,75",
-        "--raise-sizes","75",
+        // Memory-safe tree. River carries the wide sizing grid because it has no future chance
+        // streets; flop/turn stay compact and feed sequential solves later through range propagation.
+        "--bet-sizes",betSizes,
+        "--raise-sizes",raiseSizes,
         "--max-raises","1",
         "--allin-threshold","0.67",
         "--allin-pot-ratio","3",
         "--skip-cum-strategy"
-      ],{maxBuffer:16*1024*1024});
+      ],{maxBuffer:32*1024*1024});
       const raw=JSON.parse(await readFile(rawPath,"utf8"));
       const normalized=normalizeRaw(raw);
       await rm(rawPath,{force:true}).catch(()=>{});
       const stackBb=Number(matchup.eff_stack_chips)/2;
       const potBb=Number(matchup.pot_chips)/2;
-      const id="dcfr-"+street.toLowerCase()+"-"+hashId(key);
-      const context=matchupContext(matchup,roles.oop);
-      postflop.push({
-        id,
-        solver:"DCFR_SOLVER",
-        version:normalized.version,
-        solveId:hashId("solve|"+key),
-        convergence:normalized.convergence,
-        matchup:matchup.matchup,
-        scenario:{
-          gameType:"TOURNAMENT",
-          street,
-          tableSize:6,
-          heroPosition:roles.oop,
-          villainPosition:roles.ip,
-          effectiveStack:stackBb,
-          pot:potBb,
-          board:displayBoard(boardRaw),
-          heroRange:rangeString(oop.range),
-          villainRange:rangeString(ip.range),
-          actionHistory:[],
-          positions:["UTG","HJ","CO","BTN","SB","BB"],
-          playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,stackBb])),
-          potType:context.potType,
-          tags:context.tags
-        },
-        strategy:normalized.strategy
-      });
+      const baseId="dcfr-"+street.toLowerCase()+"-"+hashId(key);
+      for(const node of normalized.nodes){
+        const actingRole=node.player==="IP"?"IP":"OOP";
+        const heroPosition=actingRole==="IP"?roles.ip:roles.oop;
+        const villainPosition=actingRole==="IP"?roles.oop:roles.ip;
+        const sim=simulateNodeHistory(node.node,roles,potBb,stackBb);
+        const heroRemaining=actingRole==="IP"?sim.remaining.IP:sim.remaining.OOP;
+        const villainRemaining=actingRole==="IP"?sim.remaining.OOP:sim.remaining.IP;
+        const effectiveStack=Math.max(0,Math.min(heroRemaining,villainRemaining));
+        const context=matchupContext(matchup,heroPosition);
+        const semantic=nodeSemanticTags({node:node.node,player:node.player,street,matchup,roles,strategy:node.strategy});
+        const nodeKey=node.node==="root"?"root":hashId(node.node);
+        const id=baseId+"-"+nodeKey;
+        const playerStacks=Object.fromEntries(TABLE_POSITIONS.map(p=>[p,effectiveStack]));
+        playerStacks[roles.oop]=Math.max(0,sim.remaining.OOP);
+        playerStacks[roles.ip]=Math.max(0,sim.remaining.IP);
+        postflop.push({
+          id,
+          solver:"DCFR_SOLVER",
+          version:normalized.version,
+          solveId:hashId("solve|"+key+"|"+node.node+"|"+node.player),
+          convergence:normalized.convergence,
+          matchup:matchup.matchup,
+          node:node.node,
+          actingRole,
+          scenario:{
+            gameType:"TOURNAMENT",
+            street,
+            tableSize:6,
+            heroPosition,
+            villainPosition,
+            effectiveStack:+effectiveStack.toFixed(4),
+            pot:sim.pot,
+            currentBet:sim.currentBet,
+            board:displayBoard(boardRaw),
+            heroRange:actingRole==="IP"?rangeString(ip.range):rangeString(oop.range),
+            villainRange:actingRole==="IP"?rangeString(oop.range):rangeString(ip.range),
+            actionHistory:sim.history,
+            positions:["UTG","HJ","CO","BTN","SB","BB"],
+            playerStacks,
+            potType:context.potType,
+            tags:[...new Set([...context.tags,...semantic])],
+            solverNode:node.node,
+            solverPlayer:node.player
+          },
+          strategy:node.strategy
+        });
+      }
     }
   }
 }
