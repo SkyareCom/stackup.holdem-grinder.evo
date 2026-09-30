@@ -26,6 +26,12 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Checkout DCFR-SOLVER
+        run: |
+          mkdir -p .stackup
+          rm -rf .stackup/DCFR-SOLVER
+          git clone --depth 1 https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
         with:
@@ -33,8 +39,6 @@ jobs:
 
       - name: Build DCFR-SOLVER
         run: |
-          mkdir -p .stackup
-          git clone --depth 1 https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
           cargo build --release --manifest-path .stackup/DCFR-SOLVER/Cargo.toml
           cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-solver
           chmod +x .stackup/dcfr-solver
