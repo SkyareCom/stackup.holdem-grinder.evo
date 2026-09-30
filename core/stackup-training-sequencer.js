@@ -78,19 +78,35 @@
     }
   }
 
+  function values(value,map){
+    const raw=Array.isArray(value)?value:(value===undefined||value===null||value===''?[]:[value]);
+    return [...new Set(raw.map(map||String).filter(v=>v!==null&&v!==undefined&&v!==''))];
+  }
+
   function normalizedFilters(filters){
     const f=filters||{};
+    const streets=values(f.streets??f.street,normStreet);
+    const heroPositions=values(f.heroPositions??f.heroPosition,normPosition);
+    const effectiveStacks=values(f.effectiveStacks??f.effectiveStack,v=>{
+      const n=Number(v);return Number.isFinite(n)&&n>0?n:null;
+    });
+    const phases=values(f.phases??f.phase,v=>String(v));
     return {
       gameType:f.gameType?String(f.gameType).toUpperCase():null,
-      street:normStreet(f.street),
-      heroPosition:normPosition(f.heroPosition),
-      effectiveStack:Number.isFinite(Number(f.effectiveStack))?Number(f.effectiveStack):null,
-      phase:f.phase?String(f.phase):null,
+      street:streets.length===1?streets[0]:null,
+      streets,
+      heroPosition:heroPositions.length===1?heroPositions[0]:null,
+      heroPositions,
+      effectiveStack:effectiveStacks.length===1?effectiveStacks[0]:null,
+      effectiveStacks,
+      phase:phases.length===1?phases[0]:null,
+      phases,
       tableSize:Number.isFinite(Number(f.tableSize))?Number(f.tableSize):null,
       tournamentType:f.tournamentType?String(f.tournamentType):null,
       fieldSize:f.fieldSize?String(f.fieldSize):null,
       opponentProfile:f.opponentProfile?String(f.opponentProfile):null,
       seats:f.seats?String(f.seats):null,
+      sampleSize:Number.isFinite(Number(f.sampleSize))?Number(f.sampleSize):null,
       extras:Array.isArray(f.extras)?[...f.extras]:[],
       special:parseSpecial(f.special)
     };
@@ -197,14 +213,16 @@
 
   function compatible(spot,filters){
     const s=spot?.scenario||{};
-    if(filters.street&&normStreet(s.street)!==filters.street)return false;
-    if(filters.heroPosition&&normPosition(s.heroPosition)!==filters.heroPosition)return false;
+    const street=normStreet(s.street);
+    const heroPosition=normPosition(s.heroPosition);
+    if(filters.streets.length&&!filters.streets.includes(street))return false;
+    if(filters.heroPositions.length&&!filters.heroPositions.includes(heroPosition))return false;
     if(filters.gameType&&s.gameType&&String(s.gameType).toUpperCase()!==filters.gameType)return false;
-    if(filters.effectiveStack!==null){
+    if(filters.effectiveStacks.length){
       const stack=Number(s.effectiveStack);
-      if(Number.isFinite(stack)&&Math.abs(stack-filters.effectiveStack)>.01)return false;
+      if(Number.isFinite(stack)&&!filters.effectiveStacks.some(v=>Math.abs(stack-v)<.01))return false;
     }
-    if(filters.phase&&s.phase&&String(s.phase)!==filters.phase)return false;
+    if(filters.phases.length&&s.phase&&!filters.phases.includes(String(s.phase)))return false;
     if(filters.tableSize&&Number(s.tableSize)&&Number(s.tableSize)!==filters.tableSize){
       // Current static bank is 6-max solver data rendered on a 10-seat training table.
       // Enforce tableSize only when scenario explicitly opts into trainingTableSize semantics.
