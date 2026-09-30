@@ -216,7 +216,7 @@ function preflopSpot(filters){
       actionHistory:[],
       positions:["UTG","HJ","CO","BTN","SB","BB"],
       playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,100])),
-      tags:[..."open_by_pos",...(heroPosition==="SB"?["blind_war"]:[])]
+      tags:["open_by_pos",...(heroPosition==="SB"?["blind_war"]:[])]
     },
     strategy
   };
