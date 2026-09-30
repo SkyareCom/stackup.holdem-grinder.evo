@@ -768,6 +768,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 #app2[hidden]{display:none!important}
 </style>
 <script src="core/stackup-spots-engine.js"></script>
+<script src="core/stackup-training-sequencer.js"></script>
 <script src="core/stackup-spots-client.js"></script>
 <script src="core/stackup-table-state.js"></script>
 <script>
@@ -966,22 +967,41 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   }
   function buildSolverSpotFilters(){
     const mode=selectedOne('mode');
-    const street=selectedOne('street');
-    const phase=selectedOne('phase');
-    const pos=selectedOne('pos');
-    const stack=selectedOne('stack');
+    const seats=selectedOne('seats');
+    const tournamentType=selectedOne('ttype');
+    const fieldSize=selectedOne('fsize');
+    const opponentProfile=selectedOne('fskill');
+    const sampleSize=Number(selectedOne('hands'))||null;
+    const extras=selectedValues('extras');
+    const phases=selectedValues('phase');
+    const positions=selectedValues('pos');
+    const streetValues=selectedValues('street');
+    const stackValues=selectedValues('stack');
+    const streets=streetValues.map(v=>v==='pre'?'PRE-FLOP':v==='flop'?'FLOP':v==='turn'?'TURN':v==='river'?'RIVER':null).filter(Boolean);
+    const effectiveStacks=stackValues.map(v=>Number(String(v).replace(/bb$/i,''))).filter(v=>Number.isFinite(v)&&v>0);
     const special={};
     ADV_SECS.forEach(s=>{
       const values=selectedValues(s.id);
       if(values.length)special[s.id]=values;
     });
+    const tableSize=seats&&/^s\d+$/.test(seats)?Number(seats.slice(1)):null;
     return {
       gameType:mode==='cash'?'CASH':mode==='mtt'?'TOURNAMENT':null,
-      street:street==='pre'?'PRE-FLOP':street==='flop'?'FLOP':street==='turn'?'TURN':street==='river'?'RIVER':null,
-      phase:phase||null,
-      heroPosition:pos||null,
-      effectiveStack:stack?Number(String(stack).replace(/bb$/i,'')):null,
-      tableSize:10,
+      seats:seats||null,
+      tableSize,
+      tournamentType:tournamentType||null,
+      fieldSize:fieldSize||null,
+      opponentProfile:opponentProfile||null,
+      sampleSize,
+      extras,
+      phase:phases.length===1?phases[0]:null,
+      phases,
+      heroPosition:positions.length===1?positions[0]:null,
+      heroPositions:positions,
+      street:streets.length===1?streets[0]:null,
+      streets,
+      effectiveStack:effectiveStacks.length===1?effectiveStacks[0]:null,
+      effectiveStacks,
       special:Object.keys(special).length?JSON.stringify(special):null
     };
   }
@@ -1255,7 +1275,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
           uiAction,
           solverAction:result.selected?.action||null,
           frequency:Number(result.frequency)||0,
-          strategy:result.strategy
+          strategy:result.strategy,
+          trainingSignature:SOLVER_SPOT?.trainingSignature||null,
+          trainingFamily:SOLVER_SPOT?.trainingFamily||null,
+          trainingCycle:SOLVER_SPOT?.trainingCycle||null,
+          filters:buildSolverSpotFilters()
         }).catch(()=>{});
       }
     }
