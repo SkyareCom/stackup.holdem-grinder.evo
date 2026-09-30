@@ -191,7 +191,8 @@ function preflopSpot(filters){
     hand:h.hand,
     actions:h.actions.map(a=>{
       const n=normalizeActionLabel(a.action);
-      return {...n,frequency:Number(a.prob||0)*100};
+      const ev=Number(a.ev??a.expectedValue??a.expected_value);
+      return {...n,frequency:Number(a.prob||0)*100,ev:Number.isFinite(ev)?ev:null};
     })
   }));
 
@@ -270,7 +271,8 @@ function normalizeDcfr(raw,scenario){
     ev:Number(combo.ev??0),
     actions:(combo.actions||[]).map(a=>{
       const n=normalizeActionLabel(a.action);
-      return {...n,frequency:Number(a.weight??a.frequency??0)*100};
+      const ev=Number(a.ev??a.expectedValue??a.expected_value);
+      return {...n,frequency:Number(a.weight??a.frequency??0)*100,ev:Number.isFinite(ev)?ev:null};
     })
   })).filter(h=>h.hand&&h.actions.length);
   if(!strategy.length)throw new Error("dcfr_combo_strategy_missing");
