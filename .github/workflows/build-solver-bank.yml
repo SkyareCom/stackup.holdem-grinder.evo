@@ -7,6 +7,9 @@ on:
       - ".github/workflows/build-solver-bank.yml"
       - "scripts/generate-solver-bank.mjs"
       - "scripts/merge-solver-shards.mjs"
+      - "scripts/audit-scenario-coverage.mjs"
+      - "core/stackup-scenario-catalog.js"
+      - "data/solver/pushfold-hu-v1.json"
 
 permissions:
   contents: write
