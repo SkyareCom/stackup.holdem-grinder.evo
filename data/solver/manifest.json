@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-30T01:31:10.795Z",
+  "solver": {
+    "id": "DCFR_SOLVER",
+    "upstream": "exinori/DCFR-SOLVER",
+    "license": "MIT"
+  },
+  "preflop": {
+    "iterations": 10000000,
+    "spots": 5,
+    "hands": 845,
+    "effectiveStackBb": 100
+  },
+  "postflop": {
+    "iterations": 120,
+    "spots": 30,
+    "matchups": [
+      "UTG vs HJ",
+      "UTG vs SB",
+      "UTG vs BB",
+      "HJ vs CO",
+      "CO vs BTN"
+    ],
+    "streets": [
+      "FLOP",
+      "TURN",
+      "RIVER"
+    ]
+  }
+}
