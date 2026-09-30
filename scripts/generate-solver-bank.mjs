@@ -308,9 +308,13 @@ for(const matchup of selected){
       const key=[street,matchup.matchup,boardRaw,POSTFLOP_ITERATIONS].join("|");
       const rawPath=join(WORK,hashId(key)+".json");
       console.log("Solving",key);
-      const betSizes=street==="RIVER"?"25,33,50,66,75,100,125,150":"33,75";
-      const raiseSizes=street==="RIVER"?"50,75,100":"75";
-      await execFileAsync(BIN,[
+      // Keep the sizing tree solver-native but inside the upstream DCFR CLI's
+      // stable branching limit. The previous 8-size river grid can panic the
+      // upstream solver (index out of bounds). If a rich river tree fails,
+      // retry with the compact proven-safe tree instead of aborting the bank.
+      const primaryBetSizes=street==="RIVER"?"25,50,75,100,125":"33,75";
+      const primaryRaiseSizes=street==="RIVER"?"50,100":"75";
+      const solveArgs=(betSizes,raiseSizes)=>[
         "solve",
         "--street",street.toLowerCase(),
         "--board",boardRaw,
@@ -321,15 +325,21 @@ for(const matchup of selected){
         "--iterations",String(POSTFLOP_ITERATIONS),
         "--format","json",
         "--output",rawPath,
-        // Memory-safe tree. River carries the wide sizing grid because it has no future chance
-        // streets; flop/turn stay compact and feed sequential solves later through range propagation.
         "--bet-sizes",betSizes,
         "--raise-sizes",raiseSizes,
         "--max-raises","1",
         "--allin-threshold","0.67",
         "--allin-pot-ratio","3",
         "--skip-cum-strategy"
-      ],{maxBuffer:32*1024*1024});
+      ];
+      try{
+        await execFileAsync(BIN,solveArgs(primaryBetSizes,primaryRaiseSizes),{maxBuffer:32*1024*1024});
+      }catch(error){
+        if(street!=="RIVER")throw error;
+        console.warn("River rich tree failed; retrying compact tree:",error?.message||error);
+        await rm(rawPath,{force:true}).catch(()=>{});
+        await execFileAsync(BIN,solveArgs("33,75","75"),{maxBuffer:32*1024*1024});
+      }
       const raw=JSON.parse(await readFile(rawPath,"utf8"));
       const normalized=normalizeRaw(raw);
       await rm(rawPath,{force:true}).catch(()=>{});
