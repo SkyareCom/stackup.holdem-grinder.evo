@@ -1094,14 +1094,22 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(entry?.answer){setSpotActionsBusy(true);return;}
     setSpotActionsBusy(true);
 
-    const raw=Array.isArray(spot?.scenario?.actionHistory)?spot.scenario.actionHistory:[];
-    const history=raw.filter(a=>spotHistoryActor(a)&&['check','call','fold','raise','bet','jam'].includes(spotHistoryKind(a)));
+    const scenario=spot?.scenario||{};
+    const raw=Array.isArray(scenario.actionHistory)?scenario.actionHistory:[];
+    let history=raw.filter(a=>spotHistoryActor(a)&&['check','call','fold','raise','bet','jam'].includes(spotHistoryKind(a)));
+    const street=String(scenario.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
+    if(!history.length&&street==='PRE-FLOP'&&/rfi/i.test(String(spot?.id||scenario.node||''))){
+      const order=Array.isArray(scenario.positions)?scenario.positions.map(x=>String(x).toUpperCase()):[];
+      const heroPos=String(scenario.heroPosition||'').toUpperCase();
+      const heroIndex=order.indexOf(heroPos);
+      if(heroIndex>0)history=order.slice(0,heroIndex).map(position=>({position,kind:'fold'}));
+    }
     if(history.length){
       tb.querySelectorAll('.seat:not(.hero)').forEach(seat=>seat.classList.remove('spot-state-folded','spot-state-allin'));
       for(const action of history){
         if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
         showSpotActorAction(action);
-        await spotSleep(560);
+        await spotSleep(460);
       }
     }
     if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
