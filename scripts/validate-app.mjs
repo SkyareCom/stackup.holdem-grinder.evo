@@ -32,6 +32,10 @@ const aiPlannerPath=new URL('../core/stackup-ai-scenario-planner.js',import.meta
 const sequencerPath=new URL('../core/stackup-training-sequencer.js',import.meta.url);
 const spotsClientPath=new URL('../core/stackup-spots-client.js',import.meta.url);
 const serverPath=new URL('../solver-api/server.mjs',import.meta.url);
+const serverPlannerPath=new URL('../solver-api/scenario-planner.mjs',import.meta.url);
+const generatorPath=new URL('./generate-solver-bank.mjs',import.meta.url);
+const mergerPath=new URL('./merge-solver-shards.mjs',import.meta.url);
+const coverageAuditPath=new URL('./audit-scenario-coverage.mjs',import.meta.url);
 const tournamentMath=fs.readFileSync(tournamentMathPath,'utf8');
 const catalog=fs.readFileSync(catalogPath,'utf8');
 const aiPlanner=fs.readFileSync(aiPlannerPath,'utf8');
@@ -72,8 +76,16 @@ try{
   },contract,filters);
   if(bad!==null)failures.push('AI planner must reject proposed correct actions');
 }catch(error){failures.push('AI scenario planner syntax/runtime error: '+error.message);}
-try{new Function(sequencer);}
-catch(error){failures.push('training sequencer syntax error: '+error.message);}
+try{
+  new Function(sequencer);
+  const seqWindow={};
+  new Function('window',catalog)(seqWindow);
+  new Function('window',sequencer)(seqWindow);
+  const combos=seqWindow.StackUpTrainingSequencer?.handClassCombos;
+  if(combos?.('AA')?.length!==6)failures.push('preflop pair must expand to 6 exact combos');
+  if(combos?.('AKs')?.length!==4)failures.push('preflop suited hand must expand to 4 exact combos');
+  if(combos?.('AKo')?.length!==12)failures.push('preflop offsuit hand must expand to 12 exact combos');
+}catch(error){failures.push('training sequencer syntax/runtime error: '+error.message);}
 try{new Function(spotsClient);}
 catch(error){failures.push('spots client syntax error: '+error.message);}
 if(!html.includes('<script src="core/stackup-tournament-math.js"></script>')){
@@ -106,10 +118,24 @@ if(!sequencer.includes('trainingSignature')||!sequencer.includes('recentFamilies
 if(!html.includes('heroPositions:positions')||!html.includes('effectiveStacks')){
   failures.push('multi-select solver filters are not wired from the UI');
 }
-const serverCheck=spawnSync(process.execPath,['--check',fileURLToPath(serverPath)],{encoding:'utf8'});
-if(serverCheck.status!==0){
-  failures.push('solver API syntax error: '+String(serverCheck.stderr||serverCheck.stdout||'unknown').trim());
+for(const [label,path] of [
+  ['solver API',serverPath],
+  ['server AI planner',serverPlannerPath],
+  ['solver bank generator',generatorPath],
+  ['solver shard merger',mergerPath],
+  ['scenario coverage audit',coverageAuditPath]
+]){
+  const check=spawnSync(process.execPath,['--check',fileURLToPath(path)],{encoding:'utf8'});
+  if(check.status!==0)failures.push(label+' syntax error: '+String(check.stderr||check.stdout||'unknown').trim());
 }
+try{
+  const pushfold=JSON.parse(fs.readFileSync(new URL('../data/solver/pushfold-hu-v1.json',import.meta.url),'utf8'));
+  if(pushfold?.version!=='v1')failures.push('push-fold chart version must be v1');
+  if(Number(pushfold?.final_exploitability_bb_per_100)>=0.05)failures.push('push-fold chart fails exploitability gate');
+  const depths=pushfold?.stack_depths_bb||[];
+  if(depths.length!==14||depths[0]!==2||depths[depths.length-1]!==15)failures.push('push-fold chart must cover 2-15 BB');
+  if(!pushfold?.charts?.sb_jam||!pushfold?.charts?.bb_call_vs_jam)failures.push('push-fold chart must include both HU decision roles');
+}catch(error){failures.push('push-fold chart validation error: '+error.message);}
 
 const config=JSON.parse(fs.readFileSync(new URL('../config/grinder.product.json',import.meta.url),'utf8'));
 if(config?.product?.id!=='grinder') failures.push('product config must identify grinder');
