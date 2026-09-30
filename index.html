@@ -1119,7 +1119,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
   }
 
-  const nf=  const nf=(v,d)=>v.toLocaleString(L()==='en'?'en-US':'pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+  const nf=(v,d)=>v.toLocaleString(L()==='en'?'en-US':'pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
   function spotMode(){
     if(sel.mode&&sel.mode.has('cash'))return 'cash';
     return 'tournament';
@@ -1363,7 +1363,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
   });
 
-  function renderSpotActions(){  function renderSpotActions(){
+  function renderSpotActions(){
     const a=SPOT_ACTION_LABELS[L()]||SPOT_ACTION_LABELS.pt;
     spotActions.innerHTML='<div class="spotactionrow primary">'+a.slice(0,4).map((x,i)=>'<button class="spotaction" data-spot-action="'+['check','call','fold','raise'][i]+'">'+x+'</button>').join('')+'</div><div class="spotactionrow raise">'+a.slice(4).map((x,i)=>'<button class="spotaction" data-spot-action="'+['raise1','raise2','allin'][i]+'">'+x+'</button>').join('')+'</div>';
   }
@@ -1557,7 +1557,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     },animationMs);
   });
 
-  function renderTable(){  function renderTable(){
+  function renderTable(){
     const W=tb.clientWidth,H=tb.clientHeight;if(!W||!H)return;
     const n=resolveSpotCount(),pos=POSN[n]||POSN[9];
     const solved=solverSpotView(pos);
@@ -1615,7 +1615,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   }
 
 
-  // ===== ADVANCE:  // ===== ADVANCE: todas as secoes na mesma tela, sem subpagina =====
+  // ===== ADVANCE: todas as secoes na mesma tela, sem subpagina =====
   const adv=document.createElement('div');adv.className='advancewrap';adv.hidden=true;$('#page').appendChild(adv);
   function renderAdvance(){
     const t=TR[L()];
