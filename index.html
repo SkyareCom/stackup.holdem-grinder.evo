@@ -944,6 +944,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   // Sem endpoint configurado, o app usa exatamente os dados fallback acima.
   let SOLVER_SPOT=null;
   let SOLVER_TABLE_STATE=null;
+  let SOLVER_FILTER_KEY=null;
   let solverSpotLoading=false;
 
   const spotStateStyle=document.createElement('style');
@@ -1016,10 +1017,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   async function loadSolverSpot(force){
     const client=window.StackUpSpotsClient;
     if(!client||!client.available()||solverSpotLoading)return null;
-    if(SOLVER_SPOT&&!force)return SOLVER_SPOT;
+    const filters=buildSolverSpotFilters();
+    const filterKey=window.StackUpTrainingSequencer?.filterKey?.(filters)||JSON.stringify(filters);
+    const filtersChanged=SOLVER_FILTER_KEY!==null&&SOLVER_FILTER_KEY!==filterKey;
+    if(SOLVER_SPOT&&!force&&!filtersChanged&&SOLVER_FILTER_KEY===filterKey)return SOLVER_SPOT;
+    if(filtersChanged){
+      SOLVER_SPOT=null;
+      SOLVER_TABLE_STATE=null;
+    }
     solverSpotLoading=true;
     try{
-      const spot=await client.next(buildSolverSpotFilters());
+      const spot=await client.next(filters);
+      SOLVER_FILTER_KEY=filterKey;
       if(spot){
         SOLVER_SPOT=spot;
         try{
@@ -1033,6 +1042,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
           renderSpotActions();
           requestAnimationFrame(renderTable);
         }
+      }else{
+        SOLVER_SPOT=null;
+        SOLVER_TABLE_STATE=null;
+        if(!tb.hidden)requestAnimationFrame(renderTable);
       }
       return spot;
     }finally{
