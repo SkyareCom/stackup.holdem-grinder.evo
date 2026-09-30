@@ -104,11 +104,79 @@ function matchupContext(matchup,heroPosition){
 function hashId(value){
   return createHash("sha256").update(value).digest("hex").slice(0,24);
 }
-function normalizeRaw(raw){
-  const nodes=raw?.strategy||raw?.strategies||[];
-  const root=Array.isArray(nodes)?(nodes.find(n=>n?.node==="root")||nodes[0]):null;
-  if(!root||!Array.isArray(root.combos)||!root.combos.length)throw new Error("DCFR root strategy missing");
-  const strategy=root.combos.map(combo=>({
+function nodeActionLabels(node){
+  const text=String(node||"").trim();
+  if(!text||text==="root")return [];
+  return text.split(/\s*(?:→|->)\s*/).map(x=>x.trim()).filter(Boolean);
+}
+function closesBettingRound(actions){
+  let previous=null;
+  for(const label of actions){
+    const kind=normalizeActionLabel(label).kind;
+    if(kind==="call"||kind==="fold"||kind==="jam")return true;
+    if(kind==="check"&&previous==="check")return true;
+    previous=kind;
+  }
+  return false;
+}
+function sameStreetDecisionNode(node){
+  const actions=nodeActionLabels(node);
+  return !closesBettingRound(actions);
+}
+function actionFraction(label){
+  const text=String(label||"").toLowerCase();
+  let m=text.match(/(\d+(?:\.\d+)?)\s*%/);
+  if(m)return Number(m[1])/100;
+  m=text.match(/bet\s+(\d+)\s*\/\s*(\d+)/);
+  if(m&&Number(m[2]))return Number(m[1])/Number(m[2]);
+  m=text.match(/bet\s+(\d+(?:\.\d+)?)x/);
+  if(m)return Number(m[1]);
+  return null;
+}
+function simulateNodeHistory(node,roles,basePotBb,stackBb){
+  const actions=nodeActionLabels(node);
+  const committed={OOP:0,IP:0};
+  const remaining={OOP:stackBb,IP:stackBb};
+  let pot=basePotBb,currentBet=0,actor="OOP";
+  const history=[];
+  for(const label of actions){
+    const parsed=normalizeActionLabel(label);
+    const position=actor==="OOP"?roles.oop:roles.ip;
+    let target=committed[actor];
+    if(parsed.kind==="raise"){
+      const frac=actionFraction(label);
+      if(currentBet<=0){
+        const amount=Math.max(.01,(Number.isFinite(frac)?frac:.5)*pot);
+        target=Math.min(committed[actor]+remaining[actor],amount);
+      }else{
+        const toCall=Math.max(0,currentBet-committed[actor]);
+        const potAfterCall=pot+toCall;
+        const raiseAmount=Math.max(.01,(Number.isFinite(frac)?frac:1)*potAfterCall);
+        target=Math.min(committed[actor]+remaining[actor],currentBet+raiseAmount);
+      }
+    }else if(parsed.kind==="call"){
+      target=currentBet;
+    }else if(parsed.kind==="jam"){
+      target=committed[actor]+remaining[actor];
+    }
+    const paid=Math.max(0,Math.min(remaining[actor],target-committed[actor]));
+    committed[actor]+=paid;
+    remaining[actor]-=paid;
+    pot+=paid;
+    currentBet=Math.max(currentBet,committed[actor]);
+    history.push({position,action:label,kind:parsed.kind,to:+committed[actor].toFixed(4)});
+    actor=actor==="OOP"?"IP":"OOP";
+  }
+  return {
+    history,
+    pot:+pot.toFixed(4),
+    currentBet:+currentBet.toFixed(4),
+    committed,
+    remaining
+  };
+}
+function strategyFromNode(node){
+  const strategy=(node?.combos||[]).map(combo=>({
     hand:combo.hand,
     ev:Number(combo.ev??0),
     actions:(combo.actions||[]).map(a=>{
@@ -117,15 +185,63 @@ function normalizeRaw(raw){
       return {...n,frequency:Number(a.weight??a.frequency??0)*100,ev:Number.isFinite(ev)?ev:null};
     })
   })).filter(h=>h.hand&&h.actions.length);
-  if(!strategy.length)throw new Error("DCFR combo strategy missing");
+  return strategy;
+}
+function normalizeRaw(raw){
+  const rawNodes=Array.isArray(raw?.strategy)?raw.strategy:Array.isArray(raw?.strategies)?raw.strategies:[];
+  const safeNodes=rawNodes
+    .filter(n=>n&&Array.isArray(n.combos)&&n.combos.length&&sameStreetDecisionNode(n.node))
+    .map(n=>({
+      node:String(n.node||"root"),
+      player:String(n.player||"OOP").toUpperCase()==="IP"?"IP":"OOP",
+      strategy:strategyFromNode(n)
+    }))
+    .filter(n=>n.strategy.length);
+  if(!safeNodes.length)throw new Error("DCFR strategy nodes missing");
   return {
-    strategy,
+    nodes:safeNodes,
     convergence:{
       iterations:Number(raw.iterations??POSTFLOP_ITERATIONS),
       exploitabilityPct:raw.exploitability_pct??raw.exploitability??null
     },
     version:raw.version||"dcfr-cli"
   };
+}
+function nodeSemanticTags({node,player,street,matchup,roles}){
+  const actions=nodeActionLabels(node);
+  const tags=[];
+  const lower=actions.map(x=>x.toLowerCase());
+  const actingPos=player==="IP"?roles.ip:roles.oop;
+  const opener=String(matchup?.opener?.position||"").toUpperCase();
+  const caller=String(matchup?.caller?.position||"").toUpperCase();
+  const facingBet=actions.length>0&&normalizeActionLabel(actions[actions.length-1]).kind==="raise";
+  if(node==="root"&&actingPos===caller)tags.push("donk_bet");
+  if(actions.length===1&&normalizeActionLabel(actions[0]).kind==="check"){
+    if(actingPos===opener)tags.push("miss_cbet");
+    else tags.push("vs_missed_cbet");
+  }
+  if(actions.length>=2){
+    const a=actions.map(x=>normalizeActionLabel(x).kind);
+    const last2=a.slice(-2).join(">");
+    if(last2==="check>raise")tags.push("check_raise");
+    if(a.length>=2&&a[a.length-2]==="raise"&&a[a.length-1]==="raise")tags.push("bet_fold");
+  }
+  if(street==="RIVER"&&facingBet)tags.push("river_bluff_catch");
+  if(street==="RIVER"&&tags.includes("check_raise"))tags.push("river_check_raise");
+  for(const label of [...actions,...((node&&node!=="root")?[]:[])]){
+    const pct=actionFraction(label);
+    if(!Number.isFinite(pct))continue;
+    if(Math.abs(pct-.25)<.02)tags.push("bet_25");
+    if(Math.abs(pct-.33)<.025)tags.push("bet_33");
+    if(Math.abs(pct-.50)<.025)tags.push("bet_50");
+    if(Math.abs(pct-.66)<.03)tags.push("bet_66");
+    if(Math.abs(pct-.75)<.03)tags.push("bet_75");
+    if(Math.abs(pct-1)<.04)tags.push("pot_bet");
+    if(Math.abs(pct-1.25)<.06)tags.push("overbet_125");
+    if(Math.abs(pct-1.5)<.06)tags.push("overbet_150");
+    if(pct>1.05&&facingBet)tags.push("vs_overbet");
+  }
+  return [...new Set(tags)];
 }
 
 const preflop=charts.map(chart=>{
