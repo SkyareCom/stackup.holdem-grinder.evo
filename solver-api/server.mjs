@@ -4,6 +4,7 @@ import { readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { randomUUID, randomInt } from "node:crypto";
+import { aiPlannerReady, planScenario } from "./scenario-planner.mjs";
 
 const PORT=Number(process.env.PORT||3000);
 const SOLVER_BIN=process.env.STACKUP_DCFR_BIN||"/usr/local/bin/dcfr-solver";
@@ -459,6 +460,7 @@ const server=http.createServer(async(req,res)=>{
         solver:"DCFR_SOLVER",
         preflop:{ready:charts.length>=5,charts:charts.length},
         postflop:{ready:matchups.length>=15,matchups:matchups.length,iterations:POSTFLOP_ITERATIONS},
+        aiScenarioPlanner:{ready:aiPlannerReady(),role:"context_only"},
         cache:solveCache.size
       },origin);
     }
@@ -466,15 +468,41 @@ const server=http.createServer(async(req,res)=>{
     if(req.method==="GET"&&url.pathname==="/v1/grinder/spots/next"){
       counter=(counter+1)>>>0;
       const filters=parseFilters(url);
+      const aiPlan=aiPlannerReady()
+        ?await planScenario(filters,{recent:[]}).catch(error=>{
+          console.error(JSON.stringify({event:"ai_scenario_plan_error",message:String(error?.message||error)}));
+          return null;
+        })
+        :null;
+      if(aiPlan)filters.aiPlan=aiPlan;
       let street=filters.street;
       if(!street){
         const allowed=filters.streets.length?filters.streets:["PRE-FLOP","FLOP","TURN","RIVER"];
-        street=randomPick(allowed);
+        const planned=cleanStreet(aiPlan?.street);
+        street=planned&&allowed.includes(planned)?planned:randomPick(allowed);
       }
       const spot=street==="PRE-FLOP"
         ?preflopSpot(filters)
         :await enqueuePostflop(filters,street);
-      return json(res,200,{ok:true,spot},origin);
+      if(aiPlan&&spot?.scenario){
+        spot.scenario.aiContext=aiPlan;
+        spot.scenario.provenance={
+          ...(spot.scenario.provenance||{}),
+          contextPlanner:"AI_CONTEXT_ONLY",
+          strategySource:spot.solver||"UNKNOWN"
+        };
+      }
+      return json(res,200,{ok:true,spot,aiContextUsed:!!aiPlan},origin);
+    }
+
+    if(req.method==="POST"&&url.pathname==="/v1/grinder/scenarios/plan"){
+      const payload=await bodyJson(req);
+      const filters=payload?.filters&&typeof payload.filters==="object"?payload.filters:{};
+      const recent=Array.isArray(payload?.recent)?payload.recent:[];
+      if(!aiPlannerReady())return json(res,503,{ok:false,error:"ai_scenario_planner_not_configured"},origin);
+      const plan=await planScenario(filters,{recent});
+      if(!plan)return json(res,422,{ok:false,error:"ai_scenario_plan_unavailable"},origin);
+      return json(res,200,{ok:true,plan,role:"context_only"},origin);
     }
 
     if(req.method==="POST"&&url.pathname==="/v1/grinder/spots/answer"){
