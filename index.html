@@ -784,6 +784,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 <script src="core/stackup-training-sequencer.js"></script>
 <script src="core/stackup-spots-client.js"></script>
 <script src="core/stackup-table-state.js"></script>
+<script src="core/stackup-spot-coach.js"></script>
+<script src="core/stackup-training-history.js"></script>
 <script>
 (function(){
   /* REGRA DE TRADUCAO: todo novo item deve ser criado simultaneamente em PT, EN e ES. */
@@ -959,6 +961,56 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   let SOLVER_TABLE_STATE=null;
   let SOLVER_FILTER_KEY=null;
   let solverSpotLoading=false;
+  const SPOT_TIMELINE=[];
+  let SPOT_TIMELINE_INDEX=-1;
+
+  function cloneSpotValue(value){
+    if(value===undefined)return undefined;
+    if(window.structuredClone){try{return window.structuredClone(value);}catch(_){}}
+    try{return JSON.parse(JSON.stringify(value));}catch(_){return value;}
+  }
+  function currentSpotEntry(){
+    return SPOT_TIMELINE_INDEX>=0?SPOT_TIMELINE[SPOT_TIMELINE_INDEX]||null:null;
+  }
+  function resetSpotTimeline(){
+    SPOT_TIMELINE.length=0;
+    SPOT_TIMELINE_INDEX=-1;
+  }
+  function buildTableStateForSpot(spot){
+    if(!spot)return null;
+    try{
+      const tablePositions=POSN[resolveSpotCount()]||POSN[10];
+      const previous=SOLVER_SPOT;
+      SOLVER_SPOT=spot;
+      const view=solverSpotView(tablePositions);
+      SOLVER_SPOT=spot;
+      return window.StackUpTableState?.fromSpot?.(spot,view)||null;
+    }catch(_){
+      return null;
+    }
+  }
+  function appendSpotTimeline(spot){
+    if(!spot)return null;
+    if(SPOT_TIMELINE_INDEX<SPOT_TIMELINE.length-1)SPOT_TIMELINE.splice(SPOT_TIMELINE_INDEX+1);
+    const entry={spot:cloneSpotValue(spot),answer:null,createdAt:new Date().toISOString()};
+    SPOT_TIMELINE.push(entry);
+    SPOT_TIMELINE_INDEX=SPOT_TIMELINE.length-1;
+    return entry;
+  }
+  function activateSpotTimeline(index){
+    const i=Math.max(0,Math.min(SPOT_TIMELINE.length-1,Number(index)||0));
+    const entry=SPOT_TIMELINE[i];
+    if(!entry)return false;
+    SPOT_TIMELINE_INDEX=i;
+    SOLVER_SPOT=cloneSpotValue(entry.spot);
+    SOLVER_TABLE_STATE=entry.answer?.tableStateAfter
+      ?cloneSpotValue(entry.answer.tableStateAfter)
+      :buildTableStateForSpot(SOLVER_SPOT);
+    renderSpotActions();
+    setSpotActionsBusy(!!entry.answer);
+    requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
+    return true;
+  }
 
   const spotStateStyle=document.createElement('style');
   spotStateStyle.textContent=`
@@ -1037,36 +1089,37 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(filtersChanged){
       SOLVER_SPOT=null;
       SOLVER_TABLE_STATE=null;
+      resetSpotTimeline();
     }
     solverSpotLoading=true;
+    renderSpotSupport();
     try{
       const spot=await client.next(filters);
       SOLVER_FILTER_KEY=filterKey;
       if(spot){
         SOLVER_SPOT=spot;
-        try{
-          const tablePositions=POSN[resolveSpotCount()]||POSN[10];
-          const view=solverSpotView(tablePositions);
-          SOLVER_TABLE_STATE=window.StackUpTableState?.fromSpot?.(spot,view)||null;
-        }catch(_){
-          SOLVER_TABLE_STATE=null;
-        }
+        SOLVER_TABLE_STATE=buildTableStateForSpot(spot);
+        const active=currentSpotEntry();
+        if(force||!active||String(active.spot?.id||'')!==String(spot.id||''))appendSpotTimeline(spot);
+        else active.spot=cloneSpotValue(spot);
         if(!tb.hidden){
           renderSpotActions();
-          requestAnimationFrame(renderTable);
+          setSpotActionsBusy(!!currentSpotEntry()?.answer);
+          requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
         }
       }else{
         SOLVER_SPOT=null;
         SOLVER_TABLE_STATE=null;
-        if(!tb.hidden)requestAnimationFrame(renderTable);
+        if(!tb.hidden)requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
       }
       return spot;
     }finally{
       solverSpotLoading=false;
+      renderSpotSupport();
     }
   }
 
-  const nf=(v,d)=>v.toLocaleString(L()==='en'?'en-US':'pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+  const nf=  const nf=(v,d)=>v.toLocaleString(L()==='en'?'en-US':'pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
   function spotMode(){
     if(sel.mode&&sel.mode.has('cash'))return 'cash';
     return 'tournament';
@@ -1147,7 +1200,170 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     es:{hero:'HÉROE',villain:'VILLANO'}
   };
   const spotActions=document.createElement('div');spotActions.className='spotactions';spotActions.hidden=true;$('#page').appendChild(spotActions);
-  function renderSpotActions(){
+
+  const SPOT_SUPPORT_TEXT={
+    pt:{review:'REVER SPOT',next:'PRÓXIMO SPOT',save:'SALVAR TREINO',name:'NOME DO TREINO',cancel:'CANCELAR',confirm:'CONFIRMAR',waiting:'AGUARDANDO A AÇÃO DO HERÓI',analysis:'ANÁLISE DA DECISÃO',indicators:'35 INDICADORES CONSIDERADOS',saved:'TREINO SALVO NO HISTÓRICO',needName:'INFORME UM NOME PARA O TREINO',loading:'CARREGANDO SPOT...'},
+    en:{review:'REVIEW SPOT',next:'NEXT SPOT',save:'SAVE TRAINING',name:'TRAINING NAME',cancel:'CANCEL',confirm:'CONFIRM',waiting:'WAITING FOR HERO ACTION',analysis:'DECISION ANALYSIS',indicators:'35 INDICATORS CONSIDERED',saved:'TRAINING SAVED TO HISTORY',needName:'ENTER A TRAINING NAME',loading:'LOADING SPOT...'},
+    es:{review:'REVISAR SPOT',next:'SIGUIENTE SPOT',save:'GUARDAR ENTRENO',name:'NOMBRE DEL ENTRENO',cancel:'CANCELAR',confirm:'CONFIRMAR',waiting:'ESPERANDO LA ACCIÓN DEL HÉROE',analysis:'ANÁLISIS DE LA DECISIÓN',indicators:'35 INDICADORES CONSIDERADOS',saved:'ENTRENO GUARDADO EN HISTORIAL',needName:'INGRESA UN NOMBRE PARA EL ENTRENO',loading:'CARGANDO SPOT...'}
+  };
+  const spotSupportStyle=document.createElement('style');
+  spotSupportStyle.textContent=`
+    .content.spotsmode{overflow-y:auto!important;overflow-x:hidden!important}
+    .page.spotsmode{height:auto!important;min-height:100%!important;overflow:visible!important;gap:var(--gap)!important}
+    .page.spotsmode .spotwrap{flex:0 0 56vh!important;min-height:430px!important;max-height:560px!important}
+    .spotactions{flex:none!important}
+    .spotsupport{display:flex;flex-direction:column;gap:var(--gap);padding-bottom:4px}
+    .spotsupport[hidden]{display:none!important}
+    .spotcontrolrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
+    .spotcontrol,.spotsavebutton,.spotsaveform button,.historysort button,.historyactions button{
+      min-width:0;height:40px;padding:0 8px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);
+      box-shadow:var(--glass-hl);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+      color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label)
+    }
+    .spotcontrol:active,.spotcontrol.on,.spotsavebutton:active,.spotsavebutton.on,.spotsaveform button:active,.historysort button.on,.historyactions button.on{
+      background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);color:var(--c-accent-text);
+      -webkit-backdrop-filter:var(--on-blur);backdrop-filter:var(--on-blur)
+    }
+    .spotcontrol:disabled,.spotsavebutton:disabled{opacity:.35;pointer-events:none}
+    .spotsavebutton{width:100%}
+    .spotsaveform{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+    .spotsaveform[hidden]{display:none!important}
+    .spotsaveform input{
+      grid-column:1/-1;width:100%;height:42px;padding:0 12px;border-radius:var(--r-card);background:var(--glass-bg);
+      border:var(--glass-border);box-shadow:var(--glass-hl);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+      color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);outline:none
+    }
+    .spotsaveform input:focus{border:var(--on-border);box-shadow:var(--on-glow)}
+    .spotfeedback,.spotanalysis,.historysort,.historyitem,.historydetail,.historyempty{
+      border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);
+      -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);color:var(--c-text)
+    }
+    .spotfeedback{min-height:72px;padding:14px;display:flex;flex-direction:column;justify-content:center;gap:6px;text-align:center}
+    .spotfeedback .line1{font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label);color:var(--c-text)}
+    .spotfeedback .line2{font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);color:var(--c-muted)}
+    .spotfeedback.answered{background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow)}
+    .spotfeedback.answered .line1{color:var(--c-accent-text)}
+    .spotfeedback.waiting .line1{animation:spotWaitingBlink 1.05s ease-in-out infinite}
+    @keyframes spotWaitingBlink{0%,100%{opacity:.35}50%{opacity:1}}
+    .spotanalysis{padding:14px;display:flex;flex-direction:column;gap:12px;text-align:left}
+    .spotanalysis[hidden]{display:none!important}
+    .spotanalysistitle{color:var(--c-accent-text);letter-spacing:var(--ls-label);font-size:var(--fs)!important}
+    .spotanalysissection{display:flex;flex-direction:column;gap:4px}
+    .spotanalysissection b,.spotindicator b{font-weight:400;color:var(--c-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotanalysissection p,.spotsource,.spotindicator span,.spotindicator small{color:var(--c-muted);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);line-height:1.45}
+    .spotanalysisdetails{border-top:1px solid var(--c-accent);padding-top:10px}
+    .spotanalysisdetails summary{cursor:pointer;color:var(--c-accent-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label);list-style:none}
+    .spotanalysisdetails summary::-webkit-details-marker{display:none}
+    .spotindicatorlist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+    .spotindicator{padding-top:8px;border-top:1px solid rgba(255,255,255,.16);display:flex;flex-direction:column;gap:2px}
+    .spotsource{padding-top:8px;border-top:1px solid rgba(255,255,255,.16)}
+    @media (prefers-reduced-motion:reduce){.spotfeedback.waiting .line1{animation:none!important;opacity:1!important}}
+  `;
+  R.appendChild(spotSupportStyle);
+
+  const spotSupport=document.createElement('div');spotSupport.className='spotsupport';spotSupport.hidden=true;
+  spotSupport.innerHTML='<div class="spotcontrolrow"><button class="spotcontrol" data-spot-nav="review"></button><button class="spotcontrol" data-spot-nav="next"></button></div><button class="spotsavebutton" data-spot-save-open></button><div class="spotsaveform" hidden><input type="text" maxlength="64" autocomplete="off"><button data-spot-save-cancel></button><button data-spot-save-confirm></button></div><div class="spotfeedback waiting" aria-live="polite"><div class="line1"></div><div class="line2"></div></div><div class="spotanalysis" hidden></div>';
+  $('#page').appendChild(spotSupport);
+
+  function spotText(){return SPOT_SUPPORT_TEXT[L()]||SPOT_SUPPORT_TEXT.pt;}
+  function spotEscape(value){
+    if(window.StackUpSpotCoach?.escapeHtml)return window.StackUpSpotCoach.escapeHtml(value);
+    return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function renderSpotAnalysis(analysis){
+    const box=spotSupport.querySelector('.spotanalysis');
+    const tx=spotText();
+    if(!analysis||analysis.status==='unknown'){
+      box.hidden=false;
+      box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div><div class="spotanalysissection"><p>'+spotEscape(analysis?.line2||'—')+'</p></div>';
+      return;
+    }
+    const sections=(analysis.summary||[]).map(s=>'<div class="spotanalysissection"><b>'+spotEscape(s.title)+'</b><p>'+spotEscape(s.text)+'</p></div>').join('');
+    const indicators=(analysis.indicators||[]).map(x=>'<div class="spotindicator"><b>'+spotEscape(String(x.index)+'. '+x.name)+'</b><span>'+spotEscape(x.value)+'</span>'+(x.note?'<small>'+spotEscape(x.note)+'</small>':'')+'</div>').join('');
+    box.hidden=false;
+    box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div>'+sections+'<details class="spotanalysisdetails"><summary>'+spotEscape(tx.indicators)+'</summary><div class="spotindicatorlist">'+indicators+'</div></details><div class="spotsource">'+spotEscape(analysis.sourceNote||'')+'</div>';
+  }
+  function renderSpotSupport(){
+    if(!spotSupport)return;
+    const tx=spotText(),entry=currentSpotEntry();
+    spotSupport.querySelector('[data-spot-nav="review"]').textContent=tx.review;
+    spotSupport.querySelector('[data-spot-nav="next"]').textContent=tx.next;
+    spotSupport.querySelector('[data-spot-save-open]').textContent=tx.save;
+    spotSupport.querySelector('[data-spot-save-cancel]').textContent=tx.cancel;
+    spotSupport.querySelector('[data-spot-save-confirm]').textContent=tx.confirm;
+    const input=spotSupport.querySelector('input'); input.placeholder=tx.name;
+    const review=spotSupport.querySelector('[data-spot-nav="review"]');
+    const next=spotSupport.querySelector('[data-spot-nav="next"]');
+    review.disabled=solverSpotLoading||SPOT_TIMELINE_INDEX<=0;
+    next.disabled=solverSpotLoading||!SOLVER_SPOT;
+    spotSupport.querySelector('[data-spot-save-open]').disabled=!SOLVER_SPOT;
+    const fb=spotSupport.querySelector('.spotfeedback');
+    const line1=fb.querySelector('.line1'),line2=fb.querySelector('.line2');
+    if(solverSpotLoading&&!SOLVER_SPOT){
+      fb.className='spotfeedback waiting';line1.textContent=tx.loading;line2.textContent='';
+      spotSupport.querySelector('.spotanalysis').hidden=true;return;
+    }
+    if(entry?.answer?.analysis){
+      fb.className='spotfeedback answered';
+      line1.textContent=entry.answer.analysis.title||'—';
+      line2.textContent=entry.answer.analysis.line2||'—';
+      renderSpotAnalysis(entry.answer.analysis);
+    }else{
+      fb.className='spotfeedback waiting';
+      line1.textContent=tx.waiting;line2.textContent='';
+      spotSupport.querySelector('.spotanalysis').hidden=true;
+    }
+  }
+  function trainingSnapshot(){
+    const entry=currentSpotEntry();
+    return {
+      schemaVersion:2,
+      filters:cloneSpotValue(buildSolverSpotFilters()),
+      currentSpot:cloneSpotValue(entry?.spot||SOLVER_SPOT),
+      currentAnswer:cloneSpotValue(entry?.answer||null),
+      currentIndex:SPOT_TIMELINE_INDEX,
+      visited:SPOT_TIMELINE.length,
+      savedAt:new Date().toISOString()
+    };
+  }
+  function showSpotToast(message){
+    toast2.textContent=message;toast2.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>toast2.classList.remove('show'),1800);
+  }
+
+  spotSupport.addEventListener('click',async e=>{
+    const nav=e.target.closest('[data-spot-nav]');
+    if(nav){
+      if(nav.dataset.spotNav==='review'){
+        if(SPOT_TIMELINE_INDEX>0)activateSpotTimeline(SPOT_TIMELINE_INDEX-1);
+      }else{
+        if(SPOT_TIMELINE_INDEX<SPOT_TIMELINE.length-1)activateSpotTimeline(SPOT_TIMELINE_INDEX+1);
+        else{
+          setSpotActionsBusy(true);
+          try{await loadSolverSpot(true);}finally{setSpotActionsBusy(!!currentSpotEntry()?.answer);renderSpotSupport();}
+        }
+      }
+      return;
+    }
+    const form=spotSupport.querySelector('.spotsaveform');
+    if(e.target.closest('[data-spot-save-open]')){
+      form.hidden=!form.hidden;
+      if(!form.hidden){const input=form.querySelector('input');input.value='';setTimeout(()=>input.focus(),0);}
+      return;
+    }
+    if(e.target.closest('[data-spot-save-cancel]')){
+      form.hidden=true;form.querySelector('input').value='';return;
+    }
+    if(e.target.closest('[data-spot-save-confirm]')){
+      const input=form.querySelector('input'),name=input.value.trim(),tx=spotText();
+      if(!name){showSpotToast(tx.needName);input.focus();return;}
+      try{
+        window.StackUpTrainingHistory?.save?.(name,trainingSnapshot());
+        form.hidden=true;input.value='';showSpotToast(tx.saved);
+      }catch(_){showSpotToast(tx.needName);}
+    }
+  });
+
+  function renderSpotActions(){  function renderSpotActions(){
     const a=SPOT_ACTION_LABELS[L()]||SPOT_ACTION_LABELS.pt;
     spotActions.innerHTML='<div class="spotactionrow primary">'+a.slice(0,4).map((x,i)=>'<button class="spotaction" data-spot-action="'+['check','call','fold','raise'][i]+'">'+x+'</button>').join('')+'</div><div class="spotactionrow raise">'+a.slice(4).map((x,i)=>'<button class="spotaction" data-spot-action="'+['raise1','raise2','allin'][i]+'">'+x+'</button>').join('')+'</div>';
   }
@@ -1268,6 +1484,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const result=(SOLVER_SPOT&&view&&engine)
       ?engine.evaluate(SOLVER_SPOT,view.handKey,uiAction)
       :null;
+    const tableBefore=window.StackUpTableState?.snapshot?.(SOLVER_TABLE_STATE)||cloneSpotValue(SOLVER_TABLE_STATE);
 
     if(SOLVER_TABLE_STATE&&window.StackUpTableState){
       try{
@@ -1275,6 +1492,28 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         window.setTimeout(syncSpotTableStateDom,Math.max(120,Math.round(animationMs*.48)));
       }catch(_){}
     }
+
+    const analysis=window.StackUpSpotCoach?.analyze?.({
+      spot:SOLVER_SPOT,
+      view,
+      result,
+      uiAction,
+      tableState:tableBefore,
+      language:L()
+    })||{status:'unknown',title:spotText().analysis,line2:'—',summary:[],indicators:[]};
+
+    const entry=currentSpotEntry();
+    if(entry){
+      entry.answer={
+        uiAction,
+        result:cloneSpotValue(result),
+        analysis:cloneSpotValue(analysis),
+        answeredAt:new Date().toISOString(),
+        tableStateBefore:cloneSpotValue(tableBefore),
+        tableStateAfter:window.StackUpTableState?.snapshot?.(SOLVER_TABLE_STATE)||cloneSpotValue(SOLVER_TABLE_STATE)
+      };
+    }
+    renderSpotSupport();
 
     if(result&&view){
       try{
@@ -1287,7 +1526,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
           hand:view.handKey,
           ui_action:uiAction,
           solver_action:result.selected?.action||null,
-          solver_frequency:Number(result.frequency)||0
+          solver_frequency:Number(result.frequency)||0,
+          feedback_class:analysis.status||null
         });
       }catch(_){}
 
@@ -1310,20 +1550,14 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       }
     }
 
-    window.setTimeout(async()=>{
-      let advanced=false;
-      try{
-        if(window.StackUpSpotsClient?.available()){
-          advanced=!!(await loadSolverSpot(true));
-        }
-      }finally{
-        setSpotActionsBusy(false);
-        if(!tb.hidden&&!advanced)renderTable();
-      }
+    window.setTimeout(()=>{
+      syncSpotTableStateDom();
+      setSpotActionsBusy(true);
+      renderSpotSupport();
     },animationMs);
   });
 
-  function renderTable(){
+  function renderTable(){  function renderTable(){
     const W=tb.clientWidth,H=tb.clientHeight;if(!W||!H)return;
     const n=resolveSpotCount(),pos=POSN[n]||POSN[9];
     const solved=solverSpotView(pos);
@@ -1368,19 +1602,20 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   function syncSpots(){
     const on=cur==='spots'&&!sub.spots.length;
     const content=$('.content'),page=$('#page');
-    tb.hidden=!on;spotActions.hidden=!on;
+    tb.hidden=!on;spotActions.hidden=!on;spotSupport.hidden=!on;
     content.classList.toggle('spotsmode',on);
     page.classList.toggle('spotsmode',on);
     if(on){
       $('#page .slot').hidden=true;
       renderSpotActions();
-      requestAnimationFrame(renderTable);
+      setSpotActionsBusy(!!currentSpotEntry()?.answer);
+      requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
       loadSolverSpot(false).catch(()=>{});
     }
   }
 
 
-  // ===== ADVANCE: todas as secoes na mesma tela, sem subpagina =====
+  // ===== ADVANCE:  // ===== ADVANCE: todas as secoes na mesma tela, sem subpagina =====
   const adv=document.createElement('div');adv.className='advancewrap';adv.hidden=true;$('#page').appendChild(adv);
   function renderAdvance(){
     const t=TR[L()];
