@@ -108,7 +108,8 @@ function normalizeRaw(raw){
     ev:Number(combo.ev??0),
     actions:(combo.actions||[]).map(a=>{
       const n=normalizeActionLabel(a.action);
-      return {...n,frequency:Number(a.weight??a.frequency??0)*100};
+      const ev=Number(a.ev??a.expectedValue??a.expected_value);
+      return {...n,frequency:Number(a.weight??a.frequency??0)*100,ev:Number.isFinite(ev)?ev:null};
     })
   })).filter(h=>h.hand&&h.actions.length);
   if(!strategy.length)throw new Error("DCFR combo strategy missing");
@@ -128,7 +129,8 @@ const preflop=charts.map(chart=>{
     hand:h.hand,
     actions:(h.actions||[]).map(a=>{
       const n=normalizeActionLabel(a.action);
-      return {...n,frequency:Number(a.prob||0)*100};
+      const ev=Number(a.ev??a.expectedValue??a.expected_value);
+      return {...n,frequency:Number(a.prob||0)*100,ev:Number.isFinite(ev)?ev:null};
     })
   })).filter(h=>h.hand&&h.actions.length);
   const baseId="dcfr-pre-"+chart.spot_name.replace(/\s+/g,"-").toLowerCase();
