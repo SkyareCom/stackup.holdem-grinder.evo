@@ -482,9 +482,13 @@
       if(Number.isFinite(stack)&&!filters.effectiveStacks.some(v=>Math.abs(stack-v)<.01))return false;
     }
     if(filters.phases.length&&s.phase&&!filters.phases.includes(String(s.phase)))return false;
+    const actualTableSize=Number(s.trainingTableSize??s.tableSize);
     if(filters.tableSize){
-      const actualTableSize=Number(s.trainingTableSize??s.tableSize);
       if(!Number.isFinite(actualTableSize)||actualTableSize!==filters.tableSize)return false;
+    }else if(actualTableSize===2){
+      // RANDOM / no MESA filter must not silently collapse the trainer into heads-up.
+      // Heads-up remains available only when the user explicitly selects HEADS UP.
+      return false;
     }
     if(!hasRequestedSpecial(spot,filters.special))return false;
     return true;
