@@ -1211,9 +1211,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const spotSupportStyle=document.createElement('style');
   spotSupportStyle.textContent=`
     .content.spotsmode{overflow-y:auto!important;overflow-x:hidden!important}
-    .page.spotsmode{height:auto!important;min-height:100%!important;overflow:visible!important;gap:var(--gap)!important}
-    .page.spotsmode .spotwrap{flex:0 0 56vh!important;min-height:430px!important;max-height:560px!important}
-    .spotactions{flex:none!important}
+    .page.spotsmode{height:auto!important;min-height:100%!important;overflow:visible!important;gap:6px!important}
+    /* Mantém a mesa exatamente na área que ela ocupava antes dos novos cards.
+       Os cards de suporte começam somente abaixo dos 7 botões de ação. */
+    .page.spotsmode .spotwrap{flex:0 0 var(--spot-table-height,calc(100% - 94px))!important;height:var(--spot-table-height,calc(100% - 94px))!important;min-height:0!important;max-height:none!important}
+    .spotactions{flex:0 0 88px!important}
     .spotsupport{display:flex;flex-direction:column;gap:var(--gap);padding-bottom:4px}
     .spotsupport[hidden]{display:none!important}
     .spotcontrolrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
@@ -1252,12 +1254,17 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     .spotanalysistitle{color:var(--c-accent-text);letter-spacing:var(--ls-label);font-size:var(--fs)!important}
     .spotanalysissection{display:flex;flex-direction:column;gap:4px}
     .spotanalysissection b,.spotindicator b{font-weight:400;color:var(--c-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
-    .spotanalysissection p,.spotsource,.spotindicator span,.spotindicator small{color:var(--c-muted);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);line-height:1.45}
-    .spotanalysisdetails{border-top:1px solid var(--c-accent);padding-top:10px}
-    .spotanalysisdetails summary{cursor:pointer;color:var(--c-accent-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label);list-style:none}
-    .spotanalysisdetails summary::-webkit-details-marker{display:none}
-    .spotindicatorlist{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-    .spotindicator{padding-top:8px;border-top:1px solid rgba(255,255,255,.16);display:flex;flex-direction:column;gap:2px}
+    .spotanalysissection p,.spotsource,.spotindicator span,.spotindicator small,.spotfinalsummary li{color:var(--c-muted);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);line-height:1.45}
+    .spotindicatorheading{border-top:1px solid var(--c-accent);padding-top:10px;color:var(--c-accent-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotindicatorlist{display:flex;flex-direction:column;gap:0}
+    .spotindicator{padding:10px 0;border-top:1px solid rgba(255,255,255,.16);display:flex;flex-direction:column;gap:3px}
+    .spotindicator:first-child{border-top:0}
+    .spotindicator .indicatorvalue{color:var(--c-text)}
+    .spotindicator .indicatorcalc,.spotindicator .indicatorimpact{color:var(--c-muted)}
+    .spotfinal{border-top:1px solid var(--c-accent);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+    .spotfinaltitle{color:var(--c-accent-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotfinalsummary{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:5px}
+    .spotfinalsummary li::marker{color:var(--c-accent-text)}
     .spotsource{padding-top:8px;border-top:1px solid rgba(255,255,255,.16)}
     @media (prefers-reduced-motion:reduce){.spotfeedback.waiting .line1{animation:none!important;opacity:1!important}}
   `;
@@ -1281,9 +1288,24 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       return;
     }
     const sections=(analysis.summary||[]).map(s=>'<div class="spotanalysissection"><b>'+spotEscape(s.title)+'</b><p>'+spotEscape(s.text)+'</p></div>').join('');
-    const indicators=(analysis.indicators||[]).map(x=>'<div class="spotindicator"><b>'+spotEscape(String(x.index)+'. '+x.name)+'</b><span>'+spotEscape(x.value)+'</span>'+(x.note?'<small>'+spotEscape(x.note)+'</small>':'')+'</div>').join('');
+    const ordered=[...(analysis.indicators||[])].sort((a,b)=>Number(a.index)-Number(b.index));
+    const indicators=ordered.map(x=>{
+      const calc=x.calculation||x.note||'—';
+      const impact=x.interpretation||x.note||'—';
+      return '<div class="spotindicator">'+
+        '<b>'+spotEscape(String(x.index)+'. '+x.name)+'</b>'+
+        '<span class="indicatorvalue">'+spotEscape('RESULTADO: '+(x.value??'—'))+'</span>'+
+        '<small class="indicatorcalc">'+spotEscape('CÁLCULO / LEITURA: '+calc)+'</small>'+
+        '<small class="indicatorimpact">'+spotEscape('IMPACTO NA DECISÃO: '+impact)+'</small>'+
+      '</div>';
+    }).join('');
+    const finalSummary=ordered.map(x=>'<li><b>'+spotEscape(x.name)+'</b> — '+spotEscape(x.value??'—')+'</li>').join('');
     box.hidden=false;
-    box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div>'+sections+'<details class="spotanalysisdetails"><summary>'+spotEscape(tx.indicators)+'</summary><div class="spotindicatorlist">'+indicators+'</div></details><div class="spotsource">'+spotEscape(analysis.sourceNote||'')+'</div>';
+    box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div>'+sections+
+      '<div class="spotindicatorheading">'+spotEscape(tx.indicators)+'</div>'+
+      '<div class="spotindicatorlist">'+indicators+'</div>'+
+      '<div class="spotfinal"><div class="spotfinaltitle">'+spotEscape(tx.indicators+' · 1–35')+'</div><ol class="spotfinalsummary">'+finalSummary+'</ol></div>'+
+      '<div class="spotsource">'+spotEscape(analysis.sourceNote||'')+'</div>';
   }
   function renderSpotSupport(){
     if(!spotSupport)return;
@@ -1601,6 +1623,17 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     tb.innerHTML=html;
   }
   try{new ResizeObserver(()=>{if(!tb.hidden)renderTable();}).observe(tb);}catch(e){}
+  function sizeSpotStage(){
+    const content=$('.content'),page=$('#page');
+    if(!content||!page)return;
+    const available=Math.max(0,content.clientHeight);
+    /* 88px dos botões + 6px de gap: a mesa usa o restante da primeira tela,
+       como antes dos novos controles/feedback. */
+    const tableHeight=Math.max(220,Math.floor(available-94));
+    page.style.setProperty('--spot-table-height',tableHeight+'px');
+  }
+  try{new ResizeObserver(()=>{if(cur==='spots'&&!sub.spots.length){sizeSpotStage();requestAnimationFrame(renderTable);}}).observe($('.content'));}catch(_){}
+
   function syncSpots(){
     const on=cur==='spots'&&!sub.spots.length;
     const content=$('.content'),page=$('#page');
@@ -1609,6 +1642,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     page.classList.toggle('spotsmode',on);
     if(on){
       $('#page .slot').hidden=true;
+      sizeSpotStage();
       renderSpotActions();
       setSpotActionsBusy(!!currentSpotEntry()?.answer);
       requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
