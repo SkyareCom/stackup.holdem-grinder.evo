@@ -44,7 +44,7 @@ jobs:
           STACKUP_DCFR_BIN: ${{ github.workspace }}/.stackup/dcfr-solver
           STACKUP_PREFLOP_ITERATIONS: "10000000"
           STACKUP_POSTFLOP_ITERATIONS: "120"
-          STACKUP_RANGE_MIN_WEIGHT: "0.02"
+          STACKUP_RANGE_MIN_WEIGHT: "0.08"
         run: node scripts/generate-solver-bank.mjs
 
       - name: Commit solver bank
