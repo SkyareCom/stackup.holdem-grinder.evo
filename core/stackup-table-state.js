@@ -92,6 +92,64 @@
       apply(state,position,entry,{mutateStack:false,mutatePot:false,record:true});
     }
   }
+  function historyForCurrentStreet(view,scenario){
+    const raw=Array.isArray(view?.actionHistory)?view.actionHistory:(Array.isArray(scenario?.actionHistory)?scenario.actionHistory:[]);
+    const street=String(view?.street||scenario?.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
+    const tagged=raw.filter(x=>x&&x.street!=null);
+    if(!tagged.length)return raw;
+    return raw.filter(x=>String(x?.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP')===street);
+  }
+  function finalStreetCommitments(history){
+    const out=new Map();
+    for(const entry of history||[]){
+      const position=actorOf(entry);
+      if(!position)continue;
+      const kind=kindOf(entry);
+      if(kind==='fold'||kind==='check')continue;
+      const direct=amountOf(entry);
+      if(Number.isFinite(direct))out.set(position,Math.max(n(out.get(position)),direct));
+    }
+    return out;
+  }
+  function fromStreetStart(spot,view){
+    if(!spot||!view)return null;
+    const scenario=spot.scenario||{};
+    const positions=initialPositions(view,scenario);
+    const history=historyForCurrentStreet(view,scenario);
+    const finalCommitted=finalStreetCommitments(history);
+    const contributed=[...finalCommitted.values()].reduce((sum,v)=>sum+n(v),0);
+    const decisionPot=n(view.pot,n(scenario.pot));
+    const state={
+      spotId:view.id||spot.id||null,
+      solveId:view.solveId||spot.solveId||null,
+      solver:view.solver||spot.solver||null,
+      street:view.street||scenario.street||'PRE-FLOP',
+      heroPosition:view.heroPosition||scenario.heroPosition||null,
+      villainPosition:view.villainPosition||scenario.villainPosition||null,
+      board:Array.isArray(view.board)?[...view.board]:[],
+      heroCards:Array.isArray(view.heroCards)?[...view.heroCards]:[],
+      pot:Math.max(0,decisionPot-contributed),
+      sidePots:Array.isArray(view.sidePots)?[...view.sidePots]:[],
+      positions:[...positions],
+      players:positions.map(p=>makePlayer(p,view,scenario)),
+      currentBet:0,
+      history:[],
+      lastAction:null
+    };
+    // scenario.playerStacks describe the decision point. Add this street's chips
+    // back so the replay visibly starts at the beginning of the current street.
+    state.players.forEach(p=>{
+      const committed=n(finalCommitted.get(String(p.position).toUpperCase()));
+      if(committed>0)p.stack+=committed;
+      p.committed=0;
+      p.folded=false;
+      p.allIn=false;
+      p.acted=false;
+      p.lastAction=null;
+    });
+    return state;
+  }
+
   function fromSpot(spot,view){
     if(!spot||!view)return null;
     const scenario=spot.scenario||{};
@@ -133,6 +191,8 @@
 
   global.StackUpTableState=Object.freeze({
     fromSpot,
+    fromStreetStart,
+    historyForCurrentStreet,
     snapshot,
     player,
     currentBet,
