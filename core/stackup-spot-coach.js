@@ -443,7 +443,7 @@
         return {
           calculation:p('Última ação agressiva antes da decisão: '+init+'.','Last aggressive action before the decision: '+init+'.','Última acción agresiva antes de la decisión: '+init+'.'),
           interpretation:p(
-            'Como '+init+' carrega a iniciativa neste '+street+', a distribuição de bets/checks parte desse histórico real, não de uma regra genérica. Para '+hand+', '+solverRef,
+            'Como '+init+' carrega a iniciativa neste '+street+', a distribuição de bets/checks parte desse histórico real, não de uma regra genérica. '+solverRef,
             'Because '+init+' carries initiative on this '+street+', the bet/check distribution follows this actual history rather than a generic rule. '+solverRef,
             'Como '+init+' lleva la iniciativa en este '+street+', la distribución bet/check parte de este historial real y no de una regla genérica. '+solverRef
           )
@@ -491,9 +491,9 @@
         if(raises===0)return {
           calculation:p('Nenhum raise ocorreu antes de '+heroPos+': o pote está unopened/RFI.','No raise occurred before '+heroPos+': the pot is unopened/RFI.','No hubo raise antes de '+heroPos+': el bote está unopened/RFI.'),
           interpretation:p(
-            'Como '+heroPos+' ainda não enfrenta 3-bet nem 4-bet, este indicador não comprime o range neste ponto. A decisão é de abertura; para '+hand+', '+solverRef,
-            heroPos+' is not facing a 3-bet or 4-bet, so this factor does not compress the range yet. The decision is an opening decision; for '+hand+', '+solverRef,
-            'Como '+heroPos+' todavía no enfrenta 3-bet ni 4-bet, este factor no comprime el rango. La decisión es de apertura; para '+hand+', '+solverRef
+            'Como '+heroPos+' ainda não enfrenta 3-bet nem 4-bet, este indicador não comprime o range neste ponto. A decisão é de abertura. '+solverRef,
+            heroPos+' is not facing a 3-bet or 4-bet, so this factor does not compress the range yet. The decision is an opening decision. '+solverRef,
+            'Como '+heroPos+' todavía no enfrenta 3-bet ni 4-bet, este factor no comprime el rango. La decisión es de apertura. '+solverRef
           )
         };
         return {
@@ -581,9 +581,9 @@
         return {
           calculation:p('Board '+board+(tags.length?' → '+tags.join(' · '):' sem tag estrutural adicional')+'.','Board '+board+(tags.length?' → '+tags.join(' · '):' with no additional structural tag')+'.','Board '+board+(tags.length?' → '+tags.join(' · '):' sin etiqueta estructural adicional')+'.'),
           interpretation:p(
-            'Neste board '+board+', as propriedades '+(tags.length?tags.join(', '):'observadas')+' alteram quais draws/nuts existem e quais partes dos ranges podem apostar por value ou blefe. Para '+hand+', '+solverRef,
-            'On board '+board+', '+(tags.length?tags.join(', '):'its observed structure')+' changes available draws/nuts and which range segments can bet for value or bluff. For '+hand+', '+solverRef,
-            'En board '+board+', '+(tags.length?tags.join(', '):'su estructura')+' cambia los draws/nuts disponibles y qué partes de los rangos pueden apostar por value o bluff. Para '+hand+', '+solverRef
+            'Neste board '+board+', as propriedades '+(tags.length?tags.join(', '):'observadas')+' alteram quais draws/nuts existem e quais partes dos ranges podem apostar por value ou blefe. '+solverRef,
+            'On board '+board+', '+(tags.length?tags.join(', '):'its observed structure')+' changes available draws/nuts and which range segments can bet for value or bluff. '+solverRef,
+            'En board '+board+', '+(tags.length?tags.join(', '):'su estructura')+' cambia los draws/nuts disponibles y qué partes de los rangos pueden apostar por value o bluff. '+solverRef
           )
         };
       }
