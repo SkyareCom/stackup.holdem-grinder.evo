@@ -93,11 +93,14 @@ jobs:
           STACKUP_SHARD_INPUT: ${{ github.workspace }}/.stackup/solver-shards
         run: node scripts/merge-solver-shards.mjs
 
+      - name: Audit scenario coverage
+        run: node scripts/audit-scenario-coverage.mjs
+
       - name: Commit solver bank
         run: |
           git config user.name "StackUp Solver Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/solver/preflop.json data/solver/postflop.json data/solver/manifest.json
+          git add data/solver/preflop.json data/solver/postflop.json data/solver/manifest.json data/solver/coverage.json
           if git diff --cached --quiet; then
             echo "Solver bank unchanged."
             exit 0
