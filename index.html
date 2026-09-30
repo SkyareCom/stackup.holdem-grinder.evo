@@ -1497,8 +1497,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         '<span class="spotindicatorindex">'+spotEscape(String(x.index))+'</span>'+
         '<b>'+spotEscape(x.name)+'</b>'+
         '<span class="indicatorvalue">'+spotEscape('RESULTADO: '+(x.value??'—'))+'</span>'+
-        '<small class="indicatorcalc">'+spotEscape('CÁLCULO / LEITURA: '+calc)+'</small>'+
-        '<small class="indicatorimpact">'+spotEscape('IMPACTO NA DECISÃO: '+impact)+'</small>'+
+        (x.unavailable?'':('<small class="indicatorcalc">'+spotEscape('CÁLCULO / LEITURA: '+calc)+'</small>'+
+        '<small class="indicatorimpact">'+spotEscape('IMPACTO NA DECISÃO: '+impact)+'</small>'))+
       '</div>';
     }).join('');
     const finalSummary=ordered.map(x=>'<li><b>'+spotEscape(x.name)+'</b> — '+spotEscape(x.value??'—')+'</li>').join('');
