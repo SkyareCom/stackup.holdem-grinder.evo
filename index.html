@@ -970,6 +970,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   let SPOT_DECISION_SEQUENCE_TOKEN=0;
   let SPOT_DECISION_SEQUENCE_RUNNING=false;
   let SPOT_STAGE_INTRO=false;
+  let SPOT_TRAINING_STARTED=false;
   let SPOT_ACTIVE_ACTION=null;
   const SPOT_VISUAL_FOLDS=new Set();
   const SPOT_ANALYSIS_CACHE=new Map();
@@ -1014,6 +1015,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const entry=SPOT_TIMELINE[i];
     if(!entry)return false;
     SPOT_TIMELINE_INDEX=i;
+    SPOT_TRAINING_STARTED=true;
+    SPOT_STAGE_INTRO=false;
     SOLVER_SPOT=cloneSpotValue(entry.spot);
     SOLVER_TABLE_STATE=entry.answer?.tableStateAfter
       ?cloneSpotValue(entry.answer.tableStateAfter)
@@ -1048,8 +1051,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     @keyframes spotActionBadgeIn{from{opacity:0;transform:translate(-50%,-50%) scale(.72)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
     @keyframes spotActorPulse{from{filter:brightness(1)}to{filter:brightness(1.4)}}
     @keyframes spotHeroTurn{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}
-    .spotintro{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);z-index:8;display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--c-muted);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label);white-space:nowrap}
-    .spotintro i{display:block;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.24);box-shadow:0 0 0 8px rgba(21,91,189,.10),0 0 22px rgba(21,91,189,.30);animation:spotIntroPulse .8s ease-in-out infinite}
+    .spotintro{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 6px;font-family:var(--f-ui);font-size:var(--fs)!important}
+    .spotsetupcard{width:min(100%,360px);max-height:calc(100% - 64px);overflow:auto;padding:16px;border-radius:var(--r-card);background:var(--glass-bg-strong);border:var(--glass-border);box-shadow:var(--glass-hl);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+    .spotsetuptitle{margin-bottom:12px;text-align:center;color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotsetuprows{display:flex;flex-direction:column;gap:0}
+    .spotsetuprow{display:grid;grid-template-columns:minmax(94px,.85fr) minmax(0,1.5fr);gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.12);align-items:start}
+    .spotsetuprow:last-child{border-bottom:0}
+    .spotsetuprow b,.spotsetuprow span{font-family:var(--f-ui);font-size:var(--fs)!important;font-weight:400;line-height:1.25}
+    .spotsetuprow b{color:var(--c-muted);letter-spacing:var(--ls-label)}
+    .spotsetuprow span{color:var(--c-text);text-align:left;overflow-wrap:anywhere}
+    .spotsetupstart{width:min(100%,360px);height:44px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);-webkit-backdrop-filter:var(--on-blur);backdrop-filter:var(--on-blur);color:var(--c-accent-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotintro.loading{color:var(--c-muted);letter-spacing:var(--ls-label);white-space:nowrap}
+    .spotintro.loading i{display:block;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.24);box-shadow:0 0 0 8px rgba(21,91,189,.10),0 0 22px rgba(21,91,189,.30);animation:spotIntroPulse .8s ease-in-out infinite}
     @keyframes spotIntroPulse{0%,100%{transform:scale(.78);opacity:.35}50%{transform:scale(1);opacity:1}}
   `;
   R.appendChild(spotStateStyle);
@@ -1320,6 +1333,89 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       special:Object.keys(special).length?JSON.stringify(special):null
     };
   }
+  const SPOT_SETUP_TEXT={
+    pt:{title:'RESUMO DO TREINO',start:'INICIAR TREINO'},
+    en:{title:'TRAINING SUMMARY',start:'START TRAINING'},
+    es:{title:'RESUMEN DEL ENTRENO',start:'INICIAR ENTRENO'}
+  };
+  function spotSetupRows(){
+    const t=TR[L()],rows=[];
+    const readable=value=>{
+      try{return lab(value);}catch(_){return String(value||'');}
+    };
+    for(const section of SECS){
+      if(section.tour&&!isTour())continue;
+      const values=[];
+      for(const group of section.groups){
+        const raw=[...(sel[group.id]||[])];
+        if(group.toggle){
+          const active=raw.filter(v=>v!=='all'&&v!=='random');
+          if(active.length)values.push(active.map(readable).join(', '));
+          continue;
+        }
+        if(!raw.length||raw.includes('all')||raw.includes('random')){
+          values.push(t.all);
+        }else if(group.id==='hands'){
+          values.push(raw[0]+' '+t.hands);
+        }else{
+          values.push(raw.map(readable).join(', '));
+        }
+      }
+      const value=values.filter(Boolean).join(' · ');
+      if(value)rows.push({label:t.sec[section.id]||section.id,value});
+    }
+    for(const section of ADV_SECS){
+      if(section.tour&&!isTour())continue;
+      const active=section.groups.flatMap(group=>[...(sel[group.id]||[])])
+        .filter(v=>v!=='all'&&v!=='random');
+      if(active.length)rows.push({
+        label:t.sec[section.id]||section.id,
+        value:active.map(readable).join(', ')
+      });
+    }
+    return rows;
+  }
+  function renderSpotSetup(){
+    const tx=SPOT_SETUP_TEXT[L()]||SPOT_SETUP_TEXT.pt;
+    const rows=spotSetupRows();
+    return '<div class="spotintro"><div class="spotsetupcard">'+
+      '<div class="spotsetuptitle">'+spotEscape(tx.title)+'</div>'+
+      '<div class="spotsetuprows">'+rows.map(row=>
+        '<div class="spotsetuprow"><b>'+spotEscape(row.label)+'</b><span>'+spotEscape(row.value)+'</span></div>'
+      ).join('')+'</div></div>'+
+      '<button class="spotsetupstart" type="button" data-spot-start="1">'+spotEscape(tx.start)+'</button></div>';
+  }
+  async function startSpotTraining(){
+    if(SPOT_TRAINING_STARTED)return;
+    SPOT_TRAINING_STARTED=true;
+    SPOT_STAGE_INTRO=false;
+    spotActions.hidden=false;
+    spotSupport.hidden=false;
+    spotActions.style.visibility='';
+    setSpotActionsBusy(true);
+    renderSpotActions();
+    renderTable();
+    renderSpotSupport();
+
+    // The spot normally loads behind the summary card. If the user starts
+    // immediately, wait for that request instead of launching a duplicate one.
+    let guard=0;
+    while(solverSpotLoading&&!SOLVER_SPOT&&guard<100){
+      await spotSleep(40);
+      guard++;
+    }
+    const spot=SOLVER_SPOT||await loadSolverSpot(false);
+    if(cur!=='spots'||sub.spots.length||!SPOT_TRAINING_STARTED)return;
+    renderSpotActions();
+    renderTable();
+    renderSpotSupport();
+    if(spot&&!currentSpotEntry()?.answer&&!SPOT_DECISION_SEQUENCE_RUNNING){
+      playSpotDecisionSequence(spot);
+    }else{
+      setSpotActionsBusy(!!currentSpotEntry()?.answer);
+    }
+  }
+
   function solverSpotView(pos){
     if(!SOLVER_SPOT||!window.StackUpSpotsEngine)return null;
     try{
@@ -1942,8 +2038,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const feltLeft=Math.max(64,W*.17),feltRight=W-feltLeft;
     const top=Math.max(54,H*.095),bot=H-Math.max(58,H*.095);
     const feltW=feltRight-feltLeft,feltH=bot-top;
-    if(SPOT_STAGE_INTRO||(solverSpotLoading&&!SOLVER_SPOT)){
-      tb.innerHTML=`<div class="felt" style="left:${feltLeft}px;top:${top}px;width:${feltW}px;height:${feltH}px"></div><div class="spotintro"><i></i><span>${L()==='en'?'PREPARING SPOT':L()==='es'?'PREPARANDO SPOT':'PREPARANDO SPOT'}</span></div>`;
+    if(!SPOT_TRAINING_STARTED){
+      tb.innerHTML=renderSpotSetup();
+      return;
+    }
+    if(solverSpotLoading&&!SOLVER_SPOT){
+      tb.innerHTML=`<div class="felt" style="left:${feltLeft}px;top:${top}px;width:${feltW}px;height:${feltH}px"></div><div class="spotintro loading"><i></i><span>${L()==='en'?'LOADING TRAINING':L()==='es'?'CARGANDO ENTRENO':'CARREGANDO TREINO'}</span></div>`;
       return;
     }
     if(!SOLVER_SPOT){
@@ -1989,6 +2089,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     tb.innerHTML=html;
     paintSpotActorAction();
   }
+  tb.addEventListener('click',e=>{
+    const start=e.target.closest('[data-spot-start]');
+    if(start){
+      start.classList.add('on');
+      startSpotTraining();
+    }
+  });
   try{new ResizeObserver(()=>{if(!tb.hidden)renderTable();}).observe(tb);}catch(e){}
   function sizeSpotStage(){
     const content=$('.content'),page=$('#page');
@@ -2004,41 +2111,47 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   function syncSpots(){
     const on=cur==='spots'&&!sub.spots.length;
     const content=$('.content'),page=$('#page');
-    tb.hidden=!on;spotActions.hidden=!on;spotSupport.hidden=!on;
+    tb.hidden=!on;
     content.classList.toggle('spotsmode',on);
     page.classList.toggle('spotsmode',on);
     if(on){
       $('#page .slot').hidden=true;
       sizeSpotStage();
-      SPOT_STAGE_INTRO=true;
       clearSpotActorAction();
+
+      if(!SPOT_TRAINING_STARTED){
+        SPOT_STAGE_INTRO=true;
+        spotActions.hidden=true;
+        spotSupport.hidden=true;
+        setSpotActionsBusy(true);
+        requestAnimationFrame(renderTable);
+        // Preload while the user reviews the selected filters. Nothing from the
+        // table is revealed until INICIAR TREINO is pressed.
+        loadSolverSpot(false).then(()=>{
+          if(cur==='spots'&&!sub.spots.length&&!SPOT_TRAINING_STARTED)renderTable();
+        }).catch(()=>{
+          if(cur==='spots'&&!sub.spots.length&&!SPOT_TRAINING_STARTED)renderTable();
+        });
+        return;
+      }
+
+      SPOT_STAGE_INTRO=false;
+      spotActions.hidden=false;
+      spotSupport.hidden=false;
+      spotActions.style.visibility='';
       renderSpotActions();
-      spotActions.style.visibility='hidden';
-      setSpotActionsBusy(true);
+      setSpotActionsBusy(!!currentSpotEntry()?.answer||SPOT_DECISION_SEQUENCE_RUNNING);
       requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
-      const introStarted=Date.now();
-      loadSolverSpot(false).then(async spot=>{
-        const wait=Math.max(0,360-(Date.now()-introStarted));
-        if(wait)await spotSleep(wait);
-        if(cur!=='spots'||sub.spots.length)return;
-        SPOT_STAGE_INTRO=false;
-        spotActions.style.visibility='';
-        renderSpotActions();
-        renderTable();
-        renderSpotSupport();
-        if(spot&&!currentSpotEntry()?.answer&&!SPOT_DECISION_SEQUENCE_RUNNING){
+      loadSolverSpot(false).then(spot=>{
+        if(spot&&cur==='spots'&&!sub.spots.length&&!currentSpotEntry()?.answer&&!SPOT_DECISION_SEQUENCE_RUNNING){
           playSpotDecisionSequence(spot);
-        }else{
-          setSpotActionsBusy(!!currentSpotEntry()?.answer);
         }
-      }).catch(()=>{
-        SPOT_STAGE_INTRO=false;
-        spotActions.style.visibility='';
-        renderTable();
-        renderSpotSupport();
-      });
+      }).catch(()=>{});
     }else{
       SPOT_STAGE_INTRO=false;
+      SPOT_TRAINING_STARTED=false;
+      spotActions.hidden=true;
+      spotSupport.hidden=true;
       spotActions.style.visibility='';
       cancelSpotDecisionSequence();
     }
@@ -2159,6 +2272,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       }catch(_){}
     }
     sub.home.length=0;
+    SPOT_TRAINING_STARTED=true;
+    SPOT_STAGE_INTRO=false;
     show('spots',true);
     setSpotActionsBusy(!!entry.answer);
     requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
