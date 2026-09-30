@@ -152,8 +152,12 @@
     const bank=await ensureStaticBank();
     const sequencer=global.StackUpTrainingSequencer;
     if(sequencer?.pick){
-      const spot=sequencer.pick(bank,filters||{});
-      try{state.lastStats=sequencer.stats(bank,filters||{});}catch(_){state.lastStats=null;}
+      const activeFilters=filters||{};
+      const spot=sequencer.pick(bank,activeFilters);
+      try{
+        const key=sequencer.filterKey(activeFilters);
+        if(!state.lastStats||state.lastStats.filterKey!==key)state.lastStats=sequencer.stats(bank,activeFilters);
+      }catch(_){state.lastStats=null;}
       if(!spot)throw new Error('no_solver_spot_for_active_filters');
       return spot;
     }
