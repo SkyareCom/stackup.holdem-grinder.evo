@@ -11,7 +11,7 @@ if(!catalog)throw new Error("scenario catalog unavailable");
 
 const preflop=JSON.parse(await readFile(join(SOLVER_DIR,"preflop.json"),"utf8"));
 const postflop=JSON.parse(await readFile(join(SOLVER_DIR,"postflop.json"),"utf8"));
-const all=[...preflop,...postflop];
+const pushfold=JSON.parse(await readFile(join(SOLVER_DIR,"pushfold-hu-v1.json"),"utf8"));
 
 const SUIT_PERMS=[
   {s:"s",h:"h",d:"d",c:"c"},
@@ -25,6 +25,49 @@ const SUIT_PERMS=[
 function isExactHand(hand){
   return /^(?:10|[2-9TJQKA])[cdhs](?:10|[2-9TJQKA])[cdhs]$/i.test(String(hand||""));
 }
+const RANKS="AKQJT98765432";
+function allHandClasses(){
+  const out=[];
+  for(let i=0;i<RANKS.length;i++){
+    for(let j=0;j<RANKS.length;j++){
+      const a=RANKS[i],b=RANKS[j];
+      if(i===j)out.push(a+a);
+      else if(i<j)out.push(a+b+"s");
+      else out.push(b+a+"o");
+    }
+  }
+  return out;
+}
+function classComboCount(hand){
+  const t=String(hand||"").trim().toUpperCase().replace(/10/g,"T");
+  const m=t.match(/^([2-9TJQKA])([2-9TJQKA])([SO])?$/);
+  if(!m)return 1;
+  if(m[1]===m[2])return 6;
+  return m[3]==="S"?4:m[3]==="O"?12:1;
+}
+function pushfoldSpots(){
+  if(!pushfold?.charts)return [];
+  const expl=Number(pushfold.final_exploitability_bb_per_100);
+  if(!Number.isFinite(expl)||expl>=0.05)return [];
+  const classes=allHandClasses();
+  const out=[];
+  for(const stack of (pushfold.stack_depths_bb||[]).map(Number).filter(v=>v>=2&&v<=15)){
+    const jam=pushfold.charts?.sb_jam?.[String(stack)]||{};
+    const call=pushfold.charts?.bb_call_vs_jam?.[String(stack)]||{};
+    out.push({
+      id:"pushfold-hu-sb-"+stack+"bb",solver:"POKER_SOLVER_PUSHFOLD",
+      scenario:{gameType:"TOURNAMENT",street:"PRE-FLOP",tableSize:2,trainingTableSize:2,heroPosition:"SB",villainPosition:"BB",effectiveStack:stack,pot:1.5,board:[],actionHistory:[],tags:["open_shove","push_fold","heads_up_2max","blind_war"]},
+      strategy:classes.map(hand=>{const p=Math.max(0,Math.min(1,Number(jam[hand])||0));return {hand,actions:[{action:"FOLD",frequency:(1-p)*100},{action:"ALL IN",frequency:p*100}]};})
+    });
+    out.push({
+      id:"pushfold-hu-bb-"+stack+"bb",solver:"POKER_SOLVER_PUSHFOLD",
+      scenario:{gameType:"TOURNAMENT",street:"PRE-FLOP",tableSize:2,trainingTableSize:2,heroPosition:"BB",villainPosition:"SB",effectiveStack:stack,pot:stack+1,board:[],actionHistory:[{position:"SB",action:"ALL IN",kind:"jam",to:stack}],tags:["call_shove","push_fold","heads_up_2max","blind_war"]},
+      strategy:classes.map(hand=>{const p=Math.max(0,Math.min(1,Number(call[hand])||0));return {hand,actions:[{action:"FOLD",frequency:(1-p)*100},{action:"CALL",frequency:p*100}]};})
+    });
+  }
+  return out;
+}
+const all=[...preflop,...postflop,...pushfoldSpots()];
 function transformCard(card,perm){
   const text=String(card||"");
   const m=text.match(/^(10|[2-9TJQKA])([cdhs])$/i);
@@ -49,9 +92,11 @@ function handVariants(spot,hand){
 function candidateCount(spots){
   let total=0;
   for(const spot of spots){
+    const pre=normStreet(spot?.scenario?.street)==="PRE-FLOP";
     for(const h of spot?.strategy||[]){
       if(!h?.hand||!Array.isArray(h.actions)||!h.actions.length)continue;
-      total+=handVariants(spot,h.hand);
+      if(pre&&!isExactHand(h.hand))total+=classComboCount(h.hand);
+      else total+=handVariants(spot,h.hand);
     }
   }
   return total;
