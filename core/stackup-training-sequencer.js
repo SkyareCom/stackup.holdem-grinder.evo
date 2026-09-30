@@ -319,11 +319,26 @@
     if(/CO vs BTN/i.test(matchup))tags.add('attack_cobtn');
     boardTags(scenario.board).forEach(x=>tags.add(x));
 
+    function sizingPct(action){
+      const label=String(action?.action||action?.label||'').toLowerCase();
+      const direct=Number(action?.to??action?.size??action?.amount);
+      if(Number.isFinite(direct)){
+        if(direct<=3)return direct*100;
+        return direct;
+      }
+      let m=label.match(/(\d+(?:\.\d+)?)\s*%/);
+      if(m)return Number(m[1]);
+      m=label.match(/bet\s+(\d+)\s*\/\s*(\d+)/);
+      if(m&&Number(m[2]))return Number(m[1])/Number(m[2])*100;
+      m=label.match(/bet\s+(\d+(?:\.\d+)?)x/);
+      if(m)return Number(m[1])*100;
+      return null;
+    }
     const actions=(spot?.strategy||[]).flatMap(h=>h?.actions||[]);
     for(const a of actions){
       const label=String(a?.action||a?.label||'').toLowerCase();
-      const n=Number(a?.to??a?.size??a?.amount);
-      if(label.includes('all')||label.includes('jam'))tags.add('open_shove');
+      const n=sizingPct(a);
+      if(/\ball\s*-?\s*in\b|\bjam\b|\bshove\b/.test(label))tags.add('open_shove');
       if(label.includes('bet')||label.includes('raise')){
         if(Number.isFinite(n)){
           if(Math.abs(n-25)<2)tags.add('bet_25');
@@ -331,6 +346,9 @@
           if(Math.abs(n-50)<3)tags.add('bet_50');
           if(Math.abs(n-66)<3)tags.add('bet_66');
           if(Math.abs(n-75)<3)tags.add('bet_75');
+          if(Math.abs(n-100)<4)tags.add('pot_bet');
+          if(Math.abs(n-125)<5)tags.add('overbet_125');
+          if(Math.abs(n-150)<5)tags.add('overbet_150');
         }
       }
     }
