@@ -168,11 +168,14 @@
       else if(kind==='jam'&&!out.allin)out.allin=action;
       else if(kind==='raise')raises.push(action);
     }
+    // RAISE 1 / RAISE 2 are the first two actual sizing branches exposed
+    // by the solver tree, ordered from smaller to larger. The generic
+    // RAISE button uses the highest-frequency raise for the current combo.
     raises.sort((a,b)=>actionAmount(a)-actionAmount(b));
     if(raises.length){
-      out.raise=raises[0]||null;
-      out.raise1=raises[1]||null;
-      out.raise2=raises[2]||null;
+      out.raise=[...raises].sort((a,b)=>(Number(b.frequency)||0)-(Number(a.frequency)||0))[0]||raises[0];
+      out.raise1=raises[0]||null;
+      out.raise2=raises[1]||null;
     }
     return out;
   }
