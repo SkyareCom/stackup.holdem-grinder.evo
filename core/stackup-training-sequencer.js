@@ -414,15 +414,25 @@
     return candidates;
   }
 
+  function coverageFloor(filters){
+    const f=normalizedFilters(filters);
+    const catalogFloor=Number(global.StackUpScenarioCatalog?.MIN_SPOTS)||1500;
+    return Math.max(catalogFloor,Number(f.sampleSize)||0);
+  }
+
   function bagFor(bank,filters){
     const key=filterKey(filters);
     let bag=bags.get(key);
     if(!bag||!bag.remaining.length){
-      const candidates=expand(bank,normalizedFilters(filters));
+      const normalized=normalizedFilters(filters);
+      const candidates=expand(bank,normalized);
+      const required=coverageFloor(normalized);
       bag={
         key,
         candidates,
-        remaining:shuffle(candidates.map((_,i)=>i)),
+        required,
+        publishable:candidates.length>=required,
+        remaining:candidates.length>=required?shuffle(candidates.map((_,i)=>i)):[],
         cycle:(bag?.cycle||0)+1
       };
       bags.set(key,bag);
@@ -465,7 +475,7 @@
 
   function pick(bank,filters){
     let bag=bagFor(bank,filters);
-    if(!bag.candidates.length)return null;
+    if(!bag.candidates.length||!bag.publishable)return null;
 
     let candidate=chooseFromBag(bag);
     if(!candidate&&bag.remaining.length===0){
@@ -506,11 +516,15 @@
     const candidates=expand(bank,normalizedFilters(filters));
     const unique=new Set(candidates.map(x=>x.exact));
     const unseen=candidates.reduce((n,x)=>n+(seen.has(x.exact)?0:1),0);
+    const required=coverageFloor(filters);
     return Object.freeze({
       candidates:candidates.length,
       unique:unique.size,
       unseen,
       seen:candidates.length-unseen,
+      required,
+      publishable:candidates.length>=required,
+      shortfall:Math.max(0,required-candidates.length),
       filterKey:filterKey(filters)
     });
   }
@@ -520,6 +534,7 @@
     filterKey,
     exactSignature,
     familySignature,
+    coverageFloor,
     pick,
     stats,
     resetSession,
