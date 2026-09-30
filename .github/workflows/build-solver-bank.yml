@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/build-solver-bank.yml"
       - "scripts/generate-solver-bank.mjs"
+      - "scripts/merge-solver-shards.mjs"
 
 permissions:
   contents: write
@@ -17,7 +18,12 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5]
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,13 +49,49 @@ jobs:
           cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-solver
           chmod +x .stackup/dcfr-solver
 
-      - name: Generate solver-backed bank
+      - name: Generate solver shard
         env:
           STACKUP_DCFR_BIN: ${{ github.workspace }}/.stackup/dcfr-solver
           STACKUP_PREFLOP_ITERATIONS: "10000000"
           STACKUP_POSTFLOP_ITERATIONS: "120"
           STACKUP_RANGE_MIN_WEIGHT: "0.08"
+          STACKUP_MAX_MATCHUPS: "30"
+          STACKUP_SHARD_COUNT: "6"
+          STACKUP_SHARD_INDEX: ${{ matrix.shard }}
+          STACKUP_BOARDS_PER_STREET: "1"
+          STACKUP_SHARD_OUT: ${{ github.workspace }}/.stackup/solver-shard
         run: node scripts/generate-solver-bank.mjs
+
+      - name: Upload solver shard
+        uses: actions/upload-artifact@v4
+        with:
+          name: solver-shard-${{ matrix.shard }}
+          path: .stackup/solver-shard
+          if-no-files-found: error
+          retention-days: 1
+
+  aggregate:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download solver shards
+        uses: actions/download-artifact@v4
+        with:
+          pattern: solver-shard-*
+          path: .stackup/solver-shards
+          merge-multiple: true
+
+      - name: Merge solver bank
+        env:
+          STACKUP_SHARD_COUNT: "6"
+          STACKUP_SHARD_INPUT: ${{ github.workspace }}/.stackup/solver-shards
+        run: node scripts/merge-solver-shards.mjs
 
       - name: Commit solver bank
         run: |
