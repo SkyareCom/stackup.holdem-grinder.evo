@@ -1389,6 +1389,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(SPOT_TRAINING_STARTED)return;
     SPOT_TRAINING_STARTED=true;
     SPOT_STAGE_INTRO=false;
+    sizeSpotStage();
     spotActions.hidden=false;
     spotSupport.hidden=false;
     spotActions.style.visibility='';
@@ -2101,9 +2102,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const content=$('.content'),page=$('#page');
     if(!content||!page)return;
     const available=Math.max(0,content.clientHeight);
-    /* 88px dos botões + 6px de gap: a mesa usa o restante da primeira tela,
-       como antes dos novos controles/feedback. */
-    const tableHeight=Math.max(220,Math.floor(available-94));
+    /* Antes de iniciar, o resumo usa toda a área disponível. Depois,
+       reservamos 88px dos botões + 6px de gap para a mesa. */
+    const reserved=SPOT_TRAINING_STARTED?94:0;
+    const tableHeight=Math.max(220,Math.floor(available-reserved));
     page.style.setProperty('--spot-table-height',tableHeight+'px');
   }
   try{new ResizeObserver(()=>{if(cur==='spots'&&!sub.spots.length){sizeSpotStage();requestAnimationFrame(renderTable);}}).observe($('.content'));}catch(_){}
