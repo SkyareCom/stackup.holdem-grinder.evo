@@ -1092,6 +1092,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       resetSpotTimeline();
     }
     solverSpotLoading=true;
+    if(typeof setSpotActionsBusy==='function'&&!tb.hidden)setSpotActionsBusy(true);
     renderSpotSupport();
     try{
       const spot=await client.next(filters);
@@ -1115,6 +1116,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       return spot;
     }finally{
       solverSpotLoading=false;
+      if(typeof setSpotActionsBusy==='function'&&!tb.hidden)setSpotActionsBusy(!!currentSpotEntry()?.answer);
       renderSpotSupport();
     }
   }
