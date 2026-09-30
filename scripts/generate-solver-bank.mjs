@@ -11,7 +11,7 @@ const WORK=join(ROOT,".stackup","solver-bank");
 const OUT=join(ROOT,"data","solver");
 const PREFLOP_ITERATIONS=Math.max(100_000,Number(process.env.STACKUP_PREFLOP_ITERATIONS||10_000_000));
 const POSTFLOP_ITERATIONS=Math.max(50,Number(process.env.STACKUP_POSTFLOP_ITERATIONS||120));
-const RANGE_MIN_WEIGHT=Math.max(0,Math.min(0.25,Number(process.env.STACKUP_RANGE_MIN_WEIGHT||0.02)));
+const RANGE_MIN_WEIGHT=Math.max(0,Math.min(0.25,Number(process.env.STACKUP_RANGE_MIN_WEIGHT||0.08)));
 const POSITION_ORDER=["SB","BB","UTG","HJ","CO","BTN"];
 const TABLE_POSITIONS=["BTN","SB","BB","UTG","UTG+1","UTG+2","MP","LJ","HJ","CO"];
 const BOARDS={
@@ -169,9 +169,11 @@ for(const matchup of selected){
         "--iterations",String(POSTFLOP_ITERATIONS),
         "--format","json",
         "--output",rawPath,
-        "--bet-sizes","33,67,125",
-        "--raise-sizes","50,100",
-        "--max-raises","2",
+        // Memory-safe postflop tree for GitHub-hosted bank generation. The live API can use
+        // deeper trees; the static bank prioritizes reliability and representative training spots.
+        "--bet-sizes","33,75",
+        "--raise-sizes","75",
+        "--max-raises","1",
         "--allin-threshold","0.67",
         "--allin-pot-ratio","3",
         "--skip-cum-strategy"
