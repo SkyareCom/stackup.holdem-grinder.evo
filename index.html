@@ -968,6 +968,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const SPOT_TIMELINE=[];
   let SPOT_TIMELINE_INDEX=-1;
   let SPOT_DECISION_SEQUENCE_TOKEN=0;
+  let SPOT_DECISION_SEQUENCE_RUNNING=false;
   const SPOT_VISUAL_FOLDS=new Set();
 
   function cloneSpotValue(value){
@@ -990,7 +991,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       SOLVER_SPOT=spot;
       const view=solverSpotView(tablePositions);
       SOLVER_SPOT=spot;
-      return window.StackUpTableState?.fromSpot?.(spot,view)||null;
+      return window.StackUpTableState?.fromStreetStart?.(spot,view)
+        ||window.StackUpTableState?.fromSpot?.(spot,view)
+        ||null;
     }catch(_){
       return null;
     }
@@ -1168,46 +1171,82 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   }
   function cancelSpotDecisionSequence(){
     SPOT_DECISION_SEQUENCE_TOKEN++;
+    SPOT_DECISION_SEQUENCE_RUNNING=false;
     clearSpotActorAction();
     tb.querySelector('.seat.hero')?.classList.remove('spot-turn');
   }
   async function playSpotDecisionSequence(spot){
     const token=++SPOT_DECISION_SEQUENCE_TOKEN;
+    SPOT_DECISION_SEQUENCE_RUNNING=true;
     clearSpotActorAction();
     SPOT_VISUAL_FOLDS.clear();
     const entry=currentSpotEntry();
-    const hero=tb.querySelector('.seat.hero');
-    hero?.classList.remove('spot-turn');
-    if(entry?.answer){setSpotActionsBusy(true);return;}
+    if(entry?.answer){
+      SPOT_DECISION_SEQUENCE_RUNNING=false;
+      setSpotActionsBusy(true);
+      return;
+    }
     setSpotActionsBusy(true);
 
     const scenario=spot?.scenario||{};
-    const raw=Array.isArray(scenario.actionHistory)?scenario.actionHistory:[];
+    const tablePositions=POSN[resolveSpotCount()]||POSN[10];
+    const view=solverSpotView(tablePositions);
+    if(window.StackUpTableState?.fromStreetStart&&view){
+      SOLVER_TABLE_STATE=window.StackUpTableState.fromStreetStart(spot,view);
+      renderTable();
+      await spotSleep(80);
+    }
+
+    const currentStreetHistory=window.StackUpTableState?.historyForCurrentStreet?.(view,scenario);
+    const raw=Array.isArray(currentStreetHistory)?currentStreetHistory:(Array.isArray(scenario.actionHistory)?scenario.actionHistory:[]);
     let history=raw.filter(a=>spotHistoryActor(a)&&['check','call','fold','raise','bet','jam'].includes(spotHistoryKind(a)));
     const street=String(scenario.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
-    if(!history.length&&street==='PRE-FLOP'&&/rfi/i.test(String(spot?.id||scenario.node||''))){
+
+    // RFI charts do not carry explicit folds. Recreate only the logically required
+    // pre-hero folds so the street is shown from its first action.
+    if(!history.length&&street==='PRE-FLOP'&&/rfi/i.test(String(spot?.id||scenario.solverNode||''))){
       const order=Array.isArray(scenario.positions)?scenario.positions.map(x=>String(x).toUpperCase()):[];
       const heroPos=String(scenario.heroPosition||'').toUpperCase();
       const heroIndex=order.indexOf(heroPos);
-      if(heroIndex>0)history=order.slice(0,heroIndex).map(position=>({position,kind:'fold'}));
+      if(heroIndex>0)history=order.slice(0,heroIndex).map(position=>({position,kind:'fold',street}));
     }
-    if(history.length){
-      tb.querySelectorAll('.seat:not(.hero)').forEach(seat=>{
-        seat.classList.remove('spot-state-folded','spot-state-allin');
-        const cards=seat.querySelector('.backs');
-        if(cards)cards.style.display='';
-      });
-      for(const action of history){
-        if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
-        showSpotActorAction(action);
-        await spotSleep(1500);
-        clearSpotActorAction();
+
+    tb.querySelectorAll('.seat:not(.hero)').forEach(seat=>{
+      seat.classList.remove('spot-state-folded','spot-state-allin','spot-acting');
+      const cards=seat.querySelector('.backs');
+      if(cards)cards.style.display='';
+    });
+
+    for(const action of history){
+      if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
+      const kind=spotHistoryKind(action);
+      const actor=spotHistoryActor(action);
+
+      showSpotActorAction(action);
+
+      if(SOLVER_TABLE_STATE&&window.StackUpTableState?.apply&&actor){
+        try{
+          window.StackUpTableState.apply(SOLVER_TABLE_STATE,actor,action);
+          if(kind!=='fold')syncSpotTableStateDom();
+          else window.setTimeout(()=>{
+            if(token===SPOT_DECISION_SEQUENCE_TOKEN&&!tb.hidden)syncSpotTableStateDom();
+          },660);
+        }catch(_){}
       }
+
+      // Cada jogador ocupa exatamente 1,5 s da sequência antes do próximo.
+      await spotSleep(1500);
+      if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
+      clearSpotActorAction();
+      syncSpotTableStateDom();
     }
+
     if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
     clearSpotActorAction();
     syncSpotTableStateDom();
+    const hero=tb.querySelector('.seat.hero');
     hero?.classList.add('spot-turn');
+    SPOT_DECISION_SEQUENCE_RUNNING=false;
     setSpotActionsBusy(false);
     window.StackUpPokerAudio?.play?.('hero');
   }
@@ -1315,7 +1354,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       return spot;
     }finally{
       solverSpotLoading=false;
-      if(typeof setSpotActionsBusy==='function'&&!tb.hidden)setSpotActionsBusy(!!currentSpotEntry()?.answer);
+      if(typeof setSpotActionsBusy==='function'&&!tb.hidden){
+        setSpotActionsBusy(!!currentSpotEntry()?.answer||SPOT_DECISION_SEQUENCE_RUNNING);
+      }
       renderSpotSupport();
     }
   }
@@ -1872,7 +1913,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       renderSpotActions();
       setSpotActionsBusy(!!currentSpotEntry()?.answer);
       requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
-      loadSolverSpot(false).catch(()=>{});
+      loadSolverSpot(false).then(spot=>{
+        if(spot&&cur==='spots'&&!sub.spots.length&&!currentSpotEntry()?.answer&&!SPOT_DECISION_SEQUENCE_RUNNING){
+          playSpotDecisionSequence(spot);
+        }
+      }).catch(()=>{});
     }else{
       cancelSpotDecisionSequence();
     }
