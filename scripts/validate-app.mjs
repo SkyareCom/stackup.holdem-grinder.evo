@@ -26,17 +26,33 @@ scripts.forEach((s,i)=>{
   catch(error){failures.push('inline script '+i+' syntax error: '+error.message);}
 });
 
+const catalogPath=new URL('../core/stackup-scenario-catalog.js',import.meta.url);
 const sequencerPath=new URL('../core/stackup-training-sequencer.js',import.meta.url);
 const spotsClientPath=new URL('../core/stackup-spots-client.js',import.meta.url);
 const serverPath=new URL('../solver-api/server.mjs',import.meta.url);
+const catalog=fs.readFileSync(catalogPath,'utf8');
 const sequencer=fs.readFileSync(sequencerPath,'utf8');
 const spotsClient=fs.readFileSync(spotsClientPath,'utf8');
+try{
+  const fakeWindow={};
+  new Function('window',catalog)(fakeWindow);
+  const counts=fakeWindow.StackUpScenarioCatalog?.count?.();
+  if(counts?.adjust!==58)failures.push('scenario catalog must contain exactly 58 AJUSTES cards, found '+String(counts?.adjust));
+  if(counts?.advance!==104)failures.push('scenario catalog must contain exactly 104 ADVANCE cards, found '+String(counts?.advance));
+  if(fakeWindow.StackUpScenarioCatalog?.MIN_SPOTS!==1500)failures.push('scenario catalog minimum must be 1500 spots per card');
+}catch(error){failures.push('scenario catalog syntax/runtime error: '+error.message);}
 try{new Function(sequencer);}
 catch(error){failures.push('training sequencer syntax error: '+error.message);}
 try{new Function(spotsClient);}
 catch(error){failures.push('spots client syntax error: '+error.message);}
+if(!html.includes('<script src="core/stackup-scenario-catalog.js"></script>')){
+  failures.push('scenario catalog script is missing from index');
+}
 if(!html.includes('<script src="core/stackup-training-sequencer.js"></script>')){
   failures.push('training sequencer script is missing from index');
+}
+if(html.indexOf('stackup-scenario-catalog.js')>html.indexOf('stackup-training-sequencer.js')){
+  failures.push('scenario catalog must load before training sequencer');
 }
 if(html.indexOf('stackup-training-sequencer.js')>html.indexOf('stackup-spots-client.js')){
   failures.push('training sequencer must load before spots client');
