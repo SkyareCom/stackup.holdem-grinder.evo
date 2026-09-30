@@ -938,7 +938,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const card=c=>c?`<div class="pcard ${c[c.length-1]}"><span>${c.slice(0,-1)}</span>${SUIT[c[c.length-1]]}</div>`:'<div class="pcard pempty"></div>';
 
   const POSN={
-    2:['BTN','BB'],
+    2:['SB','BB'],
     6:['BTN','SB','BB','UTG','HJ','CO'],
     8:['BTN','SB','BB','UTG','UTG+1','MP','HJ','CO'],
     9:['BTN','SB','BB','UTG','UTG+1','MP','LJ','HJ','CO'],
@@ -1330,7 +1330,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return nf(bb,bb%1?1:0)+' BB';
   }
   function resolveSpotCount(){
-    // SPOTS usa mesa cheia: dez jogadores distribuidos ao redor do feltro.
+    const solvedSize=Number(SOLVER_SPOT?.scenario?.trainingTableSize??SOLVER_SPOT?.scenario?.tableSize);
+    if([2,6,8,9,10].includes(solvedSize))return solvedSize;
+    const requested=selectedOne('seats');
+    const requestedSize=requested&&/^s\d+$/.test(requested)?Number(requested.slice(1)):null;
+    if([2,6,8,9,10].includes(requestedSize))return requestedSize;
     return 10;
   }
   function resolveHeroPosition(pos){
