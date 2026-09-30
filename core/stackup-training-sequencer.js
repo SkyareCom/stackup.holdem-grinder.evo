@@ -194,21 +194,84 @@
     while(list.length>max)list.shift();
   }
 
+  function boardTags(board){
+    const cards=(Array.isArray(board)?board:[]).map(String).filter(Boolean);
+    if(cards.length<3)return [];
+    const rankValue={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,T:10,'10':10,J:11,Q:12,K:13,A:14};
+    const ranks=cards.map(c=>c.slice(0,-1).toUpperCase()).map(r=>rankValue[r]||0);
+    const suits=cards.map(c=>c.slice(-1).toLowerCase());
+    const uniqueRanks=new Set(ranks);
+    const suitCounts={};
+    suits.forEach(s=>suitCounts[s]=(suitCounts[s]||0)+1);
+    const tags=[];
+    const max=Math.max(...ranks),min=Math.min(...ranks);
+    if(uniqueRanks.size<ranks.length)tags.push('board_paired');
+    if(Math.max(...Object.values(suitCounts))>=3)tags.push('board_monotone');
+    else if(Object.values(suitCounts).some(n=>n===2))tags.push('board_twotone');
+    if(max>=12)tags.push('board_high_card');
+    if(max<=9)tags.push('board_low');
+    const sorted=[...new Set(ranks)].sort((a,b)=>a-b);
+    let minSpan=99;
+    for(let i=0;i<sorted.length;i++)for(let j=i+2;j<sorted.length;j++)minSpan=Math.min(minSpan,sorted[j]-sorted[i]);
+    const connected=minSpan<=4||(max-min<=5&&uniqueRanks.size>=3);
+    if(connected)tags.push('board_connected','board_dynamic');
+    else tags.push('board_dry','board_static');
+    return tags;
+  }
+
   function spotTags(spot){
     const raw=spot?.tags||spot?.scenario?.tags||spot?.scenario?.special||[];
-    if(Array.isArray(raw))return new Set(raw.map(String));
-    if(raw&&typeof raw==='object')return new Set(Object.values(raw).flat().map(String));
-    return new Set();
+    const tags=new Set();
+    if(Array.isArray(raw))raw.forEach(x=>tags.add(String(x)));
+    else if(raw&&typeof raw==='object')Object.values(raw).flat().forEach(x=>tags.add(String(x)));
+
+    const scenario=spot?.scenario||{};
+    const street=normStreet(scenario.street);
+    const hero=normPosition(scenario.heroPosition);
+    const villain=normPosition(scenario.villainPosition);
+    const id=String(spot?.id||'').toLowerCase();
+    const matchup=String(spot?.matchup||'');
+
+    if(street==='PRE-FLOP'&&id.includes('rfi')){
+      tags.add('open_by_pos');
+      if(hero==='SB')tags.add('blind_war');
+    }
+    if(hero==='BB'){
+      if(villain==='UTG')tags.add('bb_ep');
+      else if(['HJ','CO'].includes(villain))tags.add('bb_mp');
+      else if(['BTN','SB'].includes(villain))tags.add('bb_lp');
+    }
+    if(hero==='SB'){
+      if(villain==='UTG')tags.add('sb_ep');
+      else if(['HJ'].includes(villain))tags.add('sb_mp');
+      else if(['CO','BTN'].includes(villain))tags.add('sb_cobtn');
+    }
+    if(/CO vs BTN/i.test(matchup))tags.add('attack_cobtn');
+    boardTags(scenario.board).forEach(x=>tags.add(x));
+
+    const actions=(spot?.strategy||[]).flatMap(h=>h?.actions||[]);
+    for(const a of actions){
+      const label=String(a?.action||a?.label||'').toLowerCase();
+      const n=Number(a?.to??a?.size??a?.amount);
+      if(label.includes('all')||label.includes('jam'))tags.add('open_shove');
+      if(label.includes('bet')||label.includes('raise')){
+        if(Number.isFinite(n)){
+          if(Math.abs(n-25)<2)tags.add('bet_25');
+          if(Math.abs(n-33)<3)tags.add('bet_33');
+          if(Math.abs(n-50)<3)tags.add('bet_50');
+          if(Math.abs(n-66)<3)tags.add('bet_66');
+          if(Math.abs(n-75)<3)tags.add('bet_75');
+        }
+      }
+    }
+    return tags;
   }
 
   function hasRequestedSpecial(spot,special){
-    const requested=Object.values(special||{}).flat().map(String).filter(Boolean);
-    if(!requested.length)return true;
+    const groups=Object.entries(special||{}).filter(([,v])=>Array.isArray(v)&&v.length);
+    if(!groups.length)return true;
     const tags=spotTags(spot);
-    // Sparse legacy banks do not have semantic tags yet. Do not fabricate solver meaning:
-    // only enforce special filters when a candidate declares tags.
-    if(!tags.size)return true;
-    return requested.every(x=>tags.has(x));
+    return groups.every(([,values])=>values.some(x=>tags.has(String(x))));
   }
 
   function compatible(spot,filters){
