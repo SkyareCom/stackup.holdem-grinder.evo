@@ -482,10 +482,9 @@
       if(Number.isFinite(stack)&&!filters.effectiveStacks.some(v=>Math.abs(stack-v)<.01))return false;
     }
     if(filters.phases.length&&s.phase&&!filters.phases.includes(String(s.phase)))return false;
-    if(filters.tableSize&&Number(s.tableSize)&&Number(s.tableSize)!==filters.tableSize){
-      // Current static bank is 6-max solver data rendered on a 10-seat training table.
-      // Enforce tableSize only when scenario explicitly opts into trainingTableSize semantics.
-      if(s.trainingTableSize!==undefined&&Number(s.trainingTableSize)!==filters.tableSize)return false;
+    if(filters.tableSize){
+      const actualTableSize=Number(s.trainingTableSize??s.tableSize);
+      if(!Number.isFinite(actualTableSize)||actualTableSize!==filters.tableSize)return false;
     }
     if(!hasRequestedSpecial(spot,filters.special))return false;
     return true;
