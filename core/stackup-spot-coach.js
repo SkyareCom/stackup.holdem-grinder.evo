@@ -488,23 +488,37 @@
       case 7:{
         if(street!=='PRE-FLOP')return unavailable(p('Índice de 3-bet/4-bet é pré-flop; este nó está em '+street+'.','3-bet/4-bet index is preflop; this node is '+street+'.','El índice 3-bet/4-bet es preflop; este nodo está en '+street+'.'));
         const raises=(s.actionHistory||[]).filter(a=>['raise','jam'].includes(actionKind(a))).length;
+        if(raises===0)return {
+          calculation:p('Nenhum raise ocorreu antes de '+heroPos+': o pote está unopened/RFI.','No raise occurred before '+heroPos+': the pot is unopened/RFI.','No hubo raise antes de '+heroPos+': el bote está unopened/RFI.'),
+          interpretation:p(
+            'Como '+heroPos+' ainda não enfrenta 3-bet nem 4-bet, este indicador não comprime o range neste ponto. A decisão é de abertura; para '+hand+', '+solverRef,
+            heroPos+' is not facing a 3-bet or 4-bet, so this factor does not compress the range yet. The decision is an opening decision; for '+hand+', '+solverRef,
+            'Como '+heroPos+' todavía no enfrenta 3-bet ni 4-bet, este factor no comprime el rango. La decisión es de apertura; para '+hand+', '+solverRef
+          )
+        };
         return {
           calculation:p(raises+' ação(ões) agressiva(s) registrada(s) antes do herói; classificação '+potType+'.',raises+' aggressive action(s) recorded before hero; '+potType+' classification.',raises+' acción(es) agresiva(s) registrada(s) antes del héroe; clasificación '+potType+'.'),
           interpretation:p(
-            'Neste spot, o nível de agressão pré-flop já registrado define o quanto os ranges foram comprimidos antes de '+heroPos+' decidir. Quanto mais raises prévios, menos mãos marginais sobrevivem. '+solverRef,
-            'Here, recorded preflop aggression determines how compressed the ranges are before '+heroPos+' acts. More prior raises leave fewer marginal hands. '+solverRef,
-            'Aquí, la agresión preflop registrada determina cuánto se comprimieron los rangos antes de actuar '+heroPos+'. Más raises previos dejan menos manos marginales. '+solverRef
+            'Neste spot, '+raises+' ação(ões) agressiva(s) já filtraram os ranges antes de '+heroPos+' decidir. Isso reduz mãos marginais disponíveis e aumenta o peso de blockers e combos robustos. '+solverRef,
+            'Here, '+raises+' aggressive action(s) already filtered the ranges before '+heroPos+' acts, reducing marginal hands and increasing the weight of blockers and robust combos. '+solverRef,
+            'Aquí, '+raises+' acción(es) agresiva(s) ya filtraron los rangos antes de actuar '+heroPos+', reduciendo manos marginales y aumentando el peso de blockers y combos robustos. '+solverRef
           )
         };
       }
       case 8:{
         if(street!=='PRE-FLOP')return unavailable(p('Fold to 3-bet não é a estatística adequada para um nó '+street+'.','Fold to 3-bet is not the appropriate statistic for a '+street+' node.','Fold to 3-bet no es la estadística adecuada para un nodo '+street+'.'));
+        const raises=(s.actionHistory||[]).filter(a=>['raise','jam'].includes(actionKind(a))).length;
+        if(raises<2)return unavailable(p(
+          'Neste nó '+potType+', '+heroPos+' não está enfrentando uma 3-bet; portanto “Fold to 3-bet” não deve ser calculado a partir da frequência genérica de FOLD do combo.',
+          'In this '+potType+' node, '+heroPos+' is not facing a 3-bet, so “Fold to 3-bet” must not be inferred from the combo’s generic FOLD frequency.',
+          'En este nodo '+potType+', '+heroPos+' no enfrenta una 3-bet; por eso “Fold to 3-bet” no debe inferirse de la frecuencia genérica de FOLD del combo.'
+        ));
         return {
-          calculation:p('Neste combo/nó, a linha FOLD aparece em '+pct1(folds)+'. Isso é frequência do solver para '+hand+', não estatística populacional do adversário.','At this combo/node, FOLD appears at '+pct1(folds)+'. This is solver frequency for '+hand+', not an opponent population stat.','En este combo/nodo, FOLD aparece en '+pct1(folds)+'. Es frecuencia del solver para '+hand+', no estadística poblacional rival.'),
+          calculation:p('Enfrentando 3-bet/pressão superior, '+hand+' folda '+pct1(folds)+' neste nó específico.','Facing a 3-bet/higher pressure, '+hand+' folds '+pct1(folds)+' at this exact node.','Frente a 3-bet/presión superior, '+hand+' foldea '+pct1(folds)+' en este nodo específico.'),
           interpretation:p(
-            'Para '+hand+' neste ponto exato da árvore, '+pct1(folds)+' de fold indica quanto o solver abandona o combo diante da pressão já existente. A referência concorrente mais forte é '+best+' em '+pct(bestFreq)+'.',
-            'For '+hand+' at this exact node, '+pct1(folds)+' fold shows how often the solver releases the combo against existing pressure. The strongest competing line is '+best+' at '+pct(bestFreq)+'.',
-            'Para '+hand+' en este nodo exacto, '+pct1(folds)+' de fold muestra cuánto abandona el solver el combo ante la presión existente. La línea rival principal es '+best+' en '+pct(bestFreq)+'.'
+            'Aqui o '+pct1(folds)+' é útil porque existe realmente uma 3-bet/pressão equivalente no histórico. Para '+hand+', ele mede quanto o solver abandona o combo nesse confronto específico; '+solverRef,
+            'Here '+pct1(folds)+' is meaningful because a real 3-bet/equivalent pressure exists in the history. For '+hand+', it measures how often the solver releases this combo in this exact confrontation; '+solverRef,
+            'Aquí '+pct1(folds)+' es útil porque existe realmente una 3-bet/presión equivalente en el historial. Para '+hand+', mide cuánto abandona el solver este combo en este enfrentamiento; '+solverRef
           )
         };
       }
@@ -820,7 +834,9 @@
     arr.push(indicator(5,names[4],active?String(active)+' ativos / '+String(tableCount||active)+' lugares':na,active&&active>2?'potencial multiway':'heads-up / não multiway','tableState'));
     arr.push(indicator(6,names[5],street==='PRE-FLOP'&&raiseFreq!==undefined?pct(raiseFreq):nap,street==='PRE-FLOP'?rangeNote(heroRange,T.rangeHero):'', 'solver',street==='PRE-FLOP'));
     arr.push(indicator(7,names[6],street==='PRE-FLOP'?(inferPotType(s)):nap,'índice populacional não é inferido sem amostra externa','actionHistory',street==='PRE-FLOP'));
-    arr.push(indicator(8,names[7],street==='PRE-FLOP'&&folds!==undefined?pct(folds):nap,'frequência deste combo/nó, não estatística populacional','solver',street==='PRE-FLOP'));
+    const preflopRaiseCount=(s.actionHistory||[]).filter(a=>['raise','jam'].includes(actionKind(a))).length;
+    const facingThreeBet=street==='PRE-FLOP'&&preflopRaiseCount>=2;
+    arr.push(indicator(8,names[7],facingThreeBet&&folds!==undefined?pct(folds):nap,facingThreeBet?'frequência de FOLD deste combo no nó que enfrenta 3-bet/mais pressão':'não há 3-bet enfrentada neste nó','solver',facingThreeBet));
     arr.push(indicator(9,names[8],street==='PRE-FLOP'?na:nap,'o solver não fornece taxa populacional de limp neste nó','solver',street==='PRE-FLOP'));
     arr.push(indicator(10,names[9],m.potOdds!==null?pct(m.potOdds):nap,m.callCost>0?('custo '+bb(m.callCost)+' para pote '+bb(m.pot)):'' ,'calculated',m.potOdds!==null));
     arr.push(indicator(11,names[10],na,'exige árvore futura/equity por runout não exposta neste nó','solver',false));
