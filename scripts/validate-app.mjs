@@ -26,12 +26,27 @@ scripts.forEach((s,i)=>{
   catch(error){failures.push('inline script '+i+' syntax error: '+error.message);}
 });
 
+const tournamentMathPath=new URL('../core/stackup-tournament-math.js',import.meta.url);
 const catalogPath=new URL('../core/stackup-scenario-catalog.js',import.meta.url);
 const sequencerPath=new URL('../core/stackup-training-sequencer.js',import.meta.url);
 const spotsClientPath=new URL('../core/stackup-spots-client.js',import.meta.url);
 const serverPath=new URL('../solver-api/server.mjs',import.meta.url);
+const tournamentMath=fs.readFileSync(tournamentMathPath,'utf8');
 const catalog=fs.readFileSync(catalogPath,'utf8');
 const sequencer=fs.readFileSync(sequencerPath,'utf8');
+try{
+  const mathWindow={};
+  new Function('window',tournamentMath)(mathWindow);
+  const icm=mathWindow.StackUpTournamentMath;
+  const winnerTakeAll=icm.equities([60,30,10],[100,0,0]);
+  if(Math.abs(winnerTakeAll[0]-60)>1e-7||Math.abs(winnerTakeAll[1]-30)>1e-7||Math.abs(winnerTakeAll[2]-10)>1e-7){
+    failures.push('ICM winner-take-all invariant failed');
+  }
+  const equal=icm.equities([1,1,1],[50,30,20]);
+  if(equal.some(v=>Math.abs(v-(100/3))>1e-7))failures.push('ICM equal-stack symmetry invariant failed');
+  const rp=icm.riskPremium({stacks:[40,30,20,10],payouts:[50,30,20,0],heroIndex:1,villainIndex:0,risk:10});
+  if(!Number.isFinite(rp.factor)||!Number.isFinite(rp.requiredWinProbability))failures.push('ICM risk premium must be finite');
+}catch(error){failures.push('tournament math syntax/runtime error: '+error.message);}
 const spotsClient=fs.readFileSync(spotsClientPath,'utf8');
 try{
   const fakeWindow={};
@@ -45,6 +60,9 @@ try{new Function(sequencer);}
 catch(error){failures.push('training sequencer syntax error: '+error.message);}
 try{new Function(spotsClient);}
 catch(error){failures.push('spots client syntax error: '+error.message);}
+if(!html.includes('<script src="core/stackup-tournament-math.js"></script>')){
+  failures.push('tournament math script is missing from index');
+}
 if(!html.includes('<script src="core/stackup-scenario-catalog.js"></script>')){
   failures.push('scenario catalog script is missing from index');
 }
