@@ -13,7 +13,8 @@
     lastAnswer:null,
     source:null,
     manifest:null,
-    cursor:0
+    cursor:0,
+    lastStats:null
   };
 
   const cfg=Object.assign({
@@ -149,6 +150,16 @@
 
   async function nextStatic(filters){
     const bank=await ensureStaticBank();
+    const sequencer=global.StackUpTrainingSequencer;
+    if(sequencer?.pick){
+      const spot=sequencer.pick(bank,filters||{});
+      try{state.lastStats=sequencer.stats(bank,filters||{});}catch(_){state.lastStats=null;}
+      if(!spot)throw new Error('no_solver_spot_for_active_filters');
+      return spot;
+    }
+
+    // Safety fallback for older cached HTML: deterministic legacy picker is kept
+    // only when the V2 sequencer script is unavailable.
     let street=normalizedStreet(filters?.street);
     if(!street){
       const cycle=['PRE-FLOP','FLOP','TURN','RIVER'];
