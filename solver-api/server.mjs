@@ -229,7 +229,7 @@ function chooseMatchup(filters,street){
   const pool=matchups.filter(m=>{
     const roles=postflopRoles(m.opener?.position,m.caller?.position);
     if(!roles)return false;
-    if(filters.heroPositions.length&&!filters.heroPositions.includes(roles.oop))return false;
+    if(filters.heroPositions.length&&!filters.heroPositions.includes(roles.oop)&&!filters.heroPositions.includes(roles.ip))return false;
     const stackBb=Number(m.eff_stack_chips)/2;
     if(!stackMatches(stackBb,filters.effectiveStacks))return false;
     const baseTags=[
@@ -262,12 +262,72 @@ function run(command,args,{timeoutMs=20_000}={}){
   });
 }
 
-function normalizeDcfr(raw,scenario){
-  const nodes=raw?.strategy||raw?.strategies||[];
-  if(!Array.isArray(nodes)||!nodes.length)throw new Error("dcfr_strategy_missing");
-  const root=nodes.find(n=>n?.node==="root")||nodes[0];
-  if(!root||!Array.isArray(root.combos)||!root.combos.length)throw new Error("dcfr_root_missing");
-  const strategy=root.combos.map(combo=>({
+function nodeActionLabels(node){
+  const text=String(node||"").trim();
+  if(!text||text==="root")return [];
+  return text.split(/\s*(?:→|->)\s*/).map(x=>x.trim()).filter(Boolean);
+}
+function closesBettingRound(actions){
+  let previous=null;
+  for(const label of actions){
+    const kind=normalizeActionLabel(label).kind;
+    if(kind==="call"||kind==="fold"||kind==="jam")return true;
+    if(kind==="check"&&previous==="check")return true;
+    previous=kind;
+  }
+  return false;
+}
+function sameStreetDecisionNode(node){
+  return !closesBettingRound(nodeActionLabels(node));
+}
+function actionFraction(label){
+  const text=String(label||"").toLowerCase();
+  let m=text.match(/(\d+(?:\.\d+)?)\s*%/);
+  if(m)return Number(m[1])/100;
+  m=text.match(/bet\s+(\d+)\s*\/\s*(\d+)/);
+  if(m&&Number(m[2]))return Number(m[1])/Number(m[2]);
+  m=text.match(/bet\s+(\d+(?:\.\d+)?)x/);
+  if(m)return Number(m[1]);
+  return null;
+}
+function simulateStreetHistory(node,roles,basePotBb,stackBb){
+  const actions=nodeActionLabels(node);
+  const committed={OOP:0,IP:0};
+  const remaining={OOP:stackBb,IP:stackBb};
+  let pot=basePotBb,currentBet=0,actor="OOP";
+  const history=[];
+  for(const label of actions){
+    const parsed=normalizeActionLabel(label);
+    const position=actor==="OOP"?roles.oop:roles.ip;
+    let target=committed[actor];
+    if(parsed.kind==="raise"){
+      const frac=actionFraction(label);
+      if(currentBet<=0){
+        const amount=Math.max(.01,(Number.isFinite(frac)?frac:.5)*pot);
+        target=Math.min(committed[actor]+remaining[actor],amount);
+      }else{
+        const toCall=Math.max(0,currentBet-committed[actor]);
+        const potAfterCall=pot+toCall;
+        const raiseAmount=Math.max(.01,(Number.isFinite(frac)?frac:1)*potAfterCall);
+        target=Math.min(committed[actor]+remaining[actor],currentBet+raiseAmount);
+      }
+    }else if(parsed.kind==="call"){
+      target=currentBet;
+    }else if(parsed.kind==="jam"){
+      target=committed[actor]+remaining[actor];
+    }
+    const paid=Math.max(0,Math.min(remaining[actor],target-committed[actor]));
+    committed[actor]+=paid;
+    remaining[actor]-=paid;
+    pot+=paid;
+    currentBet=Math.max(currentBet,committed[actor]);
+    history.push({position,street:null,action:label,kind:parsed.kind,to:+committed[actor].toFixed(4)});
+    actor=actor==="OOP"?"IP":"OOP";
+  }
+  return {history,pot:+pot.toFixed(4),currentBet:+currentBet.toFixed(4),remaining};
+}
+function strategyFromSolverNode(node){
+  return (node?.combos||[]).map(combo=>({
     hand:combo.hand,
     ev:Number(combo.ev??0),
     actions:(combo.actions||[]).map(a=>{
@@ -276,9 +336,21 @@ function normalizeDcfr(raw,scenario){
       return {...n,frequency:Number(a.weight??a.frequency??0)*100,ev:Number.isFinite(ev)?ev:null};
     })
   })).filter(h=>h.hand&&h.actions.length);
-  if(!strategy.length)throw new Error("dcfr_combo_strategy_missing");
+}
+function normalizeDcfr(raw){
+  const rawNodes=raw?.strategy||raw?.strategies||[];
+  if(!Array.isArray(rawNodes)||!rawNodes.length)throw new Error("dcfr_strategy_missing");
+  const nodes=rawNodes
+    .filter(n=>n&&Array.isArray(n.combos)&&n.combos.length&&sameStreetDecisionNode(n.node))
+    .map(n=>({
+      node:String(n.node||"root"),
+      player:String(n.player||"OOP").toUpperCase()==="IP"?"IP":"OOP",
+      strategy:strategyFromSolverNode(n)
+    }))
+    .filter(n=>n.strategy.length);
+  if(!nodes.length)throw new Error("dcfr_decision_nodes_missing");
   return {
-    strategy,
+    nodes,
     convergence:{
       iterations:Number(raw.iterations??POSTFLOP_ITERATIONS),
       exploitabilityPct:raw.exploitability_pct??raw.exploitability??null
@@ -304,7 +376,7 @@ async function solvePostflop(filters,street){
   });
   const boardRaw=randomPick(boardPool);
   if(!boardRaw)throw new Error("postflop_board_filter_unavailable");
-  const key=[street,matchup.matchup,boardRaw,POSTFLOP_ITERATIONS].join("|");
+  const key=[street,matchup.matchup,boardRaw,POSTFLOP_ITERATIONS,(filters.heroPositions||[]).join(",")].join("|");
   if(solveCache.has(key))return solveCache.get(key);
 
   const sideByPos=new Map([
@@ -335,37 +407,57 @@ async function solvePostflop(filters,street){
   await run(SOLVER_BIN,args,{timeoutMs:Number(process.env.STACKUP_SOLVER_TIMEOUT_MS||20_000)});
   const raw=JSON.parse(await readFile(out,"utf8"));
   await rm(out,{force:true}).catch(()=>{});
-  const normalized=normalizeDcfr(raw,{
-    street,
-    heroPosition:roles.oop,
-    villainPosition:roles.ip
+  const normalized=normalizeDcfr(raw);
+  const candidates=normalized.nodes.filter(node=>{
+    if(!filters.heroPositions?.length)return true;
+    const actingPos=node.player==="IP"?roles.ip:roles.oop;
+    return filters.heroPositions.includes(actingPos);
   });
+  const chosenNode=(candidates.length?candidates:normalized.nodes)[counter%(candidates.length?candidates.length:normalized.nodes.length)];
+  const actingRole=chosenNode.player==="IP"?"IP":"OOP";
+  const heroPosition=actingRole==="IP"?roles.ip:roles.oop;
+  const villainPosition=actingRole==="IP"?roles.oop:roles.ip;
   const stackBb=Number(matchup.eff_stack_chips)/2;
   const potBb=Number(matchup.pot_chips)/2;
-  const hand=chooseStrategyHand(normalized.strategy,counter*13+7);
+  const sim=simulateStreetHistory(chosenNode.node,roles,potBb,stackBb);
+  sim.history.forEach(a=>{a.street=street;});
+  const heroRemaining=actingRole==="IP"?sim.remaining.IP:sim.remaining.OOP;
+  const villainRemaining=actingRole==="IP"?sim.remaining.OOP:sim.remaining.IP;
+  const effectiveStack=Math.max(0,Math.min(heroRemaining,villainRemaining));
+  const strategy=chosenNode.strategy;
+  const hand=chooseStrategyHand(strategy,counter*13+7);
+  const playerStacks=Object.fromEntries(TABLE_POSITIONS.map(p=>[p,effectiveStack]));
+  playerStacks[roles.oop]=Math.max(0,sim.remaining.OOP);
+  playerStacks[roles.ip]=Math.max(0,sim.remaining.IP);
+  const nodeSlug=String(chosenNode.node||"root").replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").slice(0,48)||"root";
   const result={
-    id:"dcfr-"+street.toLowerCase()+"-"+matchup.matchup.replace(/\s+/g,"-").toLowerCase()+"-"+boardRaw+"-"+hand,
+    id:"dcfr-"+street.toLowerCase()+"-"+matchup.matchup.replace(/\s+/g,"-").toLowerCase()+"-"+boardRaw+"-"+nodeSlug+"-"+hand,
     solver:"DCFR_SOLVER",
     version:normalized.version,
     solveId:normalized.solveId,
     convergence:normalized.convergence,
     hand,
+    node:chosenNode.node,
+    actingRole,
     scenario:{
       gameType:filters.gameType||"TOURNAMENT",
       street,
       tableSize:6,
-      heroPosition:roles.oop,
-      villainPosition:roles.ip,
-      effectiveStack:stackBb,
-      pot:potBb,
+      heroPosition,
+      villainPosition,
+      effectiveStack:+effectiveStack.toFixed(4),
+      pot:sim.pot,
+      currentBet:sim.currentBet,
       board:displayBoard(boardRaw),
-      heroRange:rangeString(oop.range),
-      villainRange:rangeString(ip.range),
-      actionHistory:[],
+      heroRange:actingRole==="IP"?rangeString(ip.range):rangeString(oop.range),
+      villainRange:actingRole==="IP"?rangeString(oop.range):rangeString(ip.range),
+      actionHistory:sim.history,
       positions:["UTG","HJ","CO","BTN","SB","BB"],
-      playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,stackBb])),
+      playerStacks,
+      solverNode:chosenNode.node,
+      solverPlayer:chosenNode.player,
       tags:[
-        ...matchupTags(roles.oop,roles.ip,matchup.matchup),
+        ...matchupTags(heroPosition,villainPosition,matchup.matchup),
         ...boardTags(boardRaw),
         ...(street==="FLOP"?["bet_33","bet_66","overbet_125"]:[])
       ],
@@ -377,7 +469,7 @@ async function solvePostflop(filters,street){
         extras:filters.extras
       }
     },
-    strategy:normalized.strategy
+    strategy
   };
   solveCache.set(key,result);
   if(solveCache.size>48)solveCache.delete(solveCache.keys().next().value);
