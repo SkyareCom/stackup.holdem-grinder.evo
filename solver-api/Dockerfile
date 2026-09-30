@@ -17,7 +17,7 @@ WORKDIR /app
 COPY --from=solver-builder /build/DCFR-SOLVER/target/release/dcfr-solver /usr/local/bin/dcfr-solver
 COPY --from=solver-builder /build/DCFR-SOLVER/LICENSE /licenses/DCFR-SOLVER-LICENSE
 COPY --from=solver-builder /artifacts /opt/stackup
-COPY package.json server.mjs ./
+COPY package.json server.mjs scenario-planner.mjs ./
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV STACKUP_DCFR_BIN=/usr/local/bin/dcfr-solver
@@ -26,5 +26,7 @@ ENV STACKUP_PREFLOP_MATCHUPS=/opt/stackup/matchups.json
 ENV STACKUP_PREFLOP_ITERATIONS=10000000
 ENV STACKUP_POSTFLOP_ITERATIONS=120
 ENV STACKUP_RANGE_MIN_WEIGHT=0.02
+ENV OPENAI_SCENARIO_MODEL=gpt-5.6-luna
+ENV STACKUP_AI_TIMEOUT_MS=9000
 EXPOSE 3000
 CMD ["node","server.mjs"]
