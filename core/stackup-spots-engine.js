@@ -269,16 +269,20 @@
       action:a.action||a.label||a.kind,
       kind:normalizeActionKind(a),
       to:Number.isFinite(Number(a.to))?Number(a.to):null,
-      frequency:Number(a.frequency)||0
+      frequency:Number(a.frequency)||0,
+      ev:Number.isFinite(Number(a.ev??a.expectedValue??a.expected_value))?Number(a.ev??a.expectedValue??a.expected_value):null
     }));
     const best=[...normalized].sort((a,b)=>b.frequency-a.frequency)[0]||null;
+    const handEv=Number.isFinite(Number(strategy.ev))?Number(strategy.ev):null;
     return Object.freeze({
       ok:!!selected,
       frequency:selected?Number(selected.frequency)||0:0,
+      handEv,
       selected:selected?{
         action:selected.action||selected.label||selected.kind,
         kind:normalizeActionKind(selected),
-        to:Number.isFinite(Number(selected.to))?Number(selected.to):null
+        to:Number.isFinite(Number(selected.to))?Number(selected.to):null,
+        ev:Number.isFinite(Number(selected.ev??selected.expectedValue??selected.expected_value))?Number(selected.ev??selected.expectedValue??selected.expected_value):null
       }:null,
       best,
       strategy:normalized
