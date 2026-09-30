@@ -9,12 +9,61 @@
   const MAX_RECENT_FAMILIES=8;
   const MAX_RECENT_POSITIONS=4;
   const bags=new Map();
+  // Six suit-isomorphic presentations per exact postflop combo. These are
+  // strategically identical transformations, not fabricated solver outputs.
+  const SUIT_PERMS=[
+    {s:'s',h:'h',d:'d',c:'c'},
+    {s:'h',h:'s',d:'c',c:'d'},
+    {s:'d',h:'c',d:'s',c:'h'},
+    {s:'c',h:'d',d:'h',c:'s'},
+    {s:'h',h:'d',d:'c',c:'s'},
+    {s:'d',h:'c',d:'h',c:'s'}
+  ];
 
   function clone(value){
     if(global.structuredClone){
       try{return global.structuredClone(value);}catch(_){}
     }
     return JSON.parse(JSON.stringify(value));
+  }
+
+  function transformCard(card,perm){
+    const text=String(card||'');
+    const m=text.match(/^(10|[2-9TJQKA])([cdhs])$/i);
+    if(!m)return text;
+    return m[1].toUpperCase().replace('10','T')+(perm[m[2].toLowerCase()]||m[2].toLowerCase());
+  }
+
+  function transformExactHand(hand,perm){
+    const text=String(hand||'');
+    const m=text.match(/^(10|[2-9TJQKA])([cdhs])(10|[2-9TJQKA])([cdhs])$/i);
+    if(!m)return text;
+    const a=transformCard(m[1]+m[2],perm);
+    const b=transformCard(m[3]+m[4],perm);
+    return a+b;
+  }
+
+  function isExactHand(hand){
+    return /^(?:10|[2-9TJQKA])[cdhs](?:10|[2-9TJQKA])[cdhs]$/i.test(String(hand||''));
+  }
+
+  function applySuitVariant(spot,variant){
+    const index=Math.max(0,Math.min(SUIT_PERMS.length-1,Number(variant)||0));
+    if(index===0)return spot;
+    const perm=SUIT_PERMS[index];
+    if(Array.isArray(spot?.scenario?.board)){
+      spot.scenario.board=spot.scenario.board.map(card=>transformCard(card,perm));
+    }
+    if(isExactHand(spot?.hand))spot.hand=transformExactHand(spot.hand,perm);
+    if(Array.isArray(spot?.heroCards))spot.heroCards=spot.heroCards.map(card=>transformCard(card,perm));
+    if(Array.isArray(spot?.strategy)){
+      spot.strategy=spot.strategy.map(entry=>({
+        ...entry,
+        hand:isExactHand(entry?.hand)?transformExactHand(entry.hand,perm):entry?.hand
+      }));
+    }
+    spot.suitVariant=index;
+    return spot;
   }
 
   function stable(value){
@@ -137,6 +186,27 @@
       board:s.board||[],
       actionLine:actionLine(s),
       hand:String(hand||spot?.hand||''),
+      solver:spot?.solver||null,
+      solveId:spot?.solveId||null
+    })));
+  }
+
+  function variantSignature(spot,hand,variant){
+    const s=spot?.scenario||{};
+    const perm=SUIT_PERMS[Math.max(0,Math.min(SUIT_PERMS.length-1,Number(variant)||0))];
+    const transformedHand=isExactHand(hand)?transformExactHand(hand,perm):String(hand||'');
+    const transformedBoard=(s.board||[]).map(card=>transformCard(card,perm));
+    return hash(JSON.stringify(stable({
+      street:normStreet(s.street),
+      gameType:s.gameType||null,
+      tableSize:s.tableSize??null,
+      heroPosition:s.heroPosition||null,
+      villainPosition:s.villainPosition||null,
+      effectiveStack:Number(s.effectiveStack)||0,
+      pot:Number(s.pot)||0,
+      board:transformedBoard,
+      actionLine:actionLine(s),
+      hand:transformedHand,
       solver:spot?.solver||null,
       solveId:spot?.solveId||null
     })));
@@ -304,15 +374,23 @@
       const hands=(spot.strategy||[]).filter(h=>h?.hand&&Array.isArray(h.actions)&&h.actions.length);
       for(let handIndex=0;handIndex<hands.length;handIndex++){
         const hand=String(hands[handIndex].hand);
-        candidates.push({
-          spotIndex,
-          spot,
-          hand,
-          exact:exactSignature(spot,hand),
-          family:familySignature(spot),
-          position:normPosition(spot?.scenario?.heroPosition),
-          street:normStreet(spot?.scenario?.street)
-        });
+        const variants=isExactHand(hand)?SUIT_PERMS.length:1;
+        const signatures=new Set();
+        for(let suitVariant=0;suitVariant<variants;suitVariant++){
+          const exact=variantSignature(spot,hand,suitVariant);
+          if(signatures.has(exact))continue;
+          signatures.add(exact);
+          candidates.push({
+            spotIndex,
+            spot,
+            hand,
+            suitVariant,
+            exact,
+            family:familySignature(spot),
+            position:normPosition(spot?.scenario?.heroPosition),
+            street:normStreet(spot?.scenario?.street)
+          });
+        }
       }
     }
     return candidates;
@@ -381,6 +459,7 @@
 
     const spot=clone(candidate.spot);
     spot.hand=candidate.hand;
+    applySuitVariant(spot,candidate.suitVariant||0);
     spot.trainingSignature=candidate.exact;
     spot.trainingFamily=candidate.family;
     spot.trainingCycle=bag.cycle;
