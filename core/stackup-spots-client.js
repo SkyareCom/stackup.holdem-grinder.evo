@@ -65,14 +65,16 @@
     if(staticBankPromise)return staticBankPromise;
     staticBankPromise=(async()=>{
       const manifest=await fetchJson(staticUrl('manifest.json'));
-      const [preflop,postflop]=await Promise.all([
+      const [preflop,postflop,pushfold]=await Promise.all([
         fetchJson(staticUrl('preflop.json')),
-        fetchJson(staticUrl('postflop.json'))
+        fetchJson(staticUrl('postflop.json')),
+        fetchJson(staticUrl('pushfold-hu-v1.json'))
       ]);
       if(!Array.isArray(preflop)||!preflop.length)throw new Error('static_preflop_empty');
       if(!Array.isArray(postflop)||!postflop.length)throw new Error('static_postflop_empty');
+      if(!pushfold||typeof pushfold!=='object'||!pushfold.charts)throw new Error('static_pushfold_empty');
       state.manifest=manifest;
-      return {manifest,preflop,postflop};
+      return {manifest,preflop,postflop,pushfold};
     })().catch(error=>{
       staticBankPromise=null;
       throw error;
