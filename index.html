@@ -1021,13 +1021,16 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 
   const spotStateStyle=document.createElement('style');
   spotStateStyle.textContent=`
-    .seat.spot-state-folded{opacity:.36;filter:grayscale(.85)}
-    .seat.spot-state-folded .av{text-decoration:line-through}
+    /* Fold mantém avatar/posição/stack. Somente as cartas saem da mão. */
+    .seat.spot-state-folded{opacity:1!important;filter:none!important}
+    .seat.spot-state-folded .av{text-decoration:none!important}
+    .seat.spot-state-folded .backs,.seat.spot-state-folded .herohand{opacity:0;visibility:hidden}
     .seat.spot-state-allin .playerbox{box-shadow:0 0 0 2px rgba(21,91,189,.8),0 0 16px rgba(21,91,189,.5)}
     .spotcommit{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 3px);font-size:9px;line-height:1;color:#fff;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.32);border-radius:7px;padding:2px 5px;white-space:nowrap;pointer-events:none}
     .seat.hero .spotcommit{font-size:10px}
     .seat.hero.spot-turn .av{background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow)}
-    .spotactoraction{position:absolute;z-index:12;min-width:62px;max-width:112px;padding:6px 9px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);-webkit-backdrop-filter:var(--on-blur);backdrop-filter:var(--on-blur);color:var(--c-accent-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label);line-height:1.15;text-align:center;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%)}
+    /* A ação fica literalmente por cima do avatar durante 1,5s. */
+    .spotactoraction{position:absolute;left:0;top:-3px;z-index:15;min-width:62px;max-width:112px;padding:6px 9px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);-webkit-backdrop-filter:var(--on-blur);backdrop-filter:var(--on-blur);color:var(--c-accent-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label);line-height:1.15;text-align:center;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%)}
   `;
   R.appendChild(spotStateStyle);
 
@@ -1056,28 +1059,37 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   function clearSpotActorAction(){
     tb.querySelectorAll('.spotactoraction').forEach(el=>el.remove());
   }
+  function animateSpotFoldCards(seat){
+    if(!seat)return;
+    const cards=seat.querySelector('.backs,.herohand');
+    const center=tb.querySelector('.centerbox');
+    if(!cards||!center){seat.classList.add('spot-state-folded');return;}
+    const from=cards.getBoundingClientRect(),to=center.getBoundingClientRect();
+    const dx=(to.left+to.width/2)-(from.left+from.width/2);
+    const dy=(to.top+to.height/2)-(from.top+from.height/2);
+    if(cards.animate){
+      const anim=cards.animate([
+        {transform:'translateX(-50%) translate(0,0) rotate(0deg) scale(1)',opacity:1},
+        {transform:'translateX(-50%) translate('+dx+'px,'+dy+'px) rotate(12deg) scale(.72)',opacity:.08}
+      ],{duration:520,easing:'cubic-bezier(.32,.72,.22,1)',fill:'forwards'});
+      anim.finished.catch(()=>{}).finally(()=>seat.classList.add('spot-state-folded'));
+    }else{
+      window.setTimeout(()=>seat.classList.add('spot-state-folded'),520);
+    }
+  }
   function showSpotActorAction(entry){
     clearSpotActorAction();
     const pos=spotHistoryActor(entry);
     if(!pos)return;
     const seat=[...tb.querySelectorAll('.seat[data-pos]')].find(el=>String(el.dataset.pos).toUpperCase()===pos);
     if(!seat)return;
-    const center=tb.querySelector('.centerbox');
-    let ox=0,oy=-58;
-    if(center){
-      const sr=seat.getBoundingClientRect(),cr=center.getBoundingClientRect();
-      const dx=(cr.left+cr.width/2)-(sr.left+sr.width/2),dy=(cr.top+cr.height/2)-(sr.top+sr.height/2);
-      const len=Math.hypot(dx,dy)||1;
-      ox=(dx/len)*58;oy=(dy/len)*58;
-    }
     const bubble=document.createElement('div');
     bubble.className='spotactoraction';
-    bubble.style.left=ox+'px';bubble.style.top=oy+'px';
     bubble.textContent=spotHistoryLabel(entry);
     seat.appendChild(bubble);
     const kind=spotHistoryKind(entry);
     window.StackUpPokerAudio?.play?.(kind);
-    if(kind==='fold')seat.classList.add('spot-state-folded');
+    if(kind==='fold')animateSpotFoldCards(seat);
     if(kind==='jam')seat.classList.add('spot-state-allin');
   }
   function cancelSpotDecisionSequence(){
@@ -1109,7 +1121,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       for(const action of history){
         if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
         showSpotActorAction(action);
-        await spotSleep(460);
+        await spotSleep(1500);
+        clearSpotActorAction();
       }
     }
     if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
@@ -1553,8 +1566,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     center?.classList.remove('spot-pot-hit','spot-pot-allin');
 
     if(action==='fold'){
-      hero.classList.add('spot-fold');
-      hand?.classList.add('spot-fold-cards');
+      animateSpotFoldCards(hero);
       return 760;
     }
     if(action==='check'){
@@ -1707,14 +1719,17 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 
     for(let k=0;k<n;k++){
       const p=pos[(h0+k)%n],hero=k===0,[x,y]=seatPointOutside(feltLeft,top,feltW,feltH,k,n,W,H);
-      const hand=hero?`<div class="herohand">${heroCards.map(card).join('')}</div>`:'';
+      const hand=hero
+        ?`<div class="herohand">${heroCards.map(card).join('')}</div>`
+        :'<div class="backs" aria-hidden="true"><i></i><i></i></div>';
       const statePlayer=SOLVER_TABLE_STATE?.players?.find(x=>x.position===p)||null;
       const stack=statePlayer
         ?Number(statePlayer.stack)
         :(solved&&Number.isFinite(Number(solved.stackForPosition[p]))
           ?Number(solved.stackForPosition[p])
           :DEMO_STK[k%DEMO_STK.length]);
-      const stateClass=statePlayer?(statePlayer.folded?' spot-state-folded':'')+(statePlayer.allIn?' spot-state-allin':''):'';
+      const settled=!!currentSpotEntry()?.answer;
+      const stateClass=statePlayer?((statePlayer.folded&&settled)?' spot-state-folded':'')+(statePlayer.allIn?' spot-state-allin':''):'';
       const commit=statePlayer&&Number(statePlayer.committed)>0?`<div class="spotcommit">${fmtStack(Number(statePlayer.committed))}</div>`:'';
       html+=`<div class="seat${hero?' hero':''}${stateClass}" data-pos="${p}" style="left:${x}px;top:${y}px">${hand}<div class="playerbox"><div class="av" data-pos="${p}">${p}</div><div class="stk">${fmtStack(stack)}</div></div>${commit}</div>`;
 
