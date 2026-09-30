@@ -153,7 +153,7 @@
     const sequencer=global.StackUpTrainingSequencer;
     if(sequencer?.pick){
       const activeFilters=filters||{};
-      const spot=sequencer.pick(bank,activeFilters);
+      const spot=sequencer.pick(bank,filters||{});
       try{
         const key=sequencer.filterKey(activeFilters);
         if(!state.lastStats||state.lastStats.filterKey!==key)state.lastStats=sequencer.stats(bank,activeFilters);
