@@ -19,9 +19,14 @@ const BOARDS={
   TURN:["As7d2cJh","Qh8h3c5d"],
   RIVER:["As7d2cJh4s","Qh8h3c5dTs"]
 };
+const SHARD_COUNT=Math.max(1,Number(process.env.STACKUP_SHARD_COUNT||1));
+const SHARD_INDEX=Math.max(0,Math.min(SHARD_COUNT-1,Number(process.env.STACKUP_SHARD_INDEX||0)));
+const BOARDS_PER_STREET=Math.max(1,Number(process.env.STACKUP_BOARDS_PER_STREET||BOARDS.FLOP.length));
+const SHARD_OUT=process.env.STACKUP_SHARD_OUT?resolve(process.env.STACKUP_SHARD_OUT):OUT;
 
 await mkdir(WORK,{recursive:true});
 await mkdir(OUT,{recursive:true});
+await mkdir(SHARD_OUT,{recursive:true});
 
 const blueprint=join(WORK,"preflop_blueprint.bin");
 const chartsPath=join(WORK,"preflop_charts.json");
@@ -160,11 +165,12 @@ const preflop=charts.map(chart=>{
 });
 
 const MAX_MATCHUPS=Math.max(1,Math.min(matchups.length,Number(process.env.STACKUP_MAX_MATCHUPS||30)));
-const selected=matchups
+const selectedAll=matchups
   .filter(m=>postflopRoles(m.opener?.position,m.caller?.position))
   .slice(0,MAX_MATCHUPS);
+const selected=selectedAll.filter((_,index)=>index%SHARD_COUNT===SHARD_INDEX);
 
-console.log("Selected postflop matchups:",selected.length);
+console.log("Selected postflop matchups:",selected.length,"of",selectedAll.length,"shard",SHARD_INDEX+"/"+SHARD_COUNT);
 console.log(selected.map(m=>m.matchup).join(" | "));
 
 const postflop=[];
@@ -176,7 +182,7 @@ for(const matchup of selected){
   ]);
   const oop=sideByPos.get(roles.oop),ip=sideByPos.get(roles.ip);
   for(const street of ["FLOP","TURN","RIVER"]){
-    for(const boardRaw of BOARDS[street]){
+    for(const boardRaw of BOARDS[street].slice(0,BOARDS_PER_STREET)){
       const key=[street,matchup.matchup,boardRaw,POSTFLOP_ITERATIONS].join("|");
       const rawPath=join(WORK,hashId(key)+".json");
       console.log("Solving",key);
@@ -246,6 +252,7 @@ const manifest={
     upstream:"exinori/DCFR-SOLVER",
     license:"MIT"
   },
+  shard:{index:SHARD_INDEX,count:SHARD_COUNT,boardsPerStreet:BOARDS_PER_STREET},
   preflop:{
     iterations:PREFLOP_ITERATIONS,
     spots:preflop.length,
@@ -256,13 +263,20 @@ const manifest={
     iterations:POSTFLOP_ITERATIONS,
     spots:postflop.length,
     matchupCount:selected.length,
+    totalMatchups:selectedAll.length,
     matchups:selected.map(m=>m.matchup),
     potTypes:["SRP","3BET","4BET"],
     streets:["FLOP","TURN","RIVER"]
   }
 };
 
-await writeFile(join(OUT,"preflop.json"),JSON.stringify(preflop), "utf8");
-await writeFile(join(OUT,"postflop.json"),JSON.stringify(postflop), "utf8");
-await writeFile(join(OUT,"manifest.json"),JSON.stringify(manifest,null,2)+"\n","utf8");
+if(SHARD_COUNT>1){
+  await writeFile(join(SHARD_OUT,"preflop.json"),JSON.stringify(preflop),"utf8");
+  await writeFile(join(SHARD_OUT,`postflop-shard-${SHARD_INDEX}.json`),JSON.stringify(postflop),"utf8");
+  await writeFile(join(SHARD_OUT,`shard-manifest-${SHARD_INDEX}.json`),JSON.stringify(manifest,null,2)+"\n","utf8");
+}else{
+  await writeFile(join(OUT,"preflop.json"),JSON.stringify(preflop),"utf8");
+  await writeFile(join(OUT,"postflop.json"),JSON.stringify(postflop),"utf8");
+  await writeFile(join(OUT,"manifest.json"),JSON.stringify(manifest,null,2)+"\n","utf8");
+}
 console.log(JSON.stringify(manifest,null,2));
