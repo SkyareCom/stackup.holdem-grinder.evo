@@ -359,6 +359,434 @@
   function indicator(index,name,value,note,source,applicable=true){
     return {index,name,value:value??'—',note:note||'',calculation:note||'',source:source||'spot',applicable};
   }
+
+  function spotSpecificIndicatorText(index,ctx){
+    const {language,spot,view,result,tableState,street,m,tags,heroRange,villainRange,blockers,init,tableCount,active,handClass,strategy,raiseFreq,folds,checks,exploitProfile}=ctx;
+    const l=lang(language),s=spot?.scenario||{};
+    const heroPos=String(view?.heroPosition||s.heroPosition||'—').toUpperCase();
+    const villainPos=String(view?.villainPosition||s.villainPosition||'—').toUpperCase();
+    const hand=String(view?.handKey||view?.heroCards?.join(' ')||'—');
+    const board=(view?.board||s.board||[]).join(' ')||'—';
+    const best=actionLabel(result?.best);
+    const bestFreq=n(result?.best?.frequency,0)||0;
+    const chosen=uiActionLabel(result?.uiAction||result?.selected?.kind,result);
+    const chosenFreq=n(result?.frequency,0)||0;
+    const potType=inferPotType(s);
+    const na=t(language).notAvailable;
+    const nap=t(language).notApplicable;
+    const isUnavailable=v=>v===na||v===nap||v==='—'||v===null||v===undefined;
+    const p=(pt,en,es)=>l==='en'?en:l==='es'?es:pt;
+    const pct1=v=>Number.isFinite(Number(v))?pct(Number(v)):na;
+    const bb1=v=>Number.isFinite(Number(v))?bb(Number(v)):na;
+    const spr=m.spr;
+    const sprBand=spr===null?'':spr<2?p('muito baixo','very low','muy bajo'):spr<4?p('baixo','low','bajo'):spr<8?p('médio','medium','medio'):p('alto','high','alto');
+    const posPost=(()=>{
+      const hi=POS_ORDER.indexOf(heroPos),vi=POS_ORDER.indexOf(villainPos);
+      if(street==='PRE-FLOP'||hi<0||vi<0)return null;
+      return hi>vi?'IP':'OOP';
+    })();
+    const solverRef=p(
+      'A referência do solver para '+hand+' é '+best+' em '+pct(bestFreq)+'.',
+      'The solver reference for '+hand+' is '+best+' at '+pct(bestFreq)+'.',
+      'La referencia del solver para '+hand+' es '+best+' en '+pct(bestFreq)+'.'
+    );
+    const unavailable=(why)=>({
+      calculation:why,
+      interpretation:p(
+        'Neste '+street+', esse dado não está disponível no nó atual; portanto ele não é usado para alterar artificialmente a recomendação. '+solverRef,
+        'In this '+street+' node, this datum is unavailable, so it is not used to artificially change the recommendation. '+solverRef,
+        'En este nodo '+street+', este dato no está disponible; por eso no se usa para alterar artificialmente la recomendación. '+solverRef
+      )
+    });
+
+    switch(index){
+      case 1:{
+        const calc=p(
+          'Stack efetivo '+bb1(s.effectiveStack)+'; pote atual '+bb1(m.pot)+(spr!==null?' → SPR '+spr.toFixed(2):'')+'.',
+          'Effective stack '+bb1(s.effectiveStack)+'; current pot '+bb1(m.pot)+(spr!==null?' → SPR '+spr.toFixed(2):'')+'.',
+          'Stack efectivo '+bb1(s.effectiveStack)+'; bote actual '+bb1(m.pot)+(spr!==null?' → SPR '+spr.toFixed(2):'')+'.'
+        );
+        const interp=spr!==null?p(
+          'Com '+bb1(s.effectiveStack)+' efetivos e apenas '+bb1(m.pot)+' no pote, o spot ainda tem bastante profundidade. Isso deixa espaço para decisões futuras e torna menos automático comprometer muitas fichas agora. '+solverRef,
+          'With '+bb1(s.effectiveStack)+' effective and only '+bb1(m.pot)+' in the pot, this spot is still deep. There is room for later-street decisions, so committing many chips now is less automatic. '+solverRef,
+          'Con '+bb1(s.effectiveStack)+' efectivos y sólo '+bb1(m.pot)+' en el bote, el spot sigue profundo. Hay margen para decisiones futuras, así que comprometer muchas fichas ahora es menos automático. '+solverRef
+        ):solverRef;
+        return {calculation:calc,interpretation:interp};
+      }
+      case 2:{
+        const calc=p(
+          heroPos+' enfrenta '+villainPos+(posPost?' e joga '+posPost+' pós-flop.':'.'),
+          heroPos+' faces '+villainPos+(posPost?' and plays '+posPost+' postflop.':'.'),
+          heroPos+' enfrenta '+villainPos+(posPost?' y juega '+posPost+' postflop.':'.')
+        );
+        const interp=posPost==='OOP'?p(
+          'Neste confronto '+heroPos+' vs '+villainPos+', o herói age antes pós-flop. Isso reduz a capacidade de realizar equity gratuitamente e aumenta o valor de linhas que protegem o range de check; a ação indicada deve ser lida com essa desvantagem posicional. '+solverRef,
+          'In '+heroPos+' vs '+villainPos+', hero acts first postflop. That reduces free equity realization and increases the value of protecting the checking range. '+solverRef,
+          'En '+heroPos+' vs '+villainPos+', el héroe actúa primero postflop. Eso reduce la realización gratuita de equity y aumenta el valor de proteger el rango de check. '+solverRef
+        ):posPost==='IP'?p(
+          'Neste confronto '+heroPos+' vs '+villainPos+', o herói age depois pós-flop. A informação extra permite realizar mais equity e controlar melhor o tamanho do pote; isso dá mais flexibilidade ao mix do solver. '+solverRef,
+          'In '+heroPos+' vs '+villainPos+', hero acts later postflop. Extra information improves equity realization and pot control, giving the solver mix more flexibility. '+solverRef,
+          'En '+heroPos+' vs '+villainPos+', el héroe actúa después postflop. La información extra mejora la realización de equity y el control del bote. '+solverRef
+        ):p(
+          'No pré-flop, a relevância de '+heroPos+' vs '+villainPos+' vem da ordem real de ação e dos blinds; ela define quais ranges chegam a este nó. '+solverRef,
+          'Preflop, '+heroPos+' vs '+villainPos+' matters through action order and blinds, which define the ranges reaching this node. '+solverRef,
+          'Preflop, '+heroPos+' vs '+villainPos+' importa por el orden de acción y las ciegas, que definen los rangos que llegan al nodo. '+solverRef
+        );
+        return {calculation:calc,interpretation:interp};
+      }
+      case 3:{
+        if(!init)return unavailable(p(
+          'O histórico deste spot não contém uma ação agressiva anterior que identifique PFR/iniciativa.',
+          'This spot history contains no prior aggressive action identifying PFR/initiative.',
+          'El historial de este spot no contiene una acción agresiva previa que identifique PFR/iniciativa.'
+        ));
+        return {
+          calculation:p('Última ação agressiva antes da decisão: '+init+'.','Last aggressive action before the decision: '+init+'.','Última acción agresiva antes de la decisión: '+init+'.'),
+          interpretation:p(
+            'Como '+init+' carrega a iniciativa neste '+street+', a distribuição de bets/checks parte desse histórico real, não de uma regra genérica. Para '+hand+', '+solverRef,
+            'Because '+init+' carries initiative on this '+street+', the bet/check distribution follows this actual history rather than a generic rule. '+solverRef,
+            'Como '+init+' lleva la iniciativa en este '+street+', la distribución bet/check parte de este historial real y no de una regla genérica. '+solverRef
+          )
+        };
+      }
+      case 4:{
+        return {
+          calculation:p('O histórico de ações classifica este nó como '+potType+'.','Action history classifies this node as '+potType+'.','El historial de acciones clasifica este nodo como '+potType+'.'),
+          interpretation:p(
+            'Este é um pote '+potType+'. Isso determina o quanto os ranges já foram filtrados antes de chegar a '+street+' e, portanto, muda a densidade de mãos fortes e blefes disponíveis para '+heroPos+' e '+villainPos+'. '+solverRef,
+            'This is a '+potType+' pot. That determines how much ranges were filtered before '+street+', changing the density of strong hands and bluffs available to '+heroPos+' and '+villainPos+'. '+solverRef,
+            'Este es un bote '+potType+'. Eso determina cuánto se filtraron los rangos antes de '+street+' y cambia la densidad de manos fuertes y bluffs disponibles. '+solverRef
+          )
+        };
+      }
+      case 5:{
+        if(!active)return unavailable(p('O estado da mesa não informa quantos jogadores seguem ativos.','Table state does not report active players.','El estado de mesa no informa cuántos jugadores siguen activos.'));
+        return {
+          calculation:p(active+' jogadores ativos de '+String(tableCount||active)+' lugares.',''+active+' active players out of '+String(tableCount||active)+' seats.',''+active+' jugadores activos de '+String(tableCount||active)+' asientos.'),
+          interpretation:active>2?p(
+            'A decisão ocorre multiway com '+active+' jogadores ainda vivos. Isso reduz a liberdade de blefar e aumenta a necessidade de equity robusta porque '+hand+' precisa atravessar mais de um range. '+solverRef,
+            'The decision is multiway with '+active+' players still live. Bluffing freedom drops because '+hand+' must clear more than one range. '+solverRef,
+            'La decisión es multiway con '+active+' jugadores vivos. Baja la libertad de bluff porque '+hand+' debe superar más de un rango. '+solverRef
+          ):p(
+            'O nó está heads-up: a decisão de '+heroPos+' é avaliada diretamente contra o range de '+villainPos+', sem um terceiro range comprimindo value e bluffs. '+solverRef,
+            'The node is heads-up: '+heroPos+' is evaluated directly against '+villainPos+' without a third range compressing value and bluffs. '+solverRef,
+            'El nodo es heads-up: '+heroPos+' se evalúa directamente contra '+villainPos+' sin un tercer rango comprimiendo value y bluffs. '+solverRef
+          )
+        };
+      }
+      case 6:{
+        if(street!=='PRE-FLOP')return unavailable(p('RFI só é aplicável antes do flop; o spot atual está em '+street+'.','RFI only applies preflop; current spot is '+street+'.','RFI sólo aplica preflop; el spot actual está en '+street+'.'));
+        return {
+          calculation:p('Para '+hand+', a frequência agressiva de abertura neste nó é '+pct1(raiseFreq)+'.','For '+hand+', aggressive opening frequency at this node is '+pct1(raiseFreq)+'.','Para '+hand+', la frecuencia agresiva de apertura en este nodo es '+pct1(raiseFreq)+'.'),
+          interpretation:p(
+            'Essa frequência é específica de '+hand+' em '+heroPos+' neste nó. Ela mostra se o combo pertence de forma forte, marginal ou inexistente ao range de abertura; a comparação direta é com '+best+' em '+pct(bestFreq)+'.',
+            'This frequency is specific to '+hand+' in '+heroPos+' at this node and shows how strongly the combo belongs to the opening range; compare it directly with '+best+' at '+pct(bestFreq)+'.',
+            'Esta frecuencia es específica de '+hand+' en '+heroPos+' en este nodo y muestra cuánto pertenece el combo al rango de apertura; compárela con '+best+' en '+pct(bestFreq)+'.'
+          )
+        };
+      }
+      case 7:{
+        if(street!=='PRE-FLOP')return unavailable(p('Índice de 3-bet/4-bet é pré-flop; este nó está em '+street+'.','3-bet/4-bet index is preflop; this node is '+street+'.','El índice 3-bet/4-bet es preflop; este nodo está en '+street+'.'));
+        const raises=(s.actionHistory||[]).filter(a=>['raise','jam'].includes(actionKind(a))).length;
+        return {
+          calculation:p(raises+' ação(ões) agressiva(s) registrada(s) antes do herói; classificação '+potType+'.',raises+' aggressive action(s) recorded before hero; '+potType+' classification.',raises+' acción(es) agresiva(s) registrada(s) antes del héroe; clasificación '+potType+'.'),
+          interpretation:p(
+            'Neste spot, o nível de agressão pré-flop já registrado define o quanto os ranges foram comprimidos antes de '+heroPos+' decidir. Quanto mais raises prévios, menos mãos marginais sobrevivem. '+solverRef,
+            'Here, recorded preflop aggression determines how compressed the ranges are before '+heroPos+' acts. More prior raises leave fewer marginal hands. '+solverRef,
+            'Aquí, la agresión preflop registrada determina cuánto se comprimieron los rangos antes de actuar '+heroPos+'. Más raises previos dejan menos manos marginales. '+solverRef
+          )
+        };
+      }
+      case 8:{
+        if(street!=='PRE-FLOP')return unavailable(p('Fold to 3-bet não é a estatística adequada para um nó '+street+'.','Fold to 3-bet is not the appropriate statistic for a '+street+' node.','Fold to 3-bet no es la estadística adecuada para un nodo '+street+'.'));
+        return {
+          calculation:p('Neste combo/nó, a linha FOLD aparece em '+pct1(folds)+'. Isso é frequência do solver para '+hand+', não estatística populacional do adversário.','At this combo/node, FOLD appears at '+pct1(folds)+'. This is solver frequency for '+hand+', not an opponent population stat.','En este combo/nodo, FOLD aparece en '+pct1(folds)+'. Es frecuencia del solver para '+hand+', no estadística poblacional rival.'),
+          interpretation:p(
+            'Para '+hand+' neste ponto exato da árvore, '+pct1(folds)+' de fold indica quanto o solver abandona o combo diante da pressão já existente. A referência concorrente mais forte é '+best+' em '+pct(bestFreq)+'.',
+            'For '+hand+' at this exact node, '+pct1(folds)+' fold shows how often the solver releases the combo against existing pressure. The strongest competing line is '+best+' at '+pct(bestFreq)+'.',
+            'Para '+hand+' en este nodo exacto, '+pct1(folds)+' de fold muestra cuánto abandona el solver el combo ante la presión existente. La línea rival principal es '+best+' en '+pct(bestFreq)+'.'
+          )
+        };
+      }
+      case 9:{
+        return unavailable(street==='PRE-FLOP'?p(
+          'O histórico deste nó não fornece uma taxa populacional de limp; só há as ações efetivamente usadas para chegar à decisão.',
+          'This node history does not provide a population limp rate; it only contains actions that reached the decision.',
+          'El historial del nodo no ofrece una tasa poblacional de limp; sólo contiene las acciones que llegaron a la decisión.'
+        ):p('Limp é conceito pré-flop e o spot atual está em '+street+'.','Limp is a preflop concept and current spot is '+street+'.','Limp es un concepto preflop y el spot actual está en '+street+'.'));
+      }
+      case 10:{
+        if(m.potOdds===null)return unavailable(p(
+          'Não existe call com custo positivo neste nó para calcular pot odds.',
+          'There is no positive-cost call at this node, so pot odds cannot be computed.',
+          'No existe call con costo positivo en este nodo, por lo que no se pueden calcular pot odds.'
+        ));
+        return {
+          calculation:p(
+            bb1(m.callCost)+' ÷ ('+bb1(m.pot)+' + '+bb1(m.callCost)+') = '+pct(m.potOdds)+'.',
+            bb1(m.callCost)+' ÷ ('+bb1(m.pot)+' + '+bb1(m.callCost)+') = '+pct(m.potOdds)+'.',
+            bb1(m.callCost)+' ÷ ('+bb1(m.pot)+' + '+bb1(m.callCost)+') = '+pct(m.potOdds)+'.'
+          ),
+          interpretation:p(
+            'Neste spot, CALL precisa de pelo menos '+pct(m.potOdds)+' de equity imediata antes de considerar ganhos futuros. Se '+best+' domina em '+pct(bestFreq)+', o solver está comparando essa exigência com a equity/EV real de '+hand+', não apenas com a força visual da mão.',
+            'Here, CALL needs at least '+pct(m.potOdds)+' immediate equity before future gains. If '+best+' dominates at '+pct(bestFreq)+', the solver is comparing that threshold with the actual equity/EV of '+hand+', not just hand appearance.',
+            'Aquí, CALL necesita al menos '+pct(m.potOdds)+' de equity inmediata antes de ganancias futuras. Si '+best+' domina en '+pct(bestFreq)+', el solver compara ese umbral con la equity/EV real de '+hand+'.'
+          )
+        };
+      }
+      case 11:{
+        return unavailable(p(
+          'O nó atual não expõe a árvore completa de runouts necessária para quantificar implied odds. O SPR é '+(spr!==null?spr.toFixed(2):'n/d')+'.',
+          'This node does not expose the full runout tree needed to quantify implied odds. SPR is '+(spr!==null?spr.toFixed(2):'n/a')+'.',
+          'Este nodo no expone el árbol completo de runouts necesario para cuantificar implied odds. El SPR es '+(spr!==null?spr.toFixed(2):'n/d')+'.'
+        ));
+      }
+      case 12:{
+        if(spr===null)return unavailable(p('Pote ou stack efetivo insuficientes para calcular SPR.','Pot or effective stack is insufficient to compute SPR.','Bote o stack efectivo insuficientes para calcular SPR.'));
+        const calc=bb1(s.effectiveStack)+' ÷ '+bb1(m.pot)+' = '+spr.toFixed(2)+'.';
+        let interp='';
+        if(spr>=8)interp=p(
+          'SPR '+spr.toFixed(2)+' é '+sprBand+': ainda restam aproximadamente '+spr.toFixed(1)+' potes dentro do stack efetivo. Neste '+street+', isso significa baixa pressão de compromisso imediato; inflar o pote agora exige mais força/equity e há espaço para linhas de controle, proteção e decisões nas próximas streets. '+solverRef,
+          'SPR '+spr.toFixed(2)+' is '+sprBand+': roughly '+spr.toFixed(1)+' pot-sized units remain in the effective stack. On '+street+', commitment pressure is low; bloating the pot now needs more strength/equity and there is room for later decisions. '+solverRef,
+          'SPR '+spr.toFixed(2)+' es '+sprBand+': quedan aproximadamente '+spr.toFixed(1)+' botes dentro del stack efectivo. En '+street+', la presión de compromiso inmediato es baja; inflar el bote exige más fuerza/equity y hay margen para decisiones futuras. '+solverRef
+        );
+        else if(spr>=4)interp=p(
+          'SPR '+spr.toFixed(2)+' é '+sprBand+': o pote já é relevante frente ao stack, mas ainda há espaço para mais de uma street de decisão. Sizings grandes começam a comprometer uma fração importante do stack, então a frequência de '+best+' em '+pct(bestFreq)+' deve ser lida também como gestão de compromisso.',
+          'SPR '+spr.toFixed(2)+' is '+sprBand+': the pot is meaningful relative to stack, but more than one street of decisions remains. Large sizings start committing a material fraction of stack, so '+best+' at '+pct(bestFreq)+' also reflects commitment management.',
+          'SPR '+spr.toFixed(2)+' es '+sprBand+': el bote ya pesa frente al stack, pero aún hay más de una calle de decisión. Sizings grandes comprometen una parte relevante del stack, por lo que '+best+' en '+pct(bestFreq)+' también refleja gestión de compromiso.'
+        );
+        else interp=p(
+          'SPR '+spr.toFixed(2)+' é '+sprBand+': o pote já é grande em relação ao stack efetivo. Cada aposta consome uma parcela relevante das fichas, então decisões de value/proteção e all-in ganham peso e há menos espaço para manobras futuras. '+solverRef,
+          'SPR '+spr.toFixed(2)+' is '+sprBand+': the pot is already large relative to effective stack. Each bet consumes a meaningful share, increasing the weight of value/protection and all-in decisions. '+solverRef,
+          'SPR '+spr.toFixed(2)+' es '+sprBand+': el bote ya es grande frente al stack efectivo. Cada apuesta consume una parte relevante, aumentando el peso de value/protección y all-in. '+solverRef
+        );
+        return {calculation:calc,interpretation:interp};
+      }
+      case 13:{
+        if(street==='PRE-FLOP')return unavailable(p('Ainda não existe board no pré-flop.','There is no board preflop.','Aún no existe board preflop.'));
+        return {
+          calculation:p('Board '+board+(tags.length?' → '+tags.join(' · '):' sem tag estrutural adicional')+'.','Board '+board+(tags.length?' → '+tags.join(' · '):' with no additional structural tag')+'.','Board '+board+(tags.length?' → '+tags.join(' · '):' sin etiqueta estructural adicional')+'.'),
+          interpretation:p(
+            'Neste board '+board+', as propriedades '+(tags.length?tags.join(', '):'observadas')+' alteram quais draws/nuts existem e quais partes dos ranges podem apostar por value ou blefe. Para '+hand+', '+solverRef,
+            'On board '+board+', '+(tags.length?tags.join(', '):'its observed structure')+' changes available draws/nuts and which range segments can bet for value or bluff. For '+hand+', '+solverRef,
+            'En board '+board+', '+(tags.length?tags.join(', '):'su estructura')+' cambia los draws/nuts disponibles y qué partes de los rangos pueden apostar por value o bluff. Para '+hand+', '+solverRef
+          )
+        };
+      }
+      case 14:{
+        return unavailable(p(
+          'O nó não fornece distribuição completa de equity/nuts entre '+heroPos+' e '+villainPos+' no board '+board+'.',
+          'The node does not provide full nut/equity distribution between '+heroPos+' and '+villainPos+' on '+board+'.',
+          'El nodo no proporciona la distribución completa de nuts/equity entre '+heroPos+' y '+villainPos+' en '+board+'.'
+        ));
+      }
+      case 15:{
+        return {
+          calculation:p('Range herói: '+(heroRange.text||na)+' · range vilão: '+(villainRange.text||na)+'.','Hero range: '+(heroRange.text||na)+' · villain range: '+(villainRange.text||na)+'.','Rango héroe: '+(heroRange.text||na)+' · rango villano: '+(villainRange.text||na)+'.'),
+          interpretation:(heroRange.text&&villainRange.text)?p(
+            'A comparação é feita especificamente entre o range de '+heroPos+' e o de '+villainPos+' que chegaram a '+street+'. A frequência de '+best+' em '+pct(bestFreq)+' reflete essa guerra de ranges para '+hand+', não uma regra universal.',
+            'The comparison is specifically between the '+heroPos+' and '+villainPos+' ranges reaching '+street+'. '+best+' at '+pct(bestFreq)+' reflects that range interaction for '+hand+', not a universal rule.',
+            'La comparación es específicamente entre los rangos de '+heroPos+' y '+villainPos+' que llegan a '+street+'. '+best+' en '+pct(bestFreq)+' refleja esa interacción para '+hand+', no una regla universal.'
+          ):unavailable(p('Um dos ranges completos não está exposto neste nó.','One complete range is not exposed at this node.','Uno de los rangos completos no está expuesto en este nodo.')).interpretation
+        };
+      }
+      case 16:{
+        if(street==='PRE-FLOP')return unavailable(p('Donk bet só existe pós-flop.','Donk betting only exists postflop.','Donk bet sólo existe postflop.'));
+        return {
+          calculation:p('Iniciativa registrada: '+(init||'não identificada')+'; jogador na decisão: '+heroPos+'.','Recorded initiative: '+(init||'not identified')+'; player facing decision: '+heroPos+'.','Iniciativa registrada: '+(init||'no identificada')+'; jugador en decisión: '+heroPos+'.'),
+          interpretation:init&&init!==heroPos?p(
+            'Se '+heroPos+' apostar liderando contra o agressor '+init+', a linha é estruturalmente um donk neste histórico. Só deve ser valorizada se aparecer no próprio solver para '+hand+'; aqui, '+solverRef,
+            'If '+heroPos+' leads into aggressor '+init+', that is structurally a donk in this history. It matters only if the solver includes it for '+hand+'; here, '+solverRef,
+            'Si '+heroPos+' lidera contra el agresor '+init+', la línea es estructuralmente un donk. Sólo importa si aparece en el solver para '+hand+'; aquí, '+solverRef
+          ):p(
+            'Neste histórico não há um agressor anterior claramente diferente do herói, então “donk” não é o fator que explica a decisão atual. '+solverRef,
+            'There is no clearly different prior aggressor in this history, so donk betting is not what explains the current decision. '+solverRef,
+            'No hay un agresor previo claramente distinto del héroe, por lo que donk bet no explica la decisión actual. '+solverRef
+          )
+        };
+      }
+      case 17:{
+        if(street!=='FLOP')return unavailable(p('C-bet é avaliada no flop; o spot atual está em '+street+'.','C-bet is evaluated on the flop; current spot is '+street+'.','C-bet se evalúa en flop; el spot actual está en '+street+'.'));
+        return {
+          calculation:p('Para '+hand+', frequência agressiva neste flop: '+pct1(raiseFreq)+'.','For '+hand+', aggressive frequency on this flop: '+pct1(raiseFreq)+'.','Para '+hand+', frecuencia agresiva en este flop: '+pct1(raiseFreq)+'.'),
+          interpretation:p(
+            'No flop '+board+', '+hand+' aposta/raiseia em '+pct1(raiseFreq)+' neste nó. Essa frequência já incorpora a textura e os ranges que chegaram ao flop; compare com '+best+' em '+pct(bestFreq)+'.',
+            'On flop '+board+', '+hand+' bets/raises at '+pct1(raiseFreq)+' in this node. That frequency already reflects board texture and ranges reaching the flop; compare with '+best+' at '+pct(bestFreq)+'.',
+            'En flop '+board+', '+hand+' apuesta/raisea en '+pct1(raiseFreq)+' en este nodo. La frecuencia ya incorpora textura y rangos; compárela con '+best+' en '+pct(bestFreq)+'.'
+          )
+        };
+      }
+      case 18:{
+        return unavailable(p(
+          'Delayed c-bet exige um check-back anterior explicitamente registrado; esse encadeamento não está disponível neste nó '+street+'.',
+          'Delayed c-bet requires an explicitly recorded prior check-back; that chain is unavailable in this '+street+' node.',
+          'Delayed c-bet exige un check-back previo explícitamente registrado; esa secuencia no está disponible en este nodo '+street+'.'
+        ));
+      }
+      case 19:{
+        if(m.sizingPct===null)return unavailable(p('A ação selecionada não expõe um sizing pós-flop mensurável neste nó.','Selected action exposes no measurable postflop sizing at this node.','La acción seleccionada no expone un sizing postflop medible en este nodo.'));
+        return {
+          calculation:p('Risco incremental '+bb1(m.risk)+' ÷ pote '+bb1(m.pot)+' = '+pct(m.sizingPct)+' do pote.','Incremental risk '+bb1(m.risk)+' ÷ pot '+bb1(m.pot)+' = '+pct(m.sizingPct)+' pot.','Riesgo incremental '+bb1(m.risk)+' ÷ bote '+bb1(m.pot)+' = '+pct(m.sizingPct)+' del bote.'),
+          interpretation:p(
+            'Neste '+street+', esse sizing arrisca '+bb1(m.risk)+' para disputar '+bb1(m.pot)+'. Isso muda diretamente a pressão sobre o range de '+villainPos+' e o quanto '+heroPos+' se compromete com SPR '+(spr!==null?spr.toFixed(2):'n/d')+'. '+solverRef,
+            'On '+street+', this sizing risks '+bb1(m.risk)+' to contest '+bb1(m.pot)+'. It directly changes pressure on '+villainPos+' and how committed '+heroPos+' becomes at SPR '+(spr!==null?spr.toFixed(2):'n/a')+'. '+solverRef,
+            'En '+street+', este sizing arriesga '+bb1(m.risk)+' para disputar '+bb1(m.pot)+'. Cambia la presión sobre '+villainPos+' y cuánto se compromete '+heroPos+' con SPR '+(spr!==null?spr.toFixed(2):'n/d')+'. '+solverRef
+          )
+        };
+      }
+      case 20:{
+        return unavailable(p(
+          'O nó não fornece equity por runout suficiente para medir quanto '+hand+' realiza de sua equity em '+heroPos+' '+(posPost||'')+'.',
+          'The node lacks runout equity needed to measure how much equity '+hand+' realizes from '+heroPos+' '+(posPost||'')+'.',
+          'El nodo no ofrece equity por runout suficiente para medir cuánta equity realiza '+hand+' desde '+heroPos+' '+(posPost||'')+'.'
+        ));
+      }
+      case 21:{
+        return unavailable(p(
+          'Para '+hand+' no board '+board+', os outs exatos não são inferidos sem uma equity engine porque alguns podem estar dominados ou sujos.',
+          'For '+hand+' on '+board+', exact outs are not inferred without an equity engine because some may be dominated or dirty.',
+          'Para '+hand+' en '+board+', no se infieren outs exactos sin un motor de equity porque algunos pueden estar dominados o sucios.'
+        ));
+      }
+      case 22:{
+        return unavailable(p(
+          'Sem uma contagem confiável de outs para '+hand+' no board '+board+', aplicar “2 e 4” criaria falsa precisão.',
+          'Without a reliable out count for '+hand+' on '+board+', using the rule of 2 and 4 would create false precision.',
+          'Sin una cuenta fiable de outs para '+hand+' en '+board+', aplicar la regla del 2 y 4 crearía falsa precisión.'
+        ));
+      }
+      case 23:{
+        if(street==='PRE-FLOP')return unavailable(p('Card removal pós-flop não se aplica antes do board existir.','Postflop card removal does not apply before a board exists.','Card removal postflop no aplica antes de existir board.'));
+        if(!blockers)return unavailable(p('O range explícito do vilão não está disponível para quantificar remoções por '+hand+'.','Villain explicit range is unavailable to quantify removals from '+hand+'.','El rango explícito del villano no está disponible para cuantificar removals de '+hand+'.'));
+        return {
+          calculation:p('Ranks '+blockers.ranks.join('/')+' de '+hand+' aparecem em '+blockers.affected+' de '+blockers.total+' classes listadas do range rival.','Ranks '+blockers.ranks.join('/')+' from '+hand+' appear in '+blockers.affected+' of '+blockers.total+' listed villain range classes.','Ranks '+blockers.ranks.join('/')+' de '+hand+' aparecen en '+blockers.affected+' de '+blockers.total+' clases listadas del rango rival.'),
+          interpretation:p(
+            'Neste board '+board+', essas remoções mudam a quantidade de value/draws que '+villainPos+' pode ter. Isso ajuda a explicar por que '+hand+' pode migrar entre value, bluff-catch ou bluff dentro do mix. '+solverRef,
+            'On '+board+', those removals change how many value/draw combinations '+villainPos+' can hold, helping explain why '+hand+' shifts among value, bluff-catch or bluff in the mix. '+solverRef,
+            'En '+board+', esas remociones cambian cuántas combinaciones de value/draws puede tener '+villainPos+', ayudando a explicar el papel de '+hand+' en el mix. '+solverRef
+          )
+        };
+      }
+      case 24:{
+        if(m.alpha===null)return unavailable(p('Não há sizing agressivo mensurável para calcular fold equity mínima neste nó.','There is no measurable aggressive sizing to compute minimum fold equity.','No hay sizing agresivo medible para calcular fold equity mínima.'));
+        return {
+          calculation:p('Risco '+bb1(m.risk)+' ÷ (pote '+bb1(m.pot)+' + risco '+bb1(m.risk)+') = '+pct(m.alpha)+'.','Risk '+bb1(m.risk)+' ÷ (pot '+bb1(m.pot)+' + risk '+bb1(m.risk)+') = '+pct(m.alpha)+'.','Riesgo '+bb1(m.risk)+' ÷ (bote '+bb1(m.pot)+' + riesgo '+bb1(m.risk)+') = '+pct(m.alpha)+'.'),
+          interpretation:p(
+            'Se a aposta fosse um blefe puro, '+villainPos+' precisaria foldar mais de '+pct(m.alpha)+' para essa linha empatar antes de considerar equity quando pago. No spot real, '+hand+' pode ter equity adicional, por isso o solver pode apostar mesmo abaixo desse fold observado. '+solverRef,
+            'For a pure bluff, '+villainPos+' would need to fold more than '+pct(m.alpha)+' for breakeven before accounting for called equity. '+hand+' may have extra equity, so the solver can bet even below that observed fold rate. '+solverRef,
+            'Para un bluff puro, '+villainPos+' tendría que foldear más de '+pct(m.alpha)+' para quedar break-even antes de considerar equity al ser pagado. '+hand+' puede tener equity adicional. '+solverRef
+          )
+        };
+      }
+      case 25:{
+        return unavailable(p(
+          'A sequência necessária de bets em streets anteriores não está completa no histórico deste '+street+'; por isso não classifico este nó artificialmente como double/triple barrel.',
+          'The required prior-street betting sequence is incomplete in this '+street+' history, so this node is not artificially labeled a double/triple barrel.',
+          'La secuencia de apuestas previa necesaria está incompleta en este '+street+'; por eso no se clasifica artificialmente como double/triple barrel.'
+        ));
+      }
+      case 26:{
+        return unavailable(p(
+          'Não existe amostra histórica do oponente '+villainPos+' neste spot para calcular Aggression Factor.',
+          'There is no historical sample for opponent '+villainPos+' in this spot to compute Aggression Factor.',
+          'No existe muestra histórica del rival '+villainPos+' en este spot para calcular Aggression Factor.'
+        ));
+      }
+      case 27:{
+        return {
+          calculation:p(hand+' é classificada estruturalmente como '+handClass+' no board '+board+'.',hand+' is structurally classified as '+handClass+' on board '+board+'.',hand+' se clasifica estructuralmente como '+handClass+' en board '+board+'.'),
+          interpretation:p(
+            'A força absoluta de '+hand+' é apenas o ponto de partida. Neste '+heroPos+' vs '+villainPos+' e board '+board+', o que decide a linha é como essa classe se comporta contra o range rival; por isso '+solverRef,
+            'Absolute strength of '+hand+' is only the starting point. In '+heroPos+' vs '+villainPos+' on '+board+', the line depends on how that class performs against the opposing range; '+solverRef,
+            'La fuerza absoluta de '+hand+' es sólo el punto de partida. En '+heroPos+' vs '+villainPos+' sobre '+board+', la línea depende de cómo esa clase funciona contra el rango rival; '+solverRef
+          )
+        };
+      }
+      case 28:{
+        if(!blockers)return unavailable(p('Sem range rival explícito, não é possível medir blockers de '+hand+' com segurança.','Without an explicit villain range, blockers for '+hand+' cannot be measured safely.','Sin rango rival explícito, no se pueden medir blockers de '+hand+' con seguridad.'));
+        return {
+          calculation:p(hand+' remove ranks '+blockers.ranks.join('/')+' presentes em '+blockers.affected+'/'+blockers.total+' classes listadas do range de '+villainPos+'.',hand+' removes ranks '+blockers.ranks.join('/')+' present in '+blockers.affected+'/'+blockers.total+' listed classes of '+villainPos+' range.',hand+' elimina ranks '+blockers.ranks.join('/')+' presentes en '+blockers.affected+'/'+blockers.total+' clases listadas del rango de '+villainPos+'.'),
+          interpretation:p(
+            'Esses blockers são relevantes neste spot porque alteram exatamente quais continuações fortes de '+villainPos+' permanecem disponíveis. O efeito deve ser lido junto da frequência de '+best+' em '+pct(bestFreq)+', não isoladamente.',
+            'These blockers matter here because they change which strong '+villainPos+' continuations remain available. Read them together with '+best+' at '+pct(bestFreq)+', not in isolation.',
+            'Estos blockers importan porque cambian qué continuaciones fuertes de '+villainPos+' siguen disponibles. Deben leerse junto a '+best+' en '+pct(bestFreq)+'.'
+          )
+        };
+      }
+      case 29:{
+        if(m.alpha===null)return unavailable(p('Alpha exige uma aposta/raise mensurável e esse nó não expõe uma para a ação analisada.','Alpha requires a measurable bet/raise and this node exposes none for the analyzed action.','Alpha exige una apuesta/raise medible y este nodo no expone una para la acción analizada.'));
+        return {
+          calculation:p(bb1(m.risk)+' ÷ ('+bb1(m.pot)+' + '+bb1(m.risk)+') = '+pct(m.alpha)+'.',bb1(m.risk)+' ÷ ('+bb1(m.pot)+' + '+bb1(m.risk)+') = '+pct(m.alpha)+'.',bb1(m.risk)+' ÷ ('+bb1(m.pot)+' + '+bb1(m.risk)+') = '+pct(m.alpha)+'.'),
+          interpretation:p(
+            'Com este sizing específico, um blefe sem equity precisa gerar '+pct(m.alpha)+' de folds para não perder fichas. Isso é o break-even matemático desta aposta, não uma estimativa do comportamento real de '+villainPos+'. '+solverRef,
+            'At this exact sizing, a zero-equity bluff needs '+pct(m.alpha)+' folds to break even. This is the mathematical threshold for this bet, not an estimate of '+villainPos+' behavior. '+solverRef,
+            'Con este sizing, un bluff sin equity necesita '+pct(m.alpha)+' de folds para quedar break-even. Es el umbral matemático de esta apuesta, no una estimación del comportamiento real de '+villainPos+'. '+solverRef
+          )
+        };
+      }
+      case 30:{
+        if(m.mdf===null)return unavailable(p('MDF depende do sizing agressivo e ele não está mensurável neste nó.','MDF depends on aggressive sizing, which is not measurable at this node.','MDF depende del sizing agresivo y no es medible en este nodo.'));
+        return {
+          calculation:p('100% - alpha '+pct(m.alpha)+' = MDF '+pct(m.mdf)+'.','100% - alpha '+pct(m.alpha)+' = MDF '+pct(m.mdf)+'.','100% - alpha '+pct(m.alpha)+' = MDF '+pct(m.mdf)+'.'),
+          interpretation:p(
+            'Contra esse sizing, '+villainPos+' teria uma referência teórica de continuar cerca de '+pct(m.mdf)+' do range para não overfoldar contra blefes puros. No spot real, composição de range e blockers de '+hand+' podem deslocar essa defesa por combo. '+solverRef,
+            'Against this sizing, '+villainPos+' has a theoretical reference to continue about '+pct(m.mdf)+' of range to avoid overfolding to pure bluffs. Actual range composition and '+hand+' blockers can shift defense by combo. '+solverRef,
+            'Contra este sizing, '+villainPos+' tiene como referencia teórica continuar cerca de '+pct(m.mdf)+' del rango para no overfoldear contra bluffs puros. La composición real y los blockers de '+hand+' pueden mover esa defensa. '+solverRef
+          )
+        };
+      }
+      case 31:{
+        if(street==='PRE-FLOP')return unavailable(p('Check-raise não se aplica pré-flop.','Check-raise does not apply preflop.','Check-raise no aplica preflop.'));
+        if(checks===undefined||raiseFreq===undefined)return unavailable(p('O nó não expõe mix de check e agressão suficiente para esta leitura.','The node does not expose enough check/aggression mix for this reading.','El nodo no expone suficiente mix de check/agresión para esta lectura.'));
+        return {
+          calculation:p('Para '+hand+': CHECK '+pct(checks)+' · agressão '+pct(raiseFreq)+'.','For '+hand+': CHECK '+pct(checks)+' · aggression '+pct(raiseFreq)+'.','Para '+hand+': CHECK '+pct(checks)+' · agresión '+pct(raiseFreq)+'.'),
+          interpretation:p(
+            'Esse mix mostra como '+hand+' divide suas linhas neste nó específico. Se o herói checa com frequência material, parte das mãos fortes/blefes precisa permanecer no range de check para que um raise posterior seja crível. '+solverRef,
+            'This mix shows how '+hand+' splits lines at this exact node. If hero checks materially, some strong hands/bluffs must remain in the checking range so later raises stay credible. '+solverRef,
+            'Este mix muestra cómo '+hand+' divide sus líneas en este nodo. Si el héroe hace check con frecuencia material, parte de manos fuertes/bluffs debe permanecer en check para sostener raises posteriores. '+solverRef
+          )
+        };
+      }
+      case 32:{
+        return unavailable(p('Não há histórico do jogador '+villainPos+' para medir quantas vezes ele chega ao showdown (WTSD).','There is no '+villainPos+' history to measure WTSD.','No hay historial de '+villainPos+' para medir WTSD.'));
+      }
+      case 33:{
+        return unavailable(p('Não há amostra de showdowns de '+villainPos+' para calcular W$SD.','There is no '+villainPos+' showdown sample to compute W$SD.','No hay muestra de showdowns de '+villainPos+' para calcular W$SD.'));
+      }
+      case 34:{
+        const selectedEv=n(result?.selected?.ev),handEv=n(strategy?.ev);
+        if(selectedEv===null&&handEv===null)return unavailable(p('O arquivo deste nó não expõe EV numérico por ação nem EV do combo.','This node file exposes neither action EV nor combo EV.','El archivo de este nodo no expone EV numérico por acción ni EV del combo.'));
+        return {
+          calculation:selectedEv!==null?p('EV da ação escolhida '+chosen+': '+selectedEv.toFixed(4)+'.','Chosen action EV '+chosen+': '+selectedEv.toFixed(4)+'.','EV de la acción elegida '+chosen+': '+selectedEv.toFixed(4)+'.'):p('EV disponível apenas para o combo '+hand+': '+handEv.toFixed(4)+'.','EV available only for combo '+hand+': '+handEv.toFixed(4)+'.','EV disponible sólo para el combo '+hand+': '+handEv.toFixed(4)+'.'),
+          interpretation:p(
+            'Este EV pertence a este nó, mão e configuração específicos. Quando EV por ação existe, ele é a medida mais direta para comparar linhas; quando só há EV do combo, não uso esse número para inventar diferença de EV entre '+chosen+' e '+best+'.',
+            'This EV belongs to this exact node, hand and configuration. When action EV exists it is the most direct line comparison; with combo-only EV, no fake EV gap is inferred between '+chosen+' and '+best+'.',
+            'Este EV pertenece a este nodo, mano y configuración. Cuando existe EV por acción es la comparación más directa; con EV sólo del combo no se inventa diferencia entre '+chosen+' y '+best+'.'
+          )
+        };
+      }
+      case 35:{
+        if(exploitProfile)return {
+          calculation:p('Perfil ativo: '+exploitProfile+'; baseline do solver preservada para comparação.','Active profile: '+exploitProfile+'; solver baseline preserved for comparison.','Perfil activo: '+exploitProfile+'; baseline del solver preservada para comparar.'),
+          interpretation:p(
+            'Neste spot, qualquer desvio exploit deve ser justificado por dados reais do perfil '+exploitProfile+'. Sem evidência suficiente, a referência continua '+best+' em '+pct(bestFreq)+' para '+hand+'.',
+            'Any exploit deviation here must be justified by real '+exploitProfile+' profile data. Without enough evidence, the reference remains '+best+' at '+pct(bestFreq)+' for '+hand+'.',
+            'Cualquier desvío exploit debe justificarse con datos reales del perfil '+exploitProfile+'. Sin evidencia suficiente, la referencia sigue siendo '+best+' en '+pct(bestFreq)+' para '+hand+'.'
+          )
+        };
+        return {
+          calculation:p('Nenhum perfil exploit confiável foi aplicado; análise segue o baseline '+(spot?.solver||'solver')+'.','No reliable exploit profile was applied; analysis follows '+(spot?.solver||'solver')+' baseline.','No se aplicó un perfil exploit fiable; el análisis sigue el baseline '+(spot?.solver||'solver')+'.'),
+          interpretation:p(
+            'Para este spot, não há evidência do adversário que justifique sair do baseline. Portanto '+best+' em '+pct(bestFreq)+' continua sendo a referência para '+hand+', sem inventar tendência populacional.',
+            'There is no opponent evidence here justifying a baseline deviation. Therefore '+best+' at '+pct(bestFreq)+' remains the reference for '+hand+' without inventing population tendencies.',
+            'No hay evidencia rival que justifique desviarse del baseline. Por eso '+best+' en '+pct(bestFreq)+' sigue siendo la referencia para '+hand+' sin inventar tendencias poblacionales.'
+          )
+        };
+      }
+      default:
+        return unavailable(p('Indicador sem leitura específica disponível para este nó.','No node-specific reading available for this indicator.','No hay lectura específica disponible para este indicador.'));
+    }
+  }
   function makeIndicators(ctx){
     const {spot,view,result,uiAction,tableState,language}=ctx;
     const names=INDICATOR_NAMES[lang(language)];
@@ -421,12 +849,15 @@
     arr.push(indicator(34,names[33],selectedEv!==null?String(selectedEv.toFixed(4)):(handEv!==null?String(handEv.toFixed(4))+' (EV do combo/nó)':na),selectedEv!==null?'EV da ação':handEv!==null?'o arquivo expõe EV do combo, não EV individual por ação':'','solver',selectedEv!==null||handEv!==null));
     arr.push(indicator(35,names[34],exploitProfile?('perfil '+exploitProfile+' selecionado; baseline solver mantida'):'baseline GTO/solver','ajuste exploit só é afirmado quando o solver/backend devolve essa camada','solver'));
 
-    const impacts=INDICATOR_IMPACT[lang(language)]||INDICATOR_IMPACT.pt;
-    return arr.map((x,i)=>Object.freeze({
-      ...x,
-      calculation:x.calculation||x.note||(x.applicable?'leitura direta do cenário/solver':'sem dados suficientes para cálculo confiável'),
-      interpretation:impacts[i]||'Indicador incorporado à decisão junto da frequência e do EV do solver.'
-    }));
+    const detailCtx={language,spot,view,result,tableState,street,m,tags,heroRange,villainRange,blockers,init,tableCount,active,handClass,strategy,raiseFreq,folds,checks,exploitProfile};
+    return arr.map(x=>{
+      const specific=spotSpecificIndicatorText(x.index,detailCtx);
+      return Object.freeze({
+        ...x,
+        calculation:specific.calculation,
+        interpretation:specific.interpretation
+      });
+    });
   }
 
   function analyze(input){
