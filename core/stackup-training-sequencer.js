@@ -47,6 +47,100 @@
     return /^(?:10|[2-9TJQKA])[cdhs](?:10|[2-9TJQKA])[cdhs]$/i.test(String(hand||''));
   }
 
+  const RANKS='AKQJT98765432';
+  const SUITS=['c','d','h','s'];
+
+  function allHandClasses(){
+    const out=[];
+    for(let i=0;i<RANKS.length;i++){
+      for(let j=0;j<RANKS.length;j++){
+        const a=RANKS[i],b=RANKS[j];
+        if(i===j)out.push(a+a);
+        else if(i<j)out.push(a+b+'s');
+        else out.push(b+a+'o');
+      }
+    }
+    return out;
+  }
+
+  function handClassCombos(hand){
+    const t=String(hand||'').trim().toUpperCase().replace(/10/g,'T');
+    const m=t.match(/^([2-9TJQKA])([2-9TJQKA])([SO])?$/);
+    if(!m)return [];
+    const a=m[1],b=m[2],kind=m[3]||'';
+    const out=[];
+    if(a===b){
+      for(let i=0;i<SUITS.length;i++)for(let j=i+1;j<SUITS.length;j++)out.push([a+SUITS[i],b+SUITS[j]]);
+      return out;
+    }
+    for(const s1 of SUITS)for(const s2 of SUITS){
+      if(kind==='S'&&s1!==s2)continue;
+      if(kind==='O'&&s1===s2)continue;
+      out.push([a+s1,b+s2]);
+    }
+    return out;
+  }
+
+  function pushfoldSpots(bank){
+    const pf=bank?.pushfold;
+    if(!pf?.charts)return [];
+    const expl=Number(pf.final_exploitability_bb_per_100);
+    if(!Number.isFinite(expl)||expl>=0.05)return [];
+    const classes=allHandClasses();
+    const depths=(pf.stack_depths_bb||[]).map(Number).filter(v=>Number.isInteger(v)&&v>=2&&v<=15);
+    const out=[];
+    for(const stack of depths){
+      const jam=pf.charts?.sb_jam?.[String(stack)]||{};
+      const call=pf.charts?.bb_call_vs_jam?.[String(stack)]||{};
+      const jamStrategy=classes.map(hand=>{
+        const aggressive=Math.max(0,Math.min(1,Number(jam[hand])||0));
+        return {hand,actions:[
+          {action:'FOLD',kind:'fold',frequency:(1-aggressive)*100,ev:null},
+          {action:'ALL IN',kind:'jam',frequency:aggressive*100,ev:null}
+        ]};
+      });
+      const callStrategy=classes.map(hand=>{
+        const aggressive=Math.max(0,Math.min(1,Number(call[hand])||0));
+        return {hand,actions:[
+          {action:'FOLD',kind:'fold',frequency:(1-aggressive)*100,ev:null},
+          {action:'CALL',kind:'call',frequency:aggressive*100,ev:null}
+        ]};
+      });
+      out.push({
+        id:'pushfold-hu-sb-'+stack+'bb',
+        solver:'POKER_SOLVER_PUSHFOLD',
+        version:String(pf.version||'v1'),
+        solveId:'pushfold-hu-sb-'+stack,
+        convergence:{exploitabilityBbPer100:expl,iterations:Number(pf.iterations_per_solve)||0},
+        scenario:{
+          gameType:'TOURNAMENT',street:'PRE-FLOP',tableSize:2,trainingTableSize:2,
+          heroPosition:'SB',villainPosition:'BB',effectiveStack:stack,pot:1.5,board:[],
+          positions:['SB','BB'],playerStacks:{SB:stack,BB:stack},actionHistory:[],
+          tags:['open_shove','push_fold','heads_up_2max','blind_war'],
+          provenance:{strategySource:'POKER_SOLVER_PUSHFOLD',license:'MIT',upstream:'amaster97/poker_solver'}
+        },
+        strategy:jamStrategy
+      });
+      out.push({
+        id:'pushfold-hu-bb-'+stack+'bb',
+        solver:'POKER_SOLVER_PUSHFOLD',
+        version:String(pf.version||'v1'),
+        solveId:'pushfold-hu-bb-'+stack,
+        convergence:{exploitabilityBbPer100:expl,iterations:Number(pf.iterations_per_solve)||0},
+        scenario:{
+          gameType:'TOURNAMENT',street:'PRE-FLOP',tableSize:2,trainingTableSize:2,
+          heroPosition:'BB',villainPosition:'SB',effectiveStack:stack,pot:stack+1,board:[],
+          positions:['SB','BB'],playerStacks:{SB:stack,BB:stack},
+          actionHistory:[{position:'SB',action:'ALL IN',kind:'jam',to:stack}],
+          tags:['call_shove','push_fold','heads_up_2max','blind_war'],
+          provenance:{strategySource:'POKER_SOLVER_PUSHFOLD',license:'MIT',upstream:'amaster97/poker_solver'}
+        },
+        strategy:callStrategy
+      });
+    }
+    return out;
+  }
+
   function applySuitVariant(spot,variant){
     const index=Math.max(0,Math.min(SUIT_PERMS.length-1,Number(variant)||0));
     if(index===0)return spot;
@@ -210,6 +304,20 @@
       solver:spot?.solver||null,
       solveId:spot?.solveId||null
     })));
+  }
+
+  function presentationSignature(spot,hand,heroCards,suitVariant){
+    if(Array.isArray(heroCards)&&heroCards.length===2){
+      const s=spot?.scenario||{};
+      return hash(JSON.stringify(stable({
+        street:normStreet(s.street),gameType:s.gameType||null,tableSize:s.tableSize??null,
+        heroPosition:s.heroPosition||null,villainPosition:s.villainPosition||null,
+        effectiveStack:Number(s.effectiveStack)||0,pot:Number(s.pot)||0,
+        board:s.board||[],actionLine:actionLine(s),hand:String(hand||''),
+        heroCards:[...heroCards],solver:spot?.solver||null,solveId:spot?.solveId||null
+      })));
+    }
+    return variantSignature(spot,hand,suitVariant||0);
   }
 
   function familySignature(spot){
@@ -384,7 +492,7 @@
   }
 
   function expand(bank,filters){
-    const all=[...(bank?.preflop||[]),...(bank?.postflop||[])];
+    const all=[...(bank?.preflop||[]),...(bank?.postflop||[]),...pushfoldSpots(bank)];
     const candidates=[];
     for(let spotIndex=0;spotIndex<all.length;spotIndex++){
       const spot=all[spotIndex];
@@ -392,18 +500,27 @@
       const hands=(spot.strategy||[]).filter(h=>h?.hand&&Array.isArray(h.actions)&&h.actions.length);
       for(let handIndex=0;handIndex<hands.length;handIndex++){
         const hand=String(hands[handIndex].hand);
+        const classCombos=normStreet(spot?.scenario?.street)==='PRE-FLOP'&&!isExactHand(hand)?handClassCombos(hand):[];
+        if(classCombos.length){
+          for(const heroCards of classCombos){
+            const exact=presentationSignature(spot,hand,heroCards,0);
+            candidates.push({
+              spotIndex,spot,hand,heroCards,suitVariant:0,exact,
+              family:familySignature(spot),
+              position:normPosition(spot?.scenario?.heroPosition),
+              street:normStreet(spot?.scenario?.street)
+            });
+          }
+          continue;
+        }
         const variants=isExactHand(hand)?SUIT_PERMS.length:1;
         const signatures=new Set();
         for(let suitVariant=0;suitVariant<variants;suitVariant++){
-          const exact=variantSignature(spot,hand,suitVariant);
+          const exact=presentationSignature(spot,hand,null,suitVariant);
           if(signatures.has(exact))continue;
           signatures.add(exact);
           candidates.push({
-            spotIndex,
-            spot,
-            hand,
-            suitVariant,
-            exact,
+            spotIndex,spot,hand,suitVariant,exact,
             family:familySignature(spot),
             position:normPosition(spot?.scenario?.heroPosition),
             street:normStreet(spot?.scenario?.street)
@@ -487,6 +604,7 @@
 
     const spot=clone(candidate.spot);
     spot.hand=candidate.hand;
+    if(Array.isArray(candidate.heroCards)&&candidate.heroCards.length===2)spot.heroCards=[...candidate.heroCards];
     applySuitVariant(spot,candidate.suitVariant||0);
     spot.trainingSignature=candidate.exact;
     spot.trainingFamily=candidate.family;
@@ -534,6 +652,7 @@
     filterKey,
     exactSignature,
     familySignature,
+    handClassCombos,
     coverageFloor,
     pick,
     stats,
