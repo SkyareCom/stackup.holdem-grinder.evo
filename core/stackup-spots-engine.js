@@ -234,7 +234,8 @@
     const heroCards=(Array.isArray(spot.heroCards)&&spot.heroCards.length>=2?spot.heroCards:
       Array.isArray(scenario.heroCards)&&scenario.heroCards.length>=2?scenario.heroCards:
       cardsForHand(handKey,board)).map(displayCard).filter(Boolean);
-    const inferredHand=handClassFromCards(heroCards)||handKey;
+    const exactTrainingHand=exactComboCards(handKey);
+    const inferredHand=exactTrainingHand?handKey:(handClassFromCards(heroCards)||handKey);
     const stackForPosition=stacksByPosition(scenario,positions,opt.fallbackStacks||[]);
     const sidePots=(Array.isArray(scenario.sidePots)?scenario.sidePots:[])
       .map(Number).filter(v=>Number.isFinite(v)&&v>0);
