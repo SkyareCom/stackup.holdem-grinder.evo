@@ -769,6 +769,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 </style>
 <script src="core/stackup-spots-engine.js"></script>
 <script src="core/stackup-spots-client.js"></script>
+<script src="core/stackup-table-state.js"></script>
 <script>
 (function(){
   /* REGRA DE TRADUCAO: todo novo item deve ser criado simultaneamente em PT, EN e ES. */
@@ -941,7 +942,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   // Solver-backed SPOTS: a camada visual existente continua intacta.
   // Sem endpoint configurado, o app usa exatamente os dados fallback acima.
   let SOLVER_SPOT=null;
+  let SOLVER_TABLE_STATE=null;
   let solverSpotLoading=false;
+
+  const spotStateStyle=document.createElement('style');
+  spotStateStyle.textContent=`
+    .seat.spot-state-folded{opacity:.36;filter:grayscale(.85)}
+    .seat.spot-state-folded .av{text-decoration:line-through}
+    .seat.spot-state-allin .playerbox{box-shadow:0 0 0 2px rgba(21,91,189,.8),0 0 16px rgba(21,91,189,.5)}
+    .spotcommit{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 3px);font-size:9px;line-height:1;color:#fff;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.32);border-radius:7px;padding:2px 5px;white-space:nowrap;pointer-events:none}
+    .seat.hero .spotcommit{font-size:10px}
+  `;
+  R.appendChild(spotStateStyle);
 
   function selectedValues(id){
     const S=sel[id];
@@ -990,6 +1002,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const spot=await client.next(buildSolverSpotFilters());
       if(spot){
         SOLVER_SPOT=spot;
+        try{
+          const tablePositions=POSN[resolveSpotCount()]||POSN[10];
+          const view=solverSpotView(tablePositions);
+          SOLVER_TABLE_STATE=window.StackUpTableState?.fromSpot?.(spot,view)||null;
+        }catch(_){
+          SOLVER_TABLE_STATE=null;
+        }
         if(!tb.hidden){
           renderSpotActions();
           requestAnimationFrame(renderTable);
@@ -1163,6 +1182,30 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return 790;
   }
 
+  function syncSpotTableStateDom(){
+    const state=SOLVER_TABLE_STATE;
+    if(!state)return;
+    state.players.forEach(p=>{
+      const seat=[...tb.querySelectorAll('.seat[data-pos]')].find(el=>el.dataset.pos===p.position);
+      if(!seat)return;
+      seat.classList.toggle('spot-state-folded',!!p.folded);
+      seat.classList.toggle('spot-state-allin',!!p.allIn);
+      const stk=seat.querySelector('.stk');
+      if(stk)stk.textContent=fmtStack(Number(p.stack)||0);
+      let commit=seat.querySelector('.spotcommit');
+      if(Number(p.committed)>0){
+        if(!commit){
+          commit=document.createElement('div');
+          commit.className='spotcommit';
+          seat.appendChild(commit);
+        }
+        commit.textContent=fmtStack(Number(p.committed)||0);
+      }else if(commit)commit.remove();
+    });
+    const potLine=tb.querySelector('.centerbox .potline');
+    if(potLine)potLine.textContent=TR[L()].pot+': '+fmtStack(Number(state.pot)||0);
+  }
+
   spotActions.addEventListener('click',e=>{
     const b=e.target.closest('.spotaction');
     if(!b||spotActionBusy)return;
@@ -1179,6 +1222,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const result=(SOLVER_SPOT&&view&&engine)
       ?engine.evaluate(SOLVER_SPOT,view.handKey,uiAction)
       :null;
+
+    if(SOLVER_TABLE_STATE&&window.StackUpTableState){
+      try{
+        window.StackUpTableState.applyHeroUiAction(SOLVER_TABLE_STATE,result,uiAction);
+        window.setTimeout(syncSpotTableStateDom,Math.max(120,Math.round(animationMs*.48)));
+      }catch(_){}
+    }
 
     if(result&&view){
       try{
@@ -1239,10 +1289,15 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     for(let k=0;k<n;k++){
       const p=pos[(h0+k)%n],hero=k===0,[x,y]=seatPointOutside(feltLeft,top,feltW,feltH,k,n,W,H);
       const hand=hero?`<div class="herohand">${heroCards.map(card).join('')}</div>`:'';
-      const stack=solved&&Number.isFinite(Number(solved.stackForPosition[p]))
-        ?Number(solved.stackForPosition[p])
-        :DEMO_STK[k%DEMO_STK.length];
-      html+=`<div class="seat${hero?' hero':''}" style="left:${x}px;top:${y}px">${hand}<div class="playerbox"><div class="av" data-pos="${p}">${p}</div><div class="stk">${fmtStack(stack)}</div></div></div>`;
+      const statePlayer=SOLVER_TABLE_STATE?.players?.find(x=>x.position===p)||null;
+      const stack=statePlayer
+        ?Number(statePlayer.stack)
+        :(solved&&Number.isFinite(Number(solved.stackForPosition[p]))
+          ?Number(solved.stackForPosition[p])
+          :DEMO_STK[k%DEMO_STK.length]);
+      const stateClass=statePlayer?(statePlayer.folded?' spot-state-folded':'')+(statePlayer.allIn?' spot-state-allin':''):'';
+      const commit=statePlayer&&Number(statePlayer.committed)>0?`<div class="spotcommit">${fmtStack(Number(statePlayer.committed))}</div>`:'';
+      html+=`<div class="seat${hero?' hero':''}${stateClass}" data-pos="${p}" style="left:${x}px;top:${y}px">${hand}<div class="playerbox"><div class="av" data-pos="${p}">${p}</div><div class="stk">${fmtStack(stack)}</div></div>${commit}</div>`;
 
 
     }
@@ -1250,7 +1305,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const cy=top+feltH*.45-18;
     const boardCards=solved?solved.board:DEMO_BOARD;
     const boardSlots=solved?[...boardCards,...Array(Math.max(0,5-boardCards.length)).fill(null)].slice(0,5):boardCards;
-    const potValue=solved?Number(solved.pot)||0:DEMO_BETS.reduce((sum,v)=>sum+v,0);
+    const potValue=SOLVER_TABLE_STATE?Number(SOLVER_TABLE_STATE.pot)||0:(solved?Number(solved.pot)||0:DEMO_BETS.reduce((sum,v)=>sum+v,0));
     const sidePots=solved&&Array.isArray(solved.sidePots)?solved.sidePots:[];
     const pots=[`<div class="potline">${TR[L()].pot}: ${fmtStack(potValue)}</div>`];
     sidePots.forEach((value,i)=>{
