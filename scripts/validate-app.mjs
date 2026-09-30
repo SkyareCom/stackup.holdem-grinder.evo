@@ -1,4 +1,6 @@
 import fs from 'node:fs';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 
 const html=fs.readFileSync(new URL('../index.html',import.meta.url),'utf8');
 const failures=[];
@@ -23,6 +25,35 @@ scripts.forEach((s,i)=>{
   try{new Function(s.code);}
   catch(error){failures.push('inline script '+i+' syntax error: '+error.message);}
 });
+
+const sequencerPath=new URL('../core/stackup-training-sequencer.js',import.meta.url);
+const spotsClientPath=new URL('../core/stackup-spots-client.js',import.meta.url);
+const serverPath=new URL('../solver-api/server.mjs',import.meta.url);
+const sequencer=fs.readFileSync(sequencerPath,'utf8');
+const spotsClient=fs.readFileSync(spotsClientPath,'utf8');
+try{new Function(sequencer);}
+catch(error){failures.push('training sequencer syntax error: '+error.message);}
+try{new Function(spotsClient);}
+catch(error){failures.push('spots client syntax error: '+error.message);}
+if(!html.includes('<script src="core/stackup-training-sequencer.js"></script>')){
+  failures.push('training sequencer script is missing from index');
+}
+if(html.indexOf('stackup-training-sequencer.js')>html.indexOf('stackup-spots-client.js')){
+  failures.push('training sequencer must load before spots client');
+}
+if(!spotsClient.includes('sequencer.pick(bank,filters||{})')){
+  failures.push('spots client must use Training Sequencer V2');
+}
+if(!sequencer.includes('trainingSignature')||!sequencer.includes('recentFamilies')){
+  failures.push('anti-repeat signature/family protection is missing');
+}
+if(!html.includes('heroPositions:positions')||!html.includes('effectiveStacks')){
+  failures.push('multi-select solver filters are not wired from the UI');
+}
+const serverCheck=spawnSync(process.execPath,['--check',fileURLToPath(serverPath)],{encoding:'utf8'});
+if(serverCheck.status!==0){
+  failures.push('solver API syntax error: '+String(serverCheck.stderr||serverCheck.stdout||'unknown').trim());
+}
 
 const config=JSON.parse(fs.readFileSync(new URL('../config/grinder.product.json',import.meta.url),'utf8'));
 if(config?.product?.id!=='grinder') failures.push('product config must identify grinder');
