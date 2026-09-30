@@ -14,7 +14,8 @@
     source:null,
     manifest:null,
     cursor:0,
-    lastStats:null
+    lastStats:null,
+    coverageError:null
   };
 
   const cfg=Object.assign({
@@ -158,7 +159,14 @@
         const key=sequencer.filterKey(activeFilters);
         if(!state.lastStats||state.lastStats.filterKey!==key)state.lastStats=sequencer.stats(bank,activeFilters);
       }catch(_){state.lastStats=null;}
-      if(!spot)throw new Error('no_solver_spot_for_active_filters');
+      if(!spot){
+        if(state.lastStats&&!state.lastStats.publishable){
+          const err=new Error('scenario_coverage_below_minimum');
+          err.coverage=state.lastStats;
+          throw err;
+        }
+        throw new Error('no_solver_spot_for_active_filters');
+      }
       return spot;
     }
 
@@ -179,6 +187,7 @@
     if(!available())return null;
     state.loading=true;
     state.error=null;
+    state.coverageError=null;
     try{
       let spot=null;
       if(baseUrl()){
@@ -199,6 +208,7 @@
       return spot;
     }catch(error){
       state.error=String(error?.message||error);
+      state.coverageError=error?.coverage||null;
       return null;
     }finally{
       state.loading=false;
