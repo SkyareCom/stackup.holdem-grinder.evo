@@ -482,6 +482,29 @@
       return null;
     }
     const actions=(spot?.strategy||[]).flatMap(h=>h?.actions||[]);
+    const history=Array.isArray(scenario.actionHistory)?scenario.actionHistory:[];
+    const last=history[history.length-1]||null;
+    const lastKind=String(last?.kind||last?.action||'').toLowerCase();
+    const facingAggression=last&&
+      String(last?.position||last?.player||'').toUpperCase()!==hero&&
+      (/raise|bet|jam|all\s*-?\s*in/.test(lastKind));
+    if(facingAggression){
+      tags.add('pot_odds');
+      tags.add('mdf');
+      tags.add('breakeven_call');
+    }
+
+    const currentBet=Number(scenario.currentBet||0);
+    const hasOpenBet=(spot?.strategy||[]).some(h=>(h?.actions||[]).some(a=>{
+      const label=String(a?.action||a?.label||'').toLowerCase();
+      return /\bbet\b|\braise\b/.test(label);
+    }));
+    if((!Number.isFinite(currentBet)||currentBet<=0)&&hasOpenBet)tags.add('breakeven_bluff');
+
+    if(scenario.heroRange&&scenario.villainRange)tags.add('combos');
+    const exactPostflop=street!=='PRE-FLOP'&&(spot?.strategy||[]).some(h=>isExactHand(h?.hand));
+    if(exactPostflop)tags.add('blockers');
+
     for(const a of actions){
       const label=String(a?.action||a?.label||'').toLowerCase();
       const n=sizingPct(a);
