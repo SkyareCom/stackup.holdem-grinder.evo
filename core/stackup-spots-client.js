@@ -65,18 +65,20 @@
     if(staticBankPromise)return staticBankPromise;
     staticBankPromise=(async()=>{
       const manifest=await fetchJson(staticUrl('manifest.json'));
-      const [preflop,postflop,pushfold,tournament]=await Promise.all([
+      const [preflop,postflop,pushfold,tournament,preflopDecisions]=await Promise.all([
         fetchJson(staticUrl('preflop.json')),
         fetchJson(staticUrl('postflop.json')),
         fetchJson(staticUrl('pushfold-hu-v1.json')),
-        fetchJson(staticUrl('tournament.json'))
+        fetchJson(staticUrl('tournament.json')),
+        fetchJson(staticUrl('preflop-decisions.json'))
       ]);
       if(!Array.isArray(preflop)||!preflop.length)throw new Error('static_preflop_empty');
       if(!Array.isArray(postflop)||!postflop.length)throw new Error('static_postflop_empty');
       if(!pushfold||typeof pushfold!=='object'||!pushfold.charts)throw new Error('static_pushfold_empty');
       if(!tournament||typeof tournament!=='object'||!Array.isArray(tournament.spots))throw new Error('static_tournament_invalid');
+      if(!preflopDecisions||typeof preflopDecisions!=='object'||!Array.isArray(preflopDecisions.spots))throw new Error('static_preflop_decisions_invalid');
       state.manifest=manifest;
-      return {manifest,preflop,postflop,pushfold,tournament};
+      return {manifest,preflop,postflop,pushfold,tournament,preflopDecisions};
     })().catch(error=>{
       staticBankPromise=null;
       throw error;
