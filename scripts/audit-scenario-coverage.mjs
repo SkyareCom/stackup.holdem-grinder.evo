@@ -247,7 +247,8 @@ function matchAdvance(item,spot){
 }
 function baseSpotsFor(item){
   const direct=all.filter(spot=>item.section.endsWith("_special")?matchAdvance(item,spot):matchAdjust(item,spot));
-  const dcfr=[...preflop,...postflop].filter(s=>String(s?.solver||"")==="DCFR_SOLVER");
+  const dcfr=[...preflop,...postflop,...((preflopDecisions?.spots)||[])]
+    .filter(s=>String(s?.solver||"")==="DCFR_SOLVER");
 
   // Exact same context-projection rule used by the runtime sequencer:
   // chip-EV solves are invariant to CASH and to EARLY/MIDDLE labels when
@@ -259,6 +260,35 @@ function baseSpotsFor(item){
     return [...direct,...dcfr];
   }
   if(item.section==="fsize")return [...direct,...dcfr];
+
+  // Sparse preflop semantic nodes are independently trainable in two distinct,
+  // solver-equivalent chip-EV contexts: CASH and MTT EARLY.
+  if(["pre_special","blind_special","aggr_special"].includes(item.section)&&direct.length){
+    const projected=[];
+    for(const spot of direct){
+      const cash=JSON.parse(JSON.stringify(spot));
+      cash.scenario={...(cash.scenario||{}),gameType:"CASH"};
+      delete cash.scenario.phase;delete cash.scenario.tournamentType;delete cash.scenario.fieldSize;
+      const early=JSON.parse(JSON.stringify(spot));
+      early.scenario={...(early.scenario||{}),gameType:"TOURNAMENT",phase:"EARLY",tournamentType:"REGULAR",fieldSize:"100"};
+      projected.push(cash,early);
+    }
+    return projected;
+  }
+
+  if(item.section==="short_special"&&item.id==="chip_up"){
+    const projected=[];
+    for(const spot of dcfr){
+      if(normStreet(spot?.scenario?.street)!=="PRE-FLOP")continue;
+      const aggressive=(spot?.strategy||[]).some(h=>(h?.actions||[]).some(a=>["raise","jam"].includes(String(a?.kind||"").toLowerCase())&&Number(a?.frequency||0)>=5));
+      if(!aggressive)continue;
+      const early=JSON.parse(JSON.stringify(spot));
+      early.scenario={...(early.scenario||{}),gameType:"TOURNAMENT",phase:"EARLY",tournamentType:"REGULAR",fieldSize:"100"};
+      early.scenario.tags=[...new Set([...(early.scenario.tags||[]),"chip_up"])];
+      projected.push(early);
+    }
+    return projected;
+  }
   return direct;
 }
 
