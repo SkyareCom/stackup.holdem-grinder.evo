@@ -223,7 +223,20 @@ function matchAdvance(item,spot){
   return tags(spot).has(item.id);
 }
 function baseSpotsFor(item){
-  return all.filter(spot=>item.section.endsWith("_special")?matchAdvance(item,spot):matchAdjust(item,spot));
+  const direct=all.filter(spot=>item.section.endsWith("_special")?matchAdvance(item,spot):matchAdjust(item,spot));
+  const dcfr=[...preflop,...postflop].filter(s=>String(s?.solver||"")==="DCFR_SOLVER");
+
+  // Exact same context-projection rule used by the runtime sequencer:
+  // chip-EV solves are invariant to CASH and to EARLY/MIDDLE labels when
+  // stacks/blinds/positions are unchanged. No projection is allowed for
+  // Bubble/FT/PKO/opponent-model/rebuy contexts.
+  if(item.section==="mode"&&item.id==="cash")return dcfr;
+  if(item.section==="phase"&&["early","middle"].includes(item.id))return dcfr;
+  if(item.section==="ttype"&&["regular","turbo","freeze","hroller","sng"].includes(item.id)){
+    return [...direct,...dcfr];
+  }
+  if(item.section==="fsize")return [...direct,...dcfr];
+  return direct;
 }
 
 const cards=[];
