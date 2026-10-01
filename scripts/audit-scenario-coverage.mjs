@@ -194,7 +194,10 @@ function matchAdjust(item,spot){
   switch(item.section){
     case "mode": return item.id==="mtt"?String(s.gameType||"").toUpperCase()==="TOURNAMENT":item.id==="cash"?String(s.gameType||"").toUpperCase()==="CASH":false;
     case "seats": return Number(s.trainingTableSize??s.tableSize)===Number(item.tableSize);
-    case "ttype": return String(s.tournamentType||"").toLowerCase()===String(item.id).toLowerCase();
+    case "ttype": {
+      const map={regular:"REGULAR",turbo:"TURBO",pko:"PKO",freeze:"FREEZEOUT",hroller:"HIGH_ROLLER",sng:"SNG"};
+      return String(s.tournamentType||"").toUpperCase()===map[item.id];
+    }
     case "extras": return Array.isArray(s.extras)&&s.extras.includes(item.id);
     case "fsize": return String(s.fieldSize||"")===item.id;
     case "fskill": return String(s.opponentProfile||"")===item.id;
