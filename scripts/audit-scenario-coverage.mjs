@@ -171,6 +171,22 @@ function tags(spot){
   boardTags(s.board).forEach(x=>set.add(x));
 
   const actions=(spot?.strategy||[]).flatMap(h=>h?.actions||[]);
+  const history=Array.isArray(s.actionHistory)?s.actionHistory:[];
+  const last=history[history.length-1]||null;
+  const lastKind=String(last?.kind||last?.action||"").toLowerCase();
+  const facingAggression=last&&String(last?.position||last?.player||"").toUpperCase()!==hero&&/raise|bet|jam|all\s*-?\s*in/.test(lastKind);
+  if(facingAggression){
+    set.add("pot_odds");
+    set.add("mdf");
+    set.add("breakeven_call");
+  }
+  const currentBet=Number(s.currentBet||0);
+  const hasOpenBet=(spot?.strategy||[]).some(h=>(h?.actions||[]).some(a=>/\bbet\b|\braise\b/.test(String(a?.action||a?.label||"").toLowerCase())));
+  if((!Number.isFinite(currentBet)||currentBet<=0)&&hasOpenBet)set.add("breakeven_bluff");
+  if(s.heroRange&&s.villainRange)set.add("combos");
+  const exactPostflop=street!=="PRE-FLOP"&&(spot?.strategy||[]).some(h=>isExactHand(h?.hand));
+  if(exactPostflop)set.add("blockers");
+
   for(const a of actions){
     const label=String(a?.action||a?.label||"").toLowerCase();
     const n=sizingPct(a);
