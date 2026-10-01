@@ -675,6 +675,56 @@
     return out;
   }
 
+  function ljEquivalentSpots(bank){
+    const sources=[
+      ...(bank?.preflop||[]),
+      ...((bank?.preflopDecisions?.spots)||[])
+    ].filter(s=>String(s?.solver||'')==='DCFR_SOLVER'&&
+      normStreet(s?.scenario?.street)==='PRE-FLOP'&&
+      normPosition(s?.scenario?.heroPosition)==='UTG');
+
+    const out=[];
+    const positions=['UTG','UTG+1','UTG+2','LJ','HJ','CO','BTN','SB','BB'];
+    for(const base of sources){
+      const spot=clone(base);
+      const s=spot.scenario||(spot.scenario={});
+      s.tableSize=9;
+      s.trainingTableSize=9;
+      s.positions=positions;
+      s.heroPosition='LJ';
+      if(normPosition(s.villainPosition)==='UTG')s.villainPosition='LJ';
+
+      const existing=Array.isArray(s.actionHistory)
+        ?s.actionHistory.map(x=>({...x,position:normPosition(x.position)==='UTG'?'LJ':x.position}))
+        :[];
+      s.actionHistory=[
+        {position:'UTG',action:'FOLD',kind:'fold',to:0},
+        {position:'UTG+1',action:'FOLD',kind:'fold',to:0},
+        {position:'UTG+2',action:'FOLD',kind:'fold',to:0},
+        ...existing
+      ];
+
+      const stack=Number(s.heroStack??s.effectiveStack)||100;
+      const oldStacks=s.playerStacks||{};
+      s.playerStacks={};
+      for(const p of positions){
+        if(p==='LJ')s.playerStacks[p]=Number(oldStacks.UTG??stack);
+        else s.playerStacks[p]=Number(oldStacks[p]??stack);
+      }
+
+      s.provenance={
+        ...(s.provenance||{}),
+        strategySource:'DCFR_SOLVER',
+        positionProjection:'6MAX_UTG_TO_9MAX_LJ',
+        playersBehind:5
+      };
+      spot.id='eq-lj-'+String(base.id||base.solveId||'dcfr');
+      spot.solveId=String(base.solveId||base.id||'dcfr')+'|position-equivalence|LJ9';
+      out.push(spot);
+    }
+    return out;
+  }
+
   function expand(bank,filters){
     const all=[
       ...(bank?.preflop||[]),
@@ -683,6 +733,7 @@
       ...((bank?.tournament?.spots)||[]),
       ...((bank?.preflopDecisions?.spots)||[]),
       ...((bank?.textureSizing?.spots)||[]),
+      ...ljEquivalentSpots(bank),
       ...contextualChipEvSpots(bank,filters)
     ];
     const candidates=[];
@@ -846,6 +897,7 @@
     familySignature,
     handClassCombos,
     contextualChipEvSpots,
+    ljEquivalentSpots,
     coverageFloor,
     pick,
     stats,
