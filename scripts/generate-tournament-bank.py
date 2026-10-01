@@ -155,6 +155,19 @@ def solve_game(archetype,equity,compat):
     hero=len(stacks)-2; villain=len(stacks)-1
     u=utilities(stacks,payouts,hero,villain,equity)
 
+    # PKO utility: a bounty is added only to the branch where the winner
+    # actually covers and eliminates the opponent. Values are expressed in
+    # the same normalized prize-equity units as payouts and are explicit
+    # scenario inputs, never guessed by the solver.
+    hero_bounty=float(archetype.get("heroBounty",0.0))
+    villain_bounty=float(archetype.get("villainBounty",0.0))
+    hero_covers=stacks[hero] >= stacks[villain]-1e-12
+    villain_covers=stacks[villain] >= stacks[hero]-1e-12
+    if hero_covers and villain_bounty>0:
+        u["hero_call"]=u["hero_call"] + equity*villain_bounty
+    if villain_covers and hero_bounty>0:
+        u["villain_call"]=u["villain_call"] + (1.0-equity)*hero_bounty
+
     joint=compat.astype(np.float64)
     joint/=joint.sum()
     ph=joint.sum(axis=1); pv=joint.sum(axis=0)
@@ -242,7 +255,7 @@ def mk_positions(n):
     }
     return options[n]
 
-def arch(id,tags,stacks,payouts,phase="LATE",field="100",notes="",sb_tags=None,bb_tags=None,tournament_type="REGULAR"):
+def arch(id,tags,stacks,payouts,phase="LATE",field="100",notes="",sb_tags=None,bb_tags=None,tournament_type="REGULAR",hero_bounty=0.0,villain_bounty=0.0):
     n=len(stacks)
     pay=[max(0.0,float(x)) for x in payouts]
     # A bubble model is only a bubble when at least one remaining player is
@@ -256,6 +269,8 @@ def arch(id,tags,stacks,payouts,phase="LATE",field="100",notes="",sb_tags=None,b
       "id":id,"tags":tags,"stacks":stacks,"payouts":pay,"phase":phase,
       "fieldSize":field,"positions":mk_positions(n),"notes":notes,
       "tournamentType":tournament_type,
+      "heroBounty":max(0.0,float(hero_bounty)),
+      "villainBounty":max(0.0,float(villain_bounty)),
       "sbTags":list(sb_tags) if sb_tags is not None else list(tags),
       "bbTags":list(bb_tags) if bb_tags is not None else list(tags)
     }
@@ -321,7 +336,38 @@ ARCHETYPES=[
   arch("sng50-a",[],[36,29,23,18,14,11],[.40,.24,.15,.10,.07,.04],"LATE","50",tournament_type="SNG"),
   arch("sng50-b",[],[42,32,25,19,14,10],[.40,.24,.15,.10,.07,.04],"BUBBLE","50",tournament_type="SNG"),
   arch("regular1000-a",[],[72,58,45,35,27,20],[.38,.24,.15,.10,.08,.05],"LATE","1000+",tournament_type="REGULAR"),
-  arch("regular1000-b",[],[80,62,48,37,28,21],[.38,.24,.15,.10,.08,.05],"LATE","1000+",tournament_type="REGULAR")
+  arch("regular1000-b",[],[80,62,48,37,28,21],[.38,.24,.15,.10,.08,.05],"LATE","1000+",tournament_type="REGULAR"),
+
+  # PKO: explicit bounty values in normalized prize-equity units.
+  # Equal stacks: both players can eliminate each other.
+  arch("pko-even-a",["pko_math"],[48,38,30,24,16,16],[.38,.24,.15,.10,.08,.05],"LATE","500",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.035,villain_bounty=.035),
+  arch("pko-even-b",["pko_math"],[54,42,32,25,18,18],[.38,.24,.15,.10,.08,.05],"BUBBLE","500",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.055,villain_bounty=.045),
+
+  # SB covers BB: shove side has bounty upside; BB is the covered player.
+  arch("pko-sb-cover-a",["pko_math"],[52,40,31,24,22,12],[.38,.24,.15,.10,.08,.05],"LATE","1000+",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covered_stack"],
+       tournament_type="PKO",hero_bounty=.04,villain_bounty=.05),
+  arch("pko-sb-cover-b",["pko_math"],[60,45,34,26,25,10],[.38,.24,.15,.10,.08,.05],"BUBBLE","1000+",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covered_stack"],
+       tournament_type="PKO",hero_bounty=.06,villain_bounty=.08),
+
+  # BB covers SB: caller has bounty upside; SB is covered.
+  arch("pko-bb-cover-a",["pko_math"],[50,39,30,23,10,24],[.38,.24,.15,.10,.08,.05],"LATE","350",
+       sb_tags=["pko_math","bounty_shove","covered_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.05,villain_bounty=.03),
+  arch("pko-bb-cover-b",["pko_math"],[56,43,33,25,12,28],[.38,.24,.15,.10,.08,.05],"BUBBLE","350",
+       sb_tags=["pko_math","bounty_shove","covered_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.075,villain_bounty=.04)
 ]
 
 def main():
@@ -341,6 +387,8 @@ def main():
           "trainingTableSize":len(positions),"phase":a["phase"],"fieldSize":a["fieldSize"],
           "tournamentType":a["tournamentType"],"positions":positions,
           "payouts":a["payouts"],"icmBaseEquities":result["base_equities"],
+          "heroBountyPrizeValue":a.get("heroBounty",0.0),
+          "villainBountyPrizeValue":a.get("villainBounty",0.0),
           "playerStacks":dict(zip(positions,a["stacks"])),
           "provenance":{
             "strategySource":"STACKUP_ICM_RM",
