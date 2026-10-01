@@ -296,6 +296,7 @@ console.log("Selected postflop matchups:",selected.length,"of",selectedAll.lengt
 console.log(selected.map(m=>m.matchup).join(" | "));
 
 const postflop=[];
+const solverFailures=[];
 for(const matchup of selected){
   const roles=postflopRoles(matchup.opener.position,matchup.caller.position);
   const sideByPos=new Map([
@@ -332,14 +333,33 @@ for(const matchup of selected){
         "--allin-pot-ratio","3",
         "--skip-cum-strategy"
       ];
+      let solved=false;
+      let solveProfile="primary";
       try{
         await execFileAsync(BIN,solveArgs(primaryBetSizes,primaryRaiseSizes),{maxBuffer:32*1024*1024});
+        solved=true;
       }catch(error){
-        if(street!=="RIVER")throw error;
-        console.warn("River rich tree failed; retrying compact tree:",error?.message||error);
+        console.warn("Primary DCFR tree failed; retrying compact tree:",key,error?.message||error);
         await rm(rawPath,{force:true}).catch(()=>{});
-        await execFileAsync(BIN,solveArgs("33,75","75"),{maxBuffer:32*1024*1024});
+        try{
+          await execFileAsync(BIN,solveArgs("33,75","75"),{maxBuffer:32*1024*1024});
+          solved=true;
+          solveProfile="compact";
+        }catch(compactError){
+          const failure={
+            key,
+            street,
+            matchup:matchup.matchup,
+            board:boardRaw,
+            primary:String(error?.message||error).slice(0,1200),
+            compact:String(compactError?.message||compactError).slice(0,1200)
+          };
+          solverFailures.push(failure);
+          console.warn("Skipping unstable upstream DCFR scenario:",JSON.stringify(failure));
+          await rm(rawPath,{force:true}).catch(()=>{});
+        }
       }
+      if(!solved)continue;
       const raw=JSON.parse(await readFile(rawPath,"utf8"));
       const normalized=normalizeRaw(raw);
       await rm(rawPath,{force:true}).catch(()=>{});
@@ -366,7 +386,7 @@ for(const matchup of selected){
           solver:"DCFR_SOLVER",
           version:normalized.version,
           solveId:hashId("solve|"+key+"|"+node.node+"|"+node.player),
-          convergence:normalized.convergence,
+          convergence:{...normalized.convergence,solveProfile},
           matchup:matchup.matchup,
           node:node.node,
           actingRole,
@@ -420,8 +440,10 @@ const manifest={
     totalMatchups:selectedAll.length,
     matchups:selected.map(m=>m.matchup),
     potTypes:["SRP","3BET","4BET"],
-    streets:["FLOP","TURN","RIVER"]
-  }
+    streets:["FLOP","TURN","RIVER"],
+    failures:solverFailures.length
+  },
+  solverFailures
 };
 
 if(SHARD_COUNT>1){
