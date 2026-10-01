@@ -615,7 +615,11 @@
     // chip-EV contexts when the user did not request a tournament context.
     // Strategy remains the exact same DCFR solution; only context changes.
     const specialGroups=Object.keys(filters.special||{}).filter(k=>Array.isArray(filters.special[k])&&filters.special[k].length);
-    const semanticPreflop=specialGroups.length>0&&specialGroups.every(k=>['pre_special','blind_special','aggr_special'].includes(k));
+    const semanticPreflop=specialGroups.length>0&&specialGroups.every(k=>{
+      if(['pre_special','blind_special','aggr_special'].includes(k))return true;
+      if(k==='short_special')return (filters.special[k]||[]).every(v=>String(v)==='chip_up');
+      return false;
+    });
 
     if(!cash&&!chipEvPhase&&!contextOnly&&!semanticPreflop)return [];
     if(filters.tournamentType==='PKO')return [];
