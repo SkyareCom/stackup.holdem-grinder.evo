@@ -360,6 +360,19 @@ function baseSpotsFor(item){
   }
   if(item.section==="fsize")return [...direct,...dcfr];
 
+  if(item.section==="pos"&&["UTG+1","UTG+2"].includes(item.id)&&direct.length){
+    const projected=[];
+    for(const spot of direct){
+      const cash=JSON.parse(JSON.stringify(spot));
+      cash.scenario={...(cash.scenario||{}),gameType:"CASH"};
+      delete cash.scenario.phase;delete cash.scenario.tournamentType;delete cash.scenario.fieldSize;
+      const early=JSON.parse(JSON.stringify(spot));
+      early.scenario={...(early.scenario||{}),gameType:"TOURNAMENT",phase:"EARLY",tournamentType:"REGULAR",fieldSize:"100"};
+      projected.push(cash,early);
+    }
+    return projected;
+  }
+
   // Sparse preflop semantic nodes are independently trainable in two distinct,
   // solver-equivalent chip-EV contexts: CASH and MTT EARLY.
   if(["pre_special","blind_special","aggr_special"].includes(item.section)&&direct.length){
