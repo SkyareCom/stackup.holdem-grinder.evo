@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-01T04:32:20.992Z",
+  "generatedAt": "2026-10-01T04:37:36.657Z",
   "minSpots": 1500,
   "counts": {
     "adjust": 58,
     "advance": 104,
     "total": 162
   },
-  "publishable": 59,
-  "incomplete": 103,
+  "publishable": 71,
+  "incomplete": 91,
   "cards": [
     {
       "section": "mode",
@@ -27,8 +27,8 @@
       "source": "DCFR_EXACT",
       "validator": "tournament_solver",
       "minSpots": 1500,
-      "baseSpots": 123,
-      "available": 209533,
+      "baseSpots": 159,
+      "available": 257269,
       "publishable": true
     },
     {
@@ -49,8 +49,8 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "table_size_ranges",
       "minSpots": 1500,
-      "baseSpots": 71,
-      "available": 140581,
+      "baseSpots": 103,
+      "available": 183013,
       "publishable": true
     },
     {
@@ -82,9 +82,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "table_size_ranges",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 4,
+      "available": 5304,
+      "publishable": true
     },
     {
       "section": "ttype",
@@ -93,8 +93,8 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 60,
-      "available": 79560,
+      "baseSpots": 80,
+      "available": 106080,
       "publishable": true
     },
     {
@@ -104,9 +104,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 4,
+      "available": 5304,
+      "publishable": true
     },
     {
       "section": "ttype",
@@ -126,9 +126,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 4,
+      "available": 5304,
+      "publishable": true
     },
     {
       "section": "ttype",
@@ -137,9 +137,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 4,
+      "available": 5304,
+      "publishable": true
     },
     {
       "section": "ttype",
@@ -148,9 +148,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 4,
+      "available": 5304,
+      "publishable": true
     },
     {
       "section": "extras",
@@ -181,9 +181,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 8,
+      "available": 10608,
+      "publishable": true
     },
     {
       "section": "fsize",
@@ -203,9 +203,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 6,
+      "available": 7956,
+      "publishable": true
     },
     {
       "section": "fsize",
@@ -214,9 +214,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 6,
+      "available": 7956,
+      "publishable": true
     },
     {
       "section": "fsize",
@@ -225,9 +225,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 8,
+      "available": 10608,
+      "publishable": true
     },
     {
       "section": "fsize",
@@ -236,9 +236,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 8,
+      "available": 10608,
+      "publishable": true
     },
     {
       "section": "fskill",
@@ -291,8 +291,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 123,
-      "available": 209533,
+      "baseSpots": 159,
+      "available": 257269,
       "publishable": true
     },
     {
@@ -302,8 +302,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 123,
-      "available": 209533,
+      "baseSpots": 159,
+      "available": 257269,
       "publishable": true
     },
     {
@@ -313,8 +313,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 123,
-      "available": 209533,
+      "baseSpots": 159,
+      "available": 257269,
       "publishable": true
     },
     {
@@ -324,8 +324,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 123,
-      "available": 209533,
+      "baseSpots": 159,
+      "available": 257269,
       "publishable": true
     },
     {
@@ -335,8 +335,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 123,
-      "available": 209533,
+      "baseSpots": 159,
+      "available": 257269,
       "publishable": true
     },
     {
@@ -346,8 +346,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 123,
-      "available": 209533,
+      "baseSpots": 159,
+      "available": 257269,
       "publishable": true
     },
     {
@@ -357,9 +357,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "phase_stack_icm_model",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 4,
+      "available": 5304,
+      "publishable": true
     },
     {
       "section": "phase",
@@ -368,9 +368,9 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "phase_stack_icm_model",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 14,
+      "available": 18564,
+      "publishable": true
     },
     {
       "section": "phase",
@@ -379,8 +379,8 @@
       "source": "ICM_MATH",
       "validator": "phase_stack_icm_model",
       "minSpots": 1500,
-      "baseSpots": 26,
-      "available": 34476,
+      "baseSpots": 30,
+      "available": 39780,
       "publishable": true
     },
     {
@@ -390,8 +390,8 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "phase_stack_icm_model",
       "minSpots": 1500,
-      "baseSpots": 26,
-      "available": 34476,
+      "baseSpots": 40,
+      "available": 53040,
       "publishable": true
     },
     {
@@ -412,8 +412,8 @@
       "source": "DCFR_EXACT",
       "validator": "position_range_solver",
       "minSpots": 1500,
-      "baseSpots": 51,
-      "available": 73245,
+      "baseSpots": 69,
+      "available": 97113,
       "publishable": true
     },
     {
@@ -423,8 +423,8 @@
       "source": "DCFR_EXACT",
       "validator": "position_range_solver",
       "minSpots": 1500,
-      "baseSpots": 50,
-      "available": 98173,
+      "baseSpots": 68,
+      "available": 122041,
       "publishable": true
     },
     {
@@ -511,8 +511,8 @@
       "source": "DCFR_EXACT",
       "validator": "street_solver",
       "minSpots": 1500,
-      "baseSpots": 93,
-      "available": 123318,
+      "baseSpots": 129,
+      "available": 171054,
       "publishable": true
     },
     {
@@ -566,8 +566,8 @@
       "source": "ICM_MATH",
       "validator": "effective_stack_solver",
       "minSpots": 1500,
-      "baseSpots": 11,
-      "available": 14586,
+      "baseSpots": 14,
+      "available": 18564,
       "publishable": true
     },
     {
@@ -577,8 +577,8 @@
       "source": "ICM_MATH",
       "validator": "effective_stack_solver",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
+      "baseSpots": 5,
+      "available": 6630,
       "publishable": true
     },
     {
@@ -588,8 +588,8 @@
       "source": "ICM_MATH",
       "validator": "effective_stack_solver",
       "minSpots": 1500,
-      "baseSpots": 3,
-      "available": 3978,
+      "baseSpots": 5,
+      "available": 6630,
       "publishable": true
     },
     {
@@ -599,8 +599,8 @@
       "source": "ICM_MATH",
       "validator": "effective_stack_solver",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
+      "baseSpots": 6,
+      "available": 7956,
       "publishable": true
     },
     {
@@ -610,8 +610,8 @@
       "source": "ICM_MATH",
       "validator": "effective_stack_solver",
       "minSpots": 1500,
-      "baseSpots": 2,
-      "available": 2652,
+      "baseSpots": 3,
+      "available": 3978,
       "publishable": true
     },
     {
@@ -621,8 +621,8 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "effective_stack_solver",
       "minSpots": 1500,
-      "baseSpots": 2,
-      "available": 2652,
+      "baseSpots": 3,
+      "available": 3978,
       "publishable": true
     },
     {
@@ -687,8 +687,8 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "bb_vs_open",
       "minSpots": 1500,
-      "baseSpots": 44,
-      "available": 58344,
+      "baseSpots": 62,
+      "available": 82212,
       "publishable": true
     },
     {
@@ -1039,8 +1039,8 @@
       "source": "ICM_MATH",
       "validator": "push_fold_open",
       "minSpots": 1500,
-      "baseSpots": 44,
-      "available": 58344,
+      "baseSpots": 62,
+      "available": 82212,
       "publishable": true
     },
     {
@@ -1050,8 +1050,8 @@
       "source": "ICM_MATH",
       "validator": "push_fold_call",
       "minSpots": 1500,
-      "baseSpots": 44,
-      "available": 58344,
+      "baseSpots": 62,
+      "available": 82212,
       "publishable": true
     },
     {
@@ -1083,8 +1083,8 @@
       "source": "ICM_MATH",
       "validator": "push_fold",
       "minSpots": 1500,
-      "baseSpots": 88,
-      "available": 116688,
+      "baseSpots": 124,
+      "available": 164424,
       "publishable": true
     },
     {
@@ -1182,8 +1182,8 @@
       "source": "ICM_MATH",
       "validator": "icm_equity_solver",
       "minSpots": 1500,
-      "baseSpots": 14,
-      "available": 18564,
+      "baseSpots": 16,
+      "available": 21216,
       "publishable": true
     },
     {
@@ -1193,8 +1193,8 @@
       "source": "ICM_MATH",
       "validator": "icm_equity_solver",
       "minSpots": 1500,
-      "baseSpots": 18,
-      "available": 23868,
+      "baseSpots": 20,
+      "available": 26520,
       "publishable": true
     },
     {
