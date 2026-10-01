@@ -476,12 +476,29 @@
     const heroPosition=normPosition(s.heroPosition);
     if(filters.streets.length&&!filters.streets.includes(street))return false;
     if(filters.heroPositions.length&&!filters.heroPositions.includes(heroPosition))return false;
-    if(filters.gameType&&s.gameType&&String(s.gameType).toUpperCase()!==filters.gameType)return false;
+    if(filters.gameType){
+      if(!s.gameType||String(s.gameType).toUpperCase()!==filters.gameType)return false;
+    }
     if(filters.effectiveStacks.length){
       const stack=Number(s.effectiveStack);
-      if(Number.isFinite(stack)&&!filters.effectiveStacks.some(v=>Math.abs(stack-v)<.01))return false;
+      if(!Number.isFinite(stack)||!filters.effectiveStacks.some(v=>Math.abs(stack-v)<.01))return false;
     }
-    if(filters.phases.length&&s.phase&&!filters.phases.includes(String(s.phase)))return false;
+    if(filters.phases.length){
+      const phase=String(s.phase||'');
+      if(!phase||!filters.phases.includes(phase))return false;
+    }
+    if(filters.tournamentType){
+      const t=String(s.tournamentType||'').toLowerCase();
+      if(!t||t!==String(filters.tournamentType).toLowerCase())return false;
+    }
+    if(filters.fieldSize){
+      const field=String(s.fieldSize||'');
+      if(!field||field!==String(filters.fieldSize))return false;
+    }
+    if(filters.opponentProfile){
+      const profile=String(s.opponentProfile||'');
+      if(!profile||profile!==String(filters.opponentProfile))return false;
+    }
     const actualTableSize=Number(s.trainingTableSize??s.tableSize);
     if(filters.tableSize){
       if(!Number.isFinite(actualTableSize)||actualTableSize!==filters.tableSize)return false;
@@ -495,7 +512,12 @@
   }
 
   function expand(bank,filters){
-    const all=[...(bank?.preflop||[]),...(bank?.postflop||[]),...pushfoldSpots(bank)];
+    const all=[
+      ...(bank?.preflop||[]),
+      ...(bank?.postflop||[]),
+      ...pushfoldSpots(bank),
+      ...((bank?.tournament?.spots)||[])
+    ];
     const candidates=[];
     for(let spotIndex=0;spotIndex<all.length;spotIndex++){
       const spot=all[spotIndex];
