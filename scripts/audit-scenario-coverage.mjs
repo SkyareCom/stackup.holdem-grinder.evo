@@ -106,11 +106,87 @@ function normStreet(value){
   const s=String(value||"").toUpperCase().replace("PREFLOP","PRE-FLOP");
   return s;
 }
+function boardTags(board){
+  const cards=(Array.isArray(board)?board:[]).map(String).filter(Boolean);
+  if(cards.length<3)return [];
+  const rv={2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,T:10,"10":10,J:11,Q:12,K:13,A:14};
+  const ranks=cards.map(c=>rv[c.slice(0,-1).toUpperCase()]||0);
+  const suits=cards.map(c=>c.slice(-1).toLowerCase());
+  const uniq=new Set(ranks), counts={};
+  suits.forEach(s=>counts[s]=(counts[s]||0)+1);
+  const out=[], max=Math.max(...ranks), min=Math.min(...ranks);
+  if(uniq.size<ranks.length)out.push("board_paired");
+  if(Math.max(...Object.values(counts))>=3)out.push("board_monotone");
+  else if(Object.values(counts).some(n=>n===2))out.push("board_twotone");
+  if(max>=12)out.push("board_high_card");
+  if(max<=9)out.push("board_low");
+  const sorted=[...uniq].sort((a,b)=>a-b);
+  let span=99;
+  for(let i=0;i<sorted.length;i++)for(let j=i+2;j<sorted.length;j++)span=Math.min(span,sorted[j]-sorted[i]);
+  if(span<=4||(max-min<=5&&uniq.size>=3))out.push("board_connected","board_dynamic");
+  else out.push("board_dry","board_static");
+  return out;
+}
+function sizingPct(action){
+  const label=String(action?.action||action?.label||"").toLowerCase();
+  const direct=Number(action?.to??action?.size??action?.amount);
+  if(Number.isFinite(direct))return direct<=3?direct*100:direct;
+  let m=label.match(/(\d+(?:\.\d+)?)\s*%/);
+  if(m)return Number(m[1]);
+  m=label.match(/bet\s+(\d+)\s*\/\s*(\d+)/);
+  if(m&&Number(m[2]))return Number(m[1])/Number(m[2])*100;
+  m=label.match(/bet\s+(\d+(?:\.\d+)?)x/);
+  if(m)return Number(m[1])*100;
+  return null;
+}
 function tags(spot){
   const raw=spot?.tags||spot?.scenario?.tags||spot?.scenario?.special||[];
   const set=new Set();
   if(Array.isArray(raw))raw.forEach(x=>set.add(String(x)));
   else if(raw&&typeof raw==="object")Object.values(raw).flat().forEach(x=>set.add(String(x)));
+
+  const s=spot?.scenario||{};
+  const street=normStreet(s.street);
+  const hero=String(s.heroPosition||"").toUpperCase();
+  const villain=String(s.villainPosition||"").toUpperCase();
+  const id=String(spot?.id||"").toLowerCase();
+  const matchup=String(spot?.matchup||"");
+
+  if(street==="PRE-FLOP"&&id.includes("rfi")){
+    set.add("open_by_pos");
+    if(hero==="SB")set.add("blind_war");
+  }
+  if(hero==="BB"){
+    if(villain==="UTG")set.add("bb_ep");
+    else if(["HJ","CO"].includes(villain))set.add("bb_mp");
+    else if(["BTN","SB"].includes(villain))set.add("bb_lp");
+  }
+  if(hero==="SB"){
+    if(villain==="UTG")set.add("sb_ep");
+    else if(villain==="HJ")set.add("sb_mp");
+    else if(["CO","BTN"].includes(villain))set.add("sb_cobtn");
+  }
+  if(/CO vs BTN/i.test(matchup))set.add("attack_cobtn");
+  boardTags(s.board).forEach(x=>set.add(x));
+
+  const actions=(spot?.strategy||[]).flatMap(h=>h?.actions||[]);
+  for(const a of actions){
+    const label=String(a?.action||a?.label||"").toLowerCase();
+    const n=sizingPct(a);
+    if(/\ball\s*-?\s*in\b|\bjam\b|\bshove\b/.test(label))set.add("open_shove");
+    if(label.includes("bet")||label.includes("raise")){
+      if(Number.isFinite(n)){
+        if(Math.abs(n-25)<2)set.add("bet_25");
+        if(Math.abs(n-33)<3)set.add("bet_33");
+        if(Math.abs(n-50)<3)set.add("bet_50");
+        if(Math.abs(n-66)<3)set.add("bet_66");
+        if(Math.abs(n-75)<3)set.add("bet_75");
+        if(Math.abs(n-100)<4)set.add("pot_bet");
+        if(Math.abs(n-125)<5)set.add("overbet_125");
+        if(Math.abs(n-150)<5)set.add("overbet_150");
+      }
+    }
+  }
   return set;
 }
 function matchAdjust(item,spot){
@@ -118,12 +194,15 @@ function matchAdjust(item,spot){
   switch(item.section){
     case "mode": return item.id==="mtt"?String(s.gameType||"").toUpperCase()==="TOURNAMENT":item.id==="cash"?String(s.gameType||"").toUpperCase()==="CASH":false;
     case "seats": return Number(s.trainingTableSize??s.tableSize)===Number(item.tableSize);
-    case "ttype": return String(s.tournamentType||"")===item.id;
+    case "ttype": return String(s.tournamentType||"").toLowerCase()===String(item.id).toLowerCase();
     case "extras": return Array.isArray(s.extras)&&s.extras.includes(item.id);
     case "fsize": return String(s.fieldSize||"")===item.id;
     case "fskill": return String(s.opponentProfile||"")===item.id;
     case "hands": return true;
-    case "phase": return String(s.phase||"")===item.id;
+    case "phase": {
+      const map={early:"EARLY",middle:"MIDDLE",bubble:"BUBBLE",late:"LATE",ft:"FINAL_TABLE"};
+      return String(s.phase||"").toUpperCase()===map[item.id];
+    }
     case "pos": return String(s.heroPosition||"").toUpperCase()===item.id.toUpperCase();
     case "street": {
       const map={pre:"PRE-FLOP",flop:"FLOP",turn:"TURN",river:"RIVER"};
