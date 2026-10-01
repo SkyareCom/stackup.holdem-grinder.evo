@@ -129,7 +129,7 @@ function matchAdjust(item,spot){
       const map={pre:"PRE-FLOP",flop:"FLOP",turn:"TURN",river:"RIVER"};
       return normStreet(s.street)===map[item.id];
     }
-    case "stack": return Math.abs(Number(s.effectiveStack)-Number(item.stackBb))<.01;
+    case "stack": return Math.abs(Number(s.heroStack??s.effectiveStack)-Number(item.stackBb))<.01;
     default:return false;
   }
 }
