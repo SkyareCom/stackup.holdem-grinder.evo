@@ -691,7 +691,8 @@
     const dcfr=[
       ...(bank?.preflop||[]),
       ...(bank?.postflop||[]),
-      ...((bank?.preflopDecisions?.spots)||[])
+      ...((bank?.preflopDecisions?.spots)||[]),
+      ...((bank?.preflop9max?.spots)||[])
     ].filter(s=>String(s?.solver||'')==='DCFR_SOLVER');
     if(!dcfr.length)return [];
 
@@ -713,12 +714,16 @@
       if(k==='short_special')return (filters.special[k]||[]).every(v=>String(v)==='chip_up');
       return false;
     });
+    const sparseNative9Position=
+      filters.heroPositions.length>0&&
+      filters.heroPositions.every(p=>['UTG+1','UTG+2'].includes(String(p).toUpperCase()))&&
+      !filters.gameType&&!requestedPhases.length&&!filters.tournamentType&&!filters.fieldSize;
 
-    if(!cash&&!chipEvPhase&&!contextOnly&&!semanticPreflop)return [];
+    if(!cash&&!chipEvPhase&&!contextOnly&&!semanticPreflop&&!sparseNative9Position)return [];
     if(filters.tournamentType==='PKO')return [];
 
     const contexts=[];
-    if(semanticPreflop&&!filters.gameType&&!requestedPhases.length&&!filters.tournamentType&&!filters.fieldSize){
+    if((semanticPreflop||sparseNative9Position)&&!filters.gameType&&!requestedPhases.length&&!filters.tournamentType&&!filters.fieldSize){
       contexts.push(
         {gameType:'CASH',phase:null,tournamentType:null,fieldSize:null,projection:'CASH_CHIP_EV_EQUIVALENCE'},
         {gameType:'TOURNAMENT',phase:'EARLY',tournamentType:'REGULAR',fieldSize:'100',projection:'EARLY_CHIP_EV_EQUIVALENCE'}
