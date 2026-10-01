@@ -885,6 +885,43 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       out.push(x); }
     return out.join('\n'); };
   const isTour=()=>!sel.mode.has('cash');
+
+  let TRAINING_COVERAGE=null;
+  function coverageEntry(section,id){
+    if(!TRAINING_COVERAGE?.cards||!window.StackUpScenarioCatalog?.get?.(section,id))return null;
+    return TRAINING_COVERAGE.cards.find(x=>x.section===section&&x.id===id)||null;
+  }
+  function coverageBlocked(section,id){
+    const item=coverageEntry(section,id);
+    return !!item&&!item.publishable;
+  }
+  function coverageAttr(section,id){
+    const item=coverageEntry(section,id);
+    if(!item)return '';
+    const label=L()==='en'?'Validated coverage':L()==='es'?'Cobertura validada':'Cobertura validada';
+    const text=label+': '+item.available+'/'+item.minSpots;
+    return ' title="'+String(text).replace(/"/g,'&quot;')+'" data-coverage="'+item.available+'/'+item.minSpots+'"';
+  }
+  function sanitizeCoverageSelections(){
+    if(!TRAINING_COVERAGE?.cards)return;
+    for(const item of TRAINING_COVERAGE.cards){
+      if(item.publishable)continue;
+      const S=sel[item.section];
+      if(!S||!S.has(item.id))continue;
+      S.delete(item.id);
+      if(!S.size)S.add('all');
+    }
+  }
+  fetch('data/solver/coverage.json',{cache:'no-store'})
+    .then(r=>r.ok?r.json():null)
+    .then(data=>{
+      if(!data||data.minSpots!==1500)return;
+      TRAINING_COVERAGE=data;
+      sanitizeCoverageSelections();
+      if(cur==='train')renderTrain();
+      if(cur==='profile')renderAdvance();
+    }).catch(()=>{});
+
   function summary(s){
     const t=TR[L()];
     if(s.tour&&!isTour())return t.note;
