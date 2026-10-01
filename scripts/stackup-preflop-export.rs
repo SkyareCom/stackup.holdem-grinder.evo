@@ -271,54 +271,55 @@ fn walk(
         .map(|p| POSITION_NAMES[p].to_string());
     let tags = semantic_tags(&state, events);
     let strategy = strategy_at(bp, &state, history);
-    if strategy.is_empty() { return; }
 
-    let pot = state.bets.iter().sum::<i32>() as f32 / 2.0;
-    let current_bet = state.max_bet() as f32 / 2.0;
-    let hero_total = (state.stacks[hero_idx] + state.bets[hero_idx]) as f32 / 2.0;
-    let mut eff = hero_total;
-    for &p in &active {
-        if p == hero_idx { continue; }
-        let total = (state.stacks[p] + state.bets[p]) as f32 / 2.0;
-        eff = eff.min(total);
+    if !strategy.is_empty() && !tags.is_empty() {
+        let pot = state.bets.iter().sum::<i32>() as f32 / 2.0;
+        let current_bet = state.max_bet() as f32 / 2.0;
+        let hero_total = (state.stacks[hero_idx] + state.bets[hero_idx]) as f32 / 2.0;
+        let mut eff = hero_total;
+        for &p in &active {
+            if p == hero_idx { continue; }
+            let total = (state.stacks[p] + state.bets[p]) as f32 / 2.0;
+            eff = eff.min(total);
+        }
+        let mut player_stacks = std::collections::BTreeMap::new();
+        for p in 0..NUM_PLAYERS {
+            player_stacks.insert(POSITION_NAMES[p].to_string(), state.stacks[p] as f32 / 2.0);
+        }
+        let node_id = if history.is_empty() { "root".to_string() }
+            else { history.iter().map(|x| x.to_string()).collect::<Vec<_>>().join("-") };
+        let id = format!("dcfr-preflop-node-{}", node_id);
+        spots.push(Spot {
+            id: id.clone(),
+            solver: "DCFR_SOLVER".to_string(),
+            version: "preflop-blueprint-v1".to_string(),
+            solveId: format!("preflop-blueprint|{}", node_id),
+            scenario: Scenario {
+                gameType: "TOURNAMENT".to_string(),
+                street: "PRE-FLOP".to_string(),
+                tableSize: 6,
+                heroPosition: hero,
+                villainPosition: villain,
+                heroStack: hero_total,
+                effectiveStack: eff,
+                pot,
+                currentBet: current_bet,
+                board: vec![],
+                positions: POSITION_NAMES.iter().map(|x| x.to_string()).collect(),
+                playerStacks: player_stacks,
+                actionHistory: events.clone(),
+                tags,
+                solverNode: node_id,
+                provenance: serde_json::json!({
+                    "strategySource":"DCFR_PREFLOP_BLUEPRINT",
+                    "upstream":"exinori/DCFR-SOLVER",
+                    "license":"MIT",
+                    "iterations":bp.iterations
+                }),
+            },
+            strategy,
+        });
     }
-    let mut player_stacks = std::collections::BTreeMap::new();
-    for p in 0..NUM_PLAYERS {
-        player_stacks.insert(POSITION_NAMES[p].to_string(), state.stacks[p] as f32 / 2.0);
-    }
-    let node_id = if history.is_empty() { "root".to_string() }
-        else { history.iter().map(|x| x.to_string()).collect::<Vec<_>>().join("-") };
-    let id = format!("dcfr-preflop-node-{}", node_id);
-    spots.push(Spot {
-        id: id.clone(),
-        solver: "DCFR_SOLVER".to_string(),
-        version: "preflop-blueprint-v1".to_string(),
-        solveId: format!("preflop-blueprint|{}", node_id),
-        scenario: Scenario {
-            gameType: "TOURNAMENT".to_string(),
-            street: "PRE-FLOP".to_string(),
-            tableSize: 6,
-            heroPosition: hero,
-            villainPosition: villain,
-            heroStack: hero_total,
-            effectiveStack: eff,
-            pot,
-            currentBet: current_bet,
-            board: vec![],
-            positions: POSITION_NAMES.iter().map(|x| x.to_string()).collect(),
-            playerStacks: player_stacks,
-            actionHistory: events.clone(),
-            tags,
-            solverNode: node_id,
-            provenance: serde_json::json!({
-                "strategySource":"DCFR_PREFLOP_BLUEPRINT",
-                "upstream":"exinori/DCFR-SOLVER",
-                "license":"MIT",
-                "iterations":bp.iterations
-            }),
-        },
-        strategy,
-    });
 
     let actor = state.to_act as usize;
     let actions = state.actions();
