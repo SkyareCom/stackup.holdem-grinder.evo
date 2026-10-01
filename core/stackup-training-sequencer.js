@@ -210,6 +210,20 @@
     return p||null;
   }
 
+  function normPhase(value){
+    const raw=String(value||'').trim().toLowerCase();
+    const map={
+      early:'EARLY',
+      middle:'MIDDLE',
+      bubble:'BUBBLE',
+      late:'LATE',
+      ft:'FINAL_TABLE',
+      final_table:'FINAL_TABLE',
+      'final table':'FINAL_TABLE'
+    };
+    return map[raw]||String(value||'').toUpperCase()||null;
+  }
+
   function parseSpecial(value){
     if(!value)return {};
     if(typeof value==='object'&&!Array.isArray(value))return value;
@@ -233,7 +247,7 @@
     const effectiveStacks=values(f.effectiveStacks??f.effectiveStack,v=>{
       const n=Number(v);return Number.isFinite(n)&&n>0?n:null;
     });
-    const phases=values(f.phases??f.phase,v=>String(v));
+    const phases=values(f.phases??f.phase,normPhase);
     return {
       gameType:f.gameType?String(f.gameType).toUpperCase():null,
       street:streets.length===1?streets[0]:null,
