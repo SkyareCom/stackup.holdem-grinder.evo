@@ -493,9 +493,25 @@
     return tags;
   }
 
+  function specialStreetCompatible(spot,special){
+    const street=normStreet(spot?.scenario?.street);
+    for(const [section,values] of Object.entries(special||{})){
+      if(!Array.isArray(values)||!values.length)continue;
+      if(['pre_special','blind_special','aggr_special','short_special','icm_special','pko_special'].includes(section)){
+        if(street!=='PRE-FLOP')return false;
+      }else if(section==='river_special'){
+        if(street!=='RIVER')return false;
+      }else if(['post_special','texture_special'].includes(section)){
+        if(!['FLOP','TURN','RIVER'].includes(street))return false;
+      }
+    }
+    return true;
+  }
+
   function hasRequestedSpecial(spot,special){
     const groups=Object.entries(special||{}).filter(([,v])=>Array.isArray(v)&&v.length);
     if(!groups.length)return true;
+    if(!specialStreetCompatible(spot,special))return false;
     const tags=spotTags(spot);
     return groups.every(([,values])=>values.some(x=>tags.has(String(x))));
   }
