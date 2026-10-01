@@ -14,6 +14,7 @@ const postflop=JSON.parse(await readFile(join(SOLVER_DIR,"postflop.json"),"utf8"
 const pushfold=JSON.parse(await readFile(join(SOLVER_DIR,"pushfold-hu-v1.json"),"utf8"));
 const tournament=JSON.parse(await readFile(join(SOLVER_DIR,"tournament.json"),"utf8"));
 const preflopDecisions=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-decisions.json"),"utf8"));
+const preflop9max=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-9max.json"),"utf8"));
 const textureSizing=JSON.parse(await readFile(join(SOLVER_DIR,"texture-sizing.json"),"utf8"));
 
 const SUIT_PERMS=[
@@ -74,6 +75,7 @@ const all=[
   ...preflop,...postflop,...pushfoldSpots(),
   ...((tournament?.spots)||[]),
   ...((preflopDecisions?.spots)||[]),
+  ...((preflop9max?.spots)||[]),
   ...((textureSizing?.spots)||[])
 ];
 function transformCard(card,perm){
@@ -272,7 +274,7 @@ const ljEquiv=ljEquivalentSpots();
 function baseSpotsFor(item){
   const universe=[...all,...ljEquiv];
   const direct=universe.filter(spot=>item.section.endsWith("_special")?matchAdvance(item,spot):matchAdjust(item,spot));
-  const dcfr=[...preflop,...postflop,...((preflopDecisions?.spots)||[])]
+  const dcfr=[...preflop,...postflop,...((preflopDecisions?.spots)||[]),...((preflop9max?.spots)||[])]
     .filter(s=>String(s?.solver||"")==="DCFR_SOLVER");
 
   // Exact same context-projection rule used by the runtime sequencer:
