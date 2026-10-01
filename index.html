@@ -296,7 +296,7 @@ body{background:#1a1a1a;color:#fff;display:flex;justify-content:center;align-ite
           <button data-l="es">🇪🇸 Español</button>
         </div>
       </div>
-      <button class="btn login-disabled bio" type="button" disabled aria-disabled="true" tabindex="-1">
+      <button class="btn bio" type="button" data-a="bio" aria-disabled="false">
         <span class="ic"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M481-779q108 0 203.5 46T843-601q3 5 2.5 8t-3.5 6q-3 3-7.5 3t-8.5-5q-59-82-150.5-126T481-759q-103 0-193 44.5T138-589q-4 5-7.5 6t-7.5-1q-4-2-4-6.5t2-8.5q62-86 157-133t203-47Zm0 96q136 0 233.5 90T812-371q0 46-34 78t-82 32q-49 0-84-32t-35-78q0-39-28.5-65T481-462q-39 0-68 26t-29 65q0 104 63 173.5T604-100q6 2 7.5 5t.5 7q-1 5-4 7t-8 0q-103-26-169.5-103T364-371q0-47 34.5-79t82.5-32q48 0 82.5 32t34.5 79q0 38 29.5 64t68.5 26q38 0 66.5-26t28.5-64q0-123-91.5-206T481-660q-127 0-218.5 83T171-371q0 24 5.5 62.5T200-221q2 5 0 7.5t-5 4.5q-4 2-8.5 1t-6.5-6q-13-38-20.5-77.5T152-371q0-129 98-220.5T481-683Zm0-197q65 0 127.5 16T728-819q5 2 5.5 6t-1.5 7q-2 3-5.5 5t-8.5 0q-55-27-115-42.5T481-859q-62 0-121 14.5T247-801q-5 2-7.5.5T235-805q-2-2-2-6t3-6q57-31 119.5-47T481-880Zm0 298q92 0 158.5 61T706-371q0 5-2.5 7.5T696-361q-5 0-8-2.5t-3-7.5q0-81-60.5-136T481-562q-83 0-142.5 55T279-371q0 85 29.5 145T396-106q4 4 3.5 7.5T396-92q-2 2-6.5 3.5T381-92q-58-60-90.5-126T258-371q0-89 65.5-150T481-582Zm-1 200q5 0 7.5 3t2.5 8q0 81 59.5 133.5T687-185q8 0 19-1t24-3q5-1 8 1.5t4 5.5q1 4-.5 7t-6.5 4q-18 5-31.5 5.5t-16.5.5q-88 0-152.5-58.5T470-371q0-5 2.5-8t7.5-3Z"/></svg></span>
         <span class="txt"><b data-i="bio">x</b><small data-i="bio_s">x</small></span>
         <svg class="chev" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M530-481 332-679l43-43 241 241-241 241-43-43 198-198Z"/></svg>
@@ -307,7 +307,7 @@ body{background:#1a1a1a;color:#fff;display:flex;justify-content:center;align-ite
         <svg class="chev" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M530-481 332-679l43-43 241 241-241 241-43-43 198-198Z"/></svg>
       </button>
       <div class="google-auth" aria-live="polite">
-        <button class="btn google-login-card" id="googleLoginCard" type="button" aria-label="Entrar com Google">
+        <button class="btn login-disabled google-login-card" id="googleLoginCard" type="button" disabled aria-disabled="true" tabindex="-1" aria-label="Entrar com Google">
           <span class="ic google-ic" aria-hidden="true">
             <svg viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2A11.9 11.9 0 0 1 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3a12 12 0 0 1-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
           </span>
@@ -2369,7 +2369,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   host.grinderEnter=openApp;
   function backToLogin(){ host.hidden=true; loginScreen.inert=false;
     document.querySelectorAll('.actions [data-a]').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false')}); }
-  document.querySelectorAll('.actions [data-a]').forEach(b=>b.addEventListener('click',()=>{b.classList.add('on');setTimeout(openApp,650)}));
+  document.querySelectorAll('.actions [data-a="bio"]').forEach(b=>b.addEventListener('click',()=>{b.classList.add('on');setTimeout(openApp,650)}));
   $$('.hbtn').forEach(b=>b.onclick=()=>{ if(b.disabled)return;
     $$('.hbtn').forEach(x=>x.classList.remove('on')); b.classList.add('on');
     setTimeout(()=>{ b.classList.remove('on');
@@ -2503,7 +2503,10 @@ html body #googleLoginCard.on .chev{color:#6fa4ff!important}
     var core=window.StackUpGrinder;
     if(!core)return;
     core.boot();
-    if(window.StackUpAuth)window.StackUpAuth.init().catch(function(){});
+    /* TEST GATE: apenas BIOMETRIA libera a entrada.
+       Google/WhatsApp permanecem visíveis, porém desativados. */
+    var bioOnly=true;
+    if(!bioOnly&&window.StackUpAuth)window.StackUpAuth.init().catch(function(){});
   }catch(_){}
 })();
 </script>
@@ -2562,10 +2565,11 @@ html body #googleLoginCard.on .chev{color:#6fa4ff!important}
     app.removeAttribute('hidden');
     if(login){login.inert=true;login.style.display='none';}
   }
-  document.querySelectorAll('.actions [data-a]').forEach(function(btn){
-    btn.addEventListener('click',enterGrinder,true);
-    btn.addEventListener('pointerup',enterGrinder,true);
-  });
+  var bio=document.querySelector('.actions [data-a="bio"]');
+  if(bio){
+    bio.addEventListener('click',enterGrinder,true);
+    bio.addEventListener('pointerup',enterGrinder,true);
+  }
 })();
 </script>
 
