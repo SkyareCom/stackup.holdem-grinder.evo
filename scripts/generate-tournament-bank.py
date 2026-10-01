@@ -244,8 +244,16 @@ def mk_positions(n):
 
 def arch(id,tags,stacks,payouts,phase="LATE",field="100",notes="",sb_tags=None,bb_tags=None,tournament_type="REGULAR"):
     n=len(stacks)
+    pay=[max(0.0,float(x)) for x in payouts]
+    # A bubble model is only a bubble when at least one remaining player is
+    # outside the paid places. Never label an all-paid state as BUBBLE.
+    if phase=="BUBBLE" and pay and all(x>0 for x in pay):
+        pay[-1]=0.0
+    total=sum(pay)
+    if total<=0: raise ValueError("payout vector must contain prize value")
+    pay=[x/total for x in pay]
     return {
-      "id":id,"tags":tags,"stacks":stacks,"payouts":payouts,"phase":phase,
+      "id":id,"tags":tags,"stacks":stacks,"payouts":pay,"phase":phase,
       "fieldSize":field,"positions":mk_positions(n),"notes":notes,
       "tournamentType":tournament_type,
       "sbTags":list(sb_tags) if sb_tags is not None else list(tags),
@@ -301,24 +309,18 @@ ARCHETYPES=[
   arch("10max-a",["mid_stack_pressure"],[66,54,44,36,30,25,20,16,12,28],[.28,.19,.14,.105,.08,.065,.05,.04,.03,.02],"LATE","500"),
   arch("10max-b",["big_stack_pressure"],[80,62,49,39,31,25,20,15,10,42],[.28,.19,.14,.105,.08,.065,.05,.04,.03,.02],"BUBBLE","1000+"),
 
-  # Early / Middle phase families.
-  arch("early-a",[],[85,72,60,50,40,32],[.38,.24,.15,.10,.08,.05],"EARLY","250"),
-  arch("early-b",[],[92,76,62,49,37,30],[.38,.24,.15,.10,.08,.05],"EARLY","500"),
-  arch("middle-a",[],[62,50,40,32,25,20],[.38,.24,.15,.10,.08,.05],"MIDDLE","350"),
-  arch("middle-b",[],[70,55,43,34,26,18],[.38,.24,.15,.10,.08,.05],"MIDDLE","1000+"),
-
   # Tournament-format / field-size families. PKO remains excluded until bounty economics are solved.
   arch("regular50-a",[],[48,39,31,24,18,14],[.38,.24,.15,.10,.08,.05],"LATE","50",tournament_type="REGULAR"),
   arch("regular50-b",[],[54,42,33,25,19,15],[.38,.24,.15,.10,.08,.05],"MIDDLE","50",tournament_type="REGULAR"),
-  arch("turbo250-a",[],[34,28,22,17,13,10],[.38,.24,.15,.10,.08,.05],"MIDDLE","250",tournament_type="TURBO"),
+  arch("turbo250-a",[],[34,28,22,17,13,10],[.38,.24,.15,.10,.08,.05],"LATE","250",tournament_type="TURBO"),
   arch("turbo250-b",[],[38,30,23,18,14,11],[.38,.24,.15,.10,.08,.05],"LATE","250",tournament_type="TURBO"),
-  arch("freeze350-a",[],[58,46,36,28,21,16],[.38,.24,.15,.10,.08,.05],"MIDDLE","350",tournament_type="FREEZEOUT"),
+  arch("freeze350-a",[],[58,46,36,28,21,16],[.38,.24,.15,.10,.08,.05],"LATE","350",tournament_type="FREEZEOUT"),
   arch("freeze350-b",[],[64,49,38,29,22,17],[.38,.24,.15,.10,.08,.05],"LATE","350",tournament_type="FREEZEOUT"),
-  arch("hroller500-a",[],[92,74,58,45,34,26],[.38,.24,.15,.10,.08,.05],"MIDDLE","500",tournament_type="HIGH_ROLLER"),
+  arch("hroller500-a",[],[92,74,58,45,34,26],[.38,.24,.15,.10,.08,.05],"LATE","500",tournament_type="HIGH_ROLLER"),
   arch("hroller500-b",[],[104,80,62,47,35,27],[.38,.24,.15,.10,.08,.05],"LATE","500",tournament_type="HIGH_ROLLER"),
   arch("sng50-a",[],[36,29,23,18,14,11],[.40,.24,.15,.10,.07,.04],"LATE","50",tournament_type="SNG"),
   arch("sng50-b",[],[42,32,25,19,14,10],[.40,.24,.15,.10,.07,.04],"BUBBLE","50",tournament_type="SNG"),
-  arch("regular1000-a",[],[72,58,45,35,27,20],[.38,.24,.15,.10,.08,.05],"MIDDLE","1000+",tournament_type="REGULAR"),
+  arch("regular1000-a",[],[72,58,45,35,27,20],[.38,.24,.15,.10,.08,.05],"LATE","1000+",tournament_type="REGULAR"),
   arch("regular1000-b",[],[80,62,48,37,28,21],[.38,.24,.15,.10,.08,.05],"LATE","1000+",tournament_type="REGULAR")
 ]
 
