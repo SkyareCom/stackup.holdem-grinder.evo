@@ -211,11 +211,17 @@ fn strategy_at(bp: &PreflopBlueprint, state: &PreflopState, history: &[u8]) -> V
     let mut out = Vec::with_capacity(169);
     for idx in 0..169u8 {
         let key = dcfr_solver::preflop::PreflopInfoKey { bucket: idx, history: history.to_vec() };
-        let probs = bp.entries.get(&key).map(|e| e.average_strategy()).unwrap_or_default();
+        let Some(entry) = bp.entries.get(&key) else { continue; };
+        if !entry.cum_strategy.iter().any(|x| *x > 0.0) { continue; }
+        let probs = entry.average_strategy();
+        if probs.len()!=actions.len() { continue; }
+        let total:f32=probs.iter().sum();
+        if !total.is_finite() || total<=0.0 { continue; }
+
         let ch = CanonicalHand::from_index(idx).to_string();
-        let mut hs = Vec::new();
+        let mut hs = Vec::with_capacity(actions.len());
         for (i, action) in actions.iter().enumerate() {
-            let p = probs.get(i).copied().unwrap_or(0.0);
+            let p=(probs[i]/total).max(0.0);
             hs.push(ActionProb {
                 action: action.to_string(),
                 kind: action_kind(*action).to_string(),
@@ -252,7 +258,7 @@ fn walk(
     seen: &mut HashSet<Vec<u8>>,
     spots: &mut Vec<Spot>,
 ) {
-    if history.len() > 24 || spots.len() > 5000 { return; }
+    if history.len() > 24 { return; }
     if !matches!(state.node_type(), PreflopNodeType::Decision(_)) { return; }
     if !seen.insert(history.clone()) { return; }
     if !node_supported(bp, history) { return; }
@@ -265,6 +271,7 @@ fn walk(
         .map(|p| POSITION_NAMES[p].to_string());
     let tags = semantic_tags(&state, events);
     let strategy = strategy_at(bp, &state, history);
+    if strategy.is_empty() { return; }
 
     let pot = state.bets.iter().sum::<i32>() as f32 / 2.0;
     let current_bet = state.max_bet() as f32 / 2.0;
