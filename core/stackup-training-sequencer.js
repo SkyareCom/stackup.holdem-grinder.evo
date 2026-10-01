@@ -306,6 +306,11 @@
       heroPosition:s.heroPosition||null,
       villainPosition:s.villainPosition||null,
       effectiveStack:Number(s.effectiveStack)||0,
+      heroStack:Number(s.heroStack??s.effectiveStack)||0,
+      phase:s.phase||null,
+      tournamentType:s.tournamentType||null,
+      fieldSize:s.fieldSize||null,
+      opponentProfile:s.opponentProfile||null,
       pot:Number(s.pot)||0,
       board:s.board||[],
       actionLine:actionLine(s),
@@ -357,6 +362,10 @@
       heroPosition:s.heroPosition||null,
       villainPosition:s.villainPosition||null,
       effectiveStack:Number(s.effectiveStack)||0,
+      heroStack:Number(s.heroStack??s.effectiveStack)||0,
+      phase:s.phase||null,
+      tournamentType:s.tournamentType||null,
+      fieldSize:s.fieldSize||null,
       board:s.board||[],
       actionLine:actionLine(s),
       matchup:spot?.matchup||null
@@ -545,6 +554,10 @@
       const profile=String(s.opponentProfile||'');
       if(!profile||profile!==String(filters.opponentProfile))return false;
     }
+    if(filters.extras.length){
+      const extras=Array.isArray(s.extras)?s.extras.map(String):[];
+      if(!filters.extras.every(x=>extras.includes(String(x))))return false;
+    }
     const actualTableSize=Number(s.trainingTableSize??s.tableSize);
     if(filters.tableSize){
       if(!Number.isFinite(actualTableSize)||actualTableSize!==filters.tableSize)return false;
@@ -557,12 +570,60 @@
     return true;
   }
 
+  function contextualChipEvSpots(bank,filters){
+    if(filters.opponentProfile||filters.extras.length)return [];
+    const dcfr=[...(bank?.preflop||[]),...(bank?.postflop||[])]
+      .filter(s=>String(s?.solver||'')==='DCFR_SOLVER');
+    if(!dcfr.length)return [];
+
+    const cash=filters.gameType==='CASH';
+    const requestedPhases=filters.phases||[];
+    const chipEvPhase=requestedPhases.length
+      ? requestedPhases.every(p=>['EARLY','MIDDLE'].includes(p))
+      : false;
+    const contextOnly=!cash&&!requestedPhases.length&&(
+      !!filters.tournamentType||!!filters.fieldSize
+    );
+    if(!cash&&!chipEvPhase&&!contextOnly)return [];
+    if(filters.tournamentType==='PKO')return [];
+
+    const phases=cash?[null]:(chipEvPhase?requestedPhases:['EARLY']);
+    const tournamentTypes=cash?[null]:[filters.tournamentType||'REGULAR'];
+    const fields=cash?[null]:[filters.fieldSize||'100'];
+
+    const out=[];
+    for(const base of dcfr){
+      for(const phase of phases)for(const tournamentType of tournamentTypes)for(const fieldSize of fields){
+        const spot=clone(base);
+        const s=spot.scenario||(spot.scenario={});
+        s.gameType=cash?'CASH':'TOURNAMENT';
+        if(cash){
+          delete s.phase;delete s.tournamentType;delete s.fieldSize;delete s.extras;
+        }else{
+          s.phase=phase;
+          s.tournamentType=tournamentType;
+          s.fieldSize=fieldSize;
+        }
+        s.provenance={
+          ...(s.provenance||{}),
+          strategySource:'DCFR_SOLVER',
+          contextProjection:cash?'CASH_CHIP_EV_EQUIVALENCE':'EARLY_MIDDLE_CHIP_EV_EQUIVALENCE'
+        };
+        spot.id=(cash?'cash-':'mtt-context-')+String(base.id||base.solveId||'dcfr')+'-'+String(phase||'cash')+'-'+String(tournamentType||'none')+'-'+String(fieldSize||'none');
+        spot.solveId=String(base.solveId||base.id||'dcfr')+'|context|'+String(phase||'cash')+'|'+String(tournamentType||'none')+'|'+String(fieldSize||'none');
+        out.push(spot);
+      }
+    }
+    return out;
+  }
+
   function expand(bank,filters){
     const all=[
       ...(bank?.preflop||[]),
       ...(bank?.postflop||[]),
       ...pushfoldSpots(bank),
-      ...((bank?.tournament?.spots)||[])
+      ...((bank?.tournament?.spots)||[]),
+      ...contextualChipEvSpots(bank,filters)
     ];
     const candidates=[];
     for(let spotIndex=0;spotIndex<all.length;spotIndex++){
@@ -724,6 +785,7 @@
     exactSignature,
     familySignature,
     handClassCombos,
+    contextualChipEvSpots,
     coverageFloor,
     pick,
     stats,
