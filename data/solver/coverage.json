@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-01T14:49:29.823Z",
+  "generatedAt": "2026-10-01T14:50:54.039Z",
   "minSpots": 1500,
   "counts": {
     "adjust": 58,
     "advance": 104,
     "total": 162
   },
-  "publishable": 123,
-  "incomplete": 39,
+  "publishable": 124,
+  "incomplete": 38,
   "cards": [
     {
       "section": "mode",
@@ -27,8 +27,8 @@
       "source": "DCFR_EXACT",
       "validator": "tournament_solver",
       "minSpots": 1500,
-      "baseSpots": 204,
-      "available": 339757,
+      "baseSpots": 206,
+      "available": 342409,
       "publishable": true
     },
     {
@@ -71,8 +71,8 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "table_size_ranges",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
+      "baseSpots": 6,
+      "available": 7956,
       "publishable": true
     },
     {
@@ -291,8 +291,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 204,
-      "available": 339757,
+      "baseSpots": 206,
+      "available": 342409,
       "publishable": true
     },
     {
@@ -302,8 +302,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 204,
-      "available": 339757,
+      "baseSpots": 206,
+      "available": 342409,
       "publishable": true
     },
     {
@@ -313,8 +313,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 204,
-      "available": 339757,
+      "baseSpots": 206,
+      "available": 342409,
       "publishable": true
     },
     {
@@ -324,8 +324,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 204,
-      "available": 339757,
+      "baseSpots": 206,
+      "available": 342409,
       "publishable": true
     },
     {
@@ -335,8 +335,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 204,
-      "available": 339757,
+      "baseSpots": 206,
+      "available": 342409,
       "publishable": true
     },
     {
@@ -346,8 +346,8 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 204,
-      "available": 339757,
+      "baseSpots": 206,
+      "available": 342409,
       "publishable": true
     },
     {
@@ -467,9 +467,9 @@
       "source": "DCFR_EXACT",
       "validator": "position_range_solver",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 2,
+      "available": 2652,
+      "publishable": true
     },
     {
       "section": "pos",
@@ -511,8 +511,8 @@
       "source": "DCFR_EXACT",
       "validator": "street_solver",
       "minSpots": 1500,
-      "baseSpots": 161,
-      "available": 213486,
+      "baseSpots": 163,
+      "available": 216138,
       "publishable": true
     },
     {
@@ -643,8 +643,8 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "effective_stack_solver",
       "minSpots": 1500,
-      "baseSpots": 33,
-      "available": 43758,
+      "baseSpots": 35,
+      "available": 46410,
       "publishable": true
     },
     {
@@ -764,8 +764,8 @@
       "source": "DCFR_EXACT",
       "validator": "rfi_chart",
       "minSpots": 1500,
-      "baseSpots": 20,
-      "available": 26520,
+      "baseSpots": 24,
+      "available": 31824,
       "publishable": true
     },
     {
@@ -1743,8 +1743,8 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 48,
-      "available": 132901,
+      "baseSpots": 49,
+      "available": 134227,
       "publishable": true
     },
     {
@@ -1765,8 +1765,8 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 48,
-      "available": 132901,
+      "baseSpots": 49,
+      "available": 134227,
       "publishable": true
     },
     {
