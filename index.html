@@ -790,6 +790,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 <script src="core/stackup-poker-audio.js"></script>
 <script src="core/stackup-spot-coach.js"></script>
 <script src="core/stackup-training-history.js"></script>
+<script src="core/stackup-training-performance.js"></script>
 <script>
 (function(){
   /* REGRA DE TRADUCAO: todo novo item deve ser criado simultaneamente em PT, EN e ES. */
@@ -1012,6 +1013,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   let SPOT_DECISION_SEQUENCE_RUNNING=false;
   let SPOT_STAGE_INTRO=false;
   let SPOT_TRAINING_STARTED=false;
+  let SPOT_STATS_SESSION_ID=null;
   let SPOT_ACTIVE_ACTION=null;
   const SPOT_VISUAL_FOLDS=new Set();
   const SPOT_ANALYSIS_CACHE=new Map();
@@ -1432,10 +1434,48 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       ).join('')+'</div></div>'+
       '<button class="spotsetupstart" type="button" data-spot-start="1">'+spotEscape(tx.start)+'</button></div>';
   }
+  function trainingStatsSections(){
+    const names=[];
+    for(const section of ADV_SECS){
+      if(section.tour&&!isTour())continue;
+      for(const group of section.groups){
+        for(const value of [...(sel[group.id]||[])]){
+          if(value!=='all'&&value!=='random')names.push(lab(value));
+        }
+      }
+    }
+    if(names.length)return [...new Set(names)];
+    const streets=[...(sel.street||[])].filter(x=>x!=='all'&&x!=='random').map(lab);
+    if(streets.length)return streets;
+    const positions=[...(sel.pos||[])].filter(x=>x!=='all'&&x!=='random').map(lab);
+    if(positions.length)return positions;
+    return [L()==='en'?'GENERAL':L()==='es'?'GENERAL':'GERAL'];
+  }
+  function trainingStatsLabel(){
+    const sections=trainingStatsSections();
+    if(sections.length===1&&sections[0]!=='GERAL'&&sections[0]!=='GENERAL')return sections[0];
+    const advanced=ADV_SECS.some(section=>section.groups.some(group=>[...(sel[group.id]||[])].some(v=>v!=='all'&&v!=='random')));
+    if(advanced)return (L()==='en'?'ADVANCE TRAINING':L()==='es'?'ENTRENO ADVANCE':'TREINO ADVANCE');
+    return L()==='en'?'GENERAL TRAINING':L()==='es'?'ENTRENO GENERAL':'TREINO GERAL';
+  }
+  function ensureStatsSession(meta){
+    if(SPOT_STATS_SESSION_ID)return SPOT_STATS_SESSION_ID;
+    const perf=window.StackUpTrainingPerformance;
+    if(!perf)return null;
+    SPOT_STATS_SESSION_ID=perf.startSession(Object.assign({
+      training:trainingStatsLabel(),
+      sections:trainingStatsSections(),
+      filters:cloneSpotValue(buildSolverSpotFilters()),
+      language:L()
+    },meta||{}));
+    return SPOT_STATS_SESSION_ID;
+  }
+
   async function startSpotTraining(){
     if(SPOT_TRAINING_STARTED)return;
     SPOT_TRAINING_STARTED=true;
     SPOT_STAGE_INTRO=false;
+    ensureStatsSession();
     sizeSpotStage();
     spotActions.hidden=false;
     spotSupport.hidden=false;
@@ -1805,7 +1845,19 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       currentAnswer:cloneSpotValue(entry?.answer||null),
       currentIndex:SPOT_TIMELINE_INDEX,
       visited:SPOT_TIMELINE.length,
-      savedAt:new Date().toISOString()
+      savedAt:new Date().toISOString(),
+      performanceSessionId:SPOT_STATS_SESSION_ID,
+      decisions:SPOT_TIMELINE.filter(x=>x?.answer).map(x=>({
+        spotId:x.spot?.id||'',
+        street:x.spot?.scenario?.street||'',
+        heroPosition:x.spot?.scenario?.heroPosition||'',
+        status:x.answer?.analysis?.status||'unknown',
+        chosenAction:x.answer?.analysis?.chosenAction||x.answer?.uiAction||'',
+        indicatedAction:x.answer?.analysis?.indicatedAction||'',
+        chosenFrequency:Number(x.answer?.analysis?.chosenFrequency)||0,
+        bestFrequency:Number(x.answer?.analysis?.bestFrequency)||0,
+        answeredAt:x.answer?.answeredAt||x.createdAt||new Date().toISOString()
+      }))
     };
   }
   function showSpotToast(message){
@@ -1840,6 +1892,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       if(!name){showSpotToast(tx.needName);input.focus();return;}
       try{
         window.StackUpTrainingHistory?.save?.(name,trainingSnapshot());
+        if(SPOT_STATS_SESSION_ID)window.StackUpTrainingPerformance?.updateSession?.(SPOT_STATS_SESSION_ID,{name,training:name});
         form.hidden=true;input.value='';showSpotToast(tx.saved);
       }catch(_){showSpotToast(tx.needName);}
     }
@@ -2036,6 +2089,26 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         tableStateAfter:window.StackUpTableState?.snapshot?.(SOLVER_TABLE_STATE)||cloneSpotValue(SOLVER_TABLE_STATE)
       };
     }
+    try{
+      const sid=ensureStatsSession();
+      window.StackUpTrainingPerformance?.record?.({
+        sessionId:sid,
+        answeredAt:entry?.answer?.answeredAt||new Date().toISOString(),
+        spotId:view?.id||SOLVER_SPOT?.id||'',
+        training:trainingStatsLabel(),
+        sections:trainingStatsSections(),
+        street:view?.street||SOLVER_SPOT?.scenario?.street||'',
+        heroPosition:view?.heroPosition||SOLVER_SPOT?.scenario?.heroPosition||'',
+        hand:view?.handKey||view?.heroCards?.join(' ')||'',
+        status:analysis?.status||'unknown',
+        chosenAction:analysis?.chosenAction||uiAction,
+        indicatedAction:analysis?.indicatedAction||result?.best?.action||'',
+        chosenFrequency:Number(analysis?.chosenFrequency??result?.frequency)||0,
+        bestFrequency:Number(analysis?.bestFrequency??result?.best?.frequency)||0,
+        filters:cloneSpotValue(buildSolverSpotFilters()),
+        solver:view?.solver||SOLVER_SPOT?.solver||''
+      });
+    }catch(_){}
     renderSpotSupport();
 
     if(result&&view){
@@ -2199,6 +2272,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }else{
       SPOT_STAGE_INTRO=false;
       SPOT_TRAINING_STARTED=false;
+      SPOT_STATS_SESSION_ID=null;
       spotActions.hidden=true;
       spotSupport.hidden=true;
       spotActions.style.visibility='';
@@ -2323,6 +2397,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     sub.home.length=0;
     SPOT_TRAINING_STARTED=true;
     SPOT_STAGE_INTRO=false;
+    SPOT_STATS_SESSION_ID=null;
+    ensureStatsSession({name:item.name||'',training:item.name||trainingStatsLabel(),source:'history'});
     show('spots',true);
     setSpotActionsBusy(!!entry.answer);
     requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
