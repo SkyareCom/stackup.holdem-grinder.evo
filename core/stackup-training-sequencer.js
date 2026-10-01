@@ -502,6 +502,9 @@
     if((!Number.isFinite(currentBet)||currentBet<=0)&&hasOpenBet)tags.add('breakeven_bluff');
 
     if(scenario.heroRange&&scenario.villainRange)tags.add('combos');
+    if(['FLOP','TURN'].includes(street)&&scenario.heroRange&&scenario.villainRange){
+      tags.add('equity_realization');
+    }
     const exactPostflop=street!=='PRE-FLOP'&&(spot?.strategy||[]).some(h=>isExactHand(h?.hand));
     if(exactPostflop)tags.add('blockers');
 
