@@ -1,0 +1,59 @@
+name: Audit Scenario Coverage
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/audit-scenario-coverage.yml"
+      - "scripts/audit-scenario-coverage.mjs"
+      - "core/stackup-scenario-catalog.js"
+      - "data/solver/preflop.json"
+      - "data/solver/postflop.json"
+      - "data/solver/tournament.json"
+      - "data/solver/pushfold-hu-v1.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scenario-coverage
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Audit 162 training cards
+        run: node scripts/audit-scenario-coverage.mjs
+
+      - name: Validate coverage contract
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const c=JSON.parse(fs.readFileSync('data/solver/coverage.json','utf8'));
+          if(c.minSpots!==1500)throw new Error('coverage floor must remain 1500');
+          if(c.counts.adjust!==58||c.counts.advance!==104||c.counts.total!==162){
+            throw new Error('scenario catalog count drift: '+JSON.stringify(c.counts));
+          }
+          if(!Array.isArray(c.cards)||c.cards.length!==162)throw new Error('coverage card list must have 162 entries');
+          console.log({publishable:c.publishable,incomplete:c.incomplete,minSpots:c.minSpots});
+          NODE
+
+      - name: Commit coverage audit
+        run: |
+          git config user.name "StackUp Coverage Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/solver/coverage.json
+          if git diff --cached --quiet; then
+            echo "Coverage unchanged."
+            exit 0
+          fi
+          git commit -m "Audit solver coverage for all training cards"
+          git pull --rebase origin main
+          git push
