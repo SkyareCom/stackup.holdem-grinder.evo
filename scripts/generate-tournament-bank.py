@@ -242,11 +242,13 @@ def mk_positions(n):
     }
     return options[n]
 
-def arch(id,tags,stacks,payouts,phase="LATE",field="100",notes=""):
+def arch(id,tags,stacks,payouts,phase="LATE",field="100",notes="",sb_tags=None,bb_tags=None):
     n=len(stacks)
     return {
       "id":id,"tags":tags,"stacks":stacks,"payouts":payouts,"phase":phase,
-      "fieldSize":field,"positions":mk_positions(n),"notes":notes
+      "fieldSize":field,"positions":mk_positions(n),"notes":notes,
+      "sbTags":list(sb_tags) if sb_tags is not None else list(tags),
+      "bbTags":list(bb_tags) if bb_tags is not None else list(tags)
     }
 
 # Two or more materially different archetypes for every covered card.
@@ -270,7 +272,29 @@ ARCHETYPES=[
   arch("mid-a",["mid_stack_pressure"],[40,31,24,20,16,18],[.38,.24,.15,.10,.08,.05],"LATE"),
   arch("mid-b",["mid_stack_pressure"],[46,34,25,19,14,17],[.38,.24,.15,.10,.08,.05],"BUBBLE"),
   arch("short-a",["short_stack_survival"],[38,30,24,19,15,8],[.38,.24,.15,.10,.08,.05],"BUBBLE"),
-  arch("short-b",["short_stack_survival"],[42,33,26,20,14,6],[.38,.24,.15,.10,.08,.05],"BUBBLE")
+  arch("short-b",["short_stack_survival"],[42,33,26,20,14,6],[.38,.24,.15,.10,.08,.05],"BUBBLE"),
+
+  # Deep/mid Hero call-off families. SB is the short shover; BB is the target Hero stack.
+  arch("hero18-a",[],[44,34,26,20,8,18],[.38,.24,.15,.10,.08,.05],"LATE",
+       sb_tags=["short_stack_survival"],bb_tags=["icm_13_18","mid_stack_pressure"]),
+  arch("hero18-b",[],[48,36,27,21,10,18],[.38,.24,.15,.10,.08,.05],"BUBBLE",
+       sb_tags=["short_stack_survival"],bb_tags=["icm_13_18","mid_stack_pressure"]),
+  arch("hero20-a",[],[46,35,27,21,8,20],[.38,.24,.15,.10,.08,.05],"LATE",
+       sb_tags=["short_stack_survival"],bb_tags=["icm_19_25","mid_stack_pressure"]),
+  arch("hero20-b",[],[50,37,28,22,10,20],[.38,.24,.15,.10,.08,.05],"BUBBLE",
+       sb_tags=["short_stack_survival"],bb_tags=["icm_19_25","mid_stack_pressure"]),
+  arch("hero25-a",[],[52,40,30,23,10,25],[.38,.24,.15,.10,.08,.05],"LATE",
+       sb_tags=["short_stack_survival"],bb_tags=["icm_19_25","mid_stack_pressure"]),
+  arch("hero25-b",[],[56,42,31,24,12,25],[.38,.24,.15,.10,.08,.05],"BUBBLE",
+       sb_tags=["short_stack_survival"],bb_tags=["icm_19_25","mid_stack_pressure"]),
+  arch("hero30-a",[],[58,44,34,26,10,30],[.38,.24,.15,.10,.08,.05],"LATE",
+       sb_tags=["short_stack_survival"],bb_tags=["big_stack_pressure"]),
+  arch("hero30-b",[],[62,46,35,27,12,30],[.38,.24,.15,.10,.08,.05],"BUBBLE",
+       sb_tags=["short_stack_survival"],bb_tags=["big_stack_pressure"]),
+  arch("hero50-a",[],[78,56,42,31,10,50],[.38,.24,.15,.10,.08,.05],"LATE",
+       sb_tags=["short_stack_survival"],bb_tags=["big_stack_pressure"]),
+  arch("hero50-b",[],[84,60,45,33,15,50],[.38,.24,.15,.10,.08,.05],"BUBBLE",
+       sb_tags=["short_stack_survival"],bb_tags=["big_stack_pressure"])
 ]
 
 def main():
@@ -298,14 +322,15 @@ def main():
             "nashConv":result["nashconv"],"iterations":ITERATIONS
           }
         }
-        tags=list(dict.fromkeys(a["tags"]+["push_fold"]))
+        sb_tags=list(dict.fromkeys(a.get("sbTags",a["tags"])+["push_fold","open_shove"]))
+        bb_tags=list(dict.fromkeys(a.get("bbTags",a["tags"])+["push_fold","call_shove"]))
         spots.append({
           "id":"icm-"+a["id"]+"-sb","solver":"STACKUP_ICM","version":"v1",
           "solveId":"icm-"+a["id"]+"-sb",
           "convergence":{"iterations":ITERATIONS,"nashConv":result["nashconv"],"gate":MAX_NASHCONV},
           "scenario":{**common,"heroPosition":hero,"villainPosition":villain,
             "heroStack":stack,"effectiveStack":min(stack,vstack),"pot":1.5,"board":[],
-            "actionHistory":[],"tags":tags+["open_shove"]},
+            "actionHistory":[],"tags":sb_tags},
           "strategy":strategy_rows(result["hero"],result["hero_evs"],"ALL IN","jam")
         })
         spots.append({
@@ -315,7 +340,7 @@ def main():
           "scenario":{**common,"heroPosition":villain,"villainPosition":hero,
             "heroStack":vstack,"effectiveStack":min(stack,vstack),"pot":stack+1.0,"board":[],
             "actionHistory":[{"position":hero,"action":"ALL IN","kind":"jam","to":stack}],
-            "tags":tags+["call_shove"]},
+            "tags":bb_tags},
           "strategy":strategy_rows(result["villain"],result["villain_evs"],"CALL","call")
         })
     payload={
