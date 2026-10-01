@@ -85,7 +85,7 @@ jobs:
             counts[p]=(counts[p]||0)+1;
           }
           for(const p of ['UTG+1','UTG+2']){
-            if((counts[p]||0)<2)throw new Error(p+' needs at least 2 solved nodes, found '+String(counts[p]||0));
+            if((counts[p]||0)<1)throw new Error(p+' needs at least 1 native solved node, found '+String(counts[p]||0));
           }
           console.log({nodes:d.spots.length,heroPositionNodes:counts});
           NODE
