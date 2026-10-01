@@ -2622,7 +2622,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);return;
     }
     if(kind==='pdf'){
-      const w=window.open('','_blank');if(!w)return;w.document.open();w.document.write(html+'<script>window.onload=function(){setTimeout(function(){window.print()},250)}<\/script>');w.document.close();return;
+      const w=window.open('','_blank');if(!w)return;
+      w.document.open();w.document.write(html);w.document.close();
+      window.setTimeout(()=>{try{w.focus();w.print();}catch(_){}},350);
+      return;
     }
     if(kind==='email'){
       const email=statsPanel.querySelector('[data-stats-email]')?.value.trim()||'';
