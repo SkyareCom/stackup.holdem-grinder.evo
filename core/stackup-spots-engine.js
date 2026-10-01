@@ -10,7 +10,8 @@
     PREFLOP_RANGE:'PREFLOP_RANGE_SOLVER',
     GTOPEN:'GTOPEN',
     TEXAS:'TEXAS_SOLVER',
-    PUSHFOLD:'POKER_SOLVER_PUSHFOLD'
+    PUSHFOLD:'POKER_SOLVER_PUSHFOLD',
+    ICM:'STACKUP_ICM'
   });
 
   const SOLVER_CAPABILITIES=Object.freeze({
@@ -19,7 +20,8 @@
     [SOLVER_IDS.PREFLOP_RANGE]:Object.freeze({preflop:true,postflop:false,multiwayPreflop:false}),
     [SOLVER_IDS.GTOPEN]:Object.freeze({preflop:true,postflop:true,multiwayPreflop:true}),
     [SOLVER_IDS.TEXAS]:Object.freeze({preflop:false,postflop:true,multiwayPreflop:false}),
-    [SOLVER_IDS.PUSHFOLD]:Object.freeze({preflop:true,postflop:false,multiwayPreflop:false})
+    [SOLVER_IDS.PUSHFOLD]:Object.freeze({preflop:true,postflop:false,multiwayPreflop:false}),
+    [SOLVER_IDS.ICM]:Object.freeze({preflop:true,postflop:false,multiwayPreflop:true})
   });
 
   const REQUIRED_SCENARIO=['gameType','street','heroPosition','effectiveStack','pot','actionHistory'];
