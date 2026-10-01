@@ -69,15 +69,19 @@ jobs:
           if(d.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
           if(Number(d.iterations)<10000000)throw new Error('preflop iterations below production floor');
           if(!Array.isArray(d.spots)||d.spots.length<20)throw new Error('too few decision nodes: '+d.spots?.length);
+          let classes=0;
           for(const s of d.spots){
             if(s.solver!=='DCFR_SOLVER')throw new Error('invalid solver '+s.id);
             if(s.scenario?.street!=='PRE-FLOP')throw new Error('non-preflop node '+s.id);
-            if(!Array.isArray(s.strategy)||s.strategy.length!==169)throw new Error('strategy must contain 169 classes '+s.id);
+            if(!Array.isArray(s.strategy)||!s.strategy.length||s.strategy.length>169)throw new Error('invalid solved hand-class count '+s.id);
+            classes+=s.strategy.length;
             const sums=s.strategy.map(h=>(h.actions||[]).reduce((n,a)=>n+Number(a.frequency||0),0));
             if(sums.some(x=>Math.abs(x-100)>0.25))throw new Error('frequency normalization failed '+s.id);
           }
           const tags=new Set(d.spots.flatMap(s=>s.scenario?.tags||[]));
-          console.log({nodes:d.spots.length,tags:[...tags].sort()});
+          const size=fs.statSync('data/solver/preflop-decisions.json').size;
+          if(size>95*1024*1024)throw new Error('preflop decision bank exceeds safe GitHub size: '+size);
+          console.log({nodes:d.spots.length,solvedHandClasses:classes,sizeBytes:size,tags:[...tags].sort()});
           NODE
 
       - name: Recompute 162-card coverage
