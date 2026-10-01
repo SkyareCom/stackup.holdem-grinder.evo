@@ -480,7 +480,7 @@
       if(!s.gameType||String(s.gameType).toUpperCase()!==filters.gameType)return false;
     }
     if(filters.effectiveStacks.length){
-      const stack=Number(s.effectiveStack);
+      const stack=Number(s.heroStack??s.effectiveStack);
       if(!Number.isFinite(stack)||!filters.effectiveStacks.some(v=>Math.abs(stack-v)<.01))return false;
     }
     if(filters.phases.length){
