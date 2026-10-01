@@ -2456,6 +2456,206 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(on){$('#page .slot').hidden=true;renderHistory();}
   }
 
+
+  // ===== STATS: dashboard pessoal de desempenho =====
+  const STATS_TEXT={
+    pt:{empty:'AINDA NÃO HÁ SPOTS RESPONDIDOS PARA ANALISAR.',all:'TODOS',training:'TREINO',section:'SEÇÃO',session:'SESSÃO',spots:'SPOTS',correct:'CORRETAS',adjustable:'AJUSTÁVEIS',incorrect:'INCORRETAS',accuracy:'ACERTO',sessions:'SESSÕES',overview:'VISÃO GERAL',byTraining:'DESEMPENHO POR TREINO',bySection:'GRADUAÇÃO POR ASSUNTO',bySession:'SESSÕES DE TREINO',swot:'ANÁLISE SWOT',strengths:'FORÇAS',weaknesses:'FRAQUEZAS',opportunities:'OPORTUNIDADES',threats:'AMEAÇAS',improve:'PLANO DE EVOLUÇÃO',report:'RELATÓRIO DETALHADO',contact:'RECEBER / COMPARTILHAR RELATÓRIO',email:'E-MAIL',whatsapp:'WHATSAPP',html:'GERAR HTML',pdf:'GERAR PDF',sendEmail:'ENVIAR E-MAIL',sendWhatsapp:'ENVIAR WHATSAPP',share:'COMPARTILHAR HTML',lowSample:'AMOSTRA BAIXA',trendUp:'EVOLUÇÃO POSITIVA NAS SESSÕES MAIS RECENTES.',trendDown:'QUEDA DE DESEMPENHO NAS SESSÕES MAIS RECENTES; REVISE OS ERROS RECENTES.',trendFlat:'DESEMPENHO ESTÁVEL NAS SESSÕES MAIS RECENTES.'},
+    en:{empty:'NO ANSWERED SPOTS TO ANALYZE YET.',all:'ALL',training:'TRAINING',section:'SECTION',session:'SESSION',spots:'SPOTS',correct:'CORRECT',adjustable:'ADJUSTABLE',incorrect:'INCORRECT',accuracy:'ACCURACY',sessions:'SESSIONS',overview:'OVERVIEW',byTraining:'PERFORMANCE BY TRAINING',bySection:'SUBJECT GRADUATION',bySession:'TRAINING SESSIONS',swot:'SWOT ANALYSIS',strengths:'STRENGTHS',weaknesses:'WEAKNESSES',opportunities:'OPPORTUNITIES',threats:'THREATS',improve:'IMPROVEMENT PLAN',report:'DETAILED REPORT',contact:'RECEIVE / SHARE REPORT',email:'EMAIL',whatsapp:'WHATSAPP',html:'GENERATE HTML',pdf:'GENERATE PDF',sendEmail:'SEND EMAIL',sendWhatsapp:'SEND WHATSAPP',share:'SHARE HTML',lowSample:'LOW SAMPLE',trendUp:'POSITIVE TREND IN RECENT SESSIONS.',trendDown:'PERFORMANCE DECLINED IN RECENT SESSIONS; REVIEW RECENT ERRORS.',trendFlat:'PERFORMANCE IS STABLE IN RECENT SESSIONS.'},
+    es:{empty:'AÚN NO HAY SPOTS RESPONDIDOS PARA ANALIZAR.',all:'TODOS',training:'ENTRENO',section:'SECCIÓN',session:'SESIÓN',spots:'SPOTS',correct:'CORRECTAS',adjustable:'AJUSTABLES',incorrect:'INCORRECTAS',accuracy:'ACIERTO',sessions:'SESIONES',overview:'VISIÓN GENERAL',byTraining:'RENDIMIENTO POR ENTRENO',bySection:'GRADUACIÓN POR TEMA',bySession:'SESIONES DE ENTRENO',swot:'ANÁLISIS SWOT',strengths:'FORTALEZAS',weaknesses:'DEBILIDADES',opportunities:'OPORTUNIDADES',threats:'AMENAZAS',improve:'PLAN DE EVOLUCIÓN',report:'INFORME DETALLADO',contact:'RECIBIR / COMPARTIR INFORME',email:'EMAIL',whatsapp:'WHATSAPP',html:'GENERAR HTML',pdf:'GENERAR PDF',sendEmail:'ENVIAR EMAIL',sendWhatsapp:'ENVIAR WHATSAPP',share:'COMPARTIR HTML',lowSample:'MUESTRA BAJA',trendUp:'EVOLUCIÓN POSITIVA EN LAS SESIONES RECIENTES.',trendDown:'CAÍDA DE RENDIMIENTO EN SESIONES RECIENTES; REVISA LOS ERRORES.',trendFlat:'RENDIMIENTO ESTABLE EN LAS SESIONES RECIENTES.'}
+  };
+  const statsStyle=document.createElement('style');
+  statsStyle.textContent='.statspanel{display:flex;flex-direction:column;gap:10px;padding-bottom:12px}.statspanel[hidden]{display:none!important}.statsfilters{display:grid;grid-template-columns:1fr;gap:7px}.statsfilters select,.statscontact input{width:100%;height:40px;padding:0 10px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important}.statsfilters option{background:#07182f;color:#fff}.statsgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}.statskpi,.statscard,.statsswot>div,.statssubject,.statssession,.statstraining{background:var(--glass-bg);border:var(--glass-border);border-radius:var(--r-card);box-shadow:var(--glass-hl);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}.statskpi{padding:10px 6px;text-align:center}.statskpi b,.statskpi span,.statscard b,.statscard p,.statscard small,.statssubject b,.statssubject span,.statssession b,.statssession span,.statstraining b,.statstraining span,.statsswot b,.statsswot p,.statscontact label,.statscontact button{font-family:var(--f-ui);font-size:var(--fs)!important;font-weight:400}.statskpi b{display:block;color:var(--c-accent-text);font-size:16px!important}.statskpi span,.statscard small,.statssubject span,.statssession span,.statstraining span{color:var(--c-muted)}.statscard{padding:12px}.statshead{margin-bottom:9px;color:var(--c-accent-text);letter-spacing:var(--ls-label);font-family:var(--f-ui);font-size:var(--fs)!important}.statspiebox{display:flex;align-items:center;gap:14px}.statspie{width:116px;height:116px;border-radius:50%;display:grid;place-items:center;flex:none}.statspie:after{content:"";width:72px;height:72px;border-radius:50%;background:#050913;border:1px solid rgba(255,255,255,.16)}.statspievalue{position:absolute}.statspiewrap{position:relative;width:116px;height:116px;display:grid;place-items:center}.statspievalue{z-index:2;text-align:center;color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important}.statslegend{display:flex;flex-direction:column;gap:6px}.statslegend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}.statslegend span{font-family:var(--f-ui);font-size:var(--fs)!important;color:var(--c-muted)}.statslist{display:flex;flex-direction:column;gap:7px}.statssubject,.statssession,.statstraining{padding:9px;display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:9px}.statsminipie{width:34px;height:34px;border-radius:50%}.statsgrade{color:var(--c-accent-text);white-space:nowrap}.statsswot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}.statsswot>div{padding:10px;min-height:110px}.statsswot b{display:block;color:var(--c-accent-text);margin-bottom:6px}.statsswot p{color:var(--c-muted);line-height:1.4}.statsplan{display:flex;flex-direction:column;gap:7px}.statsplan p{padding:9px;border-left:2px solid var(--c-accent);background:rgba(255,255,255,.04);font-family:var(--f-ui);font-size:var(--fs)!important;color:var(--c-text);line-height:1.4}.statscontact{display:grid;grid-template-columns:1fr;gap:7px}.statscontactrow{display:grid;grid-template-columns:1fr 1fr;gap:7px}.statscontact button{height:40px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);color:var(--c-text)}.statscontact button.on,.statscontact button:active{background:var(--on-bg);border:var(--on-border);color:var(--c-accent-text)}.statsempty{padding:22px;text-align:center;color:var(--c-muted);font-family:var(--f-ui);font-size:var(--fs)!important}.statssample{color:var(--c-muted);font-size:10px!important}';
+  R.appendChild(statsStyle);
+  const statsPanel=document.createElement('div');statsPanel.className='statspanel';statsPanel.hidden=true;$('#page').appendChild(statsPanel);
+  let statsTrainingFilter='all',statsSectionFilter='all',statsSessionFilter='all';
+
+  function statsText(){return STATS_TEXT[L()]||STATS_TEXT.pt;}
+  function statsLegacyRecords(){
+    const items=window.StackUpTrainingHistory?.list?.('date')||[];
+    const out=[];
+    items.forEach(item=>{
+      const snap=item.snapshot||{};
+      const decisions=Array.isArray(snap.decisions)&&snap.decisions.length?snap.decisions:(snap.currentAnswer?[{
+        spotId:snap.currentSpot?.id||'',street:snap.currentSpot?.scenario?.street||'',heroPosition:snap.currentSpot?.scenario?.heroPosition||'',
+        status:snap.currentAnswer?.analysis?.status||'unknown',chosenAction:snap.currentAnswer?.analysis?.chosenAction||snap.currentAnswer?.uiAction||'',
+        indicatedAction:snap.currentAnswer?.analysis?.indicatedAction||'',chosenFrequency:Number(snap.currentAnswer?.analysis?.chosenFrequency)||0,
+        bestFrequency:Number(snap.currentAnswer?.analysis?.bestFrequency)||0,answeredAt:snap.currentAnswer?.answeredAt||item.updatedAt||item.createdAt
+      }]:[]);
+      let special=snap.filters?.special||{};
+      if(typeof special==='string'){try{special=JSON.parse(special);}catch(_){special={};}}
+      const sectionNames=[];
+      Object.values(special||{}).forEach(v=>(Array.isArray(v)?v:[]).forEach(x=>{if(x!=='all'&&x!=='random'){try{sectionNames.push(lab(x));}catch(_){sectionNames.push(String(x));}}}));
+      decisions.forEach((d,i)=>out.push({
+        id:'legacy:'+item.id+':'+i,sessionId:'legacy:'+item.id,sessionName:item.name||'',answeredAt:d.answeredAt||item.updatedAt||item.createdAt,
+        spotId:d.spotId||'',training:item.name||trainingStatsLabel(),sections:sectionNames.length?[...new Set(sectionNames)]:[d.street||'GERAL'],
+        street:d.street||'',heroPosition:d.heroPosition||'',hand:d.hand||'',status:d.status||'unknown',chosenAction:d.chosenAction||'',
+        indicatedAction:d.indicatedAction||'',chosenFrequency:Number(d.chosenFrequency)||0,bestFrequency:Number(d.bestFrequency)||0,legacy:true
+      }));
+    });
+    return out;
+  }
+  function statsAllRecords(){
+    const live=window.StackUpTrainingPerformance?.records?.()||[];
+    const legacy=statsLegacyRecords();
+    const seen=new Set(live.map(x=>String(x.spotId||'')+'|'+String(x.answeredAt||'')+'|'+String(x.status||'')));
+    return live.concat(legacy.filter(x=>!seen.has(String(x.spotId||'')+'|'+String(x.answeredAt||'')+'|'+String(x.status||''))));
+  }
+  function statsAllSessions(){
+    const live=window.StackUpTrainingPerformance?.sessions?.()||[];
+    const map=new Map(live.map(x=>[x.id,x]));
+    (window.StackUpTrainingHistory?.list?.('date')||[]).forEach(item=>{
+      const id='legacy:'+item.id;
+      if(!map.has(id))map.set(id,{id,name:item.name||'',training:item.name||'',startedAt:item.createdAt,updatedAt:item.updatedAt});
+    });
+    return [...map.values()];
+  }
+  function statsCounts(records){
+    const total=records.length,correct=records.filter(x=>x.status==='correct').length,adjustable=records.filter(x=>x.status==='adjustable').length,incorrect=records.filter(x=>x.status==='incorrect').length;
+    const unknown=Math.max(0,total-correct-adjustable-incorrect);
+    const accuracy=total?correct/total*100:0;
+    const technical=total?(correct+adjustable*.5)/total*100:0;
+    return {total,correct,adjustable,incorrect,unknown,accuracy,technical};
+  }
+  function statsGrade(records){
+    const c=statsCounts(records),s=c.technical;
+    const grade=s>=85?'PRO':s>=70?'REG':s>=55?'REC':'INICIANTE';
+    return {grade,score:s,low:c.total<10};
+  }
+  function statsGroup(records,keyFn){
+    const m=new Map();
+    records.forEach(r=>{
+      const keys=keyFn(r);(Array.isArray(keys)?keys:[keys]).filter(Boolean).forEach(k=>{if(!m.has(k))m.set(k,[]);m.get(k).push(r);});
+    });
+    return [...m.entries()].map(([name,items])=>({name,items,counts:statsCounts(items),grade:statsGrade(items)})).sort((a,b)=>b.counts.total-a.counts.total||b.grade.score-a.grade.score);
+  }
+  function statsFilteredRecords(){
+    return statsAllRecords().filter(r=>{
+      if(statsTrainingFilter!=='all'&&String(r.training||'')!==statsTrainingFilter)return false;
+      const sections=(Array.isArray(r.sections)&&r.sections.length?r.sections:[r.street||'GERAL']).map(String);
+      if(statsSectionFilter!=='all'&&!sections.includes(statsSectionFilter))return false;
+      if(statsSessionFilter!=='all'&&String(r.sessionId||'')!==statsSessionFilter)return false;
+      return true;
+    });
+  }
+  function statsPieStyle(counts){
+    const t=Math.max(1,counts.total),a=counts.correct/t*100,b=(counts.correct+counts.adjustable)/t*100,d=(counts.correct+counts.adjustable+counts.incorrect)/t*100;
+    return 'background:conic-gradient(var(--c-accent-text) 0 '+a.toFixed(2)+'%,rgba(255,255,255,.62) '+a.toFixed(2)+'% '+b.toFixed(2)+'%,rgba(255,255,255,.22) '+b.toFixed(2)+'% '+d.toFixed(2)+'%,rgba(255,255,255,.08) '+d.toFixed(2)+'% 100%)';
+  }
+  function statsTrend(records){
+    const tx=statsText(),ordered=[...records].sort((a,b)=>String(b.answeredAt||'').localeCompare(String(a.answeredAt||'')));
+    if(ordered.length<10)return tx.trendFlat;
+    const n=Math.min(25,Math.floor(ordered.length/2));
+    const recent=statsCounts(ordered.slice(0,n)).technical,previous=statsCounts(ordered.slice(n,n*2)).technical;
+    if(recent>previous+4)return tx.trendUp;
+    if(recent<previous-4)return tx.trendDown;
+    return tx.trendFlat;
+  }
+  function statsModel(records){
+    const overall=statsCounts(records);
+    const byTraining=statsGroup(records,r=>r.training||'TREINO GERAL');
+    const bySection=statsGroup(records,r=>(Array.isArray(r.sections)&&r.sections.length?r.sections:[r.street||'GERAL']));
+    const sessionNames=new Map(statsAllSessions().map(s=>[s.id,s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt)]));
+    const bySession=statsGroup(records,r=>sessionNames.get(r.sessionId)||formatHistoryDate(r.answeredAt));
+    const strong=bySection.filter(x=>x.counts.total>=5&&x.grade.score>=75).slice(0,3);
+    const weak=[...bySection].filter(x=>x.counts.total>=3&&x.grade.score<65).sort((a,b)=>a.grade.score-b.grade.score).slice(0,3);
+    const adjustable=[...bySection].filter(x=>x.counts.total>=3&&x.counts.adjustable/x.counts.total>=.25).slice(0,3);
+    const risky=[...bySection].filter(x=>x.counts.total>=3&&x.counts.incorrect/x.counts.total>=.35).sort((a,b)=>b.counts.incorrect/b.counts.total-a.counts.incorrect/a.counts.total).slice(0,3);
+    const fmt=g=>g.length?g.map(x=>x.name+' ('+x.grade.score.toFixed(0)+'%)').join(' · '):'—';
+    const swot={
+      strengths:fmt(strong),
+      weaknesses:fmt(weak),
+      opportunities:adjustable.length?adjustable.map(x=>x.name+' — revisar mixes e frequências').join(' · '):(overall.total<30?'Aumentar a amostra para identificar padrões com maior confiança.':'Consolidar os assuntos intermediários com sessões focadas.'),
+      threats:risky.length?risky.map(x=>x.name+' — erros recorrentes').join(' · '):(overall.total<15?'Amostra ainda pequena pode distorcer conclusões.':'Evitar dispersar volume entre muitos filtros sem consolidar os pontos fracos.')
+    };
+    const plan=[];
+    if(overall.total<30)plan.push('Complete pelo menos 30 spots no mesmo recorte antes de concluir que um padrão está consolidado.');
+    weak.forEach(x=>plan.push('Priorize '+x.name+': faça uma sessão focada de 50 spots, revise cada decisão incorreta e compare ação escolhida, ação indicada e frequência do solver.'));
+    if(overall.adjustable>overall.correct*.35)plan.push('Há muitas decisões ajustáveis: revise os mixes do solver e treine a diferença entre ação possível e ação dominante.');
+    if(!weak.length&&overall.total>=30)plan.push('Mantenha o volume e aumente gradualmente a complexidade dos filtros, preservando a revisão das decisões ajustáveis.');
+    plan.push(statsTrend(records));
+    return {records,overall,byTraining,bySection,bySession,swot,plan};
+  }
+  function statsEsc(v){return spotEscape(String(v??''));}
+  function statsOptions(values,current,allLabel){
+    return '<option value="all"'+(current==='all'?' selected':'')+'>'+statsEsc(allLabel)+'</option>'+values.map(v=>'<option value="'+statsEsc(v.value)+'"'+(String(current)===String(v.value)?' selected':'')+'>'+statsEsc(v.label)+'</option>').join('');
+  }
+  function statsMiniRow(group,kind){
+    const c=group.counts,g=group.grade,tx=statsText();
+    return '<div class="'+kind+'"><div class="statsminipie" style="'+statsPieStyle(c)+'"></div><div><b>'+statsEsc(group.name)+'</b><span>'+c.total+' '+tx.spots+' · '+c.correct+' '+tx.correct.toLowerCase()+' · '+c.accuracy.toFixed(1).replace('.',',')+'%</span>'+(g.low?'<small class="statssample">'+tx.lowSample+'</small>':'')+'</div><div class="statsgrade">'+g.grade+'</div></div>';
+  }
+  function renderStats(){
+    const tx=statsText(),all=statsAllRecords(),sessions=statsAllSessions();
+    const trainings=[...new Set(all.map(x=>String(x.training||'TREINO GERAL')))].sort();
+    const sections=[...new Set(all.flatMap(x=>(Array.isArray(x.sections)&&x.sections.length?x.sections:[x.street||'GERAL']).map(String)))].sort();
+    const sessionOpts=sessions.map(s=>({value:s.id,label:(s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt))})).sort((a,b)=>a.label.localeCompare(b.label));
+    const filters='<div class="statsfilters"><select data-stats-filter="training" aria-label="'+tx.training+'">'+statsOptions(trainings.map(x=>({value:x,label:tx.training+' · '+x})),statsTrainingFilter,tx.training+' · '+tx.all)+'</select><select data-stats-filter="section" aria-label="'+tx.section+'">'+statsOptions(sections.map(x=>({value:x,label:tx.section+' · '+x})),statsSectionFilter,tx.section+' · '+tx.all)+'</select><select data-stats-filter="session" aria-label="'+tx.session+'">'+statsOptions(sessionOpts,statsSessionFilter,tx.session+' · '+tx.all)+'</select></div>';
+    const records=statsFilteredRecords(),model=statsModel(records),c=model.overall;
+    if(!records.length){statsPanel.innerHTML=filters+'<div class="statsempty">'+tx.empty+'</div>';return;}
+    const kpis='<div class="statsgrid"><div class="statskpi"><b>'+c.total+'</b><span>'+tx.spots+'</span></div><div class="statskpi"><b>'+c.correct+'</b><span>'+tx.correct+'</span></div><div class="statskpi"><b>'+c.accuracy.toFixed(1).replace('.',',')+'%</b><span>'+tx.accuracy+'</span></div><div class="statskpi"><b>'+c.adjustable+'</b><span>'+tx.adjustable+'</span></div><div class="statskpi"><b>'+c.incorrect+'</b><span>'+tx.incorrect+'</span></div><div class="statskpi"><b>'+new Set(records.map(x=>x.sessionId)).size+'</b><span>'+tx.sessions+'</span></div></div>';
+    const pie='<div class="statscard"><div class="statshead">'+tx.overview+'</div><div class="statspiebox"><div class="statspiewrap"><div class="statspie" style="'+statsPieStyle(c)+'"></div><div class="statspievalue">'+c.accuracy.toFixed(1).replace('.',',')+'%<br>'+tx.accuracy+'</div></div><div class="statslegend"><span><i style="background:var(--c-accent-text)"></i>'+tx.correct+' · '+c.correct+'</span><span><i style="background:rgba(255,255,255,.62)"></i>'+tx.adjustable+' · '+c.adjustable+'</span><span><i style="background:rgba(255,255,255,.22)"></i>'+tx.incorrect+' · '+c.incorrect+'</span></div></div></div>';
+    const trainingsHtml='<div class="statscard"><div class="statshead">'+tx.byTraining+'</div><div class="statslist">'+model.byTraining.map(x=>statsMiniRow(x,'statstraining')).join('')+'</div></div>';
+    const sectionsHtml='<div class="statscard"><div class="statshead">'+tx.bySection+'</div><div class="statslist">'+model.bySection.map(x=>statsMiniRow(x,'statssubject')).join('')+'</div></div>';
+    const sessionsHtml='<div class="statscard"><div class="statshead">'+tx.bySession+'</div><div class="statslist">'+model.bySession.slice(0,20).map(x=>statsMiniRow(x,'statssession')).join('')+'</div></div>';
+    const sw='<div class="statscard"><div class="statshead">'+tx.swot+'</div><div class="statsswot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></div>';
+    const plan='<div class="statscard"><div class="statshead">'+tx.improve+'</div><div class="statsplan">'+model.plan.map(x=>'<p>'+statsEsc(x)+'</p>').join('')+'</div></div>';
+    const contact='<div class="statscard"><div class="statshead">'+tx.contact+'</div><div class="statscontact"><input type="email" data-stats-email placeholder="'+tx.email+'"><input type="tel" data-stats-phone placeholder="'+tx.whatsapp+'"><div class="statscontactrow"><button data-stats-export="html">'+tx.html+'</button><button data-stats-export="pdf">'+tx.pdf+'</button></div><div class="statscontactrow"><button data-stats-export="email">'+tx.sendEmail+'</button><button data-stats-export="whatsapp">'+tx.sendWhatsapp+'</button></div><button data-stats-export="share">'+tx.share+'</button></div></div>';
+    statsPanel.innerHTML=filters+kpis+pie+trainingsHtml+sectionsHtml+sessionsHtml+sw+plan+contact;
+  }
+  function statsReportText(model){
+    const tx=statsText(),c=model.overall;
+    const lines=['STACKUP HOLD\'EM GRINDER — '+tx.report,'',tx.spots+': '+c.total,tx.correct+': '+c.correct,tx.adjustable+': '+c.adjustable,tx.incorrect+': '+c.incorrect,tx.accuracy+': '+c.accuracy.toFixed(1)+'%','','GRADUAÇÃO POR ASSUNTO'];
+    model.bySection.forEach(x=>lines.push(x.name+': '+x.grade.grade+' · '+x.counts.total+' spots · '+x.counts.accuracy.toFixed(1)+'% '+tx.accuracy.toLowerCase()));
+    lines.push('',tx.swot,tx.strengths+': '+model.swot.strengths,tx.weaknesses+': '+model.swot.weaknesses,tx.opportunities+': '+model.swot.opportunities,tx.threats+': '+model.swot.threats,'',tx.improve);
+    model.plan.forEach((x,i)=>lines.push((i+1)+'. '+x));
+    return lines.join('\n');
+  }
+  function statsReportHtml(model){
+    const tx=statsText(),c=model.overall,rows=model.bySection.map(x=>'<tr><td>'+statsEsc(x.name)+'</td><td>'+x.grade.grade+'</td><td>'+x.counts.total+'</td><td>'+x.counts.correct+'</td><td>'+x.counts.accuracy.toFixed(1)+'%</td></tr>').join('');
+    return '<!doctype html><html lang="'+L()+'"><meta charset="utf-8"><title>StackUp Grinder - '+tx.report+'</title><style>body{font-family:Arial,sans-serif;background:#07101f;color:#fff;padding:24px;line-height:1.45}h1,h2{color:#6fa4ff}section{margin:18px 0;padding:16px;border:1px solid #526078;border-radius:12px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #344052;text-align:left}.swot{display:grid;grid-template-columns:1fr 1fr;gap:10px}.swot div{padding:10px;border:1px solid #344052;border-radius:8px}@media print{body{background:#fff;color:#111}h1,h2{color:#194f9f}section,.swot div{border-color:#bbb}}</style><body><h1>STACKUP HOLD\'EM GRINDER</h1><h2>'+tx.report+'</h2><section><b>'+tx.spots+':</b> '+c.total+' &nbsp; <b>'+tx.correct+':</b> '+c.correct+' &nbsp; <b>'+tx.accuracy+':</b> '+c.accuracy.toFixed(1)+'%</section><section><h2>'+tx.bySection+'</h2><table><tr><th>'+tx.section+'</th><th>NÍVEL</th><th>'+tx.spots+'</th><th>'+tx.correct+'</th><th>'+tx.accuracy+'</th></tr>'+rows+'</table></section><section><h2>'+tx.swot+'</h2><div class="swot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></section><section><h2>'+tx.improve+'</h2><ol>'+model.plan.map(x=>'<li>'+statsEsc(x)+'</li>').join('')+'</ol></section></body></html>';
+  }
+  function statsExport(kind){
+    const records=statsFilteredRecords();if(!records.length)return;
+    const model=statsModel(records),html=statsReportHtml(model),textReport=statsReportText(model);
+    const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+    const fileName='stackup-grinder-relatorio-'+new Date().toISOString().slice(0,10)+'.html';
+    if(kind==='html'){
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);return;
+    }
+    if(kind==='pdf'){
+      const w=window.open('','_blank');if(!w)return;w.document.open();w.document.write(html+'<script>window.onload=function(){setTimeout(function(){window.print()},250)}<\/script>');w.document.close();return;
+    }
+    if(kind==='email'){
+      const email=statsPanel.querySelector('[data-stats-email]')?.value.trim()||'';
+      const subject='StackUp Grinder - '+statsText().report;
+      window.location.href='mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(textReport.slice(0,12000));return;
+    }
+    if(kind==='whatsapp'){
+      const phone=(statsPanel.querySelector('[data-stats-phone]')?.value||'').replace(/\D/g,'');
+      const url='https://wa.me/'+phone+'?text='+encodeURIComponent(textReport.slice(0,8000));
+      window.open(url,'_blank');return;
+    }
+    if(kind==='share'){
+      try{
+        const file=new File([blob],fileName,{type:'text/html'});
+        if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){navigator.share({title:'StackUp Grinder - '+statsText().report,text:textReport.slice(0,1200),files:[file]});return;}
+      }catch(_){}
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    }
+  }
+  statsPanel.addEventListener('change',e=>{
+    const f=e.target.closest('[data-stats-filter]');if(!f)return;
+    if(f.dataset.statsFilter==='training')statsTrainingFilter=f.value;
+    if(f.dataset.statsFilter==='section')statsSectionFilter=f.value;
+    if(f.dataset.statsFilter==='session')statsSessionFilter=f.value;
+    renderStats();
+  });
+  statsPanel.addEventListener('click',e=>{const b=e.target.closest('[data-stats-export]');if(b)statsExport(b.dataset.statsExport);});
+  function syncStats(){
+    const on=cur==='menu';
+    statsPanel.hidden=!on;
+    if(on){$('#page .slot').hidden=true;renderStats();}
+  }
+
   function renderHome(){ hg.innerHTML=HORD.map(k=>`<button class="tower" data-k="${k}">${HICONS[k]}<b>${k==='ia'?T2[L()][k].replace(' ','\n'):k==='api'?T2[L()][k]:brk(T2[L()]['card_'+k]||T2[L()][k])}</b></button>`).join(''); }
   hg.addEventListener('click',e=>{ const c=e.target.closest('.tower'); if(!c)return; const k=c.dataset.k;
     c.classList.add('on'); setTimeout(()=>{ if(HSUB.includes(k)){ sub.home.push(k); show('home',false);} else show(k,true); },250); });
@@ -2463,7 +2663,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null, key=hs||cur;
     const title=T2[L()]['ti_'+key];
     $('#ptitle').textContent=title; $('#sectiontitle').textContent=title;
-    $('#pslotT').textContent=T2[L()]['soon']; $('#pslotS').textContent=T2[L()]['ds_'+key]; syncTrain(); syncSpots(); syncAdvance(); syncHistory();
+    $('#pslotT').textContent=T2[L()]['soon']; $('#pslotS').textContent=T2[L()]['ds_'+key]; syncTrain(); syncSpots(); syncAdvance(); syncHistory(); syncStats();
     const hm=cur==='home'&&!hs; hg.hidden=!hm; if(hm){ $('#page .slot').hidden=true; renderHome(); } }
   function show(t,push,dir){
     const prev=cur; cur=t;
