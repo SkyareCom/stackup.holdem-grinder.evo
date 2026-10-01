@@ -224,6 +224,22 @@
     return map[raw]||String(value||'').toUpperCase()||null;
   }
 
+  function normTournamentType(value){
+    const raw=String(value||'').trim().toLowerCase();
+    const map={
+      regular:'REGULAR',
+      turbo:'TURBO',
+      pko:'PKO',
+      freeze:'FREEZEOUT',
+      freezeout:'FREEZEOUT',
+      hroller:'HIGH_ROLLER',
+      high_roller:'HIGH_ROLLER',
+      'high roller':'HIGH_ROLLER',
+      sng:'SNG'
+    };
+    return map[raw]||String(value||'').toUpperCase()||null;
+  }
+
   function parseSpecial(value){
     if(!value)return {};
     if(typeof value==='object'&&!Array.isArray(value))return value;
@@ -259,7 +275,7 @@
       phase:phases.length===1?phases[0]:null,
       phases,
       tableSize:Number.isFinite(Number(f.tableSize))?Number(f.tableSize):null,
-      tournamentType:f.tournamentType?String(f.tournamentType):null,
+      tournamentType:f.tournamentType?normTournamentType(f.tournamentType):null,
       fieldSize:f.fieldSize?String(f.fieldSize):null,
       opponentProfile:f.opponentProfile?String(f.opponentProfile):null,
       seats:f.seats?String(f.seats):null,
@@ -502,8 +518,8 @@
       if(!phase||!filters.phases.includes(phase))return false;
     }
     if(filters.tournamentType){
-      const t=String(s.tournamentType||'').toLowerCase();
-      if(!t||t!==String(filters.tournamentType).toLowerCase())return false;
+      const t=normTournamentType(s.tournamentType);
+      if(!t||t!==filters.tournamentType)return false;
     }
     if(filters.fieldSize){
       const field=String(s.fieldSize||'');
