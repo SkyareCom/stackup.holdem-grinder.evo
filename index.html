@@ -2357,7 +2357,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   function openApp(){
     hist=[];
     Object.keys(sub).forEach(k=>sub[k]=[]);
-    $('.hbtn').forEach(x=>x.classList.remove('on'));
+    $$('.hbtn').forEach(x=>x.classList.remove('on'));
     host.hidden=false;
     host.removeAttribute('hidden');
     loginScreen.inert=true;
@@ -2392,7 +2392,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       }
     },250);
   });
-  $('.tab').forEach(t=>t.onclick=()=>{
+  $$('.tab').forEach(t=>t.onclick=()=>{
     const target=t.dataset.t;
     if(target==='home'){
       // HOME no rodapé é sempre a raiz: limpa qualquer subtela antiga e
