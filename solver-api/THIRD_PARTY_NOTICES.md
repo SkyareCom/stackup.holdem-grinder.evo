@@ -23,9 +23,14 @@ StackUp includes the short-stack heads-up push/fold chart bank from **amaster97/
 - Repository: `amaster97/poker_solver`
 - License: MIT
 - Included data: `data/solver/pushfold-hu-v1.json`
-- Covered depths: 2–15 BB
+- Pinned equity asset used by the Tournament Bank: `assets/preflop_equity_169x169.npz` from upstream commit `f78f1b2bc338dd8cbb5226ecb8398bbdb3635676`.
+- Covered push/fold depths: 2–15 BB
 - Decisions: SB jam/fold and BB call/fold vs SB jam
 - Upstream convergence gate: final exploitability below 0.05 bb/100; the included v1 bank reports 0.0001 bb/100.
-- Usage in StackUp Grinder: validated short-stack / push-fold training only. It is not used as a substitute for multiway, ICM, or PKO decisions.
+- Usage in StackUp Grinder:
+  - the upstream chart bank supplies validated chip-EV heads-up push/fold training;
+  - the pinned 169×169 equity matrix supplies showdown equity inputs to StackUp's own exact-ICM tournament game solver;
+  - ICM utilities and tournament equilibria are computed by StackUp and gated by measured NashConv before publication.
+- The upstream data is not treated as a substitute for PKO-specific bounty economics or unsupported multiway trees.
 
 The upstream MIT license is retained at `data/solver/pushfold-hu-v1.LICENSE.txt`.
