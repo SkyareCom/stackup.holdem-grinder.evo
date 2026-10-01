@@ -192,6 +192,7 @@ function tags(spot){
   const hasOpenBet=(spot?.strategy||[]).some(h=>(h?.actions||[]).some(a=>/\bbet\b|\braise\b/.test(String(a?.action||a?.label||"").toLowerCase())));
   if((!Number.isFinite(currentBet)||currentBet<=0)&&hasOpenBet)set.add("breakeven_bluff");
   if(s.heroRange&&s.villainRange)set.add("combos");
+  if(["FLOP","TURN"].includes(street)&&s.heroRange&&s.villainRange)set.add("equity_realization");
   const exactPostflop=street!=="PRE-FLOP"&&(spot?.strategy||[]).some(h=>isExactHand(h?.hand));
   if(exactPostflop)set.add("blockers");
 
