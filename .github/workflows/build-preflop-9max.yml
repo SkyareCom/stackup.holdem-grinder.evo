@@ -1,0 +1,111 @@
+name: Build Native 9max Preflop Bank
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-preflop-9max.yml"
+      - "scripts/patch-dcfr-9max.py"
+      - "scripts/stackup-preflop-export.rs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: preflop-9max
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Checkout pinned DCFR-SOLVER
+        run: |
+          mkdir -p .stackup
+          git clone https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
+
+      - name: Patch DCFR to native 9-max
+        run: |
+          python scripts/patch-dcfr-9max.py .stackup/DCFR-SOLVER/src/preflop.rs
+          mkdir -p .stackup/DCFR-SOLVER/src/bin
+          cp scripts/stackup-preflop-export.rs .stackup/DCFR-SOLVER/src/bin/stackup_preflop_export.rs
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ".stackup/DCFR-SOLVER -> target"
+          shared-key: dcfr-9max
+
+      - name: Build patched solver and exporter
+        run: |
+          cargo build --release --manifest-path .stackup/DCFR-SOLVER/Cargo.toml --bin dcfr-solver --bin stackup_preflop_export
+          cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-solver-9max
+          cp .stackup/DCFR-SOLVER/target/release/stackup_preflop_export .stackup/stackup-preflop-export-9max
+          chmod +x .stackup/dcfr-solver-9max .stackup/stackup-preflop-export-9max
+
+      - name: Train native 9-max preflop blueprint
+        run: |
+          .stackup/dcfr-solver-9max preflop \
+            --iterations 10000000 \
+            --output .stackup/preflop-9max-blueprint.bin
+
+      - name: Export all 9-max decision nodes
+        run: |
+          .stackup/stackup-preflop-export-9max \
+            .stackup/preflop-9max-blueprint.bin \
+            data/solver/preflop-9max.json
+
+      - name: Validate 9-max bank
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync('data/solver/preflop-9max.json','utf8'));
+          if(d.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
+          if(Number(d.iterations)<10000000)throw new Error('9max iterations below 10M');
+          if(!Array.isArray(d.spots)||d.spots.length<30)throw new Error('too few 9max nodes: '+d.spots?.length);
+          const counts={};
+          for(const s of d.spots){
+            if(s.solver!=='DCFR_SOLVER')throw new Error('invalid solver '+s.id);
+            if(s.scenario?.street!=='PRE-FLOP')throw new Error('non-preflop '+s.id);
+            if(Number(s.scenario?.tableSize)!==9)throw new Error('non-9max '+s.id);
+            if(!Array.isArray(s.strategy)||s.strategy.length!==169)throw new Error('strategy size '+s.id);
+            const sums=s.strategy.map(h=>(h.actions||[]).reduce((n,a)=>n+Number(a.frequency||0),0));
+            if(sums.some(x=>Math.abs(x-100)>0.25))throw new Error('frequency normalization '+s.id);
+            const p=String(s.scenario?.heroPosition||'');
+            counts[p]=(counts[p]||0)+1;
+          }
+          for(const p of ['UTG+1','UTG+2']){
+            if((counts[p]||0)<2)throw new Error(p+' needs at least 2 solved nodes, found '+String(counts[p]||0));
+          }
+          console.log({nodes:d.spots.length,heroPositionNodes:counts});
+          NODE
+
+      - name: Recompute 162-card coverage
+        run: node scripts/audit-scenario-coverage.mjs
+
+      - name: Commit 9-max bank safely
+        run: |
+          git config user.name "StackUp 9max Bot"
+          git config user.email "actions@users.noreply.github.com"
+          cp data/solver/preflop-9max.json /tmp/preflop-9max.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/preflop-9max.json data/solver/preflop-9max.json
+          node scripts/audit-scenario-coverage.mjs
+          git add data/solver/preflop-9max.json data/solver/coverage.json
+          if git diff --cached --quiet; then
+            echo "9-max bank unchanged."
+            exit 0
+          fi
+          git commit -m "Generate native DCFR 9max preflop bank"
+          git push origin HEAD:main
