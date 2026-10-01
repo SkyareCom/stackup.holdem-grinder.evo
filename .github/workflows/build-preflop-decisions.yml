@@ -1,0 +1,101 @@
+name: Build Preflop Decision Bank
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-preflop-decisions.yml"
+      - "scripts/stackup-preflop-export.rs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: preflop-decisions
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Checkout pinned DCFR-SOLVER
+        run: |
+          mkdir -p .stackup
+          git clone https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
+          mkdir -p .stackup/DCFR-SOLVER/src/bin
+          cp scripts/stackup-preflop-export.rs .stackup/DCFR-SOLVER/src/bin/stackup_preflop_export.rs
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ".stackup/DCFR-SOLVER -> target"
+
+      - name: Build solver and exporter
+        run: |
+          cargo build --release --manifest-path .stackup/DCFR-SOLVER/Cargo.toml --bin dcfr-solver --bin stackup_preflop_export
+          cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-solver
+          cp .stackup/DCFR-SOLVER/target/release/stackup_preflop_export .stackup/stackup-preflop-export
+          chmod +x .stackup/dcfr-solver .stackup/stackup-preflop-export
+
+      - name: Solve preflop blueprint
+        run: |
+          .stackup/dcfr-solver preflop \
+            --iterations 10000000 \
+            --output .stackup/preflop-blueprint.bin \
+            --chart-output .stackup/preflop-charts.json \
+            --matchup-output .stackup/preflop-matchups.json
+
+      - name: Export every supported decision node
+        run: |
+          .stackup/stackup-preflop-export \
+            .stackup/preflop-blueprint.bin \
+            data/solver/preflop-decisions.json
+
+      - name: Validate preflop decision bank
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync('data/solver/preflop-decisions.json','utf8'));
+          if(d.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
+          if(Number(d.iterations)<10000000)throw new Error('preflop iterations below production floor');
+          if(!Array.isArray(d.spots)||d.spots.length<20)throw new Error('too few decision nodes: '+d.spots?.length);
+          for(const s of d.spots){
+            if(s.solver!=='DCFR_SOLVER')throw new Error('invalid solver '+s.id);
+            if(s.scenario?.street!=='PRE-FLOP')throw new Error('non-preflop node '+s.id);
+            if(!Array.isArray(s.strategy)||s.strategy.length!==169)throw new Error('strategy must contain 169 classes '+s.id);
+            const sums=s.strategy.map(h=>(h.actions||[]).reduce((n,a)=>n+Number(a.frequency||0),0));
+            if(sums.some(x=>Math.abs(x-100)>0.25))throw new Error('frequency normalization failed '+s.id);
+          }
+          const tags=new Set(d.spots.flatMap(s=>s.scenario?.tags||[]));
+          console.log({nodes:d.spots.length,tags:[...tags].sort()});
+          NODE
+
+      - name: Recompute 162-card coverage
+        run: node scripts/audit-scenario-coverage.mjs
+
+      - name: Commit bank and coverage safely
+        run: |
+          git config user.name "StackUp Preflop Bot"
+          git config user.email "actions@users.noreply.github.com"
+          cp data/solver/preflop-decisions.json /tmp/preflop-decisions.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/preflop-decisions.json data/solver/preflop-decisions.json
+          node scripts/audit-scenario-coverage.mjs
+          git add data/solver/preflop-decisions.json data/solver/coverage.json
+          if git diff --cached --quiet; then
+            echo "Preflop decision bank unchanged."
+            exit 0
+          fi
+          git commit -m "Generate full DCFR preflop decision bank"
+          git push origin HEAD:main
