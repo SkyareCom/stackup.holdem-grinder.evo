@@ -1,0 +1,86 @@
+name: Build Texture Sizing Bank
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-texture-sizing-bank.yml"
+      - "scripts/generate-texture-sizing-bank.mjs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: texture-sizing-bank
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Checkout pinned DCFR-SOLVER
+        run: |
+          mkdir -p .stackup
+          git clone https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ".stackup/DCFR-SOLVER -> target"
+
+      - name: Build DCFR-SOLVER
+        run: |
+          cargo build --release --manifest-path .stackup/DCFR-SOLVER/Cargo.toml --bin dcfr-solver
+          cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-solver
+          chmod +x .stackup/dcfr-solver
+
+      - name: Generate targeted texture and sizing solves
+        env:
+          STACKUP_DCFR_BIN: ${{ github.workspace }}/.stackup/dcfr-solver
+          STACKUP_TEXTURE_ITERATIONS: "120"
+        run: node scripts/generate-texture-sizing-bank.mjs
+
+      - name: Validate targeted bank
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const d=JSON.parse(fs.readFileSync('data/solver/texture-sizing.json','utf8'));
+          if(d.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
+          const tags=new Set((d.spots||[]).flatMap(s=>s.scenario?.tags||[]));
+          const required=['board_paired','board_monotone','board_low','bet_25','bet_50','bet_66','bet_75','pot_bet','overbet_125','overbet_150'];
+          for(const tag of required)if(!tags.has(tag))throw new Error('missing targeted solve '+tag);
+          for(const s of d.spots||[]){
+            if(!Array.isArray(s.strategy)||s.strategy.length<250)throw new Error('insufficient combos '+s.id);
+          }
+          console.log({spots:d.spots.length,failures:d.failures?.length||0,tags:[...tags]});
+          NODE
+
+      - name: Recompute 162-card coverage
+        run: node scripts/audit-scenario-coverage.mjs
+
+      - name: Commit bank and coverage safely
+        run: |
+          git config user.name "StackUp Texture Bot"
+          git config user.email "actions@users.noreply.github.com"
+          cp data/solver/texture-sizing.json /tmp/texture-sizing.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/texture-sizing.json data/solver/texture-sizing.json
+          node scripts/audit-scenario-coverage.mjs
+          git add data/solver/texture-sizing.json data/solver/coverage.json
+          if git diff --cached --quiet; then
+            echo "Texture/sizing bank unchanged."
+            exit 0
+          fi
+          git commit -m "Generate targeted DCFR texture sizing bank"
+          git push origin HEAD:main
