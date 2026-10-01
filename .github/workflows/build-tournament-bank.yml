@@ -73,11 +73,21 @@ jobs:
         run: |
           git config user.name "StackUp Tournament Bot"
           git config user.email "actions@users.noreply.github.com"
+
+          # Preserve the validated bank, then move onto the newest main so
+          # concurrent coverage/DCFR bot commits cannot create a rebase conflict.
+          cp data/solver/tournament.json /tmp/stackup-tournament.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/stackup-tournament.json data/solver/tournament.json
+
+          # Coverage must be recomputed against the newest versions of every bank.
+          node scripts/audit-scenario-coverage.mjs
+
           git add data/solver/tournament.json data/solver/coverage.json
           if git diff --cached --quiet; then
             echo "Tournament bank unchanged."
             exit 0
           fi
           git commit -m "Generate exact-ICM tournament bank"
-          git pull --rebase origin main
-          git push
+          git push origin HEAD:main
