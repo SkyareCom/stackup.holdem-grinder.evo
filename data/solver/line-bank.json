@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": null,
+  "solver": "DCFR_SOLVER",
+  "upstream": {
+    "repository": "exinori/DCFR-SOLVER",
+    "commit": "4ade6a9e15a841c41867afde1258b9d110cd6fb1",
+    "license": "MIT"
+  },
+  "iterations": 0,
+  "baseMatchups": [],
+  "spots": [],
+  "failures": []
+}
