@@ -314,6 +314,9 @@ function matchAdvance(item,spot){
   if(["pre_special","blind_special","aggr_special","short_special","icm_special","pko_special"].includes(item.section)&&street!=="PRE-FLOP")return false;
   if(item.section==="river_special"&&street!=="RIVER")return false;
   if(["post_special","texture_special"].includes(item.section)&&!["FLOP","TURN","RIVER"].includes(street))return false;
+  if(item.section==="math_special"&&["implied_odds","reverse_implied_odds"].includes(item.id)){
+    return ["FLOP","TURN"].includes(street);
+  }
   return tags(spot).has(item.id);
 }
 function ljEquivalentSpots(){
