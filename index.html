@@ -1096,11 +1096,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     .spotsetupcard{width:calc(100% - 4px);max-width:410px;max-height:calc(100% - 64px);overflow:auto;padding:14px;border-radius:var(--r-card);background:var(--glass-bg-strong);border:var(--glass-border);box-shadow:var(--glass-hl);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
     .spotsetuptitle{margin-bottom:12px;text-align:center;color:var(--c-text);font-family:var(--f-ui);font-size:12px!important;letter-spacing:var(--ls-label);white-space:nowrap!important}
     .spotsetuprows{display:flex;flex-direction:column;gap:0}
-    .spotsetuprow{display:grid!important;grid-template-columns:max-content minmax(0,1fr)!important;column-gap:10px!important;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.12);align-items:center;min-width:0;white-space:nowrap!important}
+    .spotsetuprow{display:flex!important;flex-flow:row nowrap!important;justify-content:space-between!important;column-gap:8px!important;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.12);align-items:center;min-width:0;white-space:nowrap!important}
     .spotsetuprow:last-child{border-bottom:0}
-    .spotsetuprow b,.spotsetuprow span{font-family:var(--f-ui);font-size:12px!important;font-weight:400;line-height:1.1!important;white-space:nowrap!important;word-break:normal!important;overflow-wrap:normal!important}
-    .spotsetuprow b{color:var(--c-muted);letter-spacing:0!important;min-width:max-content}
-    .spotsetuprow span{color:var(--c-text);text-align:right;letter-spacing:0!important;min-width:0;white-space:nowrap!important}
+    .spotsetuprow b,.spotsetuprow span{font-family:var(--f-ui);font-size:12px!important;font-weight:400;line-height:1.1!important;white-space:nowrap!important;word-break:keep-all!important;overflow-wrap:normal!important}
+    .spotsetuprow b{color:var(--c-muted);letter-spacing:0!important;flex:0 0 auto!important;min-width:max-content}
+    .spotsetuprow span{color:var(--c-text);text-align:right;letter-spacing:0!important;flex:0 1 auto!important;min-width:max-content;white-space:nowrap!important}
+    @media(max-width:390px){.spotsetupcard{padding-left:8px!important;padding-right:8px!important}.spotsetuprow{column-gap:5px!important}}
     .spotsetupstart{width:min(100%,400px);height:44px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);-webkit-backdrop-filter:var(--on-blur);backdrop-filter:var(--on-blur);color:var(--c-accent-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
     .spotintro.loading{color:var(--c-muted);letter-spacing:var(--ls-label);white-space:nowrap}
     .spotintro.loading i{display:block;width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.24);box-shadow:0 0 0 8px rgba(21,91,189,.10),0 0 22px rgba(21,91,189,.30);animation:spotIntroPulse .8s ease-in-out infinite}
@@ -2424,19 +2425,25 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   function openApp(){
     hist=[];
     Object.keys(sub).forEach(k=>sub[k]=[]);
-    $$('.hbtn').forEach(x=>x.classList.remove('on'));
-    primeHome();
+    $('.hbtn').forEach(x=>x.classList.remove('on'));
 
+    // Primeiro abre o container. Depois pinta HOME no mesmo evento do toque.
+    // Nenhum solver, histórico ou sincronização pode atrasar a primeira pintura.
     host.hidden=false;
     host.removeAttribute('hidden');
     host.style.display='flex';
     loginScreen.inert=true;
     loginScreen.style.display='none';
 
-    // Paint HOME first. Secondary synchronizations run only after it is visible.
-    requestAnimationFrame(()=>{
+    const pg=$('#page');
+    if(pg){pg.style.animation='none';pg.style.transition='none';pg.style.transform='';pg.style.opacity='1';}
+    primeHome();
+
+    // Rotinas secundárias somente depois de a HOME já estar visível.
+    window.setTimeout(()=>{
       try{tr();syncBack();}catch(_){}
-    });
+      if(pg){pg.style.transition='';pg.style.opacity='';}
+    },80);
   }
   host.grinderEnter=openApp;
   function backToLogin(){
