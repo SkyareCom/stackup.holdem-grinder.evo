@@ -647,6 +647,7 @@
       ...pushfoldSpots(bank),
       ...((bank?.tournament?.spots)||[]),
       ...((bank?.preflopDecisions?.spots)||[]),
+      ...((bank?.textureSizing?.spots)||[]),
       ...contextualChipEvSpots(bank,filters)
     ];
     const candidates=[];
