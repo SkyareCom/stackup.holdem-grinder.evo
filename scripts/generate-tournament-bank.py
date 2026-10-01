@@ -232,6 +232,144 @@ def solve_game(archetype,equity,compat):
         "base_equities":u["base"].tolist()
     }
 
+def transfer_many(stacks, transfers):
+    out=np.array(stacks,dtype=np.float64).copy()
+    for src,dst,amount in transfers:
+        x=min(max(0.0,float(amount)),out[src])
+        out[src]-=x; out[dst]+=x
+    return out
+
+def solve_reshove_game(archetype,equity,compat):
+    stacks=np.array(archetype["stacks"],dtype=np.float64)
+    payouts=np.array(archetype["payouts"],dtype=np.float64)
+    positions=archetype["positions"]
+    opener=positions.index(archetype["openerPosition"])
+    hero=positions.index(archetype["heroPosition"])
+    sb=positions.index("SB"); bb=positions.index("BB")
+    open_size=float(archetype.get("openSizeBb",2.2))
+
+    base=icm_equities(stacks,payouts)
+
+    # Open + Hero folds: opener wins the blinds; his own raise returns.
+    open_hero_fold=transfer_many(stacks,[(sb,opener,.5),(bb,opener,1.0)])
+    u_open_fold=icm_equities(open_hero_fold,payouts)
+
+    # Hero jams and opener folds: Hero wins opener's raise plus the blinds.
+    hero_jam_fold=transfer_many(stacks,[(opener,hero,open_size),(sb,hero,.5),(bb,hero,1.0)])
+    u_jam_fold=icm_equities(hero_jam_fold,payouts)
+
+    risk=min(float(stacks[opener]),float(stacks[hero]))
+    hero_win=transfer_many(stacks,[(opener,hero,risk),(sb,hero,.5),(bb,hero,1.0)])
+    opener_win=transfer_many(stacks,[(hero,opener,risk),(sb,opener,.5),(bb,opener,1.0)])
+    u_hw=icm_equities(hero_win,payouts)
+    u_ow=icm_equities(opener_win,payouts)
+
+    # equity[j,i] = Hero hand j equity versus opener hand i.
+    eh=equity.T
+    hero_call=eh*u_hw[hero]+(1.0-eh)*u_ow[hero]
+    opener_call=eh*u_hw[opener]+(1.0-eh)*u_ow[opener]
+
+    joint=compat.astype(np.float64)
+    joint/=joint.sum()
+    po=joint.sum(axis=1)
+    ph=joint.sum(axis=0)
+    hero_given_opener=np.divide(joint,po[:,None],out=np.zeros_like(joint),where=po[:,None]>0)
+    opener_given_hero=np.divide(joint,ph[None,:],out=np.zeros_like(joint),where=ph[None,:]>0)
+
+    # Opener root: FOLD/OPEN. Hero after open: FOLD/JAM.
+    # Opener response after jam: FOLD/CALL.
+    ro=np.zeros((169,2)); rh=np.zeros((169,2)); rr=np.zeros((169,2))
+    so=np.zeros((169,2)); sh=np.zeros((169,2)); sr=np.zeros((169,2))
+
+    for t in range(1,ITERATIONS+1):
+        O=rm_strategy(ro); H=rm_strategy(rh); R=rm_strategy(rr)
+
+        # Opener response infoset, conditional on Hero having jammed.
+        jam_weight=hero_given_opener*H[:,1][None,:]
+        p_jam_given_o=jam_weight.sum(axis=1)
+        cond_h_jam=np.divide(jam_weight,p_jam_given_o[:,None],out=np.zeros_like(jam_weight),where=p_jam_given_o[:,None]>0)
+        response_call=(cond_h_jam*opener_call).sum(axis=1)
+        response_vals=np.stack([np.full(169,u_jam_fold[opener]),response_call],axis=1)
+        response_node=(R*response_vals).sum(axis=1)
+
+        # Hero decision after observing an open.
+        open_weight=opener_given_hero*O[:,1][:,None]
+        p_open_given_h=open_weight.sum(axis=0)
+        cond_o_open=np.divide(open_weight,p_open_given_h[None,:],out=np.zeros_like(open_weight),where=p_open_given_h[None,:]>0)
+        hero_jam=(cond_o_open*(R[:,0][:,None]*u_jam_fold[hero]+R[:,1][:,None]*hero_call)).sum(axis=0)
+        hero_vals=np.stack([np.full(169,u_open_fold[hero]),hero_jam],axis=1)
+        hero_node=(H*hero_vals).sum(axis=1)
+
+        # Opener root decision anticipates Hero strategy and own response strategy.
+        open_pay=np.zeros(169)
+        for i in range(169):
+            continuation=H[:,0]*u_open_fold[opener] + H[:,1]*(R[i,0]*u_jam_fold[opener]+R[i,1]*opener_call[i,:])
+            open_pay[i]=(hero_given_opener[i,:]*continuation).sum()
+        opener_vals=np.stack([np.full(169,base[opener]),open_pay],axis=1)
+        opener_node=(O*opener_vals).sum(axis=1)
+
+        ta=float(t)**ALPHA; tb=float(t)**BETA
+        ps=ta/(ta+1.0); ns=tb/(tb+1.0); ss=(t/(t+1.0))**GAMMA
+        for reg in (ro,rh,rr):
+            reg[:]=np.where(reg>0,reg*ps,np.where(reg<0,reg*ns,reg))
+        so*=ss;sh*=ss;sr*=ss
+
+        ro+=po[:,None]*(opener_vals-opener_node[:,None])
+        rh+=(ph*p_open_given_h)[:,None]*(hero_vals-hero_node[:,None])
+        rr+=(po*O[:,1]*p_jam_given_o)[:,None]*(response_vals-response_node[:,None])
+
+        so+=po[:,None]*O
+        sh+=(ph*p_open_given_h)[:,None]*H
+        sr+=(po*O[:,1]*p_jam_given_o)[:,None]*R
+
+    def avg(x):
+        s=x.sum(axis=1,keepdims=True)
+        return np.divide(x,s,out=np.full_like(x,.5),where=s>1e-18)
+
+    O=avg(so);H=avg(sh);R=avg(sr)
+
+    # Recompute values under average strategies.
+    jam_weight=hero_given_opener*H[:,1][None,:]
+    p_jam_given_o=jam_weight.sum(axis=1)
+    cond_h_jam=np.divide(jam_weight,p_jam_given_o[:,None],out=np.zeros_like(jam_weight),where=p_jam_given_o[:,None]>0)
+    response_call=(cond_h_jam*opener_call).sum(axis=1)
+    response_vals=np.stack([np.full(169,u_jam_fold[opener]),response_call],axis=1)
+    response_current=(R*response_vals).sum(axis=1)
+    response_best=response_vals.max(axis=1)
+
+    open_weight=opener_given_hero*O[:,1][:,None]
+    p_open_given_h=open_weight.sum(axis=0)
+    cond_o_open=np.divide(open_weight,p_open_given_h[None,:],out=np.zeros_like(open_weight),where=p_open_given_h[None,:]>0)
+    hero_jam=(cond_o_open*(R[:,0][:,None]*u_jam_fold[hero]+R[:,1][:,None]*hero_call)).sum(axis=0)
+    hero_vals=np.stack([np.full(169,u_open_fold[hero]),hero_jam],axis=1)
+    hero_current=(H*hero_vals).sum(axis=1)
+    hero_gap=float((ph*p_open_given_h*(hero_vals.max(axis=1)-hero_current)).sum())
+
+    open_current=np.zeros(169)
+    open_best=np.zeros(169)
+    for i in range(169):
+        current_cont=H[:,0]*u_open_fold[opener]+H[:,1]*(R[i,0]*u_jam_fold[opener]+R[i,1]*opener_call[i,:])
+        best_cont=H[:,0]*u_open_fold[opener]+H[:,1]*response_best[i]
+        open_current[i]=(hero_given_opener[i,:]*current_cont).sum()
+        open_best[i]=(hero_given_opener[i,:]*best_cont).sum()
+
+    root_current=O[:,0]*base[opener]+O[:,1]*open_current
+    root_best=np.maximum(base[opener],open_best)
+    opener_gap=float((po*(root_best-root_current)).sum())
+    nashconv=hero_gap+opener_gap
+
+    return {
+      "openerOpen":O[:,1],
+      "heroJam":H[:,1],
+      "openerCall":R[:,1],
+      "heroEvs":hero_vals,
+      "openerResponseEvs":response_vals,
+      "nashconv":float(nashconv),
+      "baseEquities":base.tolist(),
+      "openSizeBb":open_size,
+      "risk":risk
+    }
+
 def strategy_rows(freqs,evs,aggressive_label,aggressive_kind):
     rows=[]
     for i,h in enumerate(HANDS):
@@ -370,6 +508,27 @@ ARCHETYPES=[
        tournament_type="PKO",hero_bounty=.075,villain_bounty=.04)
 ]
 
+RESHOVE_ARCHETYPES=[
+  {
+    "id":"reshove-late-12","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"CO","heroPosition":"BTN","openSizeBb":2.2,
+    "stacks":[38,34,30,12,24,22],"payouts":[.38,.24,.15,.10,.08,.05],
+    "phase":"LATE","fieldSize":"500","tournamentType":"REGULAR"
+  },
+  {
+    "id":"reshove-bubble-15","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"CO","heroPosition":"BTN","openSizeBb":2.2,
+    "stacks":[44,36,32,15,22,18],"payouts":[.40,.25,.16,.10,.09,0],
+    "phase":"BUBBLE","fieldSize":"500","tournamentType":"REGULAR"
+  },
+  {
+    "id":"reshove-late-18","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"HJ","heroPosition":"CO","openSizeBb":2.1,
+    "stacks":[46,31,18,28,24,20],"payouts":[.38,.24,.15,.10,.08,.05],
+    "phase":"LATE","fieldSize":"1000+","tournamentType":"REGULAR"
+  }
+]
+
 def main():
     if not EQ_PATH.exists(): raise SystemExit(f"missing equity matrix: {EQ_PATH}")
     equity,compat=load_equity()
@@ -418,6 +577,49 @@ def main():
             "tags":bb_tags},
           "strategy":strategy_rows(result["villain"],result["villain_evs"],"CALL","call")
         })
+    for a in RESHOVE_ARCHETYPES:
+        pay=[max(0.0,float(x)) for x in a["payouts"]]
+        total=sum(pay); pay=[x/total for x in pay]
+        aa={**a,"payouts":pay}
+        result=solve_reshove_game(aa,equity,compat)
+        print(a["id"],"reshove nashconv",result["nashconv"],flush=True)
+        if not math.isfinite(result["nashconv"]) or result["nashconv"]>MAX_NASHCONV:
+            rejected.append({"id":a["id"],"nashconv":result["nashconv"],"reason":"reshove_nashconv_above_gate"})
+            continue
+        positions=a["positions"]; opener=a["openerPosition"]; hero=a["heroPosition"]
+        oi=positions.index(opener); hi=positions.index(hero)
+        open_size=float(a["openSizeBb"])
+        current_stacks=dict(zip(positions,a["stacks"]))
+        current_stacks[opener]=max(0.0,current_stacks[opener]-open_size)
+        current_stacks["SB"]=max(0.0,current_stacks["SB"]-.5)
+        current_stacks["BB"]=max(0.0,current_stacks["BB"]-1.0)
+        spots.append({
+          "id":"icm-"+a["id"]+"-hero","solver":"STACKUP_ICM","version":"v1",
+          "solveId":"icm-"+a["id"]+"-hero",
+          "convergence":{"iterations":ITERATIONS,"nashConv":result["nashconv"],"gate":MAX_NASHCONV},
+          "scenario":{
+            "gameType":"TOURNAMENT","street":"PRE-FLOP","tableSize":len(positions),"trainingTableSize":len(positions),
+            "heroPosition":hero,"villainPosition":opener,"heroStack":float(a["stacks"][hi]),
+            "effectiveStack":min(float(a["stacks"][hi]),float(a["stacks"][oi])),
+            "pot":1.5+open_size,"currentBet":open_size,"board":[],"positions":positions,
+            "playerStacks":current_stacks,"phase":a["phase"],"fieldSize":a["fieldSize"],
+            "tournamentType":a["tournamentType"],"payouts":pay,
+            "actionHistory":[
+              {"position":"UTG","action":"FOLD","kind":"fold","to":0},
+              *([{"position":"HJ","action":"FOLD","kind":"fold","to":0}] if opener=="CO" else []),
+              {"position":opener,"action":"RAISE","kind":"raise","to":open_size}
+            ],
+            "tags":["reshove"],
+            "provenance":{
+              "strategySource":"STACKUP_ICM_RESHOVE_CFR",
+              "equitySource":"amaster97/poker_solver preflop_equity_169x169.npz",
+              "equityLicense":"MIT","utility":"EXACT_ICM",
+              "nashConv":result["nashconv"],"iterations":ITERATIONS
+            }
+          },
+          "strategy":strategy_rows(result["heroJam"],result["heroEvs"],"ALL IN","jam")
+        })
+
     payload={
       "schemaVersion":1,
       "generator":"scripts/generate-tournament-bank.py",
