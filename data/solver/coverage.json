@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-01T15:06:48.584Z",
+  "generatedAt": "2026-10-01T15:08:24.178Z",
   "minSpots": 1500,
   "counts": {
     "adjust": 58,
     "advance": 104,
     "total": 162
   },
-  "publishable": 126,
-  "incomplete": 36,
+  "publishable": 127,
+  "incomplete": 35,
   "cards": [
     {
       "section": "mode",
@@ -1710,7 +1710,7 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 0,
+      "baseSpots": 33,
       "available": 0,
       "publishable": false
     },
@@ -1721,9 +1721,9 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 33,
+      "available": 2377,
+      "publishable": true
     },
     {
       "section": "math_special",
