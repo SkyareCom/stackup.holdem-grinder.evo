@@ -13,6 +13,7 @@ const preflop=JSON.parse(await readFile(join(SOLVER_DIR,"preflop.json"),"utf8"))
 const postflop=JSON.parse(await readFile(join(SOLVER_DIR,"postflop.json"),"utf8"));
 const pushfold=JSON.parse(await readFile(join(SOLVER_DIR,"pushfold-hu-v1.json"),"utf8"));
 const tournament=JSON.parse(await readFile(join(SOLVER_DIR,"tournament.json"),"utf8"));
+const preflopDecisions=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-decisions.json"),"utf8"));
 
 const SUIT_PERMS=[
   {s:"s",h:"h",d:"d",c:"c"},
@@ -68,7 +69,7 @@ function pushfoldSpots(){
   }
   return out;
 }
-const all=[...preflop,...postflop,...pushfoldSpots(),...((tournament?.spots)||[])];
+const all=[...preflop,...postflop,...pushfoldSpots(),...((tournament?.spots)||[]),...((preflopDecisions?.spots)||[])];
 function transformCard(card,perm){
   const text=String(card||"");
   const m=text.match(/^(10|[2-9TJQKA])([cdhs])$/i);
