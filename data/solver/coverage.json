@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-01T15:00:14.360Z",
+  "generatedAt": "2026-10-01T15:04:58.010Z",
   "minSpots": 1500,
   "counts": {
     "adjust": 58,
     "advance": 104,
     "total": 162
   },
-  "publishable": 125,
-  "incomplete": 37,
+  "publishable": 126,
+  "incomplete": 36,
   "cards": [
     {
       "section": "mode",
@@ -1787,9 +1787,9 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 33,
+      "available": 98485,
+      "publishable": true
     }
   ]
 }
