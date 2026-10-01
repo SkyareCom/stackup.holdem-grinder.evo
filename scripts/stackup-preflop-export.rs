@@ -72,9 +72,12 @@ fn action_kind(a: PreflopAction) -> &'static str {
 
 fn position_rank(pos: &str) -> i32 {
     match pos {
-        "BTN" => 5,
-        "CO" => 4,
-        "HJ" => 3,
+        "BTN" => 8,
+        "CO" => 7,
+        "HJ" => 6,
+        "LJ" => 5,
+        "UTG+2" => 4,
+        "UTG+1" => 3,
         "UTG" => 2,
         "BB" => 1,
         "SB" => 0,
@@ -140,16 +143,16 @@ fn semantic_tags(state: &PreflopState, events: &[Event]) -> Vec<String> {
 
                 if hero == "BB" {
                     match open_pos {
-                        "UTG" => { tags.insert("bb_ep".to_string()); },
-                        "HJ" | "CO" => { tags.insert("bb_mp".to_string()); },
-                        "BTN" | "SB" => { tags.insert("bb_lp".to_string()); },
+                        "UTG" | "UTG+1" | "UTG+2" => { tags.insert("bb_ep".to_string()); },
+                        "LJ" | "HJ" => { tags.insert("bb_mp".to_string()); },
+                        "CO" | "BTN" | "SB" => { tags.insert("bb_lp".to_string()); },
                         _ => {}
                     }
                 }
                 if hero == "SB" {
                     match open_pos {
-                        "UTG" => { tags.insert("sb_ep".to_string()); },
-                        "HJ" => { tags.insert("sb_mp".to_string()); },
+                        "UTG" | "UTG+1" | "UTG+2" => { tags.insert("sb_ep".to_string()); },
+                        "LJ" | "HJ" => { tags.insert("sb_mp".to_string()); },
                         "CO" | "BTN" => { tags.insert("sb_cobtn".to_string()); },
                         _ => {}
                     }
@@ -297,7 +300,7 @@ fn walk(
             scenario: Scenario {
                 gameType: "TOURNAMENT".to_string(),
                 street: "PRE-FLOP".to_string(),
-                tableSize: 6,
+                tableSize: NUM_PLAYERS,
                 heroPosition: hero,
                 villainPosition: villain,
                 heroStack: hero_total,
