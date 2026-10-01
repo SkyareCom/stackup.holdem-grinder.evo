@@ -939,12 +939,16 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         <div class="stitle">${t.sec[s.id]}${dis?`<small>${t.note}</small>`:''}</div>
         <div class="tbody">${s.groups.map(g=>`
           ${(s.groups.length>1&&s.id!=='ttype')?`<div class="glabel">${t.grp[g.id]}</div>`:''}
-          ${true?`<div class="towers${g.tower?' mode':''}" style="grid-template-columns:repeat(${g.tower?3:g.cols},minmax(0,1fr))">${g.opts.map(o=>`<button class="tower${sel[g.id].has(o)?' on':''}" data-g="${g.id}" data-o="${o}" aria-pressed="${sel[g.id].has(o)}"${dis?' disabled':''}>${g.plain?'':((g.id==='street'||g.id==='phase'||g.id==='stack'||g.id==='pos'||g.special)&&o==='all'?ICONS.random:(g.id==='phase'&&o==='late'?ICONS.itm:(g.id==='stack'?ICONS[({'5bb':'<10 bb','10bb':'10–20 bb','15bb':'10–20 bb','18bb':'10–20 bb','20bb':'20–40 bb','25bb':'20–40 bb','30bb':'20–40 bb','50bb':'40–60 bb','100bb':'60–100 bb'})[o]]:(g.special?(ICONS[SPECIAL_ICON[o]]||ICONS.cbet):(g.id==='pos'&&o==='UTG+2'?ICONS['UTG+1']:(g.id==='pos'&&o==='LJ'?ICONS.MP:(ICONS[g.id+'_'+o]||ICONS[o])))))))}<b>${g.plain?lab(o):brk(g.id==='street'&&o==='all'?t.opt.random:(g.toggle&&!sel[g.id].has(o)?t.opt['no_'+o]:lab(o)))}</b></button>`).join('')}</div>`:
+          ${true?`<div class="towers${g.tower?' mode':''}" style="grid-template-columns:repeat(${g.tower?3:g.cols},minmax(0,1fr))">${g.opts.map(o=>`<button class="tower${sel[g.id].has(o)?' on':''}${coverageBlocked(g.id,o)?' coverage-off':''}" data-g="${g.id}" data-o="${o}" aria-pressed="${sel[g.id].has(o)}"${(dis||coverageBlocked(g.id,o))?' disabled':''}${coverageAttr(g.id,o)}>${g.plain?'':((g.id==='street'||g.id==='phase'||g.id==='stack'||g.id==='pos'||g.special)&&o==='all'?ICONS.random:(g.id==='phase'&&o==='late'?ICONS.itm:(g.id==='stack'?ICONS[({'5bb':'<10 bb','10bb':'10–20 bb','15bb':'10–20 bb','18bb':'10–20 bb','20bb':'20–40 bb','25bb':'20–40 bb','30bb':'20–40 bb','50bb':'40–60 bb','100bb':'60–100 bb'})[o]]:(g.special?(ICONS[SPECIAL_ICON[o]]||ICONS.cbet):(g.id==='pos'&&o==='UTG+2'?ICONS['UTG+1']:(g.id==='pos'&&o==='LJ'?ICONS.MP:(ICONS[g.id+'_'+o]||ICONS[o])))))))}<b>${g.plain?lab(o):brk(g.id==='street'&&o==='all'?t.opt.random:(g.toggle&&!sel[g.id].has(o)?t.opt['no_'+o]:lab(o)))}</b></button>`).join('')}</div>`:
           `<div class="chips" style="grid-template-columns:repeat(${g.cols},1fr)">${g.opts.map(o=>
-            `<button class="chip${sel[g.id].has(o)?' on':''}" data-g="${g.id}" data-o="${o}" aria-pressed="${sel[g.id].has(o)}"${dis?' disabled':''}>${lab(o)}</button>`).join('')}</div>`}`).join('')}
+            `<button class="chip${sel[g.id].has(o)?' on':''}${coverageBlocked(g.id,o)?' coverage-off':''}" data-g="${g.id}" data-o="${o}" aria-pressed="${sel[g.id].has(o)}"${(dis||coverageBlocked(g.id,o))?' disabled':''}${coverageAttr(g.id,o)}>${lab(o)}</button>`).join('')}</div>`}`).join('')}
         </div></section>`}).join('')+
 '';
   }
+  const coverageStyle=document.createElement('style');
+  coverageStyle.textContent='.tower.coverage-off,.chip.coverage-off{opacity:.28!important;filter:grayscale(1);cursor:not-allowed!important}.tower.coverage-off.on,.chip.coverage-off.on{box-shadow:none!important}';
+  document.head.appendChild(coverageStyle);
+
   tw.addEventListener('click',e=>{
     const h=e.target.closest('.thead');
     if(h){const id=h.parentElement.dataset.s;openSec=openSec===id?null:id;renderTrain();orgAll();
@@ -2210,7 +2214,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const g=s.groups[0],S=sel[g.id];
       return `<section class="advblock" data-adv-section="${s.id}">
         <div class="stitle">${t.sec[s.id]}</div>
-        <div class="towers advscenarios">${g.opts.map(o=>`<button class="tower${S.has(o)?' on':''}" data-ag="${g.id}" data-ao="${o}" aria-pressed="${S.has(o)}">${advIcon(o)}<b>${brk(o==='all'?t.opt.random:lab(o))}</b></button>`).join('')}</div>
+        <div class="towers advscenarios">${g.opts.map(o=>`<button class="tower${S.has(o)?' on':''}${coverageBlocked(g.id,o)?' coverage-off':''}" data-ag="${g.id}" data-ao="${o}" aria-pressed="${S.has(o)}"${coverageBlocked(g.id,o)?' disabled':''}${coverageAttr(g.id,o)}>${advIcon(o)}<b>${brk(o==='all'?t.opt.random:lab(o))}</b></button>`).join('')}</div>
       </section>`;
     }).join('');
   }
