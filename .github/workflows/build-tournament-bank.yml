@@ -1,0 +1,80 @@
+name: Build Tournament Bank
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/build-tournament-bank.yml"
+      - "scripts/generate-tournament-bank.py"
+      - "core/stackup-tournament-math.js"
+      - "core/stackup-scenario-catalog.js"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tournament-bank
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install numeric runtime
+        run: python -m pip install --disable-pip-version-check numpy
+
+      - name: Download pinned MIT preflop equity matrix
+        run: |
+          mkdir -p .stackup
+          curl --fail --location --retry 3 \
+            https://raw.githubusercontent.com/amaster97/poker_solver/f78f1b2bc338dd8cbb5226ecb8398bbdb3635676/assets/preflop_equity_169x169.npz \
+            --output .stackup/preflop_equity_169x169.npz
+          test -s .stackup/preflop_equity_169x169.npz
+
+      - name: Validate generator syntax
+        run: python -m py_compile scripts/generate-tournament-bank.py
+
+      - name: Generate exact-ICM tournament bank
+        env:
+          STACKUP_PREFLOP_EQUITY: ${{ github.workspace }}/.stackup/preflop_equity_169x169.npz
+          STACKUP_ICM_ITERATIONS: "8000"
+          STACKUP_ICM_MAX_NASHCONV: "0.0015"
+        run: python scripts/generate-tournament-bank.py
+
+      - name: Validate tournament bank
+        run: |
+          python - <<'PY'
+          import json, math
+          p=json.load(open("data/solver/tournament.json","r",encoding="utf-8"))
+          spots=p.get("spots",[])
+          assert spots, "tournament bank empty"
+          gate=float(p["maxNashConv"])
+          for s in spots:
+              nc=float(s["convergence"]["nashConv"])
+              assert math.isfinite(nc) and nc <= gate, (s["id"],nc,gate)
+              assert len(s.get("strategy",[])) == 169, s["id"]
+          print({"spots":len(spots),"rejected":len(p.get("rejected",[])),"gate":gate})
+          PY
+
+      - name: Commit tournament bank
+        run: |
+          git config user.name "StackUp Tournament Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/solver/tournament.json
+          if git diff --cached --quiet; then
+            echo "Tournament bank unchanged."
+            exit 0
+          fi
+          git commit -m "Generate exact-ICM tournament bank"
+          git pull --rebase origin main
+          git push
