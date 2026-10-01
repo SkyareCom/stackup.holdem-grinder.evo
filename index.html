@@ -2518,6 +2518,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   }
   function statsGrade(records){
     const c=statsCounts(records),s=c.technical;
+    if(!c.total)return {grade:'—',score:0,low:true};
     const grade=s>=85?'PRO':s>=70?'REG':s>=55?'REC':'INICIANTE';
     return {grade,score:s,low:c.total<10};
   }
@@ -2556,6 +2557,17 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const bySection=statsGroup(records,r=>(Array.isArray(r.sections)&&r.sections.length?r.sections:[r.street||'GERAL']));
     const sessionNames=new Map(statsAllSessions().map(s=>[s.id,s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt)]));
     const bySession=statsGroup(records,r=>sessionNames.get(r.sessionId)||formatHistoryDate(r.answeredAt));
+    if(!overall.total){
+      return {
+        records,
+        overall,
+        byTraining:[],
+        bySection:[],
+        bySession:[],
+        swot:{strengths:'—',weaknesses:'—',opportunities:'—',threats:'—'},
+        plan:['—']
+      };
+    }
     const strong=bySection.filter(x=>x.counts.total>=5&&x.grade.score>=75).slice(0,3);
     const weak=[...bySection].filter(x=>x.counts.total>=3&&x.grade.score<65).sort((a,b)=>a.grade.score-b.grade.score).slice(0,3);
     const adjustable=[...bySection].filter(x=>x.counts.total>=3&&x.counts.adjustable/x.counts.total>=.25).slice(0,3);
@@ -2583,6 +2595,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const c=group.counts,g=group.grade,tx=statsText();
     return '<div class="'+kind+'"><div class="statsminipie" style="'+statsPieStyle(c)+'"></div><div><b>'+statsEsc(group.name)+'</b><span>'+c.total+' '+tx.spots+' · '+c.correct+' '+tx.correct.toLowerCase()+' · '+c.accuracy.toFixed(1).replace('.',',')+'%</span>'+(g.low?'<small class="statssample">'+tx.lowSample+'</small>':'')+'</div><div class="statsgrade">'+g.grade+'</div></div>';
   }
+  function statsZeroRow(kind){
+    const tx=statsText(),zero={total:0,correct:0,adjustable:0,incorrect:0,unknown:0,accuracy:0,technical:0};
+    return '<div class="'+kind+'"><div class="statsminipie" style="'+statsPieStyle(zero)+'"></div><div><b>—</b><span>0 '+tx.spots+' · 0 '+tx.correct.toLowerCase()+' · 0,0%</span></div><div class="statsgrade">—</div></div>';
+  }
   function renderStats(){
     const tx=statsText(),all=statsAllRecords(),sessions=statsAllSessions();
     const trainings=[...new Set(all.map(x=>String(x.training||'TREINO GERAL')))].sort();
@@ -2590,15 +2606,16 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const sessionOpts=sessions.map(s=>({value:s.id,label:(s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt))})).sort((a,b)=>a.label.localeCompare(b.label));
     const filters='<div class="statsfilters"><select data-stats-filter="training" aria-label="'+tx.training+'">'+statsOptions(trainings.map(x=>({value:x,label:tx.training+' · '+x})),statsTrainingFilter,tx.training+' · '+tx.all)+'</select><select data-stats-filter="section" aria-label="'+tx.section+'">'+statsOptions(sections.map(x=>({value:x,label:tx.section+' · '+x})),statsSectionFilter,tx.section+' · '+tx.all)+'</select><select data-stats-filter="session" aria-label="'+tx.session+'">'+statsOptions(sessionOpts,statsSessionFilter,tx.session+' · '+tx.all)+'</select></div>';
     const records=statsFilteredRecords(),model=statsModel(records),c=model.overall;
-    if(!records.length){statsPanel.innerHTML=filters+'<div class="statsempty">'+tx.empty+'</div>';return;}
+    const hasData=records.length>0;
     const kpis='<div class="statsgrid"><div class="statskpi"><b>'+c.total+'</b><span>'+tx.spots+'</span></div><div class="statskpi"><b>'+c.correct+'</b><span>'+tx.correct+'</span></div><div class="statskpi"><b>'+c.accuracy.toFixed(1).replace('.',',')+'%</b><span>'+tx.accuracy+'</span></div><div class="statskpi"><b>'+c.adjustable+'</b><span>'+tx.adjustable+'</span></div><div class="statskpi"><b>'+c.incorrect+'</b><span>'+tx.incorrect+'</span></div><div class="statskpi"><b>'+new Set(records.map(x=>x.sessionId)).size+'</b><span>'+tx.sessions+'</span></div></div>';
     const pie='<div class="statscard"><div class="statshead">'+tx.overview+'</div><div class="statspiebox"><div class="statspiewrap"><div class="statspie" style="'+statsPieStyle(c)+'"></div><div class="statspievalue">'+c.accuracy.toFixed(1).replace('.',',')+'%<br>'+tx.accuracy+'</div></div><div class="statslegend"><span><i style="background:var(--c-accent-text)"></i>'+tx.correct+' · '+c.correct+'</span><span><i style="background:rgba(255,255,255,.62)"></i>'+tx.adjustable+' · '+c.adjustable+'</span><span><i style="background:rgba(255,255,255,.22)"></i>'+tx.incorrect+' · '+c.incorrect+'</span></div></div></div>';
-    const trainingsHtml='<div class="statscard"><div class="statshead">'+tx.byTraining+'</div><div class="statslist">'+model.byTraining.map(x=>statsMiniRow(x,'statstraining')).join('')+'</div></div>';
-    const sectionsHtml='<div class="statscard"><div class="statshead">'+tx.bySection+'</div><div class="statslist">'+model.bySection.map(x=>statsMiniRow(x,'statssubject')).join('')+'</div></div>';
-    const sessionsHtml='<div class="statscard"><div class="statshead">'+tx.bySession+'</div><div class="statslist">'+model.bySession.slice(0,20).map(x=>statsMiniRow(x,'statssession')).join('')+'</div></div>';
+    const trainingsHtml='<div class="statscard"><div class="statshead">'+tx.byTraining+'</div><div class="statslist">'+(hasData?model.byTraining.map(x=>statsMiniRow(x,'statstraining')).join(''):statsZeroRow('statstraining'))+'</div></div>';
+    const sectionsHtml='<div class="statscard"><div class="statshead">'+tx.bySection+'</div><div class="statslist">'+(hasData?model.bySection.map(x=>statsMiniRow(x,'statssubject')).join(''):statsZeroRow('statssubject'))+'</div></div>';
+    const sessionsHtml='<div class="statscard"><div class="statshead">'+tx.bySession+'</div><div class="statslist">'+(hasData?model.bySession.slice(0,20).map(x=>statsMiniRow(x,'statssession')).join(''):statsZeroRow('statssession'))+'</div></div>';
     const sw='<div class="statscard"><div class="statshead">'+tx.swot+'</div><div class="statsswot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></div>';
     const plan='<div class="statscard"><div class="statshead">'+tx.improve+'</div><div class="statsplan">'+model.plan.map(x=>'<p>'+statsEsc(x)+'</p>').join('')+'</div></div>';
-    const contact='<div class="statscard"><div class="statshead">'+tx.contact+'</div><div class="statscontact"><input type="email" data-stats-email placeholder="'+tx.email+'"><input type="tel" data-stats-phone placeholder="'+tx.whatsapp+'"><div class="statscontactrow"><button data-stats-export="html">'+tx.html+'</button><button data-stats-export="pdf">'+tx.pdf+'</button></div><div class="statscontactrow"><button data-stats-export="email">'+tx.sendEmail+'</button><button data-stats-export="whatsapp">'+tx.sendWhatsapp+'</button></div><button data-stats-export="share">'+tx.share+'</button></div></div>';
+    const disabled=hasData?'':' disabled aria-disabled="true"';
+    const contact='<div class="statscard"><div class="statshead">'+tx.contact+'</div><div class="statscontact"><input type="email" data-stats-email placeholder="'+tx.email+'"'+disabled+'><input type="tel" data-stats-phone placeholder="'+tx.whatsapp+'"'+disabled+'><div class="statscontactrow"><button data-stats-export="html"'+disabled+'>'+tx.html+'</button><button data-stats-export="pdf"'+disabled+'>'+tx.pdf+'</button></div><div class="statscontactrow"><button data-stats-export="email"'+disabled+'>'+tx.sendEmail+'</button><button data-stats-export="whatsapp"'+disabled+'>'+tx.sendWhatsapp+'</button></div><button data-stats-export="share"'+disabled+'>'+tx.share+'</button></div></div>';
     statsPanel.innerHTML=filters+kpis+pie+trainingsHtml+sectionsHtml+sessionsHtml+sw+plan+contact;
   }
   function statsReportText(model){
