@@ -595,8 +595,11 @@
 
   function contextualChipEvSpots(bank,filters){
     if(filters.opponentProfile||filters.extras.length)return [];
-    const dcfr=[...(bank?.preflop||[]),...(bank?.postflop||[])]
-      .filter(s=>String(s?.solver||'')==='DCFR_SOLVER');
+    const dcfr=[
+      ...(bank?.preflop||[]),
+      ...(bank?.postflop||[]),
+      ...((bank?.preflopDecisions?.spots)||[])
+    ].filter(s=>String(s?.solver||'')==='DCFR_SOLVER');
     if(!dcfr.length)return [];
 
     const cash=filters.gameType==='CASH';
@@ -607,33 +610,61 @@
     const contextOnly=!cash&&!requestedPhases.length&&(
       !!filters.tournamentType||!!filters.fieldSize
     );
-    if(!cash&&!chipEvPhase&&!contextOnly)return [];
+
+    // Sparse preflop semantic cards may safely use two explicitly different
+    // chip-EV contexts when the user did not request a tournament context.
+    // Strategy remains the exact same DCFR solution; only context changes.
+    const specialGroups=Object.keys(filters.special||{}).filter(k=>Array.isArray(filters.special[k])&&filters.special[k].length);
+    const semanticPreflop=specialGroups.length>0&&specialGroups.every(k=>['pre_special','blind_special','aggr_special'].includes(k));
+
+    if(!cash&&!chipEvPhase&&!contextOnly&&!semanticPreflop)return [];
     if(filters.tournamentType==='PKO')return [];
 
-    const phases=cash?[null]:(chipEvPhase?requestedPhases:['EARLY']);
-    const tournamentTypes=cash?[null]:[filters.tournamentType||'REGULAR'];
-    const fields=cash?[null]:[filters.fieldSize||'100'];
+    const contexts=[];
+    if(semanticPreflop&&!filters.gameType&&!requestedPhases.length&&!filters.tournamentType&&!filters.fieldSize){
+      contexts.push(
+        {gameType:'CASH',phase:null,tournamentType:null,fieldSize:null,projection:'CASH_CHIP_EV_EQUIVALENCE'},
+        {gameType:'TOURNAMENT',phase:'EARLY',tournamentType:'REGULAR',fieldSize:'100',projection:'EARLY_CHIP_EV_EQUIVALENCE'}
+      );
+    }else if(cash){
+      contexts.push({gameType:'CASH',phase:null,tournamentType:null,fieldSize:null,projection:'CASH_CHIP_EV_EQUIVALENCE'});
+    }else{
+      const phases=chipEvPhase?requestedPhases:['EARLY'];
+      for(const phase of phases)contexts.push({
+        gameType:'TOURNAMENT',
+        phase,
+        tournamentType:filters.tournamentType||'REGULAR',
+        fieldSize:filters.fieldSize||'100',
+        projection:'EARLY_MIDDLE_CHIP_EV_EQUIVALENCE'
+      });
+    }
 
     const out=[];
     for(const base of dcfr){
-      for(const phase of phases)for(const tournamentType of tournamentTypes)for(const fieldSize of fields){
+      for(const ctx of contexts){
         const spot=clone(base);
         const s=spot.scenario||(spot.scenario={});
-        s.gameType=cash?'CASH':'TOURNAMENT';
-        if(cash){
+        s.gameType=ctx.gameType;
+        if(ctx.gameType==='CASH'){
           delete s.phase;delete s.tournamentType;delete s.fieldSize;delete s.extras;
         }else{
-          s.phase=phase;
-          s.tournamentType=tournamentType;
-          s.fieldSize=fieldSize;
+          s.phase=ctx.phase;
+          s.tournamentType=ctx.tournamentType;
+          s.fieldSize=ctx.fieldSize;
+          if(ctx.phase==='EARLY'){
+            const tags=new Set(Array.isArray(s.tags)?s.tags:[]);
+            const aggressive=(spot.strategy||[]).some(h=>(h.actions||[]).some(a=>['raise','jam'].includes(String(a.kind||'').toLowerCase())&&Number(a.frequency||0)>=5));
+            if(aggressive)tags.add('chip_up');
+            s.tags=[...tags];
+          }
         }
         s.provenance={
           ...(s.provenance||{}),
           strategySource:'DCFR_SOLVER',
-          contextProjection:cash?'CASH_CHIP_EV_EQUIVALENCE':'EARLY_MIDDLE_CHIP_EV_EQUIVALENCE'
+          contextProjection:ctx.projection
         };
-        spot.id=(cash?'cash-':'mtt-context-')+String(base.id||base.solveId||'dcfr')+'-'+String(phase||'cash')+'-'+String(tournamentType||'none')+'-'+String(fieldSize||'none');
-        spot.solveId=String(base.solveId||base.id||'dcfr')+'|context|'+String(phase||'cash')+'|'+String(tournamentType||'none')+'|'+String(fieldSize||'none');
+        spot.id='ctx-'+String(base.id||base.solveId||'dcfr')+'-'+String(ctx.gameType)+'-'+String(ctx.phase||'none')+'-'+String(ctx.tournamentType||'none')+'-'+String(ctx.fieldSize||'none');
+        spot.solveId=String(base.solveId||base.id||'dcfr')+'|context|'+String(ctx.gameType)+'|'+String(ctx.phase||'none')+'|'+String(ctx.tournamentType||'none')+'|'+String(ctx.fieldSize||'none');
         out.push(spot);
       }
     }
