@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-10-01T04:46:55.354Z",
+  "generatedAt": "2026-10-01T04:48:23.051Z",
   "minSpots": 1500,
   "counts": {
     "adjust": 58,
     "advance": 104,
     "total": 162
   },
-  "publishable": 72,
-  "incomplete": 90,
+  "publishable": 78,
+  "incomplete": 84,
   "cards": [
     {
       "section": "mode",
@@ -1699,9 +1699,9 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 58,
+      "available": 76908,
+      "publishable": true
     },
     {
       "section": "math_special",
@@ -1732,9 +1732,9 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 58,
+      "available": 76908,
+      "publishable": true
     },
     {
       "section": "math_special",
@@ -1743,9 +1743,9 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 35,
+      "available": 92845,
+      "publishable": true
     },
     {
       "section": "math_special",
@@ -1754,9 +1754,9 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 58,
+      "available": 76908,
+      "publishable": true
     },
     {
       "section": "math_special",
@@ -1765,9 +1765,9 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 35,
+      "available": 92845,
+      "publishable": true
     },
     {
       "section": "math_special",
@@ -1776,9 +1776,9 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 0,
-      "available": 0,
-      "publishable": false
+      "baseSpots": 30,
+      "available": 86215,
+      "publishable": true
     },
     {
       "section": "math_special",
