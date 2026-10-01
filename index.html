@@ -2355,18 +2355,48 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     tr(); syncBack();
   }
   function openApp(){
-    hist=[];
-    Object.keys(sub).forEach(k=>sub[k]=[]);
-    $$('.hbtn').forEach(x=>x.classList.remove('on'));
+    // A entrada precisa funcionar mesmo que alguma sincronização secundária falhe.
     host.hidden=false;
     host.removeAttribute('hidden');
+    host.style.display='flex';
     loginScreen.inert=true;
     loginScreen.style.display='none';
-    show('home',false,0);
-    const content=$('.content');
-    if(content)content.scrollTop=0;
-    renderHome();
-    requestAnimationFrame(()=>tr());
+
+    try{
+      hist=[];
+      Object.keys(sub).forEach(k=>sub[k]=[]);
+      $('.hbtn').forEach(x=>x.classList.remove('on'));
+      cur='home';
+      sub.home.length=0;
+      const content=$('.content');
+      if(content)content.scrollTop=0;
+
+      // HOME primeiro: conteúdo visível antes de qualquer rotina de SPOTS/ADVANCE.
+      renderHome();
+      hg.hidden=false;
+      const slot=$('#page .slot');
+      if(slot)slot.hidden=true;
+      const ptitle=$('#ptitle');
+      const sectiontitle=$('#sectiontitle');
+      if(ptitle)ptitle.textContent=T2[L()].ti_home;
+      if(sectiontitle)sectiontitle.textContent=T2[L()].ti_home;
+      $('.tab').forEach(x=>{
+        const on=x.dataset.t==='home';
+        x.classList.toggle('on',on);
+        if(on)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current');
+      });
+
+      // Sincronizações completas vêm depois. Se alguma falhar, HOME já está aberta.
+      try{tr();syncBack();}catch(_){}
+      requestAnimationFrame(()=>{try{tr();}catch(_){}});
+    }catch(_){
+      // Nunca voltar para o login por uma falha interna de renderização.
+      host.hidden=false;
+      host.removeAttribute('hidden');
+      host.style.display='flex';
+      loginScreen.inert=true;
+      loginScreen.style.display='none';
+    }
   }
   host.grinderEnter=openApp;
   function backToLogin(){
@@ -2587,6 +2617,57 @@ html body #biometricLoginCard{opacity:1!important;filter:none!important;cursor:p
 })();
 </script>
 
+<script id="biometricEntryOverride">
+(function(){
+  function bind(){
+    var old=document.getElementById('biometricLoginCard');
+    if(!old)return;
+    var bio=old.cloneNode(true);
+    old.replaceWith(bio);
+    bio.disabled=false;
+    bio.removeAttribute('disabled');
+    bio.classList.remove('login-disabled');
+    bio.setAttribute('aria-disabled','false');
+    bio.tabIndex=0;
+
+    var entered=false;
+    function enter(e){
+      if(e){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();}
+      if(entered)return;
+      entered=true;
+      bio.classList.add('on');
+
+      var app=document.getElementById('app2');
+      var login=document.querySelector('main.screen');
+      if(!app){entered=false;return;}
+
+      // Torna o container visível antes de chamar a lógica interna.
+      app.hidden=false;
+      app.removeAttribute('hidden');
+      app.style.display='flex';
+      if(login){login.inert=true;login.style.display='none';}
+
+      try{
+        if(typeof app.grinderEnter==='function')app.grinderEnter();
+      }catch(_){
+        // O container já está aberto; não devolver o usuário ao login.
+      }
+
+      // Garantia final para navegadores Android/TWA.
+      app.hidden=false;
+      app.removeAttribute('hidden');
+      app.style.display='flex';
+      if(login){login.inert=true;login.style.display='none';}
+    }
+
+    bio.addEventListener('click',enter,{capture:true});
+    bio.addEventListener('pointerup',enter,{capture:true});
+    bio.addEventListener('touchend',enter,{capture:true,passive:false});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});
+  else bind();
+})();
+</script>
 <script id="grinderSplashScript">
 /* GRINDER splash timing mirrors the WRAPS opening while remaining isolated. */
 (function(){
