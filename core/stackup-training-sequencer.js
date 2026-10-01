@@ -528,6 +528,92 @@
     return tags;
   }
 
+  function exactCardsFromHand(hand){
+    const text=String(hand||'').replace(/10/g,'T');
+    const m=text.match(/^([2-9TJQKA])([cdhs])([2-9TJQKA])([cdhs])$/i);
+    return m?[m[1].toUpperCase()+m[2].toLowerCase(),m[3].toUpperCase()+m[4].toLowerCase()]:[];
+  }
+
+  function cardRankValue(card){
+    const r=String(card||'').slice(0,-1).toUpperCase();
+    return ({2:2,3:3,4:4,5:5,6:6,7:7,8:8,9:9,T:10,J:11,Q:12,K:13,A:14})[r]||0;
+  }
+
+  function drawProfile(spot,hand){
+    const hero=exactCardsFromHand(hand);
+    const board=(spot?.scenario?.board||[]).map(x=>String(x).replace(/^10/i,'T'));
+    if(hero.length!==2||board.length<3||board.length>4)return null;
+    const cards=[...hero,...board];
+
+    const suits={};
+    for(const card of cards){
+      const suit=card.slice(-1).toLowerCase();
+      (suits[suit]??=[]).push(card);
+    }
+    let flushDraw=false,nonNutFlushDraw=false;
+    for(const [suit,suitCards] of Object.entries(suits)){
+      if(suitCards.length!==4)continue;
+      const boardSuit=board.filter(x=>x.slice(-1).toLowerCase()===suit);
+      const heroSuit=hero.filter(x=>x.slice(-1).toLowerCase()===suit);
+      if(!heroSuit.length)continue;
+      flushDraw=true;
+
+      const boardRanks=new Set(boardSuit.map(cardRankValue));
+      const heroRanks=new Set(heroSuit.map(cardRankValue));
+      let nutRank=14;
+      while(nutRank>=2&&boardRanks.has(nutRank))nutRank--;
+      if(nutRank>=2&&!heroRanks.has(nutRank))nonNutFlushDraw=true;
+    }
+
+    const allRanks=new Set(cards.map(cardRankValue).filter(Boolean));
+    if(allRanks.has(14))allRanks.add(1);
+    const heroRanks=new Set(hero.map(cardRankValue));
+    if(heroRanks.has(14))heroRanks.add(1);
+    let madeStraight=false,straightDraw=false;
+    for(let low=1;low<=10;low++){
+      const window=[low,low+1,low+2,low+3,low+4];
+      const present=window.filter(r=>allRanks.has(r));
+      if(present.length===5)madeStraight=true;
+      if(present.length===4&&present.some(r=>heroRanks.has(r)))straightDraw=true;
+    }
+    if(madeStraight)straightDraw=false;
+
+    return Object.freeze({
+      flushDraw,
+      nonNutFlushDraw,
+      straightDraw,
+      anyDraw:flushDraw||straightDraw
+    });
+  }
+
+  function spotFacesAggression(spot){
+    const s=spot?.scenario||{};
+    const hero=normPosition(s.heroPosition);
+    const h=Array.isArray(s.actionHistory)?s.actionHistory:[];
+    const last=h[h.length-1]||null;
+    if(!last)return false;
+    const actor=normPosition(last.position||last.player||last.actor);
+    const kind=String(last.kind||last.action||'').toLowerCase();
+    return actor!==hero&&/raise|bet|jam|all\s*-?\s*in/.test(kind);
+  }
+
+  const HAND_LEVEL_MATH=new Set(['implied_odds','reverse_implied_odds']);
+
+  function candidateMathCompatible(spot,hand,special){
+    const requested=(special?.math_special||[]).map(String).filter(x=>HAND_LEVEL_MATH.has(x));
+    if(!requested.length)return true;
+    const street=normStreet(spot?.scenario?.street);
+    if(!['FLOP','TURN'].includes(street))return false;
+    const profile=drawProfile(spot,hand);
+    if(!profile)return false;
+
+    return requested.some(id=>{
+      if(id==='implied_odds')return spotFacesAggression(spot)&&profile.anyDraw;
+      if(id==='reverse_implied_odds')return profile.nonNutFlushDraw;
+      return false;
+    });
+  }
+
   function specialStreetCompatible(spot,special){
     const street=normStreet(spot?.scenario?.street);
     for(const [section,values] of Object.entries(special||{})){
@@ -548,7 +634,11 @@
     if(!groups.length)return true;
     if(!specialStreetCompatible(spot,special))return false;
     const tags=spotTags(spot);
-    return groups.every(([,values])=>values.some(x=>tags.has(String(x))));
+    return groups.every(([section,values])=>{
+      const spotLevel=values.map(String).filter(x=>!(section==='math_special'&&HAND_LEVEL_MATH.has(x)));
+      if(!spotLevel.length)return true;
+      return spotLevel.some(x=>tags.has(x));
+    });
   }
 
   function compatible(spot,filters){
@@ -747,6 +837,7 @@
       const hands=(spot.strategy||[]).filter(h=>h?.hand&&Array.isArray(h.actions)&&h.actions.length);
       for(let handIndex=0;handIndex<hands.length;handIndex++){
         const hand=String(hands[handIndex].hand);
+        if(!candidateMathCompatible(spot,hand,filters.special))continue;
         const classCombos=normStreet(spot?.scenario?.street)==='PRE-FLOP'&&!isExactHand(hand)?handClassCombos(hand):[];
         if(classCombos.length){
           for(const heroCards of classCombos){
@@ -902,6 +993,8 @@
     handClassCombos,
     contextualChipEvSpots,
     ljEquivalentSpots,
+    drawProfile,
+    candidateMathCompatible,
     coverageFloor,
     pick,
     stats,
