@@ -340,6 +340,91 @@ fn walk(
     }
 }
 
+
+fn combo_count(hand: &str) -> usize {
+    if hand.len() < 2 { return 0; }
+    let chars: Vec<char> = hand.chars().collect();
+    if chars[0] == chars[1] { return 6; }
+    if hand.ends_with('s') { return 4; }
+    if hand.ends_with('o') { return 12; }
+    0
+}
+
+fn spot_combo_count(spot: &Spot) -> usize {
+    spot.strategy.iter().map(|h| combo_count(&h.hand)).sum()
+}
+
+fn target_tags() -> HashSet<&'static str> {
+    [
+        "limping","bb_ep","bb_mp","bb_lp","sb_ep","sb_mp","sb_cobtn",
+        "attack_cobtn","cobtn_vs_raise","cobtn","open_by_pos","vs_open_ip",
+        "vs_open_oop","cold_call","blind_war","bb_limpers","sb_limp_call",
+        "sb_limp_raise","iso_limpers","limp_raise","squeeze","facing_4bet",
+        "cold_call_4bet","raise_vs_3bet","3bet_ip","3bet_oop","call_3bet",
+        "fold_to_3bet","call_4bet","cold_4bet"
+    ].into_iter().collect()
+}
+
+fn compact_for_training(spots: Vec<Spot>) -> (Vec<Spot>, serde_json::Value) {
+    const TARGET_PER_TAG: usize = 2200;
+    const MAX_NODES_PER_TAG: usize = 8;
+
+    let targets = target_tags();
+    let mut tag_to_indices: std::collections::BTreeMap<String, Vec<usize>> = std::collections::BTreeMap::new();
+    for (idx, spot) in spots.iter().enumerate() {
+        for tag in &spot.scenario.tags {
+            if targets.contains(tag.as_str()) {
+                tag_to_indices.entry(tag.clone()).or_default().push(idx);
+            }
+        }
+    }
+
+    for indices in tag_to_indices.values_mut() {
+        indices.sort_by_key(|&i| std::cmp::Reverse(spot_combo_count(&spots[i])));
+    }
+
+    let mut selected = BTreeSet::new();
+    let mut report = serde_json::Map::new();
+
+    for tag in targets.iter() {
+        let mut covered = 0usize;
+        let mut nodes = 0usize;
+        if let Some(indices) = tag_to_indices.get(*tag) {
+            for &idx in indices {
+                if nodes >= MAX_NODES_PER_TAG || covered >= TARGET_PER_TAG { break; }
+                let count = spot_combo_count(&spots[idx]);
+                if count == 0 { continue; }
+                selected.insert(idx);
+                covered += count;
+                nodes += 1;
+            }
+        }
+        report.insert((*tag).to_string(), serde_json::json!({
+            "candidateCombos": covered,
+            "selectedNodes": nodes,
+            "target": TARGET_PER_TAG
+        }));
+    }
+
+    // Keep a small, diverse RFI backbone even when another bank already contains root charts.
+    // These nodes are useful as cross-checks and do not materially increase bundle size.
+    let mut rfi_by_pos: std::collections::BTreeMap<String, usize> = std::collections::BTreeMap::new();
+    for (idx, spot) in spots.iter().enumerate() {
+        if !spot.scenario.tags.iter().any(|t| t=="open_by_pos") { continue; }
+        let pos=spot.scenario.heroPosition.clone();
+        let count=spot_combo_count(spot);
+        let replace=rfi_by_pos.get(&pos).map(|&old| count>spot_combo_count(&spots[old])).unwrap_or(true);
+        if replace { rfi_by_pos.insert(pos,idx); }
+    }
+    for idx in rfi_by_pos.values() { selected.insert(*idx); }
+
+    let compact: Vec<Spot> = spots.into_iter().enumerate()
+        .filter_map(|(idx,spot)| if selected.contains(&idx) { Some(spot) } else { None })
+        .collect();
+
+    (compact, serde_json::Value::Object(report))
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<String> = std::env::args().collect();
     if args.len() != 3 {
@@ -354,6 +439,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut events = Vec::new();
     let mut seen = HashSet::new();
     walk(&bp, root, &mut history, &mut events, &mut seen, &mut spots);
+    let raw_nodes = spots.len();
+    let (spots, coverage_report) = compact_for_training(spots);
 
     let payload = serde_json::json!({
         "schemaVersion":1,
@@ -364,6 +451,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "license":"MIT"
         },
         "iterations":bp.iterations,
+        "rawDecisionNodes":raw_nodes,
+        "publishedDecisionNodes":spots.len(),
+        "selectionTargetCombosPerTag":2200,
+        "coverageReport":coverage_report,
         "spots":spots
     });
     std::fs::write(&args[2], serde_json::to_vec(&payload)?)?;
