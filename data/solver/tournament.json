@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "generator": "pending",
+  "iterations": 0,
+  "maxNashConv": 0.0015,
+  "equityUpstream": {
+    "repository": "amaster97/poker_solver",
+    "license": "MIT",
+    "commit": "f78f1b2bc338dd8cbb5226ecb8398bbdb3635676",
+    "asset": "assets/preflop_equity_169x169.npz"
+  },
+  "spots": [],
+  "rejected": []
+}
