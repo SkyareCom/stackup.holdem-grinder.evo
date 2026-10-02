@@ -3,9 +3,20 @@
   'use strict';
   const KEY='stackup.grinder.personal.trainings.v1';
   const MAX=120;
+  let memory=null;
 
-  function read(){try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[];}catch(_){return [];}}
-  function write(v){try{localStorage.setItem(KEY,JSON.stringify((v||[]).slice(0,MAX)));return true;}catch(_){return false;}}
+  function read(){
+    if(Array.isArray(memory))return memory;
+    try{
+      const v=JSON.parse(localStorage.getItem(KEY)||'[]');
+      memory=Array.isArray(v)?v:[];
+    }catch(_){memory=[];}
+    return memory;
+  }
+  function write(v){
+    memory=(v||[]).slice(0,MAX);
+    try{localStorage.setItem(KEY,JSON.stringify(memory));return true;}catch(_){return false;}
+  }
   function id(){try{if(crypto?.randomUUID)return crypto.randomUUID();}catch(_){}return 'personal-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);}
   function clean(x){
     const now=new Date().toISOString();
@@ -85,12 +96,17 @@
     const idv=String(v),items=read().map(clean),next=items.filter(x=>x.id!==idv&&x.externalKey!==idv);
     write(next);return items.length-next.length;
   }
-  function clear(){try{localStorage.removeItem(KEY);return true;}catch(_){return false;}}
+  function clear(){
+    memory=[];
+    try{localStorage.removeItem(KEY);return true;}catch(_){return false;}
+  }
 
   function markReminder(v,when){
     const item=get(v);if(!item)return null;
     return upsert({...item,lastReminderAt:String(when||new Date().toISOString())});
   }
+
+  window.addEventListener?.('storage',event=>{if(String(event?.key||'')===KEY)memory=null;});
 
   global.StackUpPersonalTraining=Object.freeze({list,get,upsert,setStatus,remove,clear,relevance,markReminder});
 })(window);
