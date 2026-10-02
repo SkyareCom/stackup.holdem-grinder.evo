@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="filter-compatibility-v1">
+<meta name="grinder-build" content="stats-report-library-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -797,6 +797,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 <script src="core/stackup-spot-coach.js"></script>
 <script src="core/stackup-training-history.js"></script>
 <script src="core/stackup-training-performance.js"></script>
+<script src="core/stackup-report-library.js"></script>
 <script>
 (function(){
   /* REGRA DE TRADUCAO: todo novo item deve ser criado simultaneamente em PT, EN e ES. */
@@ -2612,7 +2613,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   R.appendChild(statsPremiumStyle);
 
   const statsPanel=document.createElement('div');statsPanel.className='statspanel';statsPanel.hidden=true;$('#page').appendChild(statsPanel);
-  let statsTrainingFilter='all',statsSectionFilter='all',statsSessionFilter='all',statsView='overview';
+  let statsTrainingFilter='all',statsSectionFilter='all',statsSessionFilter='all',statsView='overview',statsReportOverride=null;
 
   function statsText(){return STATS_TEXT[L()]||STATS_TEXT.pt;}
   function statsLegacyRecords(){
@@ -2674,8 +2675,19 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     });
     return [...m.entries()].map(([name,items])=>({name,items,counts:statsCounts(items),grade:statsGrade(items)})).sort((a,b)=>b.counts.total-a.counts.total||b.grade.score-a.grade.score);
   }
+  function statsRecordKey(record){
+    if(record?.id)return 'id:'+String(record.id);
+    return [
+      String(record?.sessionId||''),
+      String(record?.answeredAt||''),
+      String(record?.spotId||''),
+      String(record?.hand||''),
+      String(record?.status||'')
+    ].join('|');
+  }
   function statsFilteredRecords(){
-    return statsAllRecords().filter(r=>{
+    const source=statsReportOverride?.records?.length?statsReportOverride.records:statsAllRecords();
+    return source.filter(r=>{
       if(statsTrainingFilter!=='all'&&String(r.training||'')!==statsTrainingFilter)return false;
       const sections=(Array.isArray(r.sections)&&r.sections.length?r.sections:[r.street||'GERAL']).map(String);
       if(statsSectionFilter!=='all'&&!sections.includes(statsSectionFilter))return false;
@@ -3029,7 +3041,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const sw='<div class="statscard premium"><div class="statshead premium"><span>'+tx.swot+'</span><small>'+(L()==='en'?'performance reading':L()==='es'?'lectura de rendimiento':'leitura de desempenho')+'</small></div><div class="statsswot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></div>';
     const plan='<div class="statscard premium"><div class="statshead premium"><span>'+tx.improve+'</span><small>'+(L()==='en'?'next steps':L()==='es'?'próximos pasos':'próximos passos')+'</small></div><div class="statsplan">'+model.plan.map((x,i)=>'<p><b>'+(i+1)+'.</b> '+statsEsc(x)+'</p>').join('')+'</div></div>';
     const disabled=hasData?'':' disabled aria-disabled="true"';
-    const contact='<div class="statscard premium"><div class="statshead premium"><span>'+tx.contact+'</span><small>HTML / PDF / E-MAIL / WHATSAPP</small></div><div class="statscontact"><input type="email" data-stats-email placeholder="'+tx.email+'"'+disabled+'><input type="tel" data-stats-phone placeholder="'+tx.whatsapp+'"'+disabled+'><div class="statscontactrow"><button data-stats-export="html"'+disabled+'>'+tx.html+'</button><button data-stats-export="pdf"'+disabled+'>'+tx.pdf+'</button></div><div class="statscontactrow"><button data-stats-export="email"'+disabled+'>'+tx.sendEmail+'</button><button data-stats-export="whatsapp"'+disabled+'>'+tx.sendWhatsapp+'</button></div><button data-stats-export="share"'+disabled+'>'+tx.share+'</button></div></div>';
+    const contact='<div class="statscard premium"><div class="statshead premium"><span>'+tx.contact+'</span><small>HTML / PDF / E-MAIL / WHATSAPP</small></div><div class="statscontact"><input type="email" data-stats-email placeholder="'+tx.email+'"'+disabled+'><input type="tel" data-stats-phone placeholder="'+tx.whatsapp+'"'+disabled+'><div class="statscontactrow"><button data-stats-export="html"'+disabled+'>'+tx.html+'</button><button data-stats-export="pdf"'+disabled+'>'+tx.pdf+'</button></div><div class="statscontactrow"><button data-stats-export="email"'+disabled+'>'+tx.sendEmail+'</button><button data-stats-export="whatsapp"'+disabled+'>'+tx.sendWhatsapp+'</button></div><div class="statscontactrow"><button data-stats-export="save"'+disabled+'>'+(L()==='en'?'SAVE REPORT':L()==='es'?'GUARDAR INFORME':'SALVAR RELATÓRIO')+'</button><button data-stats-export="share"'+disabled+'>'+tx.share+'</button></div></div></div>';
 
     const overview='<div class="statsview" data-stats-panel="overview"'+(statsView==='overview'?'':' hidden')+'>'+kpis+overviewPie+statsTrendHtml(model)+diagnostic+trainingsHtml+statsCoverageHtml(records)+'</div>';
     const evolution='<div class="statsview" data-stats-panel="evolution"'+(statsView==='evolution'?'':' hidden')+'>'+statsEvolutionHtml(records,model)+'</div>';
@@ -3052,37 +3064,76 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const tx=statsText(),c=model.overall,rows=model.bySection.map(x=>'<tr><td>'+statsEsc(x.name)+'</td><td>'+x.grade.grade+'</td><td>'+x.counts.total+'</td><td>'+x.counts.correct+'</td><td>'+x.counts.accuracy.toFixed(1)+'%</td></tr>').join('');
     return '<!doctype html><html lang="'+L()+'"><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>StackUp Grinder - '+tx.report+'</title><style>body{font-family:Arial,sans-serif;background:#07101f;color:#fff;padding:24px;line-height:1.45}h1,h2{color:#6fa4ff}section{margin:18px 0;padding:16px;border:1px solid #526078;border-radius:12px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #344052;text-align:left}.swot{display:grid;grid-template-columns:1fr 1fr;gap:10px}.swot div{padding:10px;border:1px solid #344052;border-radius:8px}@media print{body{background:#fff;color:#111}h1,h2{color:#194f9f}section,.swot div{border-color:#bbb}}</style><body><h1>STACKUP HOLD\'EM GRINDER</h1><h2>'+tx.report+'</h2><section><b>'+tx.spots+':</b> '+c.total+' &nbsp; <b>'+tx.correct+':</b> '+c.correct+' &nbsp; <b>'+tx.accuracy+':</b> '+c.accuracy.toFixed(1)+'%</section><section><h2>'+tx.bySection+'</h2><table><tr><th>'+tx.section+'</th><th>NÍVEL</th><th>'+tx.spots+'</th><th>'+tx.correct+'</th><th>'+tx.accuracy+'</th></tr>'+rows+'</table></section><section><h2>'+tx.swot+'</h2><div class="swot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></section><section><h2>'+tx.improve+'</h2><ol>'+model.plan.map(x=>'<li>'+statsEsc(x)+'</li>').join('')+'</ol></section></body></html>';
   }
+  function statsReportName(view,createdAt){
+    const labels={
+      overview:{pt:'RESUMO',en:'OVERVIEW',es:'RESUMEN'},
+      evolution:{pt:'EVOLUÇÃO',en:'EVOLUTION',es:'EVOLUCIÓN'},
+      game:{pt:'JOGO',en:'GAME',es:'JUEGO'},
+      advance:{pt:'ADVANCE',en:'ADVANCE',es:'ADVANCE'},
+      sessions:{pt:'SESSÕES',en:'SESSIONS',es:'SESIONES'},
+      report:{pt:'RELATÓRIO',en:'REPORT',es:'INFORME'}
+    };
+    const lang=L(),label=labels[view]?.[lang]||labels.report[lang];
+    let stamp='';
+    try{stamp=new Intl.DateTimeFormat(lang==='en'?'en-US':lang==='es'?'es-ES':'pt-BR',{dateStyle:'short',timeStyle:'short'}).format(new Date(createdAt||Date.now()));}
+    catch(_){stamp=new Date(createdAt||Date.now()).toISOString().slice(0,16).replace('T',' ');}
+    return label+' — '+stamp;
+  }
+  function statsPersistReport(records,model,html,textReport){
+    if(statsReportOverride?.id){
+      return window.StackUpReportLibrary?.get?.(statsReportOverride.id)||statsReportOverride.item||null;
+    }
+    const c=model.overall,grade=statsGrade(records);
+    return window.StackUpReportLibrary?.save?.({
+      name:statsReportName(statsView,new Date().toISOString()),
+      language:L(),
+      view:statsView,
+      recordKeys:records.map(statsRecordKey),
+      summary:{
+        total:c.total,correct:c.correct,adjustable:c.adjustable,incorrect:c.incorrect,
+        accuracy:c.accuracy,technical:c.technical,grade:grade.grade
+      },
+      text:textReport,
+      html
+    })||null;
+  }
   function statsExport(kind){
     const records=statsFilteredRecords();if(!records.length)return;
     const model=statsModel(records),html=statsReportHtml(model),textReport=statsReportText(model);
+    const saved=statsPersistReport(records,model,html,textReport);
+    if(kind==='save'){
+      showSpotToast(L()==='en'?'REPORT SAVED':L()==='es'?'INFORME GUARDADO':'RELATÓRIO SALVO');
+      return saved;
+    }
     const blob=new Blob([html],{type:'text/html;charset=utf-8'});
     const fileName='stackup-grinder-relatorio-'+new Date().toISOString().slice(0,10)+'.html';
     if(kind==='html'){
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);return;
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);return saved;
     }
     if(kind==='pdf'){
-      const w=window.open('','_blank');if(!w)return;
+      const w=window.open('','_blank');if(!w)return saved;
       w.document.open();w.document.write(html);w.document.close();
       window.setTimeout(()=>{try{w.focus();w.print();}catch(_){}},350);
-      return;
+      return saved;
     }
     if(kind==='email'){
       const email=statsPanel.querySelector('[data-stats-email]')?.value.trim()||'';
       const subject='StackUp Grinder - '+statsText().report;
-      window.location.href='mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(textReport.slice(0,12000));return;
+      window.location.href='mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(textReport.slice(0,12000));return saved;
     }
     if(kind==='whatsapp'){
       const phone=(statsPanel.querySelector('[data-stats-phone]')?.value||'').replace(/\D/g,'');
       const url='https://wa.me/'+phone+'?text='+encodeURIComponent(textReport.slice(0,8000));
-      window.open(url,'_blank');return;
+      window.open(url,'_blank');return saved;
     }
     if(kind==='share'){
       try{
         const file=new File([blob],fileName,{type:'text/html'});
-        if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){navigator.share({title:'StackUp Grinder - '+statsText().report,text:textReport.slice(0,1200),files:[file]});return;}
+        if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){navigator.share({title:'StackUp Grinder - '+statsText().report,text:textReport.slice(0,1200),files:[file]});return saved;}
       }catch(_){}
       const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
     }
+    return saved;
   }
   statsPanel.addEventListener('change',e=>{
     const f=e.target.closest('[data-stats-filter]');if(!f)return;
