@@ -5,7 +5,9 @@
   function mount(ctx){
     const R=ctx.root,page=ctx.page,lib=ctx.library,coach=ctx.coach,bridge=ctx.bridge;
     if(!R||!page||!lib||!coach)return null;
-    let personalFilter='all';
+    let personalFilter='now';
+    let pendingPersonalDelete=null;
+    let pendingDataAction=null;
 
     const style=document.createElement('style');
     style.textContent=`
@@ -44,9 +46,9 @@
     function esc(v){return ctx.escape(String(v??''));}
     function T(){
       const t={
-        pt:{summary:'PLANO DE EVOLUÇÃO',desc:'Treinos indicados pelo HEROES e pelo próprio GRINDER, ordenados pela relevância atual.',all:'TODOS',heroes:'HEROES',grinder:'GRINDER',weak:'FRAQUEZAS',reinforce:'REFORÇO',completed:'CONCLUÍDOS',pending:'PENDENTE',progress:'EM ANDAMENTO',start:'INICIAR',continue:'CONTINUAR',finish:'CONCLUIR',priority:'PRIORIDADE',relevance:'RELEVÂNCIA',goal:'META',due:'PRAZO',reason:'MOTIVO',spots:'SPOTS',empty:'NENHUM TREINO PERSONAL INDICADO AINDA',loaded:'TREINO PERSONAL CARREGADO',done:'TREINO CONCLUÍDO',coach:'WHATSAPP COACH',coachDesc:'Mensagens automáticas sobre programação, pendências, evolução e reforço.',enabled:'ATIVADO',disabled:'DESATIVADO',phone:'WHATSAPP',max:'MÁX. / DIA',quiet:'HORÁRIO SILENCIOSO',save:'CONFIRMAR',templates:'10 MENSAGENS ADAPTATIVAS',backend:'ENVIO WHATSAPP',waiting:'AGUARDANDO WHATSAPP BUSINESS / BACKEND',ready:'TRANSPORTE CONECTADO',queued:'NA FILA',saved:'PREFERÊNCIA SALVA'},
-        en:{summary:'EVOLUTION PLAN',desc:'Training prescribed by HEROES and by GRINDER itself, ordered by current relevance.',all:'ALL',heroes:'HEROES',grinder:'GRINDER',weak:'WEAKNESSES',reinforce:'REINFORCEMENT',completed:'COMPLETED',pending:'PENDING',progress:'IN PROGRESS',start:'START',continue:'CONTINUE',finish:'COMPLETE',priority:'PRIORITY',relevance:'RELEVANCE',goal:'GOAL',due:'DUE',reason:'REASON',spots:'SPOTS',empty:'NO PERSONAL TRAINING PRESCRIBED YET',loaded:'PERSONAL TRAINING LOADED',done:'TRAINING COMPLETED',coach:'WHATSAPP COACH',coachDesc:'Automatic messages about schedule, pending training, evolution and reinforcement.',enabled:'ENABLED',disabled:'DISABLED',phone:'WHATSAPP',max:'MAX / DAY',quiet:'QUIET HOURS',save:'CONFIRM',templates:'10 ADAPTIVE MESSAGES',backend:'WHATSAPP DELIVERY',waiting:'WAITING FOR WHATSAPP BUSINESS / BACKEND',ready:'TRANSPORT CONNECTED',queued:'QUEUED',saved:'PREFERENCE SAVED'},
-        es:{summary:'PLAN DE EVOLUCIÓN',desc:'Entrenos indicados por HEROES y por el propio GRINDER, ordenados por relevancia actual.',all:'TODOS',heroes:'HEROES',grinder:'GRINDER',weak:'DEBILIDADES',reinforce:'REFUERZO',completed:'COMPLETADOS',pending:'PENDIENTE',progress:'EN CURSO',start:'INICIAR',continue:'CONTINUAR',finish:'COMPLETAR',priority:'PRIORIDAD',relevance:'RELEVANCIA',goal:'META',due:'PLAZO',reason:'MOTIVO',spots:'SPOTS',empty:'AÚN NO HAY ENTRENO PERSONAL INDICADO',loaded:'ENTRENO PERSONAL CARGADO',done:'ENTRENO COMPLETADO',coach:'WHATSAPP COACH',coachDesc:'Mensajes automáticos sobre programación, pendientes, evolución y refuerzo.',enabled:'ACTIVADO',disabled:'DESACTIVADO',phone:'WHATSAPP',max:'MÁX. / DÍA',quiet:'HORARIO SILENCIOSO',save:'CONFIRMAR',templates:'10 MENSAJES ADAPTATIVOS',backend:'ENVÍO WHATSAPP',waiting:'ESPERANDO WHATSAPP BUSINESS / BACKEND',ready:'TRANSPORTE CONECTADO',queued:'EN COLA',saved:'PREFERENCIA GUARDADA'}
+        pt:{summary:'PLANO DE EVOLUÇÃO',desc:'Treinos indicados pelo HEROES e pelo próprio GRINDER, ordenados pela relevância atual.',now:'AGORA',scheduled:'PROGRAMADOS',heroes:'HEROES',grinder:'GRINDER',weak:'FRAQUEZAS',reinforce:'REFORÇO',completed:'CONCLUÍDOS',pending:'PENDENTE',progress:'EM ANDAMENTO',start:'INICIAR',continue:'CONTINUAR',finish:'CONCLUIR',delete:'APAGAR',cancel:'CANCELAR',confirmDelete:'CONFIRMAR APAGAR',priority:'PRIORIDADE',relevance:'RELEVÂNCIA',goal:'META',due:'PRAZO',reason:'MOTIVO',spots:'SPOTS',empty:'NENHUM TREINO PERSONAL INDICADO AINDA',loaded:'TREINO PERSONAL CARREGADO',done:'TREINO CONCLUÍDO',deleted:'TREINO APAGADO',coach:'WHATSAPP COACH',coachDesc:'Mensagens automáticas sobre programação, pendências, evolução e reforço.',enabled:'ATIVADO',disabled:'DESATIVADO',phone:'WHATSAPP',max:'MÁX. / DIA',quiet:'HORÁRIO SILENCIOSO',save:'CONFIRMAR',templates:'10 MENSAGENS ADAPTATIVAS',backend:'ENVIO WHATSAPP',waiting:'AGUARDANDO WHATSAPP BUSINESS / BACKEND',ready:'TRANSPORTE CONECTADO',queued:'NA FILA',saved:'PREFERÊNCIA SALVA',data:'DADOS E HISTÓRICO',dataDesc:'Gerencie dados locais do GRINDER. Exclusões coletivas exigem confirmação.',delHistory:'APAGAR TREINOS SALVOS',delPerformance:'APAGAR DESEMPENHO + ANÁLISES + XP',delPersonal:'APAGAR TREINOS PERSONAL DO GRINDER',delReports:'APAGAR RELATÓRIOS',resetAll:'RESETAR TODOS OS DADOS LOCAIS',confirmData:'TOQUE NOVAMENTE PARA CONFIRMAR',dataDone:'DADOS APAGADOS'},
+        en:{summary:'EVOLUTION PLAN',desc:'Training prescribed by HEROES and by GRINDER itself, ordered by current relevance.',now:'NOW',scheduled:'SCHEDULED',heroes:'HEROES',grinder:'GRINDER',weak:'WEAKNESSES',reinforce:'REINFORCEMENT',completed:'COMPLETED',pending:'PENDING',progress:'IN PROGRESS',start:'START',continue:'CONTINUE',finish:'COMPLETE',delete:'DELETE',cancel:'CANCEL',confirmDelete:'CONFIRM DELETE',priority:'PRIORITY',relevance:'RELEVANCE',goal:'GOAL',due:'DUE',reason:'REASON',spots:'SPOTS',empty:'NO PERSONAL TRAINING PRESCRIBED YET',loaded:'PERSONAL TRAINING LOADED',done:'TRAINING COMPLETED',deleted:'TRAINING DELETED',coach:'WHATSAPP COACH',coachDesc:'Automatic messages about schedule, pending training, evolution and reinforcement.',enabled:'ENABLED',disabled:'DISABLED',phone:'WHATSAPP',max:'MAX / DAY',quiet:'QUIET HOURS',save:'CONFIRM',templates:'10 ADAPTIVE MESSAGES',backend:'WHATSAPP DELIVERY',waiting:'WAITING FOR WHATSAPP BUSINESS / BACKEND',ready:'TRANSPORT CONNECTED',queued:'QUEUED',saved:'PREFERENCE SAVED',data:'DATA & HISTORY',dataDesc:'Manage local GRINDER data. Bulk deletions require confirmation.',delHistory:'DELETE SAVED TRAININGS',delPerformance:'DELETE PERFORMANCE + ANALYSIS + XP',delPersonal:'DELETE GRINDER PERSONAL TRAININGS',delReports:'DELETE REPORTS',resetAll:'RESET ALL LOCAL DATA',confirmData:'TAP AGAIN TO CONFIRM',dataDone:'DATA DELETED'},
+        es:{summary:'PLAN DE EVOLUCIÓN',desc:'Entrenos indicados por HEROES y por el propio GRINDER, ordenados por relevancia actual.',now:'AHORA',scheduled:'PROGRAMADOS',heroes:'HEROES',grinder:'GRINDER',weak:'DEBILIDADES',reinforce:'REFUERZO',completed:'COMPLETADOS',pending:'PENDIENTE',progress:'EN CURSO',start:'INICIAR',continue:'CONTINUAR',finish:'COMPLETAR',delete:'BORRAR',cancel:'CANCELAR',confirmDelete:'CONFIRMAR BORRADO',priority:'PRIORIDAD',relevance:'RELEVANCIA',goal:'META',due:'PLAZO',reason:'MOTIVO',spots:'SPOTS',empty:'AÚN NO HAY ENTRENO PERSONAL INDICADO',loaded:'ENTRENO PERSONAL CARGADO',done:'ENTRENO COMPLETADO',deleted:'ENTRENO BORRADO',coach:'WHATSAPP COACH',coachDesc:'Mensajes automáticos sobre programación, pendientes, evolución y refuerzo.',enabled:'ACTIVADO',disabled:'DESACTIVADO',phone:'WHATSAPP',max:'MÁX. / DÍA',quiet:'HORARIO SILENCIOSO',save:'CONFIRMAR',templates:'10 MENSAJES ADAPTATIVOS',backend:'ENVÍO WHATSAPP',waiting:'ESPERANDO WHATSAPP BUSINESS / BACKEND',ready:'TRANSPORTE CONECTADO',queued:'EN COLA',saved:'PREFERENCIA GUARDADA',data:'DATOS E HISTORIAL',dataDesc:'Gestiona los datos locales del GRINDER. Los borrados colectivos requieren confirmación.',delHistory:'BORRAR ENTRENOS GUARDADOS',delPerformance:'BORRAR RENDIMIENTO + ANÁLISIS + XP',delPersonal:'BORRAR ENTRENOS PERSONAL DEL GRINDER',delReports:'BORRAR INFORMES',resetAll:'RESETEAR TODOS LOS DATOS LOCALES',confirmData:'TOCA OTRA VEZ PARA CONFIRMAR',dataDone:'DATOS BORRADOS'}
       };
       return t[L()]||t.pt;
     }
@@ -158,20 +160,31 @@
         weak:live.filter(x=>x.kind==='weakness').length,
         progress:live.filter(x=>x.status==='in_progress').length
       };
-      const filtered=live.filter(x=>personalFilter==='all'||x.origin===personalFilter||x.kind===personalFilter||(personalFilter==='completed'&&x.status==='completed'));
-      const tabs=[['all',tx.all],['heroes',tx.heroes],['grinder',tx.grinder],['weakness',tx.weak],['reinforcement',tx.reinforce],['completed',tx.completed]];
+      const now=Date.now();
+      const filtered=live.filter(x=>{
+        if(personalFilter==='completed')return x.status==='completed';
+        if(personalFilter==='scheduled'){
+          const scheduled=Date.parse(x.scheduledAt||'');
+          return x.status!=='completed'&&Number.isFinite(scheduled)&&scheduled>now;
+        }
+        return x.status!=='completed'&&(!x.scheduledAt||Date.parse(x.scheduledAt)<=now);
+      });
+      const tabs=[['now',tx.now],['scheduled',tx.scheduled],['completed',tx.completed]];
       const hero='<div class="personalhero"><b>'+esc(tx.summary)+'</b><span>'+esc(tx.desc)+'</span><div class="personalstats"><div class="personalstat"><strong>'+counts.heroes+'</strong><small>HEROES</small></div><div class="personalstat"><strong>'+counts.grinder+'</strong><small>GRINDER</small></div><div class="personalstat"><strong>'+counts.weak+'</strong><small>'+esc(tx.weak)+'</small></div><div class="personalstat"><strong>'+counts.progress+'</strong><small>'+esc(tx.progress)+'</small></div></div></div>';
       const nav='<div class="personaltabs">'+tabs.map(x=>'<button data-pf="'+x[0]+'" class="'+(personalFilter===x[0]?'on':'')+'">'+esc(x[1])+'</button>').join('')+'</div>';
       const list=filtered.length?filtered.map((item,index)=>{
         const p=progress(item),rel=lib.relevance(item,{progressById:{[item.id]:p.pct}});
         const status=item.status==='in_progress'?tx.progress:item.status==='completed'?tx.completed:tx.pending;
         const action=item.status==='in_progress'?tx.continue:tx.start;
+        const deleting=pendingPersonalDelete===item.id;
         let due='—';try{if(item.dueAt)due=new Intl.DateTimeFormat(L()==='en'?'en-US':L()==='es'?'es-ES':'pt-BR',{dateStyle:'short'}).format(new Date(item.dueAt));}catch(_){}
+        const controls=deleting
+          ?'<div class="personalactions"><button data-pa="cancel-delete" data-id="'+esc(item.id)+'">'+esc(tx.cancel)+'</button><button class="dataaction danger" data-pa="confirm-delete" data-id="'+esc(item.id)+'">'+esc(tx.confirmDelete)+'</button></div>'
+          :'<div class="personalactions"><button class="primary" data-pa="start" data-id="'+esc(item.id)+'">'+esc(action)+'</button><button data-pa="finish" data-id="'+esc(item.id)+'">'+esc(tx.finish)+'</button></div><button class="dataaction danger" style="width:100%;margin-top:8px" data-pa="delete" data-id="'+esc(item.id)+'">'+esc(tx.delete)+'</button>';
         return '<div class="personalcard"><div class="personalcardtop"><div class="personalcardtitle"><b>'+esc(item.title)+'</b><small>'+esc((item.kind==='weakness'?tx.weak:tx.reinforce)+' · '+status)+'</small></div><span class="personalbadge">#'+(index+1)+' · '+esc(String(item.origin).toUpperCase())+'</span></div>'+
           '<div class="personalmeta"><span>'+tx.priority+': '+esc(String(item.priority).toUpperCase())+'</span><span>'+tx.relevance+': '+rel+'</span><span>'+tx.goal+': '+p.target+' '+tx.spots+'</span><span>'+tx.due+': '+esc(due)+'</span></div>'+
           (item.reason?'<span class="personalreason"><b>'+tx.reason+':</b> '+esc(item.reason)+'</span>':'')+
-          '<div class="personalprogressline"><span>'+esc(status)+'</span><span>'+p.pct.toFixed(0)+'%</span></div><div class="personalprogress"><i style="width:'+p.pct.toFixed(1)+'%"></i></div>'+
-          '<div class="personalactions"><button class="primary" data-pa="start" data-id="'+esc(item.id)+'">'+esc(action)+'</button><button data-pa="finish" data-id="'+esc(item.id)+'">'+esc(tx.finish)+'</button></div></div>';
+          '<div class="personalprogressline"><span>'+esc(status)+'</span><span>'+p.pct.toFixed(0)+'%</span></div><div class="personalprogress"><i style="width:'+p.pct.toFixed(1)+'%"></i></div>'+controls+'</div>';
       }).join(''):'<div class="personalempty">'+esc(tx.empty)+'</div>';
       personal.innerHTML=hero+nav+'<div class="personallist">'+list+'</div>';
     }
@@ -179,6 +192,13 @@
     function renderProfile(){
       const tx=T(),cfg=coach.settings(),templates=coach.templates(L()),transport=typeof global.StackUpWhatsAppTransport?.send==='function';
       const outbox=coach.outbox().length;
+      const dataButtons=[
+        ['history',tx.delHistory],
+        ['performance',tx.delPerformance],
+        ['personal',tx.delPersonal],
+        ['reports',tx.delReports],
+        ['all',tx.resetAll]
+      ].map(([key,label])=>'<button class="dataaction danger" data-data-action="'+key+'">'+esc(pendingDataAction===key?tx.confirmData:label)+'</button>').join('');
       profile.innerHTML=
         '<div class="coachcard"><b>'+esc(tx.coach)+'</b><span>'+esc(tx.coachDesc)+'</span>'+
         '<div class="coachstate"><span>'+esc(tx.coach)+'</span><strong>'+(cfg.enabled?esc(tx.enabled):esc(tx.disabled))+'</strong></div>'+
@@ -186,15 +206,19 @@
         '<div class="coachgrid"><input data-coach-phone value="'+esc(cfg.phone)+'" placeholder="'+esc(tx.phone)+'"><select data-coach-max><option value="1"'+(cfg.maxPerDay===1?' selected':'')+'>1 / DIA</option><option value="2"'+(cfg.maxPerDay===2?' selected':'')+'>2 / DIA</option><option value="3"'+(cfg.maxPerDay===3?' selected':'')+'>3 / DIA</option><option value="4"'+(cfg.maxPerDay===4?' selected':'')+'>4 / DIA</option></select><input data-coach-start type="time" value="'+esc(cfg.quietStart)+'"><input data-coach-end type="time" value="'+esc(cfg.quietEnd)+'"></div>'+
         '<button class="coachsave" data-coach-save>'+esc(tx.save)+'</button>'+
         '<div class="coachstatus">'+esc(tx.backend)+': '+esc(transport?tx.ready:tx.waiting)+' · '+esc(tx.queued)+': '+outbox+'</div></div>'+
-        '<div class="coachcard"><b>'+esc(tx.templates)+'</b><div class="coachtemplates">'+templates.map((m,i)=>'<div class="coachtemplate"><b>'+(i+1)+'. '+esc(m.title)+'</b><span>'+esc(m.body)+'</span></div>').join('')+'</div></div>';
+        '<div class="coachcard"><details class="sudisclosure"><summary>'+esc(tx.templates)+'</summary><div class="sudisclosurebody coachtemplates">'+templates.map((m,i)=>'<div class="coachtemplate"><b>'+(i+1)+'. '+esc(m.title)+'</b><span>'+esc(m.body)+'</span></div>').join('')+'</div></details></div>'+
+        '<div class="coachcard datamanager"><b>'+esc(tx.data)+'</b><span class="datamanagerintro">'+esc(tx.dataDesc)+'</span><div class="datamanagergrid">'+dataButtons+'</div></div>';
     }
 
     personal.addEventListener('click',e=>{
-      const f=e.target.closest('[data-pf]');if(f){personalFilter=f.dataset.pf||'all';renderPersonal();return;}
+      const f=e.target.closest('[data-pf]');if(f){personalFilter=f.dataset.pf||'now';pendingPersonalDelete=null;renderPersonal();return;}
       const a=e.target.closest('[data-pa][data-id]');if(!a)return;
       const item=lib.get(a.dataset.id);if(!item)return;
-      if(a.dataset.pa==='start'){lib.setStatus(item.id,'in_progress');ctx.startTraining(lib.get(item.id));ctx.toast(T().loaded);}
-      if(a.dataset.pa==='finish'){complete(item,progress(item));renderPersonal();ctx.toast(T().done);}
+      if(a.dataset.pa==='start'){lib.setStatus(item.id,'in_progress');ctx.startTraining(lib.get(item.id));ctx.toast(T().loaded);return;}
+      if(a.dataset.pa==='finish'){complete(item,progress(item));renderPersonal();ctx.toast(T().done);return;}
+      if(a.dataset.pa==='delete'){pendingPersonalDelete=item.id;renderPersonal();return;}
+      if(a.dataset.pa==='cancel-delete'){pendingPersonalDelete=null;renderPersonal();return;}
+      if(a.dataset.pa==='confirm-delete'){lib.remove(item.id);pendingPersonalDelete=null;renderPersonal();ctx.toast(T().deleted);}
     });
     profile.addEventListener('click',async e=>{
       const t=e.target.closest('[data-coach-toggle]');
@@ -211,7 +235,30 @@
           quietStart:profile.querySelector('[data-coach-start]')?.value||'22:00',
           quietEnd:profile.querySelector('[data-coach-end]')?.value||'08:00'
         });
-        renderProfile();ctx.toast(T().saved);
+        renderProfile();ctx.toast(T().saved);return;
+      }
+      const data=e.target.closest('[data-data-action]');
+      if(data){
+        const key=data.dataset.dataAction,tx=T();
+        if(pendingDataAction!==key){pendingDataAction=key;renderProfile();return;}
+        if(key==='history')global.StackUpTrainingHistory?.clear?.();
+        if(key==='performance'){
+          global.StackUpTrainingPerformance?.clear?.();
+          global.StackUpXPPerformance?.clear?.();
+          lib.list().filter(x=>x.origin==='grinder').forEach(x=>lib.remove(x.id));
+        }
+        if(key==='personal')lib.list().filter(x=>x.origin==='grinder').forEach(x=>lib.remove(x.id));
+        if(key==='reports')global.StackUpReportLibrary?.clear?.();
+        if(key==='all'){
+          global.StackUpTrainingHistory?.clear?.();
+          global.StackUpTrainingPerformance?.clear?.();
+          global.StackUpXPPerformance?.clear?.();
+          global.StackUpReportLibrary?.clear?.();
+          lib.clear?.();
+        }
+        pendingDataAction=null;
+        renderProfile();
+        ctx.toast(tx.dataDone);
       }
     });
 
