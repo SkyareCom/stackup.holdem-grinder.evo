@@ -65,14 +65,15 @@
     if(staticBankPromise)return staticBankPromise;
     staticBankPromise=(async()=>{
       const manifest=await fetchJson(staticUrl('manifest.json'));
-      const [preflop,postflop,pushfold,tournament,preflopDecisions,textureSizing,preflop9max]=await Promise.all([
+      const [preflop,postflop,pushfold,tournament,preflopDecisions,textureSizing,preflop9max,lineBank]=await Promise.all([
         fetchJson(staticUrl('preflop.json')),
         fetchJson(staticUrl('postflop.json')),
         fetchJson(staticUrl('pushfold-hu-v1.json')),
         fetchJson(staticUrl('tournament.json')),
         fetchJson(staticUrl('preflop-decisions.json')),
         fetchJson(staticUrl('texture-sizing.json')),
-        fetchJson(staticUrl('preflop-9max.json'))
+        fetchJson(staticUrl('preflop-9max.json')),
+        fetchJson(staticUrl('line-bank.json'))
       ]);
       if(!Array.isArray(preflop)||!preflop.length)throw new Error('static_preflop_empty');
       if(!Array.isArray(postflop)||!postflop.length)throw new Error('static_postflop_empty');
@@ -81,8 +82,9 @@
       if(!preflopDecisions||typeof preflopDecisions!=='object'||!Array.isArray(preflopDecisions.spots))throw new Error('static_preflop_decisions_invalid');
       if(!textureSizing||typeof textureSizing!=='object'||!Array.isArray(textureSizing.spots))throw new Error('static_texture_sizing_invalid');
       if(!preflop9max||typeof preflop9max!=='object'||!Array.isArray(preflop9max.spots))throw new Error('static_preflop_9max_invalid');
+      if(!lineBank||typeof lineBank!=='object'||!Array.isArray(lineBank.spots))throw new Error('static_line_bank_invalid');
       state.manifest=manifest;
-      return {manifest,preflop,postflop,pushfold,tournament,preflopDecisions,textureSizing,preflop9max};
+      return {manifest,preflop,postflop,pushfold,tournament,preflopDecisions,textureSizing,preflop9max,lineBank};
     })().catch(error=>{
       staticBankPromise=null;
       throw error;
@@ -214,6 +216,12 @@
       }
       if(!spot)throw new Error('solver_spot_unavailable');
       global.StackUpSpotsEngine?.validateSolverSpot?.(spot);
+      const solved=global.StackUpSolvedSpotContract?.validateSolvedDecision?.(spot,spot.hand);
+      if(solved&&!solved.ok)throw new Error('unvalidated_solved_spot:'+solved.errors.join(','));
+      if(solved?.id){
+        spot.solvedSpotId=solved.id;
+        spot.validationMode='STRICT_SOLVED_ONLY';
+      }
       state.current=spot;
       return spot;
     }catch(error){
@@ -246,6 +254,12 @@
 
   function setCurrent(spot){
     global.StackUpSpotsEngine?.validateSolverSpot?.(spot);
+    const solved=global.StackUpSolvedSpotContract?.validateSolvedDecision?.(spot,spot?.hand);
+    if(solved&&!solved.ok)throw new Error('unvalidated_solved_spot:'+solved.errors.join(','));
+    if(solved?.id){
+      spot.solvedSpotId=solved.id;
+      spot.validationMode='STRICT_SOLVED_ONLY';
+    }
     state.current=spot;
     state.error=null;
     state.source='manual';
