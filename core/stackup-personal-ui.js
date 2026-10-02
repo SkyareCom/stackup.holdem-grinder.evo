@@ -8,6 +8,7 @@
     let personalFilter='now';
     let pendingPersonalDelete=null;
     let pendingDataAction=null;
+    let renderRecordsCache=null;
 
     const style=document.createElement('style');
     style.textContent=`
@@ -55,7 +56,8 @@
 
     function pid(item){return String(item?.meta?.prescriptionId||item?.externalKey||item?.id||'');}
     function progress(item){
-      const records=ctx.records().filter(r=>String(r?.prescriptionId||'')===pid(item));
+      const source=renderRecordsCache||ctx.records();
+      const records=source.filter(r=>String(r?.prescriptionId||'')===pid(item));
       const c=ctx.counts(records),target=Math.max(1,Number(item?.targetSpots)||50);
       const prev=Number(item?.meta?.baselineScore);
       return {records,counts:c,done:c.total,target,pct:Math.min(100,c.total/target*100),score:c.total?c.technical:(Number.isFinite(prev)?prev:0),delta:c.total&&Number.isFinite(prev)?c.technical-prev:0};
@@ -92,7 +94,7 @@
       });
     }
     function syncGrinder(){
-      const records=ctx.records();if(records.length<10)return;
+      const records=renderRecordsCache||ctx.records();if(records.length<10)return;
       const dimensions=[
         ['section',ctx.group(records,r=>(Array.isArray(r.sections)&&r.sections.length?r.sections:[r.street||'GERAL']))],
         ['position',ctx.group(records,r=>r.heroPosition||null)],
@@ -150,6 +152,7 @@
     }
 
     function renderPersonal(){
+      renderRecordsCache=ctx.records();
       syncHeroes();syncGrinder();syncCompletion();
       const tx=T(),base=lib.list(),map=progressMap(base),items=lib.list({progressById:map});
       runCoach(items);
@@ -187,6 +190,7 @@
           '<div class="personalprogressline"><span>'+esc(status)+'</span><span>'+p.pct.toFixed(0)+'%</span></div><div class="personalprogress"><i style="width:'+p.pct.toFixed(1)+'%"></i></div>'+controls+'</div>';
       }).join(''):'<div class="personalempty">'+esc(tx.empty)+'</div>';
       personal.innerHTML=hero+nav+'<div class="personallist">'+list+'</div>';
+      renderRecordsCache=null;
     }
 
     function renderProfile(){
@@ -264,7 +268,14 @@
 
     function showPersonal(on){personal.hidden=!on;personal.style.display=on?'flex':'none';if(on)renderPersonal();}
     function showProfile(on){profile.hidden=!on;profile.style.display=on?'flex':'none';if(on)renderProfile();}
-    function onRecord(){syncCompletion();const items=lib.list().filter(x=>x.status!=='dismissed');runCoach(items);if(!personal.hidden)renderPersonal();}
+    function onRecord(){
+      renderRecordsCache=ctx.records();
+      syncCompletion();
+      const items=lib.list().filter(x=>x.status!=='dismissed');
+      runCoach(items);
+      renderRecordsCache=null;
+      if(!personal.hidden)renderPersonal();
+    }
     function onBridge(env){if(env?.type==='training_prescription'&&env?.source==='heroes'){syncHeroes();if(!personal.hidden)renderPersonal();}}
 
     return Object.freeze({personal,profile,showPersonal,showProfile,renderPersonal,renderProfile,onRecord,onBridge});
