@@ -38,8 +38,9 @@ const filters=(coverage.cards||[]).map(card=>{
   };
 }).sort((a,b)=>a.priority-b.priority||b.shortfallToPublish-a.shortfallToPublish||a.solved-b.solved);
 
+const generatedAt=new Date().toISOString();
 const summary={
-  generatedAt:new Date().toISOString(),
+  generatedAt,
   policyVersion:policy.schemaVersion,
   strategy:policy.growth?.strategy||"DEFICIT_FIRST",
   publishFloor:policy.publishFloor,
@@ -55,5 +56,28 @@ const summary={
   filters
 };
 
+const shardSize=Number(policy.growth?.shardSize)||500;
+const queue={
+  generatedAt,
+  policyVersion:policy.schemaVersion,
+  mode:"STRICT_SOLVED_ONLY",
+  batchSize:shardSize,
+  items:filters
+    .filter(x=>x.stage!=="MATURE"&&x.shortfallToNextTarget>0)
+    .map(x=>({
+      key:x.section+"/"+x.id,
+      section:x.section,
+      id:x.id,
+      label:x.label,
+      priority:x.priority,
+      stage:x.stage,
+      solved:x.solved,
+      target:x.nextTarget,
+      requestedSolves:Math.min(shardSize,x.shortfallToNextTarget),
+      status:"QUEUED"
+    }))
+};
+
 await writeFile(join(SOLVER_DIR,"growth-plan.json"),JSON.stringify(summary,null,2)+"\n","utf8");
-console.log(JSON.stringify(summary.counts,null,2));
+await writeFile(join(SOLVER_DIR,"generation-queue.json"),JSON.stringify(queue,null,2)+"\n","utf8");
+console.log(JSON.stringify({...summary.counts,queued:queue.items.length},null,2));
