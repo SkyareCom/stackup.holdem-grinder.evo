@@ -124,6 +124,11 @@ def main():
     if len(hero_entries)<30 or len(villain_entries)<30:
         raise SystemExit(f"solver ranges too small hero={len(hero_entries)} villain={len(villain_entries)}")
 
+    # Board blockers reduce the legal exact Hero combos. The quality gate must
+    # scale with the solver range; the global >=1500 solved-decision floor below
+    # remains authoritative for publication.
+    min_board_hands=max(30,int(math.floor(len(hero_entries)*0.60)))
+
     spots=[];rejected=[];total_solved=0
     for bi,board in enumerate(BOARDS):
         hero_legal=legal(hero_entries,board)
@@ -159,8 +164,11 @@ def main():
             call_ev=eq*final_pot-call_cost
             strategy.append(strategy_row(hero,call_ev,eq,se))
 
-        if len(strategy)<250:
-            rejected.append({"board":bi,"reason":"insufficient_hero_exact_hands","hands":len(strategy)})
+        if len(strategy)<min_board_hands:
+            rejected.append({
+              "board":bi,"reason":"insufficient_hero_exact_hands",
+              "hands":len(strategy),"required":min_board_hands
+            })
             continue
 
         positions=["UTG","HJ","CO","BTN","SB","BB"]
@@ -200,6 +208,7 @@ def main():
     payload={
       "schemaVersion":1,"generatedAt":__import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
       "solver":"STACKUP_MULTIWAY_RIVER_BR","modelVersion":"v1","samplesPerHand":SAMPLES,
+      "minHandsPerBoard":min_board_hands,
       "solvedPostflopMultiway":total_solved,"spots":spots,"rejected":rejected
     }
     OUT.write_text(json.dumps(payload,separators=(",",":")),encoding="utf-8")
