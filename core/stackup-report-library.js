@@ -4,16 +4,20 @@
 
   const KEY='stackup.grinder.stats.reports.v1';
   const MAX_REPORTS=80;
+  let memory=null;
 
   function read(){
+    if(Array.isArray(memory))return memory;
     try{
       const data=JSON.parse(localStorage.getItem(KEY)||'[]');
-      return Array.isArray(data)?data:[];
-    }catch(_){return [];}
+      memory=Array.isArray(data)?data:[];
+    }catch(_){memory=[];}
+    return memory;
   }
   function write(items){
+    memory=(items||[]).slice(0,MAX_REPORTS);
     try{
-      localStorage.setItem(KEY,JSON.stringify((items||[]).slice(0,MAX_REPORTS)));
+      localStorage.setItem(KEY,JSON.stringify(memory));
       return true;
     }catch(_){return false;}
   }
@@ -90,8 +94,10 @@
     return items.length-next.length;
   }
   function clear(){
+    memory=[];
     try{localStorage.removeItem(KEY);return true;}catch(_){return false;}
   }
+  window.addEventListener?.('storage',event=>{if(String(event?.key||'')===KEY)memory=null;});
 
   global.StackUpReportLibrary=Object.freeze({list,get,save,remove,removeMany,clear});
 })(window);
