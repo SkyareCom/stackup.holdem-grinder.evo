@@ -2,6 +2,17 @@ name: Validate Solved Spot Pipeline
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - "core/stackup-solved-spot-contract.js"
+      - "core/stackup-solved-spot-classifier.js"
+      - "core/stackup-training-sequencer.js"
+      - "core/stackup-spots-client.js"
+      - "scripts/*.mjs"
+      - "scripts/*.py"
+      - "scripts/stackup-preflop-export.rs"
+      - "data/solver/solved-spot-policy.json"
+      - ".github/workflows/*.yml"
   push:
     paths:
       - "core/stackup-solved-spot-contract.js"
@@ -66,11 +77,14 @@ jobs:
             ['lineBank','line-bank.json']
           ];
           for(const [key,file] of banks){
-            if(!client.includes("fetchJson(staticUrl('"+file+"'))"))throw new Error('runtime client missing '+file);
+            const direct=client.includes("fetchJson(staticUrl('"+file+"'))");
+            const mapped=client.includes(key+":{file:'"+file+"'")||client.includes(key+':{file:"'+file+'"');
+            if(!direct&&!mapped)throw new Error('runtime client missing '+file);
             if(!sequencer.includes('bank?.'+key+'?.spots'))throw new Error('sequencer missing '+key);
             if(!audit.includes(key+'?.spots'))throw new Error('coverage auditor missing '+key);
           }
-          console.log({runtimeAuditParity:true,banks:banks.length});
+          if(!client.includes('loadStaticPart'))throw new Error('progressive static-bank loader missing');
+          console.log({runtimeAuditParity:true,banks:banks.length,progressiveLoader:true});
           NODE
 
       - name: Guard strict no-projection runtime
