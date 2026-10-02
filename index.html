@@ -800,6 +800,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 <script src="core/stackup-report-library.js"></script>
 <script src="core/stackup-personal-training.js"></script>
 <script src="core/stackup-whatsapp-coach.js"></script>
+<script src="core/stackup-personal-ui.js"></script>
 <script src="core/stackup-app-bridge.js"></script>
 <script>
 (function(){
@@ -811,6 +812,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const $=s=>R.querySelector(s),qa=s=>R.querySelectorAll(s);
   const grinderBridge=window.StackUpAppBridge?.create?.('grinder')||null;
   let ACTIVE_STACKUP_PRESCRIPTION=null;
+  let personalUI=null;
   function grinderIntegrationStatus(){return grinderBridge?.status?.()||{app:'grinder',sameOrigin:false,inbox:0,outbox:0};}
   function grinderIncomingPrescriptions(){
     return (grinderBridge?.inbox?.()||[]).filter(x=>x?.type==='training_prescription'&&x?.source==='heroes');
@@ -2189,6 +2191,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
           answeredAt:entry?.answer?.answeredAt||new Date().toISOString()
         },{correlationId:ACTIVE_STACKUP_PRESCRIPTION.envelopeId});
       }
+      personalUI?.onRecord?.();
     }catch(_){}
     renderSpotSupport();
 
@@ -3417,6 +3420,67 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
   }
 
+  function startPersonalTrainingItem(item){
+    if(!item)return false;
+    applySavedFilters(item.filters||{});
+    normalizeFilterSelections({source:'personal'});
+    ACTIVE_STACKUP_PRESCRIPTION={
+      id:String(item?.meta?.prescriptionId||item.externalKey||item.id),
+      personalId:item.id,
+      envelopeId:item.sourceMessageId||null,
+      source:item.origin||'grinder',
+      title:item.title||'PERSONAL',
+      reason:item.reason||'',
+      priority:item.priority||'normal',
+      targetSpots:Math.max(1,Number(item.targetSpots)||50),
+      receivedAt:new Date().toISOString()
+    };
+    resetSpotTimeline();
+    SOLVER_SPOT=null;
+    SOLVER_TABLE_STATE=null;
+    SOLVER_FILTER_KEY='';
+    SPOT_TRAINING_STARTED=false;
+    SPOT_STAGE_INTRO=true;
+    SPOT_STATS_SESSION_ID=null;
+    sub.home.length=0;
+    renderTrain();
+    renderAdvance();
+    show('spots',true);
+    requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
+    return true;
+  }
+
+  personalUI=window.StackUpPersonalUI?.mount?.({
+    root:R,
+    page:$('#page'),
+    lang:L,
+    escape:spotEscape,
+    clone:cloneSpotValue,
+    library:window.StackUpPersonalTraining,
+    coach:window.StackUpWhatsAppCoach,
+    bridge:grinderBridge,
+    heroInbox:grinderIncomingPrescriptions,
+    records:statsAllRecords,
+    counts:statsCounts,
+    group:statsGroup,
+    scenario:statsScenarioValue,
+    startTraining:startPersonalTrainingItem,
+    toast:showSpotToast
+  })||null;
+
+  function syncPersonalAreas(){
+    const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null;
+    const personalOn=hs==='account',profileOn=hs==='perfil';
+    personalUI?.showPersonal?.(personalOn);
+    personalUI?.showProfile?.(profileOn);
+    if(personalOn||profileOn){
+      const slot=$('#page .slot');if(slot)slot.hidden=true;
+      hg.hidden=true;tw.hidden=true;adv.hidden=true;historyPanel.hidden=true;reportsPanel.hidden=true;
+      statsPanel.hidden=true;statsPanel.style.display='none';tb.hidden=true;spotActions.hidden=true;spotSupport.hidden=true;
+      const content=$('.content');if(content)content.scrollTop=0;
+    }
+  }
+
   function renderHome(){ hg.innerHTML=HORD.map(k=>`<button class="tower" data-k="${k}">${HICONS[k]}<b>${k==='ia'?T2[L()][k].replace(' ','\n'):k==='api'?T2[L()][k]:brk(T2[L()]['card_'+k]||T2[L()][k])}</b></button>`).join(''); }
   hg.addEventListener('click',e=>{ const c=e.target.closest('.tower'); if(!c)return; const k=c.dataset.k;
     c.classList.add('on'); setTimeout(()=>{ if(HSUB.includes(k)){ sub.home.push(k); show('home',false);} else show(k,true); },250); });
@@ -3424,7 +3488,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null, key=hs||cur;
     const title=T2[L()]['ti_'+key];
     $('#ptitle').textContent=title; $('#sectiontitle').textContent=title;
-    $('#pslotT').textContent=T2[L()]['soon']; $('#pslotS').textContent=T2[L()]['ds_'+key]; syncTrain(); syncSpots(); syncAdvance(); syncHistory(); syncStats(); syncReports();
+    $('#pslotT').textContent=T2[L()]['soon']; $('#pslotS').textContent=T2[L()]['ds_'+key]; syncTrain(); syncSpots(); syncAdvance(); syncHistory(); syncStats(); syncReports(); syncPersonalAreas();
     const hm=cur==='home'&&!hs; hg.hidden=!hm; if(hm){ $('#page .slot').hidden=true; renderHome(); } }
   function show(t,push,dir){
     const prev=cur; cur=t;
@@ -3485,6 +3549,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   if(grinderBridge){
     grinderBridge.onMessage(env=>{
       if(env?.type==='training_prescription'&&env?.source==='heroes'){
+        personalUI?.onBridge?.(env);
         showSpotToast(L()==='en'?'NEW HEROES TRAINING AVAILABLE':L()==='es'?'NUEVO ENTRENO HEROES DISPONIBLE':'NOVO TREINO HEROES DISPONÍVEL');
       }
     });
