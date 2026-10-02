@@ -92,4 +92,4 @@ jobs:
             exit 0
           fi
           git commit -m "Audit solver coverage for all training cards"
-          git push origin HEAD:main
+          bash scripts/persist-solver-artifacts.sh
