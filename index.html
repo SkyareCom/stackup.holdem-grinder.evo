@@ -980,6 +980,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       if(cur==='profile')renderAdvance();
     }).catch(()=>{});
 
+  let TRAIN_RENDER_LANG='';
+  let ADVANCE_RENDER_LANG='';
   function summary(s){
     const t=TR[L()];
     if(s.tour&&!isTour())return t.note;
@@ -990,6 +992,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       return v.map(lab).join(', ');}).filter(x=>x!==null).join(' · ');
   }
   function renderTrain(){
+    TRAIN_RENDER_LANG=L();
     const t=TR[L()];
     tw.innerHTML=SECS.map(s=>{
       const dis=s.tour&&!isTour();
@@ -1028,7 +1031,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     ['.tsec .thead','bar',(e,i)=>'thead-'+e.parentElement.dataset.s],
     ['.chip','chip',(e,i)=>'chip-'+e.dataset.g+'-'+e.dataset.o],
     ['.tower','blob',(e,i)=>'tower-'+e.dataset.o]]); }
-  function syncTrain(){ const on=cur==='train'; tw.hidden=!on; $('#page .slot').hidden=on; if(on)renderTrain(); orgAll(); }
+  function syncTrain(){
+    const on=cur==='train';
+    tw.hidden=!on;
+    $('#page .slot').hidden=on;
+    if(on&&(!tw.childElementCount||TRAIN_RENDER_LANG!==L()))renderTrain();
+    orgAll();
+  }
 
   // ===== Mesa de treino (Spots) =====
   const SUIT={s:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9 6 3 9.5 3 14a4.5 4.5 0 0 0 7.6 3.2c-.3 1.9-1.1 3.3-2.6 4.8h8c-1.5-1.5-2.3-2.9-2.6-4.8A4.5 4.5 0 0 0 21 14c0-4.5-6-8-9-12z"/></svg>',
@@ -2462,6 +2471,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   // ===== ADVANCE: todas as secoes na mesma tela, sem subpagina =====
   const adv=document.createElement('div');adv.className='advancewrap';adv.hidden=true;$('#page').appendChild(adv);
   function renderAdvance(){
+    ADVANCE_RENDER_LANG=L();
     const t=TR[L()];
     adv.innerHTML=ADV_SECS.map(s=>{
       const g=s.groups[0],S=sel[g.id];
@@ -2486,7 +2496,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(on){
       if(sub.profile.length)sub.profile.length=0;
       $('#page .slot').hidden=true;
-      renderAdvance();
+      if(!adv.childElementCount||ADVANCE_RENDER_LANG!==L())renderAdvance();
     }
   }
 
