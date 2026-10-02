@@ -2576,6 +2576,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   R.appendChild(historyStyle);
   const historyPanel=document.createElement('div');historyPanel.className='historypanel';historyPanel.hidden=true;$('#page').appendChild(historyPanel);
   let historySelectedId=null,historyPendingAction=null,historyClearPending=false;
+  let historyRenderKey='',historyRenderToken=0;
 
   function historyText(){return HISTORY_TEXT[L()]||HISTORY_TEXT.pt;}
   function formatHistoryDate(value){
@@ -2679,10 +2680,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     showSpotToast(historyText().resume);
     return true;
   }
-  function renderHistory(){
+  function renderHistory(force){
     const api=window.StackUpTrainingHistory,tx=historyText();
     const mode=api?.sortPreference?.()||'date';
     const items=api?.list?.(mode)||[];
+    const key=[L(),mode,historySelectedId||'',historyPendingAction||'',historyClearPending?'1':'0',items.length,...items.slice(0,80).map(x=>x.id+':'+String(x.updatedAt||x.createdAt||''))].join('|');
+    if(!force&&key===historyRenderKey&&historyPanel.childElementCount)return;
+    historyRenderKey=key;
     const sort='<div class="historysort"><button data-history-sort="date" class="'+(mode==='date'?'on':'')+'">'+spotEscape(tx.date)+'</button><button data-history-sort="alpha" class="'+(mode==='alpha'?'on':'')+'">'+spotEscape(tx.alpha)+'</button></div>';
     const clear='<button class="dataaction danger" style="width:100%" data-history-clear>'+(historyClearPending?spotEscape(tx.confirmClear):spotEscape(tx.clearAll))+'</button>';
     if(!items.length){historyPanel.innerHTML=sort+'<div class="historyempty">'+spotEscape(tx.empty)+'</div>';return;}
@@ -2720,7 +2724,15 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null;
     const on=hs==='history';
     historyPanel.hidden=!on;
-    if(on){$('#page .slot').hidden=true;renderHistory();}
+    const token=++historyRenderToken;
+    if(on){
+      $('#page .slot').hidden=true;
+      if(!historyPanel.childElementCount)historyPanel.innerHTML='<div class="historyempty">CARREGANDO...</div>';
+      requestAnimationFrame(()=>{
+        if(token!==historyRenderToken||historyPanel.hidden)return;
+        renderHistory(false);
+      });
+    }
   }
 
 
@@ -3510,6 +3522,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   $('#page').appendChild(reportsPanel);
   const reportsSelected=new Set();
   let reportsPendingDelete=new Set(),reportsSelectMode=false,reportsOpenId=null,reportsShareOpen=false,reportsClearPending=false;
+  let reportsRenderKey='',reportsRenderToken=0;
 
   function reportsText(){return REPORTS_TEXT[L()]||REPORTS_TEXT.pt;}
   function reportLibraryItems(){return window.StackUpReportLibrary?.list?.()||[];}
@@ -3604,8 +3617,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     show('menu',true);
     const content=$('.content');if(content)content.scrollTop=0;
   }
-  function renderReports(){
+  function renderReports(force){
     const tx=reportsText(),items=reportLibraryItems();
+    const key=[L(),reportsSelectMode?'1':'0',reportsOpenId||'',reportsShareOpen?'1':'0',reportsClearPending?'1':'0',
+      [...reportsSelected].sort().join(','),[...reportsPendingDelete].sort().join(','),items.length,
+      ...items.slice(0,100).map(x=>x.id+':'+String(x.updatedAt||x.createdAt||''))].join('|');
+    if(!force&&key===reportsRenderKey&&reportsPanel.childElementCount)return;
+    reportsRenderKey=key;
     [...reportsSelected].forEach(id=>{if(!items.some(x=>x.id===id))reportsSelected.delete(id);});
     const top='<div class="reportshead"><b>'+spotEscape(L()==='en'?'REPORT LIBRARY':L()==='es'?'BIBLIOTECA DE INFORMES':'BIBLIOTECA DE RELATÓRIOS')+'</b><span>'+items.length+'</span></div>'+
       '<div class="reportsselectrow"><button data-reports-mode="'+(reportsSelectMode?'close':'select')+'" class="'+(reportsSelectMode?'on':'')+'">'+spotEscape(reportsSelectMode?tx.close:tx.select)+'</button><button class="dataaction danger" data-reports-clear>'+(reportsClearPending?spotEscape(tx.confirmClear):spotEscape(tx.clearAll))+'</button></div>';
@@ -3663,11 +3681,16 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const on=hs==='reports';
     reportsPanel.hidden=!on;
     reportsPanel.style.display=on?'flex':'none';
+    const token=++reportsRenderToken;
     if(on){
       const slot=$('#page .slot');if(slot)slot.hidden=true;
       hg.hidden=true;tw.hidden=true;adv.hidden=true;historyPanel.hidden=true;statsPanel.hidden=true;statsPanel.style.display='none';tb.hidden=true;spotActions.hidden=true;spotSupport.hidden=true;
-      renderReports();
-      const content=$('.content');if(content)content.scrollTop=0;
+      if(!reportsPanel.childElementCount)reportsPanel.innerHTML='<div class="reportempty">CARREGANDO...</div>';
+      requestAnimationFrame(()=>{
+        if(token!==reportsRenderToken||reportsPanel.hidden)return;
+        renderReports(false);
+      });
+      const content=$('.content');if(content&&content.scrollTop<4)content.scrollTop=0;
     }
   }
 
