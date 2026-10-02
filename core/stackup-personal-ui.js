@@ -9,6 +9,11 @@
     let pendingPersonalDelete=null;
     let pendingDataAction=null;
     let renderRecordsCache=null;
+    let progressIndex=null;
+    let lastGrinderSyncKey='';
+    let lastCoachKey='';
+    let lastCoachAt=0;
+    let personalRenderToken=0;
 
     const style=document.createElement('style');
     style.textContent=`
@@ -55,12 +60,28 @@
     }
 
     function pid(item){return String(item?.meta?.prescriptionId||item?.externalKey||item?.id||'');}
+    function recordsKey(records){
+      const r=Array.isArray(records)?records:[];
+      const first=r[0]||{},last=r[r.length-1]||{};
+      return [r.length,first.id||'',first.answeredAt||'',last.id||'',last.answeredAt||''].join('|');
+    }
+    function buildProgressIndex(records){
+      const map=new Map();
+      for(const r of records||[]){
+        const key=String(r?.prescriptionId||'');
+        if(!key)continue;
+        if(!map.has(key))map.set(key,[]);
+        map.get(key).push(r);
+      }
+      return map;
+    }
     function progress(item){
       const source=renderRecordsCache||ctx.records();
-      const records=source.filter(r=>String(r?.prescriptionId||'')===pid(item));
+      if(!progressIndex)progressIndex=buildProgressIndex(source);
+      const records=progressIndex.get(pid(item))||[];
       const c=ctx.counts(records),target=Math.max(1,Number(item?.targetSpots)||50);
       const prev=Number(item?.meta?.baselineScore);
-      return {records,counts:c,done:c.total,target,pct:Math.min(100,c.total/target*100),score:c.total?c.technical:(Number.isFinite(prev)?prev:0),delta:c.total&&Number.isFinite(prev)?c.technical-prev:0};
+      return {counts:c,done:c.total,target,pct:Math.min(100,c.total/target*100),score:c.total?c.technical:(Number.isFinite(prev)?prev:0),delta:c.total&&Number.isFinite(prev)?c.technical-prev:0};
     }
     function dueFor(priority){
       const days={critical:1,high:2,medium:4,normal:7,low:10}[priority]||7;
@@ -95,6 +116,9 @@
     }
     function syncGrinder(){
       const records=renderRecordsCache||ctx.records();if(records.length<10)return;
+      const key=recordsKey(records);
+      if(key===lastGrinderSyncKey)return;
+      lastGrinderSyncKey=key;
       const dimensions=[
         ['section',ctx.group(records,r=>(Array.isArray(r.sections)&&r.sections.length?r.sections:[r.street||'GERAL']))],
         ['position',ctx.group(records,r=>r.heroPosition||null)],
@@ -144,15 +168,20 @@
       const map={};items.forEach(item=>map[item.id]=progress(item).pct);return map;
     }
     function runCoach(items){
+      const now=Date.now();
+      const key=[L(),...(items||[]).map(x=>x.id+':'+x.status+':'+x.updatedAt)].join('|');
+      if(key===lastCoachKey&&now-lastCoachAt<15000)return;
+      lastCoachKey=key;lastCoachAt=now;
       coach.schedule(items,item=>{
         const p=progress(item);
         return {done:p.done,score:p.score,delta:p.delta};
       },L());
-      coach.flush();
+      Promise.resolve(coach.flush?.()).catch(()=>{});
     }
 
     function renderPersonal(){
       renderRecordsCache=ctx.records();
+      progressIndex=buildProgressIndex(renderRecordsCache);
       syncHeroes();syncGrinder();syncCompletion();
       const tx=T(),base=lib.list(),map=progressMap(base),items=lib.list({progressById:map});
       runCoach(items);
@@ -266,15 +295,30 @@
       }
     });
 
-    function showPersonal(on){personal.hidden=!on;personal.style.display=on?'flex':'none';if(on)renderPersonal();}
-    function showProfile(on){profile.hidden=!on;profile.style.display=on?'flex':'none';if(on)renderProfile();}
+    function showPersonal(on){
+      personal.hidden=!on;personal.style.display=on?'flex':'none';
+      const token=++personalRenderToken;
+      if(!on)return;
+      if(!personal.childElementCount)personal.innerHTML='<div class="personalempty">CARREGANDO...</div>';
+      requestAnimationFrame(()=>window.setTimeout(()=>{
+        if(token!==personalRenderToken||personal.hidden)return;
+        renderPersonal();
+      },0));
+    }
+    function showProfile(on){
+      profile.hidden=!on;profile.style.display=on?'flex':'none';
+      if(on&&(!profile.childElementCount||pendingDataAction!==null))requestAnimationFrame(renderProfile);
+    }
     function onRecord(){
       renderRecordsCache=ctx.records();
+      progressIndex=buildProgressIndex(renderRecordsCache);
+      lastGrinderSyncKey='';
       syncCompletion();
       const items=lib.list().filter(x=>x.status!=='dismissed');
       runCoach(items);
       renderRecordsCache=null;
-      if(!personal.hidden)renderPersonal();
+      progressIndex=null;
+      if(!personal.hidden)requestAnimationFrame(()=>renderPersonal());
     }
     function onBridge(env){if(env?.type==='training_prescription'&&env?.source==='heroes'){syncHeroes();if(!personal.hidden)renderPersonal();}}
 
