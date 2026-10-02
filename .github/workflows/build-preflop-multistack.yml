@@ -52,6 +52,41 @@ jobs:
           - { game: TOURNAMENT, stack: 75, phase: FINAL_TABLE, tournament_type: HIGH_ROLLER, field: "250", extra_tags: "" }
           - { game: TOURNAMENT, stack: 80, phase: LATE, tournament_type: REGULAR, field: "1000+", extra_tags: "" }
 
+          # V3: additional independent stack-depth solves. These are separate
+          # DCFR games because effective stack is part of the game tree.
+          # They are not context projections and are counted only after the
+          # exact solved decision contract + 4bet_value classifier pass.
+          - { game: TOURNAMENT, stack: 31, phase: MIDDLE, tournament_type: REGULAR, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 32, phase: MIDDLE, tournament_type: REGULAR, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 33, phase: MIDDLE, tournament_type: TURBO, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 34, phase: LATE, tournament_type: REGULAR, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 36, phase: LATE, tournament_type: FREEZEOUT, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 37, phase: LATE, tournament_type: REGULAR, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 38, phase: MIDDLE, tournament_type: HIGH_ROLLER, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 39, phase: LATE, tournament_type: TURBO, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 41, phase: MIDDLE, tournament_type: REGULAR, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 42, phase: LATE, tournament_type: REGULAR, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 43, phase: LATE, tournament_type: FREEZEOUT, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 44, phase: MIDDLE, tournament_type: TURBO, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 45, phase: LATE, tournament_type: REGULAR, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 46, phase: MIDDLE, tournament_type: HIGH_ROLLER, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 47, phase: LATE, tournament_type: REGULAR, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 48, phase: LATE, tournament_type: TURBO, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 52, phase: MIDDLE, tournament_type: REGULAR, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 55, phase: LATE, tournament_type: FREEZEOUT, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 58, phase: MIDDLE, tournament_type: REGULAR, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 62, phase: LATE, tournament_type: HIGH_ROLLER, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 65, phase: MIDDLE, tournament_type: REGULAR, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 68, phase: LATE, tournament_type: TURBO, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 72, phase: LATE, tournament_type: REGULAR, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 78, phase: FINAL_TABLE, tournament_type: FREEZEOUT, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 82, phase: LATE, tournament_type: REGULAR, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 85, phase: MIDDLE, tournament_type: HIGH_ROLLER, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 88, phase: LATE, tournament_type: REGULAR, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 90, phase: LATE, tournament_type: TURBO, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 95, phase: MIDDLE, tournament_type: REGULAR, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 98, phase: LATE, tournament_type: HIGH_ROLLER, field: "1000+", extra_tags: "" }
+
           - { game: CASH, stack: 5, phase: "", tournament_type: "", field: "", extra_tags: "" }
           - { game: CASH, stack: 10, phase: "", tournament_type: "", field: "", extra_tags: "" }
           - { game: CASH, stack: 15, phase: "", tournament_type: "", field: "", extra_tags: "" }
@@ -159,7 +194,7 @@ jobs:
           const fs=require('fs'),path=require('path');
           const dir='.stackup/multistack-in';
           const files=fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort();
-          if(files.length!==30)throw new Error('expected 30 context banks, found '+files.length);
+          if(files.length!==60)throw new Error('expected 60 context banks, found '+files.length);
           const spots=[],contexts=[],ids=new Set();
           for(const file of files){
             const d=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'));
