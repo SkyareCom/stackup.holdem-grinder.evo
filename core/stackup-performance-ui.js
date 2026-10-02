@@ -6,6 +6,7 @@
     const R=ctx.root,page=ctx.page,xp=ctx.xp;
     if(!R||!page||!xp)return null;
     let pendingClear=false;
+    let panelVisible=false;
     let lastRenderKey='';
     let renderToken=0;
 
@@ -141,14 +142,17 @@
     });
 
     function show(on){
+      const changed=panelVisible!==!!on;
+      panelVisible=!!on;
       panel.hidden=!on;panel.style.display=on?'flex':'none';
       const token=++renderToken;
       if(!on)return;
+      if(!changed&&panel.childElementCount)return;
       if(!panel.childElementCount)panel.innerHTML='<div class="perfcard"><div class="perfempty">CARREGANDO...</div></div>';
-      requestAnimationFrame(()=>window.setTimeout(()=>{
+      requestAnimationFrame(()=>{
         if(token!==renderToken||panel.hidden)return;
         render();
-      },0));
+      });
     }
     return Object.freeze({panel,render,show});
   }
