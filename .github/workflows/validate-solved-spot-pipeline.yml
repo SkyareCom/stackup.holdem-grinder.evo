@@ -51,6 +51,10 @@ jobs:
           python -m py_compile scripts/patch-dcfr-9max.py
           python -m py_compile scripts/patch-dcfr-stack.py
           python -m py_compile scripts/patch-dcfr-hu.py
+          python -m py_compile scripts/generate-reentry-bank.py
+          python -m py_compile scripts/generate-opponent-profile-bank.py
+          python -m py_compile scripts/generate-multiway-tournament-bank.py
+          python -m py_compile scripts/generate-multiway-postflop-bank.py
 
       - name: Validate solved-spot policy and bank envelopes
         run: |
@@ -64,6 +68,10 @@ jobs:
             'data/solver/preflop-9max.json',
             'data/solver/preflop-multistack.json',
             'data/solver/preflop-hu.json',
+            'data/solver/reentry.json',
+            'data/solver/opponent-profile.json',
+            'data/solver/multiway-tournament.json',
+            'data/solver/multiway-postflop.json',
             'data/solver/line-bank.json',
             'data/solver/tournament.json',
             'data/solver/texture-sizing.json'
@@ -79,3 +87,10 @@ jobs:
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
           node scripts/route-solve-queue.mjs
+          node - <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync('data/solver/solve-route-plan.json','utf8'));
+          if(r.counts.unrouted!==0)throw new Error('unrouted deficits: '+r.counts.unrouted);
+          if(r.counts.engineRequired!==0)throw new Error('engines still required: '+r.counts.engineRequired);
+          console.log({readyToSolve:r.counts.readyToSolve,engineRequired:r.counts.engineRequired,unrouted:r.counts.unrouted});
+          NODE
