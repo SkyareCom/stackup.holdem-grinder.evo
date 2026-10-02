@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="stats-evolution-v4">
+<meta name="grinder-build" content="typography-12-footer-10-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -3215,6 +3215,26 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     box.addEventListener('click',e=>{ if(moved){ e.stopPropagation(); e.preventDefault(); moved=false; } },true);
   })();
 
+  // PADRÃO TIPOGRÁFICO FINAL:
+  // conteúdo = 12px; rodapé = 10px; cabeçalho e logotipo permanecem intocados.
+  const typographyStyle=document.createElement('style');
+  typographyStyle.id='grinder-typography-standard';
+  typographyStyle.textContent=`
+    .content,
+    .content *{
+      font-size:12px!important;
+    }
+    .toast,
+    .toast *{
+      font-size:12px!important;
+    }
+    .tabbar,
+    .tabbar *{
+      font-size:10px!important;
+    }
+  `;
+  R.appendChild(typographyStyle);
+
   // HOME pronta enquanto o usuário ainda está na tela de login.
   primeHome();
 
@@ -3477,5 +3497,21 @@ html body #biometricLoginCard{opacity:1!important;filter:none!important;cursor:p
 })();
 </script>
 
+
+<style id="grinder-login-typography-standard">
+/* Tela de entrada: conteúdo em 12px e texto de rodapé em 10px.
+   Identidade visual, logotipo e bloco de marca/título não são alterados. */
+main.screen .actions *,
+main.screen .menu *,
+main.screen .welcome *,
+main.screen .google-auth-status,
+main.screen .toast{
+  font-size:12px!important;
+}
+main.screen .legal,
+main.screen .legal *{
+  font-size:10px!important;
+}
+</style>
 </body>
 </html>
