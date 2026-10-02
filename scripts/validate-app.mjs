@@ -88,19 +88,19 @@ try{
 }catch(error){failures.push('training sequencer syntax/runtime error: '+error.message);}
 try{new Function(spotsClient);}
 catch(error){failures.push('spots client syntax error: '+error.message);}
-if(!html.includes('<script src="core/stackup-tournament-math.js"></script>')){
+if(!/<script\s+src=["']core\/stackup-tournament-math\.js(?:\?[^"']*)?["'][^>]*><\/script>/i.test(html)){
   failures.push('tournament math script is missing from index');
 }
-if(!html.includes('<script src="core/stackup-scenario-catalog.js"></script>')){
+if(!/<script\s+src=["']core\/stackup-scenario-catalog\.js(?:\?[^"']*)?["'][^>]*><\/script>/i.test(html)){
   failures.push('scenario catalog script is missing from index');
 }
-if(!html.includes('<script src="core/stackup-ai-scenario-planner.js"></script>')){
+if(!/<script\s+src=["']core\/stackup-ai-scenario-planner\.js(?:\?[^"']*)?["'][^>]*><\/script>/i.test(html)){
   failures.push('AI scenario planner script is missing from index');
 }
 if(html.indexOf('stackup-scenario-catalog.js')>html.indexOf('stackup-ai-scenario-planner.js')){
   failures.push('scenario catalog must load before AI scenario planner');
 }
-if(!html.includes('<script src="core/stackup-training-sequencer.js"></script>')){
+if(!/<script\s+src=["']core\/stackup-training-sequencer\.js(?:\?[^"']*)?["'][^>]*><\/script>/i.test(html)){
   failures.push('training sequencer script is missing from index');
 }
 if(html.indexOf('stackup-scenario-catalog.js')>html.indexOf('stackup-training-sequencer.js')){
