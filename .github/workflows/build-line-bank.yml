@@ -21,7 +21,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: strict-solved-line-bank
+  group: strict-solved-line-debug-f-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -30,9 +30,9 @@ jobs:
     timeout-minutes: 75
     strategy:
       fail-fast: false
-      max-parallel: 8
+      max-parallel: 1
       matrix:
-        runout: [a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t]
+        runout: [f]
 
     steps:
       - uses: actions/checkout@v4
@@ -117,7 +117,7 @@ jobs:
           const fs=require('fs'),path=require('path');
           const dir='.stackup/line-in';
           const files=fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort();
-          if(files.length!==20)throw new Error('expected 20 line runout shards, found '+files.length);
+          if(files.length!==1)throw new Error('expected debug shard f, found '+files.length);
           const spots=[],failures=[],ids=new Set(),runouts=[];
           let first=null,iterations=Infinity;
           for(const file of files){
