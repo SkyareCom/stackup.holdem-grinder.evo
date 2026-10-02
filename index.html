@@ -804,7 +804,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 <script src="core/stackup-xp-performance.js"></script>
 <script src="core/stackup-performance-analysis.js"></script>
 <script src="core/stackup-performance-ui.js"></script>
-<script src="core/stackup-ui-system.js"></script>\n<script src="core/stackup-personal-ui.js"></script>
+<script src="core/stackup-ui-system.js"></script>
+<script src="core/stackup-personal-ui.js"></script>
 <script src="core/stackup-app-bridge.js"></script>
 <script>
 (function(){
@@ -3248,8 +3249,34 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return lines.join('\n');
   }
   function statsReportHtml(model){
-    const tx=statsText(),c=model.overall,rows=model.bySection.map(x=>'<tr><td>'+statsEsc(x.name)+'</td><td>'+x.grade.grade+'</td><td>'+x.counts.total+'</td><td>'+x.counts.correct+'</td><td>'+x.counts.accuracy.toFixed(1)+'%</td></tr>').join('');
-    return '<!doctype html><html lang="'+L()+'"><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>StackUp Grinder - '+tx.report+'</title><style>body{font-family:Arial,sans-serif;background:#07101f;color:#fff;padding:24px;line-height:1.45}h1,h2{color:#6fa4ff}section{margin:18px 0;padding:16px;border:1px solid #526078;border-radius:12px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #344052;text-align:left}.swot{display:grid;grid-template-columns:1fr 1fr;gap:10px}.swot div{padding:10px;border:1px solid #344052;border-radius:8px}@media print{body{background:#fff;color:#111}h1,h2{color:#194f9f}section,.swot div{border-color:#bbb}}</style><body><h1>STACKUP HOLD\'EM GRINDER</h1><h2>'+tx.report+'</h2><section><b>'+tx.spots+':</b> '+c.total+' &nbsp; <b>'+tx.correct+':</b> '+c.correct+' &nbsp; <b>'+tx.accuracy+':</b> '+c.accuracy.toFixed(1)+'%</section><section><h2>'+tx.bySection+'</h2><table><tr><th>'+tx.section+'</th><th>NÍVEL</th><th>'+tx.spots+'</th><th>'+tx.correct+'</th><th>'+tx.accuracy+'</th></tr>'+rows+'</table></section><section><h2>'+tx.swot+'</h2><div class="swot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></section><section><h2>'+tx.improve+'</h2><ol>'+model.plan.map(x=>'<li>'+statsEsc(x)+'</li>').join('')+'</ol></section></body></html>';
+    const tx=statsText(),c=model.overall,d=model.deep||{},grade=statsGrade(model.records||[]);
+    const esc=statsEsc;
+    const pct=v=>(Number(v)||0).toFixed(1)+'%';
+    const issueCards=(items,label)=>(items||[]).map((x,i)=>
+      '<article class="issue"><div class="issuehead"><span>'+(i+1)+'</span><div><b>'+esc(x.name)+'</b><small>'+esc(label)+' · '+pct(x.metrics?.technical)+'</small></div></div>'+
+      '<p><strong>'+(L()==='en'?'Evidence':L()==='es'?'Evidencia':'Evidência')+':</strong> '+esc(x.evidence)+'</p>'+
+      '<p>'+esc(x.comment)+'</p>'+
+      '<p><strong>'+(L()==='en'?'Risk':L()==='es'?'Riesgo':'Risco')+':</strong> '+esc(x.risk)+'</p>'+
+      '<p><strong>'+(L()==='en'?'Action':L()==='es'?'Acción':'Ação')+':</strong> '+esc(x.action)+'</p></article>'
+    ).join('');
+    const sections=(model.bySection||[]).slice(0,20).map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.grade.grade)+'</td><td>'+x.counts.total+'</td><td>'+pct(x.counts.technical)+'</td><td>'+pct(x.counts.accuracy)+'</td></tr>').join('');
+    const plan=(model.plan||[]).map((x,i)=>'<li><b>'+(i+1)+'.</b> '+esc(x)+'</li>').join('');
+    const title=L()==='en'?'PERFORMANCE REPORT':L()==='es'?'INFORME DE RENDIMIENTO':'RELATÓRIO DE PERFORMANCE';
+    const diagnosis=L()==='en'?'PRIORITY DIAGNOSIS':L()==='es'?'DIAGNÓSTICO PRIORITARIO':'DIAGNÓSTICO PRIORITÁRIO';
+    return '<!doctype html><html lang="'+L()+'"><head><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StackUp Grinder - '+title+'</title>'+
+      '<style>*{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#07101f;color:#d9dde5;margin:0;padding:24px;line-height:1.5}main{max-width:860px;margin:auto}h1,h2,h3{color:#fff;margin:0 0 10px}h1{font-size:24px}h2{font-size:16px;margin-top:28px}p{margin:7px 0}.accent{color:#6fa4ff}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:18px 0}.kpi,.issue,.panel{padding:14px;border:1px solid #34465f;border-radius:14px;background:#0b1728}.kpi b{display:block;color:#fff;font-size:20px}.kpi small,.issue small{color:#8f9bad}.issue{margin:8px 0}.issuehead{display:flex;gap:10px;align-items:center}.issuehead>span{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#143a70;color:#8db8ff}.issue p strong{color:#fff}ol{padding-left:20px}li{margin:8px 0}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:9px;border-bottom:1px solid #26384f;text-align:left}th{color:#fff}.note{margin-top:24px;padding:14px;border-radius:14px;background:#0d2d57;color:#dceaff}@media(max-width:620px){body{padding:14px}.summary{grid-template-columns:1fr 1fr}}@media print{body{background:#fff;color:#333}.kpi,.issue,.panel{background:#fff;border-color:#bbb}h1,h2,h3,.kpi b,.issue p strong,th{color:#111}.accent{color:#194f9f}.note{background:#eef5ff;color:#222}}</style></head><body><main>'+
+      '<h1>STACKUP HOLD\'EM GRINDER</h1><h3 class="accent">'+title+'</h3>'+
+      '<div class="summary"><div class="kpi"><b>'+c.total+'</b><small>'+tx.spots+'</small></div><div class="kpi"><b>'+pct(c.technical)+'</b><small>SCORE TÉCNICO</small></div><div class="kpi"><b>'+pct(c.accuracy)+'</b><small>'+tx.accuracy+'</small></div><div class="kpi"><b>'+esc(grade.grade)+'</b><small>NÍVEL</small></div></div>'+
+      '<h2>'+diagnosis+'</h2>'+
+      ((d.weaknesses||[]).length?'<div class="panel"><h3>'+tx.weaknesses+'</h3>'+issueCards((d.weaknesses||[]).slice(0,5),tx.weaknesses)+'</div>':'')+
+      ((d.threats||[]).length?'<div class="panel"><h3>'+tx.threats+'</h3>'+issueCards((d.threats||[]).slice(0,5),tx.threats)+'</div>':'')+
+      '<h2>'+tx.improve+'</h2><div class="panel"><ol>'+plan+'</ol></div>'+
+      '<h2>'+tx.bySection+'</h2><div class="panel"><table><tr><th>'+tx.section+'</th><th>NÍVEL</th><th>'+tx.spots+'</th><th>TÉCNICO</th><th>'+tx.accuracy+'</th></tr>'+sections+'</table></div>'+
+      '<h2>'+tx.opportunities+' / '+tx.strengths+'</h2>'+
+      ((d.opportunities||[]).length?'<div class="panel"><h3>'+tx.opportunities+'</h3>'+issueCards((d.opportunities||[]).slice(0,4),tx.opportunities)+'</div>':'')+
+      ((d.strengths||[]).length?'<div class="panel"><h3>'+tx.strengths+'</h3>'+issueCards((d.strengths||[]).slice(0,4),tx.strengths)+'</div>':'')+
+      '<div class="note">'+esc(d.accessMessage||'')+'</div>'+
+      '</main></body></html>';
   }
   function statsReportName(view,createdAt){
     const labels={
@@ -3257,6 +3284,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       evolution:{pt:'EVOLUÇÃO',en:'EVOLUTION',es:'EVOLUCIÓN'},
       game:{pt:'JOGO',en:'GAME',es:'JUEGO'},
       advance:{pt:'ADVANCE',en:'ADVANCE',es:'ADVANCE'},
+      situations:{pt:'SITUAÇÕES',en:'SITUATIONS',es:'SITUACIONES'},
       sessions:{pt:'SESSÕES',en:'SESSIONS',es:'SESIONES'},
       report:{pt:'RELATÓRIO',en:'REPORT',es:'INFORME'}
     };
