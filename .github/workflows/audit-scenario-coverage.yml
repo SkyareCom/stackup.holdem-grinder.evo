@@ -6,7 +6,10 @@ on:
     paths:
       - ".github/workflows/audit-scenario-coverage.yml"
       - "scripts/audit-scenario-coverage.mjs"
+      - "scripts/plan-solved-spot-growth.mjs"
       - "core/stackup-scenario-catalog.js"
+      - "core/stackup-solved-spot-contract.js"
+      - "data/solver/solved-spot-policy.json"
       - "data/solver/preflop.json"
       - "data/solver/postflop.json"
       - "data/solver/tournament.json"
@@ -14,6 +17,7 @@ on:
       - "data/solver/preflop-decisions.json"
       - "data/solver/preflop-9max.json"
       - "data/solver/texture-sizing.json"
+      - "data/solver/line-bank.json"
 
 permissions:
   contents: write
@@ -32,23 +36,33 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Audit 162 training cards
-        run: node scripts/audit-scenario-coverage.mjs
+      - name: Audit 162 training cards with strict solved-spot contract
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
 
       - name: Validate coverage contract
         run: |
           node - <<'NODE'
           const fs=require('fs');
           const c=JSON.parse(fs.readFileSync('data/solver/coverage.json','utf8'));
+          if(c.mode!=='STRICT_SOLVED_ONLY')throw new Error('strict solved-only coverage required');
           if(c.minSpots!==1500)throw new Error('coverage floor must remain 1500');
+          if(c.currentGoal!==2000)throw new Error('current solved-spot goal must be 2000');
+          if(c.longTermTarget!==20000)throw new Error('long-term solved-spot target must be 20000');
           if(c.counts.adjust!==58||c.counts.advance!==104||c.counts.total!==162){
             throw new Error('scenario catalog count drift: '+JSON.stringify(c.counts));
           }
           if(!Array.isArray(c.cards)||c.cards.length!==162)throw new Error('coverage card list must have 162 entries');
-          console.log({publishable:c.publishable,incomplete:c.incomplete,minSpots:c.minSpots});
+          for(const card of c.cards){
+            if(card.available!==card.validatedSolvedSpots)throw new Error('presentation inflation detected: '+card.section+'/'+card.id);
+            if(card.targetSpots!==2000)throw new Error('card target drift: '+card.section+'/'+card.id);
+          }
+          console.log({publishable:c.publishable,incomplete:c.incomplete,minSpots:c.minSpots,currentGoal:c.currentGoal,longTermTarget:c.longTermTarget});
           NODE
 
       - name: Commit coverage audit safely
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "StackUp Coverage Bot"
           git config user.email "actions@users.noreply.github.com"
@@ -58,8 +72,9 @@ jobs:
           git fetch origin main
           git reset --hard origin/main
           node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
 
-          git add data/solver/coverage.json
+          git add data/solver/coverage.json data/solver/growth-plan.json
           if git diff --cached --quiet; then
             echo "Coverage unchanged."
             exit 0
