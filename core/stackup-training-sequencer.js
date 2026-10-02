@@ -846,14 +846,23 @@
   }
 
   function expand(bank,filters){
+    // Runtime candidate universe must mirror the strict coverage auditor.
+    // Every counted solved bank is loaded here; STRICT_SOLVED_ONLY validation
+    // below remains the final gate for every scenario + hand decision.
     const all=[
       ...(bank?.preflop||[]),
       ...(bank?.postflop||[]),
       ...pushfoldSpots(bank),
       ...((bank?.tournament?.spots)||[]),
+      ...((bank?.reentry?.spots)||[]),
+      ...((bank?.opponentProfile?.spots)||[]),
+      ...((bank?.multiwayTournament?.spots)||[]),
+      ...((bank?.multiwayPostflop?.spots)||[]),
       ...((bank?.preflopDecisions?.spots)||[]),
-      ...((bank?.textureSizing?.spots)||[]),
       ...((bank?.preflop9max?.spots)||[]),
+      ...((bank?.preflopMultistack?.spots)||[]),
+      ...((bank?.preflopHu?.spots)||[]),
+      ...((bank?.textureSizing?.spots)||[]),
       ...((bank?.lineBank?.spots)||[])
     ];
     const candidates=[];
