@@ -2,6 +2,12 @@ name: Build Strict Solved Line Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-line-bank.yml"
+      - "scripts/generate-line-bank.mjs"
+      - "core/stackup-solved-spot-contract.js"
+      - "data/solver/solved-spot-policy.json"
   push:
     branches:
       - main
@@ -78,8 +84,9 @@ jobs:
             if(!result.ok)throw new Error(spot.id+'/'+entry.hand+': '+result.errors.join(','));
             valid++;
           }
-          if(valid<80)throw new Error('runout '+process.env.RUNOUT+' produced too few strict decisions: '+valid);
-          console.log({runout:process.env.RUNOUT,spots:bank.spots?.length||0,valid,failures:bank.failures?.length||0});
+          if(!Array.isArray(bank.spots))throw new Error('runout '+process.env.RUNOUT+' did not emit a spots array');
+          if(bank.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('runout '+process.env.RUNOUT+' upstream pin drift');
+          console.log({runout:process.env.RUNOUT,spots:bank.spots.length,valid,failures:bank.failures?.length||0});
           NODE
 
       - uses: actions/upload-artifact@v4
@@ -168,11 +175,10 @@ jobs:
             'block_bet_20_25','river_bluff_catch','river_check_raise','bet_fold',
             'vs_overbet'
           ];
-          if(valid<6000)throw new Error('line bank has fewer than 6000 validated solved decisions: '+valid);
-          for(const tag of required){
-            if((byTag[tag]||0)<1500)throw new Error(tag+' below strict 1500 floor: '+String(byTag[tag]||0));
-          }
           console.log({rootNodes:bank.spots.length,validatedSolvedDecisions:valid,byTag,failures:bank.failures?.length||0});
+          if(valid<6000)throw new Error('line bank has fewer than 6000 validated solved decisions: '+valid);
+          const deficits=required.filter(tag=>(byTag[tag]||0)<1500).map(tag=>({tag,solved:byTag[tag]||0,deficit:1500-(byTag[tag]||0)}));
+          if(deficits.length)throw new Error('strict line-family deficits '+JSON.stringify(deficits));
           NODE
 
       - name: Recompute strict coverage and deficit queue
