@@ -184,7 +184,16 @@
       }
     };
   }
+  let ANALYSIS_CACHE_KEY='';
+  let ANALYSIS_CACHE_VALUE=null;
+  function analysisKey(records,lang){
+    const r=Array.isArray(records)?records:[];
+    const first=r[0]||{},last=r[r.length-1]||{};
+    return [lang||'pt',r.length,first.id||'',first.answeredAt||'',first.status||'',last.id||'',last.answeredAt||'',last.status||''].join('|');
+  }
   function analyze(records,lang){
+    const cacheKey=analysisKey(records,lang);
+    if(cacheKey===ANALYSIS_CACHE_KEY&&ANALYSIS_CACHE_VALUE)return ANALYSIS_CACHE_VALUE;
     const all=[];
     ['section','position','street','stack','phase','action','training'].forEach(d=>all.push(...grouped(records,d)));
     const usable=all.filter(x=>x.counts.total>=6&&x.name&&x.name!=='N/D'&&x.name!=='null');
@@ -211,11 +220,13 @@
       if(seen.has(key))return;
       seen.add(key);recommendations.push(x.training);
     });
-    return {
+    ANALYSIS_CACHE_KEY=cacheKey;
+    ANALYSIS_CACHE_VALUE={
       overall:counts(records),strengths,weaknesses,opportunities,threats,
       recommendations:recommendations.slice(0,10),
       accessMessage:langText(lang).access
     };
+    return ANALYSIS_CACHE_VALUE;
   }
 
   global.StackUpPerformanceAnalysis=Object.freeze({analyze,counts,trend,grouped});

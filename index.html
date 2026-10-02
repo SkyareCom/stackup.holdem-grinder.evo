@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="ux-audit-restructure-v1">
+<meta name="grinder-build" content="runtime-performance-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -2277,8 +2277,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
           answeredAt
         },{correlationId:ACTIVE_STACKUP_PRESCRIPTION.envelopeId});
       }
-      personalUI?.onRecord?.();
-      performanceUI?.render?.();
+      invalidateStatsDataCache();
+      const deferAnalytics=window.requestIdleCallback
+        ?cb=>window.requestIdleCallback(cb,{timeout:700})
+        :cb=>window.setTimeout(cb,80);
+      deferAnalytics(()=>{try{personalUI?.onRecord?.();}catch(_){}});
     }catch(_){}
     renderSpotSupport();
 
@@ -2772,6 +2775,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   let statsTrainingFilter='all',statsSectionFilter='all',statsSessionFilter='all',statsView='overview',statsReportOverride=null;
 
   function statsText(){return STATS_TEXT[L()]||STATS_TEXT.pt;}
+  const STATS_DATA_CACHE={records:null,recordsAt:0,sessions:null,sessionsAt:0};
+  function invalidateStatsDataCache(){
+    STATS_DATA_CACHE.records=null;STATS_DATA_CACHE.recordsAt=0;
+    STATS_DATA_CACHE.sessions=null;STATS_DATA_CACHE.sessionsAt=0;
+  }
+  window.StackUpInvalidateStatsData=invalidateStatsDataCache;
   function statsLegacyRecords(){
     const items=window.StackUpTrainingHistory?.list?.('date')||[];
     const out=[];
@@ -2797,19 +2806,27 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return out;
   }
   function statsAllRecords(){
+    const now=performance.now();
+    if(STATS_DATA_CACHE.records&&now-STATS_DATA_CACHE.recordsAt<500)return STATS_DATA_CACHE.records;
     const live=window.StackUpTrainingPerformance?.records?.()||[];
     const legacy=statsLegacyRecords();
     const seen=new Set(live.map(x=>String(x.spotId||'')+'|'+String(x.answeredAt||'')+'|'+String(x.status||'')));
-    return live.concat(legacy.filter(x=>!seen.has(String(x.spotId||'')+'|'+String(x.answeredAt||'')+'|'+String(x.status||''))));
+    STATS_DATA_CACHE.records=live.concat(legacy.filter(x=>!seen.has(String(x.spotId||'')+'|'+String(x.answeredAt||'')+'|'+String(x.status||''))));
+    STATS_DATA_CACHE.recordsAt=now;
+    return STATS_DATA_CACHE.records;
   }
   function statsAllSessions(){
+    const now=performance.now();
+    if(STATS_DATA_CACHE.sessions&&now-STATS_DATA_CACHE.sessionsAt<750)return STATS_DATA_CACHE.sessions;
     const live=window.StackUpTrainingPerformance?.sessions?.()||[];
     const map=new Map(live.map(x=>[x.id,x]));
     (window.StackUpTrainingHistory?.list?.('date')||[]).forEach(item=>{
       const id='legacy:'+item.id;
       if(!map.has(id))map.set(id,{id,name:item.name||'',training:item.name||'',startedAt:item.createdAt,updatedAt:item.updatedAt});
     });
-    return [...map.values()];
+    STATS_DATA_CACHE.sessions=[...map.values()];
+    STATS_DATA_CACHE.sessionsAt=now;
+    return STATS_DATA_CACHE.sessions;
   }
   function statsCounts(records){
     const total=records.length,correct=records.filter(x=>x.status==='correct').length,adjustable=records.filter(x=>x.status==='adjustable').length,incorrect=records.filter(x=>x.status==='incorrect').length;
@@ -3676,6 +3693,32 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   `;
   R.appendChild(uxAuditStyle);
 
+  // ===== PERFORMANCE RUNTIME: Android/mobile =====
+  const runtimePerformanceStyle=document.createElement('style');
+  runtimePerformanceStyle.textContent=`
+    .statscard,.statskpi,.statssubject,.statssession,.statstraining,
+    .personalcard,.personalhero,.coachcard,.perfcard,.perfduel,.perfrank,
+    .perfswotblock,.perfswotitem,.perftraining,.historyitem,.reportitem{
+      content-visibility:auto;
+      contain-intrinsic-size:auto 120px;
+    }
+    .performancepanel,.statspanel,.personalpanel,.reportspanel,.historypanel{
+      contain:layout style;
+    }
+    @media(max-width:600px){
+      .tower,.chip,.thead,.hbtn,.tabbar,.sectionhead,.sectiontitle,
+      .statscard,.statskpi,.statshero,.statssubject,.statssession,.statstraining,
+      .personalcard,.personalhero,.coachcard,.perfcard,.perfduel,.perfrank,
+      .perfswotblock,.perfswotitem,.perftraining,.historyitem,.historydetail,
+      .reportitem,.reportdetail,.reportshead,.reportsbatch,
+      .spotanalysissection,.spotindicator,.spotfinal{
+        -webkit-backdrop-filter:none!important;
+        backdrop-filter:none!important;
+      }
+    }
+  `;
+  R.appendChild(runtimePerformanceStyle);
+
   // ===== REGRA VISUAL GLOBAL: SEM MOLDURAS EXTERNAS =====
   const noOuterFramesStyle=document.createElement('style');
   noOuterFramesStyle.textContent=`
@@ -3793,7 +3836,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 
   function renderHome(){ hg.innerHTML=HORD.map(k=>`<button class="tower" data-k="${k}">${HICONS[k]}<b>${k==='ia'?T2[L()][k].replace(' ','\n'):k==='api'?T2[L()][k]:brk(T2[L()]['card_'+k]||T2[L()][k])}</b></button>`).join(''); }
   hg.addEventListener('click',e=>{ const c=e.target.closest('.tower'); if(!c)return; const k=c.dataset.k;
-    c.classList.add('on'); setTimeout(()=>{ if(HSUB.includes(k)){ sub.home.push(k); show('home',false);} else show(k,true); },250); });
+    c.classList.add('on');
+    requestAnimationFrame(()=>{ if(HSUB.includes(k)){ sub.home.push(k); show('home',false);} else show(k,true); });
+  });
   function tr(){ qa('[data-i]').forEach(el=>el.textContent=T2[L()][el.dataset.i]);
     const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null, key=hs||cur;
     const title=T2[L()]['ti_'+key];
@@ -3808,9 +3853,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
     qa('.tab').forEach(x=>{const on=x.dataset.t===t;x.classList.toggle('on',on);on?x.setAttribute('aria-current','page'):x.removeAttribute('aria-current')});
     const pg=$('#page'); const a=dir!==undefined?dir:(TORDER.indexOf(t)-TORDER.indexOf(prev));
-    pg.style.animation='none';pg.offsetHeight;pg.style.animation=a>0?'slideInR .26s cubic-bezier(.2,.7,.2,1)':a<0?'slideInL .26s cubic-bezier(.2,.7,.2,1)':'';
     if(a) $('.content').scrollTop=0;
     tr(); syncBack();
+    if(a&&pg?.animate&&!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches){
+      try{
+        pg.getAnimations?.().forEach(anim=>{if(anim.id==='stackup-nav')anim.cancel();});
+        const anim=pg.animate(
+          [{transform:'translate3d('+(a>0?'14px':'-14px')+',0,0)',opacity:.72},{transform:'translate3d(0,0,0)',opacity:1}],
+          {duration:150,easing:'cubic-bezier(.2,.7,.2,1)'}
+        );
+        anim.id='stackup-nav';
+      }catch(_){}
+    }
   }
   function primeHome(){
     try{
@@ -3889,7 +3943,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         renderHome();
         requestAnimationFrame(()=>tr());
       }
-    },250);
+    },70);
   });
   qa('.tab').forEach(t=>t.onclick=()=>{
     const target=t.dataset.t;

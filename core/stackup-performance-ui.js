@@ -6,6 +6,7 @@
     const R=ctx.root,page=ctx.page,xp=ctx.xp;
     if(!R||!page||!xp)return null;
     let pendingClear=false;
+    let lastRenderKey='';
 
     const style=document.createElement('style');
     style.textContent=`
@@ -78,7 +79,12 @@
     function render(){
       const records=ctx.records();
       xp.backfill(records);
-      const tx=T(),s=xp.summary(),deep=ctx.analysis?.(records,L())||{strengths:[],weaknesses:[],opportunities:[],threats:[],recommendations:[]};
+      const tx=T(),s=xp.summary();
+      const first=records[0]||{},last=records[records.length-1]||{};
+      const renderKey=[L(),records.length,first.id||'',first.answeredAt||'',last.id||'',last.answeredAt||'',s.total,s.heroXP,pendingClear?'1':'0'].join('|');
+      if(renderKey===lastRenderKey&&panel.childElementCount)return;
+      lastRenderKey=renderKey;
+      const deep=ctx.analysis?.(records,L())||{strengths:[],weaknesses:[],opportunities:[],threats:[],recommendations:[]};
       persistRecommendations(deep);
       if(!s.total){
         panel.innerHTML='<div class="perfcard"><div class="perftitle">'+esc(tx.rank)+'</div><div class="perfempty">'+esc(tx.empty)+'</div></div>';
