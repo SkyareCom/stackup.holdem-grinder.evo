@@ -4017,7 +4017,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const go=(Math.abs(dx)>w*.22||(v>.45&&Math.abs(dx)>30))&&j>=0&&j<TORDER.length;
       if(go){ const ms=reduce?0:130;
         pg.style.transition=`transform ${ms}ms ease-in, opacity ${ms}ms`; pg.style.transform=`translateX(${-dir*w}px)`; pg.style.opacity='0';
-        setTimeout(()=>{ pg.style.transition='none'; pg.style.transform=''; pg.style.opacity=''; show(TORDER[j],true,dir); },ms);
+        setTimeout(()=>{ pg.style.transition='none'; pg.style.transform=''; pg.style.opacity=''; show(TORDER[j],true,0); },ms);
       } else { pg.style.transition='transform .22s ease, opacity .22s'; pg.style.transform=''; pg.style.opacity=''; }
     }
     box.addEventListener('pointerup',end); box.addEventListener('pointercancel',end);
