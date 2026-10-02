@@ -94,6 +94,7 @@ jobs:
         run: node scripts/audit-scenario-coverage.mjs
 
       - name: Commit 9-max bank safely
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "StackUp 9max Bot"
           git config user.email "actions@users.noreply.github.com"
