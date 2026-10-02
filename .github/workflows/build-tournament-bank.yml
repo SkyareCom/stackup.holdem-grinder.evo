@@ -3,6 +3,8 @@ name: Build Tournament Bank
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - ".github/workflows/build-tournament-bank.yml"
       - "scripts/generate-tournament-bank.py"
