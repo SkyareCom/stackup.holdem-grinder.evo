@@ -12,6 +12,7 @@ const OUT=process.env.STACKUP_LINE_OUT
   ?resolve(ROOT,process.env.STACKUP_LINE_OUT)
   :join(ROOT,"data","solver","line-bank.json");
 const ITER=Math.max(100,Number(process.env.STACKUP_LINE_ITERATIONS||160));
+const CHIP_SCALE=10000;
 await mkdir(WORK,{recursive:true});
 await mkdir(dirname(OUT),{recursive:true});
 
@@ -169,7 +170,7 @@ function normalizeNode(node){
   if(!node||!Array.isArray(node.combos))return [];
   return node.combos.map(combo=>({
     hand:combo.hand,
-    ev:Number.isFinite(Number(combo.ev))?Number(combo.ev):null,
+    ev:Number.isFinite(Number(combo.ev))?Number(combo.ev)/CHIP_SCALE:null,
     actions:(combo.actions||[]).map(a=>({
       action:String(a.action||""),
       kind:actionKind(a.action),
@@ -249,8 +250,8 @@ async function solveRaw({id,street,board,oopRange,ipRange,potBb,stackBb,betSizes
   const args=[
     "solve","--street",street.toLowerCase(),"--board",board,
     "--oop-range",rangeText(cleanOop),"--ip-range",rangeText(cleanIp),
-    "--pot",String(Math.max(1,Math.round(potBb*10000))),
-    "--stack",String(Math.max(1,Math.round(stackBb*10000))),
+    "--pot",String(Math.max(1,Math.round(potBb*CHIP_SCALE))),
+    "--stack",String(Math.max(1,Math.round(stackBb*CHIP_SCALE))),
     "--iterations",String(ITER),"--format","json","--output",rawPath,
     "--bet-sizes",betSizes,"--raise-sizes",raiseSizes,
     "--max-raises",String(maxRaises),"--allin-threshold","0.67","--allin-pot-ratio","3",
@@ -309,7 +310,7 @@ function materialize({
         upstreamCommit:"4ade6a9e15a841c41867afde1258b9d110cd6fb1",
         license:"MIT",
         purpose:"TARGETED_PROPAGATED_LINE",
-        chipScalePerBb:10000
+        chipScalePerBb:CHIP_SCALE
       },
       ...extra
     },
