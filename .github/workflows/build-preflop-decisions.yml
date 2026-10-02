@@ -87,7 +87,10 @@ jobs:
           NODE
 
       - name: Recompute 162-card coverage
-        run: node scripts/audit-scenario-coverage.mjs
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
       - name: Commit bank and coverage safely
         if: github.ref == 'refs/heads/main'
@@ -99,7 +102,7 @@ jobs:
           git reset --hard origin/main
           cp /tmp/preflop-decisions.json data/solver/preflop-decisions.json
           node scripts/audit-scenario-coverage.mjs
-          git add data/solver/preflop-decisions.json data/solver/coverage.json
+          git add data/solver/preflop-decisions.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
           if git diff --cached --quiet; then
             echo "Preflop decision bank unchanged."
             exit 0
