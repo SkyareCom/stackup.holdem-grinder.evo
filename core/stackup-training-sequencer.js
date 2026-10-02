@@ -601,17 +601,27 @@
 
   function candidateMathCompatible(spot,hand,special){
     const requested=(special?.math_special||[]).map(String).filter(x=>HAND_LEVEL_MATH.has(x));
-    if(!requested.length)return true;
-    const street=normStreet(spot?.scenario?.street);
-    if(!['FLOP','TURN'].includes(street))return false;
-    const profile=drawProfile(spot,hand);
-    if(!profile)return false;
+    if(requested.length){
+      const street=normStreet(spot?.scenario?.street);
+      if(!['FLOP','TURN'].includes(street))return false;
+      const profile=drawProfile(spot,hand);
+      if(!profile)return false;
+      const mathOk=requested.some(id=>{
+        if(id==='implied_odds')return spotFacesAggression(spot)&&profile.anyDraw;
+        if(id==='reverse_implied_odds')return profile.nonNutFlushDraw;
+        return false;
+      });
+      if(!mathOk)return false;
+    }
 
-    return requested.some(id=>{
-      if(id==='implied_odds')return spotFacesAggression(spot)&&profile.anyDraw;
-      if(id==='reverse_implied_odds')return profile.nonNutFlushDraw;
-      return false;
-    });
+    const classifier=global.StackUpSolvedSpotClassifier;
+    if(classifier?.isHandLevel&&classifier?.qualifies){
+      for(const [section,values] of Object.entries(special||{})){
+        const handLevel=(Array.isArray(values)?values:[]).map(String).filter(id=>classifier.isHandLevel(section,id));
+        if(handLevel.length&&!handLevel.some(id=>classifier.qualifies(section,id,spot,hand)))return false;
+      }
+    }
+    return true;
   }
 
   function specialStreetCompatible(spot,special){
@@ -635,7 +645,12 @@
     if(!specialStreetCompatible(spot,special))return false;
     const tags=spotTags(spot);
     return groups.every(([section,values])=>{
-      const spotLevel=values.map(String).filter(x=>!(section==='math_special'&&HAND_LEVEL_MATH.has(x)));
+      const classifier=global.StackUpSolvedSpotClassifier;
+      const spotLevel=values.map(String).filter(x=>{
+        if(section==='math_special'&&HAND_LEVEL_MATH.has(x))return false;
+        if(classifier?.isHandLevel?.(section,x))return false;
+        return true;
+      });
       if(!spotLevel.length)return true;
       return spotLevel.some(x=>tags.has(x));
     });
