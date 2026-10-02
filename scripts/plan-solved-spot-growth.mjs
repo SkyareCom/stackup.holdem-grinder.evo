@@ -21,10 +21,12 @@ function stage(count){
 
 const filters=(coverage.cards||[]).map(card=>{
   const solved=Number(card.validatedSolvedSpots??card.solvedSpots??card.available??0)||0;
+  const controlOnly=card.section==="hands";
   const target=nextTarget(solved);
   return {
     section:card.section,
     id:card.id,
+    controlOnly,
     label:card.label,
     solved,
     publishFloor:Number(policy.publishFloor),
@@ -33,8 +35,8 @@ const filters=(coverage.cards||[]).map(card=>{
     shortfallToPublish:Math.max(0,Number(policy.publishFloor)-solved),
     shortfallToCurrentGoal:Math.max(0,Number(policy.currentGoal)-solved),
     shortfallToNextTarget:Math.max(0,target-solved),
-    stage:stage(solved),
-    priority:solved<policy.publishFloor?1:solved<policy.currentGoal?2:solved<5000?3:solved<10000?4:solved<20000?5:6
+    stage:controlOnly?"CONTROL_ONLY":stage(solved),
+    priority:controlOnly?99:solved<policy.publishFloor?1:solved<policy.currentGoal?2:solved<5000?3:solved<10000?4:solved<20000?5:6
   };
 }).sort((a,b)=>a.priority-b.priority||b.shortfallToPublish-a.shortfallToPublish||a.solved-b.solved);
 
@@ -50,8 +52,9 @@ const summary={
     total:filters.length,
     belowPublish:filters.filter(x=>x.solved<policy.publishFloor).length,
     atOrAbovePublish:filters.filter(x=>x.solved>=policy.publishFloor).length,
-    atOrAboveCurrentGoal:filters.filter(x=>x.solved>=policy.currentGoal).length,
-    mature:filters.filter(x=>x.solved>=(policy.growth?.longTermTargetPerFilter||20000)).length
+    atOrAboveCurrentGoal:filters.filter(x=>x.controlOnly||x.solved>=policy.currentGoal).length,
+    controlOnly:filters.filter(x=>x.controlOnly).length,
+    mature:filters.filter(x=>x.controlOnly||x.solved>=(policy.growth?.longTermTargetPerFilter||20000)).length
   },
   filters
 };
@@ -63,7 +66,7 @@ const queue={
   mode:"STRICT_SOLVED_ONLY",
   batchSize:shardSize,
   items:filters
-    .filter(x=>x.stage!=="MATURE"&&x.shortfallToNextTarget>0)
+    .filter(x=>!x.controlOnly&&x.stage!=="MATURE"&&x.shortfallToNextTarget>0)
     .map(x=>({
       key:x.section+"/"+x.id,
       section:x.section,
