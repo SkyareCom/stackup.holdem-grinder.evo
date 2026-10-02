@@ -200,6 +200,7 @@ jobs:
         run: |
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
       - name: Commit multistack bank safely
         if: github.ref == 'refs/heads/main'
@@ -212,6 +213,7 @@ jobs:
           cp /tmp/preflop-multistack.json data/solver/preflop-multistack.json
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
           git add data/solver/preflop-multistack.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json
           if git diff --cached --quiet; then
             echo "Multistack bank unchanged."
