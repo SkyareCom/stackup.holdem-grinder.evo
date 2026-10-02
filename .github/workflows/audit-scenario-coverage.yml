@@ -20,6 +20,7 @@ on:
       - "data/solver/preflop-decisions.json"
       - "data/solver/preflop-9max.json"
       - "data/solver/preflop-multistack.json"
+      - "data/solver/preflop-hu.json"
       - "data/solver/texture-sizing.json"
       - "data/solver/line-bank.json"
 
