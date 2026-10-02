@@ -50,6 +50,7 @@ jobs:
           python -m py_compile scripts/generate-tournament-bank.py
           python -m py_compile scripts/patch-dcfr-9max.py
           python -m py_compile scripts/patch-dcfr-stack.py
+          python -m py_compile scripts/patch-dcfr-hu.py
 
       - name: Validate solved-spot policy and bank envelopes
         run: |
@@ -62,6 +63,7 @@ jobs:
           for(const file of [
             'data/solver/preflop-9max.json',
             'data/solver/preflop-multistack.json',
+            'data/solver/preflop-hu.json',
             'data/solver/line-bank.json',
             'data/solver/tournament.json',
             'data/solver/texture-sizing.json'
