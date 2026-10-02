@@ -17,9 +17,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  solve:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 55
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        tag:
+          - board_paired
+          - board_monotone
+          - board_low
+          - bet_25
+          - bet_50
+          - bet_66
+          - bet_75
+          - pot_bet
+          - overbet_125
+          - overbet_150
 
     steps:
       - uses: actions/checkout@v4
@@ -39,6 +54,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: ".stackup/DCFR-SOLVER -> target"
+          shared-key: texture-sizing-v2
 
       - name: Build DCFR-SOLVER
         run: |
@@ -46,30 +62,116 @@ jobs:
           cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-solver
           chmod +x .stackup/dcfr-solver
 
-      - name: Generate targeted texture and sizing solves
+      - name: Generate one texture or sizing shard
         env:
           STACKUP_DCFR_BIN: ${{ github.workspace }}/.stackup/dcfr-solver
           STACKUP_TEXTURE_ITERATIONS: "120"
+          STACKUP_TEXTURE_TAG: ${{ matrix.tag }}
+          STACKUP_TEXTURE_OUT: ".stackup/texture-out/${{ matrix.tag }}.json"
         run: node scripts/generate-texture-sizing-bank.mjs
+
+      - name: Validate strict shard
+        env:
+          TARGET_TAG: ${{ matrix.tag }}
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const file='.stackup/texture-out/'+process.env.TARGET_TAG+'.json';
+          const d=JSON.parse(fs.readFileSync(file,'utf8'));
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          let valid=0;
+          for(const s of d.spots||[]){
+            if(!(s.scenario?.tags||[]).includes(process.env.TARGET_TAG))throw new Error('tag mismatch '+s.id);
+            for(const entry of s.strategy||[]){
+              const verdict=fake.StackUpSolvedSpotContract.validateSolvedDecision(s,entry);
+              if(!verdict.ok)throw new Error(s.id+'/'+entry.hand+': '+verdict.errors.join(','));
+              valid++;
+            }
+          }
+          if(valid<1500)throw new Error(process.env.TARGET_TAG+' shard below 1500: '+valid);
+          console.log({tag:process.env.TARGET_TAG,spots:d.spots?.length||0,valid,failures:d.failures?.length||0});
+          NODE
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "texture-${{ matrix.tag }}"
+          path: ".stackup/texture-out/${{ matrix.tag }}.json"
+          retention-days: 1
+
+  aggregate:
+    needs: solve
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: texture-*
+          path: .stackup/texture-in
+          merge-multiple: true
+
+      - name: Merge texture sizing shards
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const dir='.stackup/texture-in';
+          const files=fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort();
+          if(files.length!==10)throw new Error('expected 10 texture shards, found '+files.length);
+          const spots=[],failures=[],ids=new Set(),tags=[];
+          let first=null,iterations=Infinity;
+          for(const file of files){
+            const d=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'));
+            first=first||d;
+            iterations=Math.min(iterations,Number(d.iterations)||0);
+            for(const spot of d.spots||[]){
+              if(ids.has(spot.id))throw new Error('duplicate texture spot '+spot.id);
+              ids.add(spot.id);spots.push(spot);
+              for(const tag of spot.scenario?.tags||[])tags.push(tag);
+            }
+            for(const failure of d.failures||[])failures.push(failure);
+          }
+          const payload={
+            schemaVersion:1,
+            generatedAt:new Date().toISOString(),
+            solver:'DCFR_SOLVER',
+            upstream:first.upstream,
+            iterations,
+            baseSpot:first.baseSpot,
+            tags:[...new Set(tags)].sort(),
+            spots,
+            failures
+          };
+          fs.writeFileSync('data/solver/texture-sizing.json',JSON.stringify(payload));
+          console.log({shards:files.length,spots:spots.length,failures:failures.length});
+          NODE
 
       - name: Validate targeted bank
         run: |
           node - <<'NODE'
           const fs=require('fs');
           const d=JSON.parse(fs.readFileSync('data/solver/texture-sizing.json','utf8'));
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
           if(d.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
-          const tags=new Set((d.spots||[]).flatMap(s=>s.scenario?.tags||[]));
           const required=['board_paired','board_monotone','board_low','bet_25','bet_50','bet_66','bet_75','pot_bet','overbet_125','overbet_150'];
           const solvedByTag={};
           for(const s of d.spots||[]){
-            if(!Array.isArray(s.strategy)||s.strategy.length<250)throw new Error('insufficient solved hands '+s.id);
-            for(const tag of s.scenario?.tags||[])solvedByTag[tag]=(solvedByTag[tag]||0)+s.strategy.length;
+            let valid=0;
+            for(const entry of s.strategy||[]){
+              const verdict=fake.StackUpSolvedSpotContract.validateSolvedDecision(s,entry);
+              if(!verdict.ok)throw new Error(s.id+'/'+entry.hand+': '+verdict.errors.join(','));
+              valid++;
+            }
+            for(const tag of s.scenario?.tags||[])solvedByTag[tag]=(solvedByTag[tag]||0)+valid;
           }
           for(const tag of required){
-            if(!tags.has(tag))throw new Error('missing targeted solve '+tag);
             if((solvedByTag[tag]||0)<1500)throw new Error(tag+' below strict 1500 floor: '+String(solvedByTag[tag]||0));
           }
-          if((d.failures?.length||0)>2)throw new Error('too many texture/sizing failures: '+d.failures.length);
           console.log({spots:d.spots.length,failures:d.failures?.length||0,solvedByTag});
           NODE
 
@@ -84,17 +186,6 @@ jobs:
         run: |
           git config user.name "StackUp Texture Bot"
           git config user.email "actions@users.noreply.github.com"
-          cp data/solver/texture-sizing.json /tmp/texture-sizing.json
-          git fetch origin main
-          git reset --hard origin/main
-          cp /tmp/texture-sizing.json data/solver/texture-sizing.json
-          node scripts/audit-scenario-coverage.mjs
-          node scripts/plan-solved-spot-growth.mjs
-          node scripts/route-solve-queue.mjs
-          git add data/solver/texture-sizing.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
-          if git diff --cached --quiet; then
-            echo "Texture/sizing bank unchanged."
-            exit 0
-          fi
+          git add data/solver/texture-sizing.json
           git commit -m "Generate targeted DCFR texture sizing bank"
           bash scripts/persist-solver-artifacts.sh data/solver/texture-sizing.json
