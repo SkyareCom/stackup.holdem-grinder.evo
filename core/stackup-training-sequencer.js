@@ -637,8 +637,11 @@
     const street=normStreet(spot?.scenario?.street);
     for(const [section,values] of Object.entries(special||{})){
       if(!Array.isArray(values)||!values.length)continue;
-      if(['pre_special','blind_special','aggr_special','short_special','icm_special','pko_special'].includes(section)){
+      if(['pre_special','blind_special','short_special','icm_special','pko_special'].includes(section)){
         if(street!=='PRE-FLOP')return false;
+      }else if(section==='aggr_special'){
+        const domains=values.flatMap(id=>String(id)==='pot_4bet'?['FLOP','TURN','RIVER']:['PRE-FLOP']);
+        if(!domains.includes(street))return false;
       }else if(section==='river_special'){
         if(street!=='RIVER')return false;
       }else if(['post_special','texture_special'].includes(section)){
@@ -706,143 +709,6 @@
     }
     if(!hasRequestedSpecial(spot,filters.special))return false;
     return true;
-  }
-
-  function contextualChipEvSpots(bank,filters){
-    if(filters.opponentProfile||filters.extras.length)return [];
-    const dcfr=[
-      ...(bank?.preflop||[]),
-      ...(bank?.postflop||[]),
-      ...((bank?.preflopDecisions?.spots)||[]),
-      ...((bank?.preflop9max?.spots)||[])
-    ].filter(s=>String(s?.solver||'')==='DCFR_SOLVER');
-    if(!dcfr.length)return [];
-
-    const cash=filters.gameType==='CASH';
-    const requestedPhases=filters.phases||[];
-    const chipEvPhase=requestedPhases.length
-      ? requestedPhases.every(p=>['EARLY','MIDDLE'].includes(p))
-      : false;
-    const contextOnly=!cash&&!requestedPhases.length&&(
-      !!filters.tournamentType||!!filters.fieldSize
-    );
-
-    // Sparse preflop semantic cards may safely use two explicitly different
-    // chip-EV contexts when the user did not request a tournament context.
-    // Strategy remains the exact same DCFR solution; only context changes.
-    const specialGroups=Object.keys(filters.special||{}).filter(k=>Array.isArray(filters.special[k])&&filters.special[k].length);
-    const semanticPreflop=specialGroups.length>0&&specialGroups.every(k=>{
-      if(['pre_special','blind_special','aggr_special'].includes(k))return true;
-      if(k==='short_special')return (filters.special[k]||[]).every(v=>String(v)==='chip_up');
-      return false;
-    });
-    const sparseNative9Position=
-      filters.heroPositions.length>0&&
-      filters.heroPositions.every(p=>['UTG+1','UTG+2'].includes(String(p).toUpperCase()))&&
-      !filters.gameType&&!requestedPhases.length&&!filters.tournamentType&&!filters.fieldSize;
-
-    if(!cash&&!chipEvPhase&&!contextOnly&&!semanticPreflop&&!sparseNative9Position)return [];
-    if(filters.tournamentType==='PKO')return [];
-
-    const contexts=[];
-    if((semanticPreflop||sparseNative9Position)&&!filters.gameType&&!requestedPhases.length&&!filters.tournamentType&&!filters.fieldSize){
-      contexts.push(
-        {gameType:'CASH',phase:null,tournamentType:null,fieldSize:null,projection:'CASH_CHIP_EV_EQUIVALENCE'},
-        {gameType:'TOURNAMENT',phase:'EARLY',tournamentType:'REGULAR',fieldSize:'100',projection:'EARLY_CHIP_EV_EQUIVALENCE'}
-      );
-    }else if(cash){
-      contexts.push({gameType:'CASH',phase:null,tournamentType:null,fieldSize:null,projection:'CASH_CHIP_EV_EQUIVALENCE'});
-    }else{
-      const phases=chipEvPhase?requestedPhases:['EARLY'];
-      for(const phase of phases)contexts.push({
-        gameType:'TOURNAMENT',
-        phase,
-        tournamentType:filters.tournamentType||'REGULAR',
-        fieldSize:filters.fieldSize||'100',
-        projection:'EARLY_MIDDLE_CHIP_EV_EQUIVALENCE'
-      });
-    }
-
-    const out=[];
-    for(const base of dcfr){
-      for(const ctx of contexts){
-        const spot=clone(base);
-        const s=spot.scenario||(spot.scenario={});
-        s.gameType=ctx.gameType;
-        if(ctx.gameType==='CASH'){
-          delete s.phase;delete s.tournamentType;delete s.fieldSize;delete s.extras;
-        }else{
-          s.phase=ctx.phase;
-          s.tournamentType=ctx.tournamentType;
-          s.fieldSize=ctx.fieldSize;
-          if(ctx.phase==='EARLY'){
-            const tags=new Set(Array.isArray(s.tags)?s.tags:[]);
-            const aggressive=(spot.strategy||[]).some(h=>(h.actions||[]).some(a=>['raise','jam'].includes(String(a.kind||'').toLowerCase())&&Number(a.frequency||0)>=5));
-            if(aggressive)tags.add('chip_up');
-            s.tags=[...tags];
-          }
-        }
-        s.provenance={
-          ...(s.provenance||{}),
-          strategySource:'DCFR_SOLVER',
-          contextProjection:ctx.projection
-        };
-        spot.id='ctx-'+String(base.id||base.solveId||'dcfr')+'-'+String(ctx.gameType)+'-'+String(ctx.phase||'none')+'-'+String(ctx.tournamentType||'none')+'-'+String(ctx.fieldSize||'none');
-        spot.solveId=String(base.solveId||base.id||'dcfr')+'|context|'+String(ctx.gameType)+'|'+String(ctx.phase||'none')+'|'+String(ctx.tournamentType||'none')+'|'+String(ctx.fieldSize||'none');
-        out.push(spot);
-      }
-    }
-    return out;
-  }
-
-  function ljEquivalentSpots(bank){
-    const sources=[
-      ...(bank?.preflop||[]),
-      ...((bank?.preflopDecisions?.spots)||[])
-    ].filter(s=>String(s?.solver||'')==='DCFR_SOLVER'&&
-      normStreet(s?.scenario?.street)==='PRE-FLOP'&&
-      normPosition(s?.scenario?.heroPosition)==='UTG');
-
-    const out=[];
-    const positions=['UTG','UTG+1','UTG+2','LJ','HJ','CO','BTN','SB','BB'];
-    for(const base of sources){
-      const spot=clone(base);
-      const s=spot.scenario||(spot.scenario={});
-      s.tableSize=9;
-      s.trainingTableSize=9;
-      s.positions=positions;
-      s.heroPosition='LJ';
-      if(normPosition(s.villainPosition)==='UTG')s.villainPosition='LJ';
-
-      const existing=Array.isArray(s.actionHistory)
-        ?s.actionHistory.map(x=>({...x,position:normPosition(x.position)==='UTG'?'LJ':x.position}))
-        :[];
-      s.actionHistory=[
-        {position:'UTG',action:'FOLD',kind:'fold',to:0},
-        {position:'UTG+1',action:'FOLD',kind:'fold',to:0},
-        {position:'UTG+2',action:'FOLD',kind:'fold',to:0},
-        ...existing
-      ];
-
-      const stack=Number(s.heroStack??s.effectiveStack)||100;
-      const oldStacks=s.playerStacks||{};
-      s.playerStacks={};
-      for(const p of positions){
-        if(p==='LJ')s.playerStacks[p]=Number(oldStacks.UTG??stack);
-        else s.playerStacks[p]=Number(oldStacks[p]??stack);
-      }
-
-      s.provenance={
-        ...(s.provenance||{}),
-        strategySource:'DCFR_SOLVER',
-        positionProjection:'6MAX_UTG_TO_9MAX_LJ',
-        playersBehind:5
-      };
-      spot.id='eq-lj-'+String(base.id||base.solveId||'dcfr');
-      spot.solveId=String(base.solveId||base.id||'dcfr')+'|position-equivalence|LJ9';
-      out.push(spot);
-    }
-    return out;
   }
 
   function expand(bank,filters){
@@ -1014,8 +880,6 @@
     exactSignature,
     familySignature,
     handClassCombos,
-    contextualChipEvSpots,
-    ljEquivalentSpots,
     drawProfile,
     candidateMathCompatible,
     coverageFloor,
