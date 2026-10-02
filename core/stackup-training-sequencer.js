@@ -600,17 +600,24 @@
   const HAND_LEVEL_MATH=new Set(['implied_odds','reverse_implied_odds']);
 
   function candidateMathCompatible(spot,hand,special){
-    const requested=(special?.math_special||[]).map(String).filter(x=>HAND_LEVEL_MATH.has(x));
+    const requested=(special?.math_special||[]).map(String);
     if(!requested.length)return true;
-    const street=normStreet(spot?.scenario?.street);
-    if(!['FLOP','TURN'].includes(street))return false;
-    const profile=drawProfile(spot,hand);
-    if(!profile)return false;
 
+    // Dentro de MATH os cards são alternativas (OR), exatamente como os demais
+    // grupos multi-select. Opções de nível de mão e tags de cenário não podem
+    // virar um AND acidental quando selecionadas juntas.
+    const tags=spotTags(spot);
+    const street=normStreet(spot?.scenario?.street);
+    let profile=null;
     return requested.some(id=>{
-      if(id==='implied_odds')return spotFacesAggression(spot)&&profile.anyDraw;
-      if(id==='reverse_implied_odds')return profile.nonNutFlushDraw;
-      return false;
+      if(id==='implied_odds'||id==='reverse_implied_odds'){
+        if(!['FLOP','TURN'].includes(street))return false;
+        profile=profile||drawProfile(spot,hand);
+        if(!profile)return false;
+        if(id==='implied_odds')return spotFacesAggression(spot)&&profile.anyDraw;
+        return profile.nonNutFlushDraw;
+      }
+      return tags.has(id);
     });
   }
 
@@ -635,7 +642,10 @@
     if(!specialStreetCompatible(spot,special))return false;
     const tags=spotTags(spot);
     return groups.every(([section,values])=>{
-      const spotLevel=values.map(String).filter(x=>!(section==='math_special'&&HAND_LEVEL_MATH.has(x)));
+      // MATH é validado por mão em candidateMathCompatible para preservar
+      // semântica OR entre todas as opções matemáticas.
+      if(section==='math_special')return true;
+      const spotLevel=values.map(String);
       if(!spotLevel.length)return true;
       return spotLevel.some(x=>tags.has(x));
     });
