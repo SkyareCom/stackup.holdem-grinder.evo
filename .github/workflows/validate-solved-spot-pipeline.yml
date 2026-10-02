@@ -73,6 +73,19 @@ jobs:
           console.log({runtimeAuditParity:true,banks:banks.length});
           NODE
 
+      - name: Guard strict no-projection runtime
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          for(const file of ['core/stackup-training-sequencer.js','scripts/audit-scenario-coverage.mjs']){
+            const text=fs.readFileSync(file,'utf8');
+            for(const forbidden of ['contextProjection','positionProjection','6MAX_UTG_TO_9MAX_LJ','position-equivalence']){
+              if(text.includes(forbidden))throw new Error(file+' contains forbidden solved-spot projection marker '+forbidden);
+            }
+          }
+          console.log({strictNoProjection:true});
+          NODE
+
       - name: Validate Python generators and patchers
         run: |
           python -m py_compile scripts/generate-tournament-bank.py
