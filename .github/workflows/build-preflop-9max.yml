@@ -178,6 +178,7 @@ jobs:
         run: |
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
       - name: Commit native 9-max bank safely
         if: github.ref == 'refs/heads/main'
@@ -190,6 +191,7 @@ jobs:
           cp /tmp/preflop-9max.json data/solver/preflop-9max.json
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
           git add data/solver/preflop-9max.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json
           if git diff --cached --quiet; then
             echo "9-max bank unchanged."
