@@ -12,13 +12,23 @@ const OUT=process.env.STACKUP_LINE_OUT
   ?resolve(ROOT,process.env.STACKUP_LINE_OUT)
   :join(ROOT,"data","solver","line-bank.json");
 const ITER=Math.max(100,Number(process.env.STACKUP_LINE_ITERATIONS||160));
+const CHIP_SCALE=10000;
 await mkdir(WORK,{recursive:true});
 await mkdir(dirname(OUT),{recursive:true});
 
 const baseBank=JSON.parse(await readFile(join(ROOT,"data","solver","postflop.json"),"utf8"));
-const baseCallerOop=baseBank.find(s=>s?.matchup==="UTG vs BB"&&s?.scenario?.street==="FLOP");
-const baseAggressorOop=baseBank.find(s=>s?.matchup==="UTG vs HJ"&&s?.scenario?.street==="FLOP");
-if(!baseCallerOop||!baseAggressorOop)throw new Error("required_line_base_matchups_missing");
+const isSrp=s=>!s?.scenario?.potType||String(s.scenario.potType).toUpperCase()==="SRP";
+const callerOopBases=baseBank.filter(s=>
+  s?.scenario?.street==="FLOP"&&isSrp(s)&&
+  ["SB","BB"].includes(String(s?.scenario?.heroPosition||"").toUpperCase())&&
+  !["SB","BB"].includes(String(s?.scenario?.villainPosition||"").toUpperCase())
+).sort((a,b)=>String(a.matchup).localeCompare(String(b.matchup)));
+const aggressorOopBases=baseBank.filter(s=>
+  s?.scenario?.street==="FLOP"&&isSrp(s)&&
+  !["SB","BB"].includes(String(s?.scenario?.heroPosition||"").toUpperCase())&&
+  !["SB","BB"].includes(String(s?.scenario?.villainPosition||"").toUpperCase())
+).sort((a,b)=>String(a.matchup).localeCompare(String(b.matchup)));
+if(!callerOopBases.length||!aggressorOopBases.length)throw new Error("required_line_base_matchups_missing");
 
 const ALL_RUNOUTS=[
   {id:"a",flop:"As7d2c",turn:"Jh",river:"4s"},
@@ -160,7 +170,7 @@ function normalizeNode(node){
   if(!node||!Array.isArray(node.combos))return [];
   return node.combos.map(combo=>({
     hand:combo.hand,
-    ev:Number.isFinite(Number(combo.ev))?Number(combo.ev):null,
+    ev:Number.isFinite(Number(combo.ev))?Number(combo.ev)/CHIP_SCALE:null,
     actions:(combo.actions||[]).map(a=>({
       action:String(a.action||""),
       kind:actionKind(a.action),
@@ -240,7 +250,8 @@ async function solveRaw({id,street,board,oopRange,ipRange,potBb,stackBb,betSizes
   const args=[
     "solve","--street",street.toLowerCase(),"--board",board,
     "--oop-range",rangeText(cleanOop),"--ip-range",rangeText(cleanIp),
-    "--pot",String(potBb*2),"--stack",String(stackBb*2),
+    "--pot",String(Math.max(1,Math.round(potBb*CHIP_SCALE))),
+    "--stack",String(Math.max(1,Math.round(stackBb*CHIP_SCALE))),
     "--iterations",String(ITER),"--format","json","--output",rawPath,
     "--bet-sizes",betSizes,"--raise-sizes",raiseSizes,
     "--max-raises",String(maxRaises),"--allin-threshold","0.67","--allin-pot-ratio","3",
@@ -264,7 +275,7 @@ function materialize({
 }){
   if(!node)return null;
   const strategy=normalizeNode(node);
-  if(strategy.length<40)return null;
+  if(!strategy.length)return null;
   const nodePlayer=String(node.player||"OOP").toUpperCase()==="IP"?"IP":"OOP";
   const heroPosition=nodePlayer==="IP"?base.scenario.villainPosition:base.scenario.heroPosition;
   const villainPosition=nodePlayer==="IP"?base.scenario.heroPosition:base.scenario.villainPosition;
@@ -298,7 +309,8 @@ function materialize({
         upstream:"exinori/DCFR-SOLVER",
         upstreamCommit:"4ade6a9e15a841c41867afde1258b9d110cd6fb1",
         license:"MIT",
-        purpose:"TARGETED_PROPAGATED_LINE"
+        purpose:"TARGETED_PROPAGATED_LINE",
+        chipScalePerBb:CHIP_SCALE
       },
       ...extra
     },
@@ -310,12 +322,13 @@ function addSpot(spots,spot){if(spot)spots.push(spot);}
 const spots=[],failures=[];
 
 for(const runout of RUNOUTS){
+  const runoutOrdinal=Math.max(0,ALL_RUNOUTS.findIndex(x=>x.id===runout.id));
   // -----------------------------------------------------------------------
   // LINE A: UTG opener IP vs BB caller OOP.
   // Flop check-back -> Turn probe / delayed c-bet -> River checked-through.
   // -----------------------------------------------------------------------
   try{
-    const base=baseCallerOop;
+    const base=callerOopBases[runoutOrdinal%callerOopBases.length];
     const oop0=parseRange(base.scenario.heroRange);
     const ip0=parseRange(base.scenario.villainRange);
     const pot0=Number(base.scenario.pot);
@@ -486,7 +499,7 @@ for(const runout of RUNOUTS){
   // Flop c-bet -> call -> Turn double barrel -> call -> River triple barrel.
   // -----------------------------------------------------------------------
   try{
-    const base=baseAggressorOop;
+    const base=aggressorOopBases[runoutOrdinal%aggressorOopBases.length];
     const oop0=parseRange(base.scenario.heroRange);
     const ip0=parseRange(base.scenario.villainRange);
     const pot0=Number(base.scenario.pot);
@@ -554,9 +567,65 @@ for(const runout of RUNOUTS){
     ];
     addSpot(spots,materialize({
       id:"triplebarrel-"+runout.id,raw:riverRaw,node:riverRoot,
-      tags:["triple_barrel","sequential_lines"],
+      tags:["triple_barrel","block_bet_20_25","sequential_lines"],
       base,oopRange:oopRiver,ipRange:ipRiver,potBb:potRiver,stackBb:stackRiver,history:histRiver
     }));
+
+    // River response families from the same independently solved river tree.
+    // This avoids requiring two prior check-backs, whose posterior ranges can
+    // legitimately become very small on some boards.
+    const riverAfterCheck=findNode(riverRaw,[{kind:"check"}]);
+    if(riverAfterCheck){
+      const over=(riverAfterCheck.combos||[]).flatMap(x=>x.actions||[])
+        .map(a=>String(a.action)).find(x=>actionKind(x)==="raise"&&Number(sizingPct(x))>=120);
+      const fallbackBet=chooseBet(ipRiver,riverAfterCheck,{minPct:50,maxPct:160});
+      const chosen=over?{label:over,pct:sizingPct(over)}:fallbackBet;
+      if(chosen){
+        const response=findNode(riverRaw,[{kind:"check"},{label:chosen.label}]);
+        const betSize=potRiver*(chosen.pct/100);
+        const responseTags=["river_bluff_catch","river_check_raise","sequential_lines"];
+        if(chosen.pct>=120)responseTags.push("vs_overbet");
+        addSpot(spots,materialize({
+          id:"barrel-river-response-"+runout.id,raw:riverRaw,node:response,tags:responseTags,
+          base,
+          oopRange:conditionRange(oopRiver,riverRoot,{kind:"check"}),
+          ipRange:conditionRange(ipRiver,riverAfterCheck,{label:chosen.label}),
+          potBb:potRiver+betSize,stackBb:stackRiver,currentBet:betSize,
+          history:[
+            ...histRiver,
+            checkEvent(base.scenario.heroPosition,"RIVER"),
+            actionEvent(base.scenario.villainPosition,chosen.label,betSize,"RIVER")
+          ]
+        }));
+      }
+    }
+
+    // Bet/fold from a real small-bet -> raise -> response branch.
+    const small=(riverRoot?.combos||[]).flatMap(x=>x.actions||[])
+      .map(a=>String(a.action)).find(x=>actionKind(x)==="raise"&&Math.abs(Number(sizingPct(x))-25)<=3);
+    if(small){
+      const afterSmall=findNode(riverRaw,[{label:small}]);
+      const raise=chooseBet(ipRiver,afterSmall,{minPct:40,maxPct:120});
+      if(raise){
+        const response=findNode(riverRaw,[{label:small},{label:raise.label}]);
+        const b1=potRiver*(sizingPct(small)/100);
+        const potAfterCall=potRiver+2*b1;
+        const raiseAmount=potAfterCall*(raise.pct/100);
+        const to=b1+raiseAmount;
+        addSpot(spots,materialize({
+          id:"barrel-betfold-"+runout.id,raw:riverRaw,node:response,tags:["bet_fold","sequential_lines"],
+          base,
+          oopRange:conditionRange(oopRiver,riverRoot,{label:small}),
+          ipRange:conditionRange(ipRiver,afterSmall,{label:raise.label}),
+          potBb:potRiver+b1+to,stackBb:stackRiver,currentBet:to,
+          history:[
+            ...histRiver,
+            actionEvent(base.scenario.heroPosition,small,b1,"RIVER"),
+            actionEvent(base.scenario.villainPosition,raise.label,to,"RIVER")
+          ]
+        }));
+      }
+    }
   }catch(error){
     failures.push({runout:runout.id,line:"BARREL",error:String(error?.message||error).slice(0,1400)});
   }
@@ -568,7 +637,7 @@ const payload={
   solver:"DCFR_SOLVER",
   upstream:{repository:"exinori/DCFR-SOLVER",commit:"4ade6a9e15a841c41867afde1258b9d110cd6fb1",license:"MIT"},
   iterations:ITER,
-  baseMatchups:[baseCallerOop.matchup,baseAggressorOop.matchup],
+  baseMatchups:[...new Set([...callerOopBases,...aggressorOopBases].map(x=>x.matchup))],
   spots,failures
 };
 await writeFile(OUT,JSON.stringify(payload),"utf8");
