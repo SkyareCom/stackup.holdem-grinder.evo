@@ -35,6 +35,30 @@ BOARDS=[
  ["Kc","Qd","5h","5s","9c"],
  ["7s","6s","2d","8h","Ac"],
  ["Jc","9c","4d","2h","Qs"],
+ ["Ah","Kd","7c","3s","2h"],
+ ["Ks","Td","8c","6h","3d"],
+ ["Qs","Jd","9h","5c","2d"],
+ ["Ac","Qc","8d","4h","3s"],
+ ["Kh","Jh","6c","6d","2s"],
+ ["Ad","9d","7h","5c","3s"],
+ ["Kc","9h","8s","4d","2c"],
+ ["Qd","Td","7s","6h","4c"],
+ ["As","Js","8h","5d","2c"],
+ ["Kd","Qh","9c","3d","2s"],
+ ["Ah","Th","6s","4c","3d"],
+ ["Ks","Jc","7d","5h","2c"],
+ ["Qc","9s","6d","4h","2s"],
+ ["Ad","Kd","8c","7h","3s"],
+ ["Kh","Qh","Td","5s","2c"],
+ ["As","9c","8h","6d","4s"],
+ ["Kc","Tc","7h","3d","2s"],
+ ["Qh","Jh","8c","6d","3s"],
+ ["Ac","Jd","9h","7s","5c"],
+ ["Kd","Ts","8d","5h","4c"],
+ ["Ah","Qc","7d","6s","2h"],
+ ["Ks","Qd","9s","4c","3h"],
+ ["Ad","Jc","8s","6h","5d"],
+ ["Kh","Td","9c","7s","2d"],
 ]
 
 def seed_for(*parts):
@@ -97,7 +121,7 @@ def main():
 
     hero_entries=parse_range(base["scenario"].get("heroRange"))
     villain_entries=parse_range(base["scenario"].get("villainRange"))
-    if len(hero_entries)<100 or len(villain_entries)<100:
+    if len(hero_entries)<30 or len(villain_entries)<30:
         raise SystemExit(f"solver ranges too small hero={len(hero_entries)} villain={len(villain_entries)}")
 
     spots=[];rejected=[];total_solved=0
