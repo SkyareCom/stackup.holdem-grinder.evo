@@ -142,6 +142,55 @@
     })));
   }
 
+  // Strategic identity intentionally excludes descriptive context labels and
+  // run identifiers. The same poker decision exported once as CASH and once
+  // as early-stage MTT is still one decision when stacks/ranges/action state
+  // are identical. Variables that actually alter strategy remain included.
+  function strategicScenarioFingerprint(scenario){
+    return hash(JSON.stringify(stable({
+      street:normStreet(scenario?.street),
+      tableSize:scenario?.trainingTableSize??scenario?.tableSize??null,
+      positions:scenario?.positions||[],
+      heroPosition:scenario?.heroPosition??null,
+      villainPosition:scenario?.villainPosition??null,
+      effectiveStack:Number(scenario?.effectiveStack),
+      heroStack:Number(scenario?.heroStack??scenario?.effectiveStack),
+      playerStacks:scenario?.playerStacks??null,
+      pot:Number(scenario?.pot),
+      currentBet:Number(scenario?.currentBet||0),
+      board:scenario?.board||[],
+      heroRange:scenario?.heroRange??null,
+      villainRange:scenario?.villainRange??null,
+      actionHistory:scenario?.actionHistory||[],
+      legalActions:scenario?.legalActions||[],
+      sizings:scenario?.sizings||[],
+      targetSizingPct:scenario?.targetSizingPct??null,
+      ante:scenario?.ante??null,
+      payouts:scenario?.payouts??null,
+      icmBaseEquities:scenario?.icmBaseEquities??scenario?.icm??null,
+      heroBountyPrizeValue:scenario?.heroBountyPrizeValue??null,
+      villainBountyPrizeValue:scenario?.villainBountyPrizeValue??null,
+      bounty:scenario?.bounty??null,
+      reentryUtilityModel:scenario?.reentryUtilityModel??null,
+      opponentProfile:scenario?.opponentProfile??null,
+      profileMix:scenario?.profileMix??null,
+      behaviorModel:scenario?.behaviorModel??null,
+      multiwayModel:scenario?.multiwayModel??null,
+      extras:scenario?.extras||[],
+      solverNode:scenario?.solverNode??null
+    })));
+  }
+
+  function strategicDecisionId(spot,handOrEntry){
+    const entry=strategyEntry(spot,handOrEntry);
+    if(!entry)return null;
+    return 'ssd1_'+hash(JSON.stringify(stable({
+      scenario:strategicScenarioFingerprint(spot?.scenario||{}),
+      hand:String(entry.hand||'').trim(),
+      solver:spot?.solver||null
+    })));
+  }
+
   function validateSolvedDecision(spot,handOrEntry){
     const errors=[];
     if(!spot||typeof spot!=='object')return Object.freeze({ok:false,id:null,errors:['spot_missing']});
@@ -166,11 +215,13 @@
     return Object.freeze({
       ok:unique.length===0,
       id:unique.length?null:solvedDecisionId(spot,entry),
+      strategicId:unique.length?null:strategicDecisionId(spot,entry),
       errors:unique,
       hand:entry?.hand||null,
       solver:spot?.solver||null,
       solveId:spot?.solveId||spot?.id||null,
-      scenarioFingerprint:spot?.scenario?scenarioFingerprint(spot.scenario):null
+      scenarioFingerprint:spot?.scenario?scenarioFingerprint(spot.scenario):null,
+      strategicScenarioFingerprint:spot?.scenario?strategicScenarioFingerprint(spot.scenario):null
     });
   }
 
@@ -180,9 +231,10 @@
     for(const spot of Array.isArray(spots)?spots:[]){
       for(const entry of Array.isArray(spot?.strategy)?spot.strategy:[]){
         const verdict=validateSolvedDecision(spot,entry);
-        if(!verdict.ok||seen.has(verdict.id))continue;
-        seen.add(verdict.id);
-        out.push(Object.freeze({id:verdict.id,spot,entry,hand:entry.hand}));
+        const uniqueId=verdict.strategicId||verdict.id;
+        if(!verdict.ok||seen.has(uniqueId))continue;
+        seen.add(uniqueId);
+        out.push(Object.freeze({id:uniqueId,sourceId:verdict.id,spot,entry,hand:entry.hand}));
       }
     }
     return out;
@@ -199,7 +251,7 @@
         const v=validateSolvedDecision(spot,entry);
         if(v.ok){
           validEntries++;
-          unique.add(v.id);
+          unique.add(v.strategicId||v.id);
         }else{
           invalidEntries++;
           if(v.errors.includes('context_projection')||v.errors.includes('position_projection'))projectedRejected++;
@@ -218,7 +270,7 @@
   }
 
   global.StackUpSolvedSpotContract=Object.freeze({
-    VERSION:'1.0.0',
+    VERSION:'1.1.0',
     POLICY:DEFAULT_POLICY,
     REQUIRED_SCENARIO,
     stable,
@@ -230,7 +282,9 @@
     scenarioErrors,
     actionErrors,
     scenarioFingerprint,
+    strategicScenarioFingerprint,
     solvedDecisionId,
+    strategicDecisionId,
     validateSolvedDecision,
     enumerateSolvedDecisions,
     auditSpots
