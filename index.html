@@ -9,12 +9,15 @@
 <meta http-equiv="Expires" content="0">
 <meta name="grinder-build" content="runtime-fluidity-v2">
 <title>Grinder Login</title>
+<link rel="preload" href="assets/bebrush.otf" as="font" type="font/otf" crossorigin>
+<link rel="preload" href="assets/road-rage.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/logo-stackup-440.png" as="image">
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
 <style id="grinderSplashStyle">
 /* ===== GRINDER animated splash — isolated from the app ===== */
-@font-face{font-family:'GrinderSplashBrush';src:url('assets/bebrush.otf') format('opentype');font-display:block}
-@font-face{font-family:'GrinderSplashRage';src:url('assets/road-rage.woff2') format('woff2');font-display:block}
+@font-face{font-family:'GrinderSplashBrush';src:url('assets/bebrush.otf') format('opentype');font-display:swap}
+@font-face{font-family:'GrinderSplashRage';src:url('assets/road-rage.woff2') format('woff2');font-display:swap}
 
 #grinderSplash{
   position:fixed;inset:0;z-index:2147483647;
@@ -162,7 +165,7 @@
 
 <style>
 /* Fonte única embutida: Bebrush. */
-@font-face{font-family:'Bebrush';src:url(assets/bebrush.otf) format('opentype');font-display:block}
+@font-face{font-family:'Bebrush';src:url(assets/bebrush.otf) format('opentype');font-display:swap}
 
 :root{--brush:'Bebrush',sans-serif;--bubble:var(--brush)}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -519,7 +522,7 @@ document.addEventListener('click',()=>document.getElementById('langBtn').setAttr
 
 <style>
 /* v15: sem brilho atrás do nome; marca maior; GRINDER em Road Rage */
-@font-face{font-family:'Road Rage';src:url(assets/road-rage.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Road Rage';src:url(assets/road-rage.woff2) format('woff2');font-display:swap}
 .namebase::before,.namebase::after{display:none!important;content:none!important}
 .brand{font-size:clamp(28px,9vw,40px)!important;letter-spacing:2px}
 .title{font-family:'Road Rage','Bebrush',sans-serif!important;font-weight:400;font-size:clamp(64px,21vw,92px)!important;letter-spacing:2px;line-height:.95;text-shadow:none;mix-blend-mode:normal}
@@ -4368,7 +4371,7 @@ html body #biometricLoginCard{opacity:1!important;filter:none!important;cursor:p
   var brand=document.getElementById('grinderSplashBrand');
   var cards=document.getElementById('grinderSplashCards');
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var exitAt=reduce?900:2300;
+  var exitAt=reduce?450:1200;
 
   function beginExit(){
     if(!splash||!splash.isConnected)return;
@@ -4395,13 +4398,13 @@ html body #biometricLoginCard{opacity:1!important;filter:none!important;cursor:p
     void splash.offsetWidth;
 
     if(center){
-      center.style.transition=reduce?'opacity .35s ease':'opacity .35s ease,transform .35s ease';
+      center.style.transition=reduce?'opacity .2s ease':'opacity .24s ease,transform .24s ease';
       center.style.opacity='0';
       if(!reduce)center.style.transform='scale(.94)';
     }
 
     window.setTimeout(function(){
-      splash.style.transition='opacity .5s ease';
+      splash.style.transition='opacity .3s ease';
       splash.style.opacity='0';
 
       window.setTimeout(function(){
@@ -4410,8 +4413,8 @@ html body #biometricLoginCard{opacity:1!important;filter:none!important;cursor:p
         var script=document.getElementById('grinderSplashScript');
         if(style&&style.parentNode)style.parentNode.removeChild(style);
         if(script&&script.parentNode)script.parentNode.removeChild(script);
-      },500);
-    },320);
+      },300);
+    },180);
   }
 
   window.setTimeout(beginExit,exitAt);
