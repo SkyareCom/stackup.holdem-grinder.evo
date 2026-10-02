@@ -26,24 +26,24 @@ jobs:
       max-parallel: 9
       matrix:
         include:
-          - { game: TOURNAMENT, stack: 5, phase: EARLY, tournament_type: REGULAR, field: "50" }
-          - { game: TOURNAMENT, stack: 10, phase: MIDDLE, tournament_type: TURBO, field: "100" }
-          - { game: TOURNAMENT, stack: 15, phase: LATE, tournament_type: FREEZEOUT, field: "250" }
-          - { game: TOURNAMENT, stack: 18, phase: FINAL_TABLE, tournament_type: HIGH_ROLLER, field: "350" }
-          - { game: TOURNAMENT, stack: 20, phase: EARLY, tournament_type: SNG, field: "500" }
-          - { game: TOURNAMENT, stack: 25, phase: MIDDLE, tournament_type: REGULAR, field: "1000+" }
-          - { game: TOURNAMENT, stack: 30, phase: LATE, tournament_type: TURBO, field: "50" }
-          - { game: TOURNAMENT, stack: 50, phase: FINAL_TABLE, tournament_type: FREEZEOUT, field: "250" }
-          - { game: TOURNAMENT, stack: 100, phase: EARLY, tournament_type: HIGH_ROLLER, field: "500" }
-          - { game: CASH, stack: 5, phase: "", tournament_type: "", field: "" }
-          - { game: CASH, stack: 10, phase: "", tournament_type: "", field: "" }
-          - { game: CASH, stack: 15, phase: "", tournament_type: "", field: "" }
-          - { game: CASH, stack: 18, phase: "", tournament_type: "", field: "" }
-          - { game: CASH, stack: 20, phase: "", tournament_type: "", field: "" }
-          - { game: CASH, stack: 25, phase: "", tournament_type: "", field: "" }
-          - { game: CASH, stack: 30, phase: "", tournament_type: "", field: "" }
-          - { game: CASH, stack: 50, phase: "", tournament_type: "", field: "" }
-          - { game: CASH, stack: 100, phase: "", tournament_type: "", field: "" }
+          - { game: TOURNAMENT, stack: 5, phase: EARLY, tournament_type: REGULAR, field: "50", extra_tags: "chip_up" }
+          - { game: TOURNAMENT, stack: 10, phase: MIDDLE, tournament_type: TURBO, field: "100", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 15, phase: LATE, tournament_type: FREEZEOUT, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 18, phase: FINAL_TABLE, tournament_type: HIGH_ROLLER, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 20, phase: EARLY, tournament_type: SNG, field: "500", extra_tags: "chip_up" }
+          - { game: TOURNAMENT, stack: 25, phase: MIDDLE, tournament_type: REGULAR, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 30, phase: LATE, tournament_type: TURBO, field: "50", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 50, phase: FINAL_TABLE, tournament_type: FREEZEOUT, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 100, phase: EARLY, tournament_type: HIGH_ROLLER, field: "500", extra_tags: "chip_up" }
+          - { game: CASH, stack: 5, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 10, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 15, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 18, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 20, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 25, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 30, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 50, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 100, phase: "", tournament_type: "", field: "", extra_tags: "" }
 
     steps:
       - uses: actions/checkout@v4
@@ -86,6 +86,7 @@ jobs:
           STACKUP_PHASE: "${{ matrix.phase }}"
           STACKUP_TOURNAMENT_TYPE: "${{ matrix.tournament_type }}"
           STACKUP_FIELD_SIZE: "${{ matrix.field }}"
+          STACKUP_EXTRA_TAGS: "${{ matrix.extra_tags }}"
         run: |
           mkdir -p .stackup/multistack-out
           .stackup/stackup-preflop-export             ".stackup/preflop-${{ matrix.game }}-${{ matrix.stack }}.bin"             ".stackup/multistack-out/bank-${{ matrix.game }}-${{ matrix.stack }}.json"
