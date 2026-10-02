@@ -3,6 +3,8 @@ name: Build Preflop Decision Bank
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - ".github/workflows/build-preflop-decisions.yml"
       - "scripts/stackup-preflop-export.rs"
