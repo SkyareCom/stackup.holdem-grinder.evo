@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "model": "EQUILIBRIUM_NOISE_MIXTURE",
+  "description": "Opponent skill is modeled as action noise around a pinned equilibrium push/fold policy, not as arbitrary loose/tight stereotypes.",
+  "errorRates": {
+    "REC": 0.22,
+    "REG": 0.07,
+    "PRO": 0.015
+  },
+  "profiles": {
+    "opp50": {
+      "REC": 0.5,
+      "REG": 0.3,
+      "PRO": 0.2
+    },
+    "opp60": {
+      "REC": 0.6,
+      "REG": 0.25,
+      "PRO": 0.15
+    },
+    "opp75": {
+      "REC": 0.75,
+      "REG": 0.1,
+      "PRO": 0.05
+    },
+    "opp40": {
+      "REC": 0.4,
+      "REG": 0.3,
+      "PRO": 0.3
+    }
+  },
+  "equilibriumSource": "data/solver/pushfold-hu-v1.json",
+  "calibrationStatus": "VERSIONED_BASELINE_V1"
+}
