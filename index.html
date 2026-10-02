@@ -3535,21 +3535,21 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   }
   reportsPanel.addEventListener('click',e=>{
     const mode=e.target.closest('[data-reports-mode]');
-    if(mode){reportsSelectMode=mode.dataset.reportsMode==='select';reportsSelected.clear();reportsPendingDelete.clear();reportsSelectMode=false;reportsOpenId=null;reportsShareOpen=false;reportsClearPending=false;reportsOpenId=null;reportsShareOpen=false;renderReports();return;}
+    if(mode){reportsSelectMode=mode.dataset.reportsMode==='select';reportsSelected.clear();reportsPendingDelete.clear();reportsOpenId=null;reportsShareOpen=false;renderReports();return;}
     if(e.target.closest('[data-reports-clear]')){
       if(!reportsClearPending){reportsClearPending=true;renderReports();return;}
       window.StackUpReportLibrary?.clear?.();reportsClearPending=false;reportsSelected.clear();reportsOpenId=null;renderReports();showSpotToast(reportsText().deleted);return;
     }
     const select=e.target.closest('[data-report-select]');
-    if(select){if(select.dataset.reportSelect==='all')reportLibraryItems().forEach(x=>reportsSelected.add(x.id));else{reportsSelected.clear();reportsPendingDelete.clear();reportsSelectMode=false;reportsOpenId=null;reportsShareOpen=false;reportsClearPending=false;}renderReports();return;}
+    if(select){if(select.dataset.reportSelect==='all')reportLibraryItems().forEach(x=>reportsSelected.add(x.id));else{reportsSelected.clear();reportsPendingDelete.clear();}renderReports();return;}
     const selectItem=e.target.closest('[data-report-select-item]');
     if(selectItem){const id=selectItem.dataset.reportSelectItem;if(reportsSelected.has(id))reportsSelected.delete(id);else reportsSelected.add(id);renderReports();return;}
     const open=e.target.closest('[data-report-open]');
-    if(open){reportsOpenId=reportsOpenId===open.dataset.reportOpen?null:open.dataset.reportOpen;reportsShareOpen=false;reportsPendingDelete.clear();reportsSelectMode=false;reportsOpenId=null;reportsShareOpen=false;reportsClearPending=false;renderReports();return;}
+    if(open){reportsOpenId=reportsOpenId===open.dataset.reportOpen?null:open.dataset.reportOpen;reportsShareOpen=false;reportsPendingDelete.clear();renderReports();return;}
     const share=e.target.closest('[data-report-share]');
     if(share){reportsOpenId=share.dataset.reportShare;reportsShareOpen=!reportsShareOpen;renderReports();return;}
     const one=e.target.closest('[data-report-delete-one]');
-    if(one){const id=one.dataset.reportDeleteOne;if(!reportsPendingDelete.has(id)){reportsPendingDelete.clear();reportsSelectMode=false;reportsOpenId=null;reportsShareOpen=false;reportsClearPending=false;reportsPendingDelete.add(id);renderReports();return;}window.StackUpReportLibrary?.remove?.(id);reportsPendingDelete.clear();reportsSelectMode=false;reportsOpenId=null;reportsShareOpen=false;reportsClearPending=false;reportsOpenId=null;renderReports();showSpotToast(reportsText().deleted);return;}
+    if(one){const id=one.dataset.reportDeleteOne;if(!reportsPendingDelete.has(id)){reportsPendingDelete.clear();reportsPendingDelete.add(id);renderReports();return;}window.StackUpReportLibrary?.remove?.(id);reportsPendingDelete.clear();reportsOpenId=null;renderReports();showSpotToast(reportsText().deleted);return;}
     const section=e.target.closest('[data-report-section][data-report-id]');
     if(section){openSavedReportSection(section.dataset.reportId,section.dataset.reportSection);return;}
     const action=e.target.closest('[data-report-action]');
