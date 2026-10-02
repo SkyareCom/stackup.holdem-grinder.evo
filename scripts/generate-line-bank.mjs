@@ -249,16 +249,13 @@ async function solveRaw({id,street,board,oopRange,ipRange,potBb,stackBb,betSizes
   const args=[
     "solve","--street",street.toLowerCase(),"--board",board,
     "--oop-range",rangeText(cleanOop),"--ip-range",rangeText(cleanIp),
-    "--pot",String(potBb*2),"--stack",String(stackBb*2),
+    "--pot",String(Math.max(1,Math.round(potBb*10000))),
+    "--stack",String(Math.max(1,Math.round(stackBb*10000))),
     "--iterations",String(ITER),"--format","json","--output",rawPath,
     "--bet-sizes",betSizes,"--raise-sizes",raiseSizes,
     "--max-raises",String(maxRaises),"--allin-threshold","0.67","--allin-pot-ratio","3",
     "--skip-cum-strategy"
   ];
-  // Action-conditioned exact ranges generally differ by suit. The upstream
-  // solver's isomorphism is board-based, so disable it after flop propagation
-  // rather than permuting asymmetric reach weights.
-  if(String(street).toUpperCase()!=="FLOP")args.push("--no-iso");
   try{
     await execFileAsync(BIN,args,{maxBuffer:48*1024*1024});
     return JSON.parse(await readFile(rawPath,"utf8"));
@@ -311,7 +308,8 @@ function materialize({
         upstream:"exinori/DCFR-SOLVER",
         upstreamCommit:"4ade6a9e15a841c41867afde1258b9d110cd6fb1",
         license:"MIT",
-        purpose:"TARGETED_PROPAGATED_LINE"
+        purpose:"TARGETED_PROPAGATED_LINE",
+        chipScalePerBb:10000
       },
       ...extra
     },
