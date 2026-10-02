@@ -214,7 +214,7 @@ jobs:
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
           node scripts/route-solve-queue.mjs
-          git add data/solver/preflop-multistack.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json
+          git add data/solver/preflop-multistack.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
           if git diff --cached --quiet; then
             echo "Multistack bank unchanged."
             exit 0
