@@ -301,22 +301,37 @@
     const s=spot?.scenario||{};
     return hash(JSON.stringify(stable({
       street:normStreet(s.street),
-      gameType:s.gameType||null,
-      tableSize:s.tableSize??null,
+      tableSize:s.trainingTableSize??s.tableSize??null,
+      positions:s.positions||[],
       heroPosition:s.heroPosition||null,
       villainPosition:s.villainPosition||null,
       effectiveStack:Number(s.effectiveStack)||0,
       heroStack:Number(s.heroStack??s.effectiveStack)||0,
-      phase:s.phase||null,
-      tournamentType:s.tournamentType||null,
-      fieldSize:s.fieldSize||null,
-      opponentProfile:s.opponentProfile||null,
+      playerStacks:s.playerStacks||null,
       pot:Number(s.pot)||0,
+      currentBet:Number(s.currentBet)||0,
       board:s.board||[],
+      heroRange:s.heroRange??null,
+      villainRange:s.villainRange??null,
       actionLine:actionLine(s),
+      legalActions:s.legalActions||[],
+      sizings:s.sizings||[],
+      targetSizingPct:s.targetSizingPct??null,
+      ante:s.ante??null,
+      payouts:s.payouts??null,
+      icmBaseEquities:s.icmBaseEquities??s.icm??null,
+      heroBountyPrizeValue:s.heroBountyPrizeValue??null,
+      villainBountyPrizeValue:s.villainBountyPrizeValue??null,
+      bounty:s.bounty??null,
+      reentryUtilityModel:s.reentryUtilityModel??null,
+      opponentProfile:s.opponentProfile??null,
+      profileMix:s.profileMix??null,
+      behaviorModel:s.behaviorModel??null,
+      multiwayModel:s.multiwayModel??null,
+      extras:s.extras||[],
+      solverNode:s.solverNode??null,
       hand:String(hand||spot?.hand||''),
-      solver:spot?.solver||null,
-      solveId:spot?.solveId||null
+      solver:spot?.solver||null
     })));
   }
 
@@ -745,17 +760,26 @@
           ?contract.validateSolvedDecision(spot,entry)
           :{ok:true,id:exactSignature(spot,hand)};
         if(!verdict?.ok)continue;
-        const exact=verdict.id||exactSignature(spot,hand);
+        const sourceSolvedDecisionId=verdict.id||exactSignature(spot,hand);
+        const exact=verdict.strategicId||contract?.strategicDecisionId?.(spot,entry)||exactSignature(spot,hand);
         candidates.push({
           spotIndex,spot,hand,suitVariant:0,exact,
           solvedDecisionId:exact,
+          sourceSolvedDecisionId,
           family:familySignature(spot),
           position:normPosition(spot?.scenario?.heroPosition),
           street:normStreet(spot?.scenario?.street)
         });
       }
     }
-    return candidates;
+    const unique=[];
+    const seenStrategic=new Set();
+    for(const candidate of candidates){
+      if(seenStrategic.has(candidate.exact))continue;
+      seenStrategic.add(candidate.exact);
+      unique.push(candidate);
+    }
+    return unique;
   }
 
   function coverageFloor(filters){
