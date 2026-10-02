@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T07:27:17.057Z",
+  "generatedAt": "2026-10-02T10:02:12.740Z",
   "mode": "STRICT_SOLVED_ONLY",
   "counts": {
     "total": 123,
@@ -8,8 +8,55 @@
     "unrouted": 0
   },
   "workflows": {
-    "build-preflop-multistack.yml": [
+    "build-solver-bank.yml": [
       "aggr_special/pot_4bet",
+      "math_special/implied_odds",
+      "math_special/reverse_implied_odds",
+      "street/turn",
+      "street/river",
+      "street/flop",
+      "math_special/equity_realization"
+    ],
+    "build-line-bank.yml": [
+      "post_special/check_raise",
+      "post_special/sequential_lines",
+      "post_special/donk_bet",
+      "post_special/delayed_cbet",
+      "post_special/probe_bet",
+      "post_special/check_back_flop",
+      "post_special/double_barrel",
+      "post_special/triple_barrel",
+      "post_special/turn_check_raise",
+      "post_special/float_flop",
+      "post_special/miss_cbet",
+      "post_special/vs_missed_cbet",
+      "river_special/river_bluff_catch",
+      "river_special/vs_overbet",
+      "river_special/block_bet_20_25",
+      "river_special/river_check_raise",
+      "river_special/bet_fold",
+      "river_special/thin_value",
+      "river_special/value_river"
+    ],
+    "build-texture-sizing-bank.yml": [
+      "texture_special/bet_25",
+      "texture_special/bet_50",
+      "texture_special/bet_66",
+      "texture_special/bet_75",
+      "texture_special/pot_bet",
+      "texture_special/overbet_125",
+      "texture_special/overbet_150",
+      "texture_special/board_monotone",
+      "texture_special/board_paired",
+      "texture_special/board_low",
+      "texture_special/board_connected",
+      "texture_special/board_dynamic",
+      "texture_special/board_twotone",
+      "texture_special/bet_33",
+      "texture_special/board_dry",
+      "texture_special/board_static"
+    ],
+    "build-preflop-multistack.yml": [
       "aggr_special/4bet_value",
       "pos/UTG",
       "pre_special/limping",
@@ -46,53 +93,6 @@
       "pre_special/sb_cobtn",
       "stack/15bb",
       "pre_special/cobtn"
-    ],
-    "build-line-bank.yml": [
-      "post_special/check_raise",
-      "post_special/sequential_lines",
-      "post_special/donk_bet",
-      "post_special/delayed_cbet",
-      "post_special/probe_bet",
-      "post_special/check_back_flop",
-      "post_special/double_barrel",
-      "post_special/triple_barrel",
-      "post_special/turn_check_raise",
-      "post_special/float_flop",
-      "post_special/miss_cbet",
-      "post_special/vs_missed_cbet",
-      "river_special/river_bluff_catch",
-      "river_special/vs_overbet",
-      "river_special/block_bet_20_25",
-      "river_special/river_check_raise",
-      "river_special/bet_fold",
-      "river_special/thin_value",
-      "river_special/value_river"
-    ],
-    "build-solver-bank.yml": [
-      "math_special/implied_odds",
-      "math_special/reverse_implied_odds",
-      "street/turn",
-      "street/river",
-      "street/flop",
-      "math_special/equity_realization"
-    ],
-    "build-texture-sizing-bank.yml": [
-      "texture_special/bet_25",
-      "texture_special/bet_50",
-      "texture_special/bet_66",
-      "texture_special/bet_75",
-      "texture_special/pot_bet",
-      "texture_special/overbet_125",
-      "texture_special/overbet_150",
-      "texture_special/board_monotone",
-      "texture_special/board_paired",
-      "texture_special/board_low",
-      "texture_special/board_connected",
-      "texture_special/board_dynamic",
-      "texture_special/board_twotone",
-      "texture_special/bet_33",
-      "texture_special/board_dry",
-      "texture_special/board_static"
     ],
     "build-tournament-bank.yml": [
       "pko_special/covered_stack",
@@ -167,9 +167,9 @@
       "target": 1500,
       "requestedSolves": 500,
       "status": "QUEUED",
-      "engineId": "DCFR_PREFLOP_MULTISTACK",
-      "workflow": "build-preflop-multistack.yml",
-      "generator": "scripts/stackup-preflop-export.rs",
+      "engineId": "DCFR_POSTFLOP_GENERAL",
+      "workflow": "build-solver-bank.yml",
+      "generator": "scripts/generate-solver-bank.mjs",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
