@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T01:33:02.398Z",
+  "generatedAt": "2026-10-02T06:48:32.783Z",
   "policyVersion": 1,
   "strategy": "DEFICIT_FIRST",
   "publishFloor": 1500,
@@ -7,15 +7,17 @@
   "longTermTarget": 20000,
   "counts": {
     "total": 162,
-    "belowPublish": 107,
-    "atOrAbovePublish": 55,
-    "atOrAboveCurrentGoal": 52,
-    "mature": 14
+    "belowPublish": 98,
+    "atOrAbovePublish": 64,
+    "atOrAboveCurrentGoal": 59,
+    "controlOnly": 6,
+    "mature": 23
   },
   "filters": [
     {
       "section": "mode",
       "id": "cash",
+      "controlOnly": false,
       "label": "CASH GAME",
       "solved": 0,
       "publishFloor": 1500,
@@ -30,6 +32,7 @@
     {
       "section": "extras",
       "id": "rebuy",
+      "controlOnly": false,
       "label": "REBUY",
       "solved": 0,
       "publishFloor": 1500,
@@ -44,63 +47,8 @@
     {
       "section": "extras",
       "id": "addon",
+      "controlOnly": false,
       "label": "ADDON",
-      "solved": 0,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1500,
-      "shortfallToCurrentGoal": 2000,
-      "shortfallToNextTarget": 1500,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
-      "section": "fskill",
-      "id": "opp50",
-      "label": "OPP50",
-      "solved": 0,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1500,
-      "shortfallToCurrentGoal": 2000,
-      "shortfallToNextTarget": 1500,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
-      "section": "fskill",
-      "id": "opp60",
-      "label": "OPP60",
-      "solved": 0,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1500,
-      "shortfallToCurrentGoal": 2000,
-      "shortfallToNextTarget": 1500,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
-      "section": "fskill",
-      "id": "opp75",
-      "label": "OPP75",
-      "solved": 0,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1500,
-      "shortfallToCurrentGoal": 2000,
-      "shortfallToNextTarget": 1500,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
-      "section": "fskill",
-      "id": "opp40",
-      "label": "OPP40",
       "solved": 0,
       "publishFloor": 1500,
       "currentGoal": 2000,
@@ -114,6 +62,7 @@
     {
       "section": "phase",
       "id": "early",
+      "controlOnly": false,
       "label": "EARLY",
       "solved": 0,
       "publishFloor": 1500,
@@ -128,6 +77,7 @@
     {
       "section": "pos",
       "id": "UTG+1",
+      "controlOnly": false,
       "label": "UTG+1",
       "solved": 0,
       "publishFloor": 1500,
@@ -142,6 +92,7 @@
     {
       "section": "pos",
       "id": "UTG+2",
+      "controlOnly": false,
       "label": "UTG+2",
       "solved": 0,
       "publishFloor": 1500,
@@ -156,6 +107,7 @@
     {
       "section": "pos",
       "id": "LJ",
+      "controlOnly": false,
       "label": "LJ",
       "solved": 0,
       "publishFloor": 1500,
@@ -170,35 +122,8 @@
     {
       "section": "aggr_special",
       "id": "pot_4bet",
+      "controlOnly": false,
       "label": "POTE 4-BET",
-      "solved": 0,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1500,
-      "shortfallToCurrentGoal": 2000,
-      "shortfallToNextTarget": 1500,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
-      "section": "aggr_special",
-      "id": "4bet_bluff",
-      "label": "4-BET BLUFF",
-      "solved": 0,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1500,
-      "shortfallToCurrentGoal": 2000,
-      "shortfallToNextTarget": 1500,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
-      "section": "aggr_special",
-      "id": "4bet_value",
-      "label": "4-BET VALUE",
       "solved": 0,
       "publishFloor": 1500,
       "currentGoal": 2000,
@@ -212,6 +137,7 @@
     {
       "section": "short_special",
       "id": "chip_up",
+      "controlOnly": false,
       "label": "CHIP UP",
       "solved": 0,
       "publishFloor": 1500,
@@ -226,6 +152,7 @@
     {
       "section": "short_special",
       "id": "multi_shove",
+      "controlOnly": false,
       "label": "MULTI SHOVE",
       "solved": 0,
       "publishFloor": 1500,
@@ -240,6 +167,7 @@
     {
       "section": "pko_special",
       "id": "bounty_iso",
+      "controlOnly": false,
       "label": "BOUNTY ISO",
       "solved": 0,
       "publishFloor": 1500,
@@ -254,6 +182,7 @@
     {
       "section": "pko_special",
       "id": "multiway_bounty",
+      "controlOnly": false,
       "label": "MULTIWAY BOUNTY",
       "solved": 0,
       "publishFloor": 1500,
@@ -268,6 +197,7 @@
     {
       "section": "post_special",
       "id": "postflop_multiway",
+      "controlOnly": false,
       "label": "PÓS-FLOP MULTIWAY",
       "solved": 0,
       "publishFloor": 1500,
@@ -282,6 +212,7 @@
     {
       "section": "post_special",
       "id": "check_raise",
+      "controlOnly": false,
       "label": "CHECK-RAISE",
       "solved": 0,
       "publishFloor": 1500,
@@ -296,6 +227,7 @@
     {
       "section": "post_special",
       "id": "sequential_lines",
+      "controlOnly": false,
       "label": "LINHAS SEQUENCIAIS",
       "solved": 0,
       "publishFloor": 1500,
@@ -310,6 +242,7 @@
     {
       "section": "post_special",
       "id": "donk_bet",
+      "controlOnly": false,
       "label": "DONK BET",
       "solved": 0,
       "publishFloor": 1500,
@@ -324,6 +257,7 @@
     {
       "section": "post_special",
       "id": "delayed_cbet",
+      "controlOnly": false,
       "label": "DELAYED C-BET",
       "solved": 0,
       "publishFloor": 1500,
@@ -338,6 +272,7 @@
     {
       "section": "post_special",
       "id": "probe_bet",
+      "controlOnly": false,
       "label": "PROBE BET",
       "solved": 0,
       "publishFloor": 1500,
@@ -352,6 +287,7 @@
     {
       "section": "post_special",
       "id": "check_back_flop",
+      "controlOnly": false,
       "label": "CHECK-BACK FLOP",
       "solved": 0,
       "publishFloor": 1500,
@@ -366,6 +302,7 @@
     {
       "section": "post_special",
       "id": "double_barrel",
+      "controlOnly": false,
       "label": "DOUBLE BARREL",
       "solved": 0,
       "publishFloor": 1500,
@@ -380,6 +317,7 @@
     {
       "section": "post_special",
       "id": "triple_barrel",
+      "controlOnly": false,
       "label": "TRIPLE BARREL",
       "solved": 0,
       "publishFloor": 1500,
@@ -394,6 +332,7 @@
     {
       "section": "post_special",
       "id": "turn_check_raise",
+      "controlOnly": false,
       "label": "TURN CHECK-RAISE",
       "solved": 0,
       "publishFloor": 1500,
@@ -408,6 +347,7 @@
     {
       "section": "post_special",
       "id": "float_flop",
+      "controlOnly": false,
       "label": "FLOAT FLOP",
       "solved": 0,
       "publishFloor": 1500,
@@ -422,6 +362,7 @@
     {
       "section": "post_special",
       "id": "miss_cbet",
+      "controlOnly": false,
       "label": "MISS C-BET",
       "solved": 0,
       "publishFloor": 1500,
@@ -436,6 +377,7 @@
     {
       "section": "post_special",
       "id": "vs_missed_cbet",
+      "controlOnly": false,
       "label": "VS MISSED C-BET",
       "solved": 0,
       "publishFloor": 1500,
@@ -450,6 +392,7 @@
     {
       "section": "river_special",
       "id": "river_bluff_catch",
+      "controlOnly": false,
       "label": "RIVER BLUFF CATCH",
       "solved": 0,
       "publishFloor": 1500,
@@ -464,6 +407,7 @@
     {
       "section": "river_special",
       "id": "vs_overbet",
+      "controlOnly": false,
       "label": "VS OVERBET",
       "solved": 0,
       "publishFloor": 1500,
@@ -478,6 +422,7 @@
     {
       "section": "river_special",
       "id": "block_bet_20_25",
+      "controlOnly": false,
       "label": "BLOCK BET 20–25%",
       "solved": 0,
       "publishFloor": 1500,
@@ -492,6 +437,7 @@
     {
       "section": "river_special",
       "id": "river_check_raise",
+      "controlOnly": false,
       "label": "RIVER CHECK-RAISE",
       "solved": 0,
       "publishFloor": 1500,
@@ -506,35 +452,8 @@
     {
       "section": "river_special",
       "id": "bet_fold",
+      "controlOnly": false,
       "label": "BET/FOLD",
-      "solved": 0,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1500,
-      "shortfallToCurrentGoal": 2000,
-      "shortfallToNextTarget": 1500,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
-      "section": "river_special",
-      "id": "thin_value",
-      "label": "THIN VALUE",
-      "solved": 0,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1500,
-      "shortfallToCurrentGoal": 2000,
-      "shortfallToNextTarget": 1500,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
-      "section": "river_special",
-      "id": "value_river",
-      "label": "VALUE RIVER",
       "solved": 0,
       "publishFloor": 1500,
       "currentGoal": 2000,
@@ -548,6 +467,7 @@
     {
       "section": "math_special",
       "id": "implied_odds",
+      "controlOnly": false,
       "label": "IMPLIED ODDS",
       "solved": 0,
       "publishFloor": 1500,
@@ -560,8 +480,24 @@
       "priority": 1
     },
     {
+      "section": "aggr_special",
+      "id": "4bet_value",
+      "controlOnly": false,
+      "label": "4-BET VALUE",
+      "solved": 28,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 1500,
+      "shortfallToPublish": 1472,
+      "shortfallToCurrentGoal": 1972,
+      "shortfallToNextTarget": 1472,
+      "stage": "RECOVERY_TO_PUBLISH",
+      "priority": 1
+    },
+    {
       "section": "pre_special",
       "id": "limping",
+      "controlOnly": false,
       "label": "LIMPING",
       "solved": 169,
       "publishFloor": 1500,
@@ -576,6 +512,7 @@
     {
       "section": "blind_special",
       "id": "bb_limpers",
+      "controlOnly": false,
       "label": "BB × LIMPERS",
       "solved": 169,
       "publishFloor": 1500,
@@ -590,6 +527,7 @@
     {
       "section": "blind_special",
       "id": "sb_limp_call",
+      "controlOnly": false,
       "label": "SB LIMP-CALL",
       "solved": 169,
       "publishFloor": 1500,
@@ -604,6 +542,7 @@
     {
       "section": "blind_special",
       "id": "sb_limp_raise",
+      "controlOnly": false,
       "label": "SB LIMP-RAISE",
       "solved": 169,
       "publishFloor": 1500,
@@ -618,6 +557,7 @@
     {
       "section": "blind_special",
       "id": "iso_limpers",
+      "controlOnly": false,
       "label": "ISO LIMPERS",
       "solved": 169,
       "publishFloor": 1500,
@@ -632,6 +572,7 @@
     {
       "section": "blind_special",
       "id": "limp_raise",
+      "controlOnly": false,
       "label": "LIMP-RAISE",
       "solved": 169,
       "publishFloor": 1500,
@@ -644,36 +585,9 @@
       "priority": 1
     },
     {
-      "section": "phase",
-      "id": "middle",
-      "label": "MIDDLE",
-      "solved": 338,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1162,
-      "shortfallToCurrentGoal": 1662,
-      "shortfallToNextTarget": 1162,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
-      "section": "stack",
-      "id": "5bb",
-      "label": "5BB",
-      "solved": 338,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 1162,
-      "shortfallToCurrentGoal": 1662,
-      "shortfallToNextTarget": 1162,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
       "section": "stack",
       "id": "30bb",
+      "controlOnly": false,
       "label": "30BB",
       "solved": 338,
       "publishFloor": 1500,
@@ -688,6 +602,7 @@
     {
       "section": "stack",
       "id": "50bb",
+      "controlOnly": false,
       "label": "50BB",
       "solved": 338,
       "publishFloor": 1500,
@@ -702,6 +617,7 @@
     {
       "section": "pre_special",
       "id": "bb_ep",
+      "controlOnly": false,
       "label": "BB × EP",
       "solved": 338,
       "publishFloor": 1500,
@@ -716,6 +632,7 @@
     {
       "section": "pre_special",
       "id": "sb_ep",
+      "controlOnly": false,
       "label": "SB × EP",
       "solved": 338,
       "publishFloor": 1500,
@@ -730,6 +647,7 @@
     {
       "section": "pre_special",
       "id": "sb_mp",
+      "controlOnly": false,
       "label": "SB × MP",
       "solved": 338,
       "publishFloor": 1500,
@@ -744,6 +662,7 @@
     {
       "section": "pre_special",
       "id": "attack_cobtn",
+      "controlOnly": false,
       "label": "ATAQUE CO/BTN",
       "solved": 338,
       "publishFloor": 1500,
@@ -758,6 +677,7 @@
     {
       "section": "pre_special",
       "id": "cobtn_vs_raise",
+      "controlOnly": false,
       "label": "CO/BTN VS RAISE",
       "solved": 338,
       "publishFloor": 1500,
@@ -772,6 +692,7 @@
     {
       "section": "aggr_special",
       "id": "facing_4bet",
+      "controlOnly": false,
       "label": "FACING 4-BET",
       "solved": 338,
       "publishFloor": 1500,
@@ -786,6 +707,7 @@
     {
       "section": "aggr_special",
       "id": "cold_call_4bet",
+      "controlOnly": false,
       "label": "COLD CALL / 4-BET",
       "solved": 338,
       "publishFloor": 1500,
@@ -800,6 +722,7 @@
     {
       "section": "aggr_special",
       "id": "raise_vs_3bet",
+      "controlOnly": false,
       "label": "RAISE VS 3-BET",
       "solved": 338,
       "publishFloor": 1500,
@@ -814,6 +737,7 @@
     {
       "section": "aggr_special",
       "id": "call_3bet",
+      "controlOnly": false,
       "label": "CALL 3-BET",
       "solved": 338,
       "publishFloor": 1500,
@@ -828,6 +752,7 @@
     {
       "section": "aggr_special",
       "id": "fold_to_3bet",
+      "controlOnly": false,
       "label": "FOLD TO 3-BET",
       "solved": 338,
       "publishFloor": 1500,
@@ -842,6 +767,7 @@
     {
       "section": "aggr_special",
       "id": "call_4bet",
+      "controlOnly": false,
       "label": "CALL 4-BET",
       "solved": 338,
       "publishFloor": 1500,
@@ -856,6 +782,7 @@
     {
       "section": "aggr_special",
       "id": "cold_4bet",
+      "controlOnly": false,
       "label": "COLD 4-BET",
       "solved": 338,
       "publishFloor": 1500,
@@ -870,6 +797,7 @@
     {
       "section": "math_special",
       "id": "reverse_implied_odds",
+      "controlOnly": false,
       "label": "REVERSE IMPLIED ODDS",
       "solved": 439,
       "publishFloor": 1500,
@@ -884,6 +812,7 @@
     {
       "section": "stack",
       "id": "25bb",
+      "controlOnly": false,
       "label": "25BB",
       "solved": 507,
       "publishFloor": 1500,
@@ -898,6 +827,7 @@
     {
       "section": "pre_special",
       "id": "bb_mp",
+      "controlOnly": false,
       "label": "BB × MP",
       "solved": 507,
       "publishFloor": 1500,
@@ -912,6 +842,7 @@
     {
       "section": "pre_special",
       "id": "vs_open_ip",
+      "controlOnly": false,
       "label": "VS OPEN IP",
       "solved": 507,
       "publishFloor": 1500,
@@ -926,6 +857,7 @@
     {
       "section": "aggr_special",
       "id": "3bet_ip",
+      "controlOnly": false,
       "label": "3-BET IP",
       "solved": 507,
       "publishFloor": 1500,
@@ -940,6 +872,7 @@
     {
       "section": "short_special",
       "id": "reshove",
+      "controlOnly": false,
       "label": "RESHOVE",
       "solved": 507,
       "publishFloor": 1500,
@@ -954,6 +887,7 @@
     {
       "section": "texture_special",
       "id": "bet_25",
+      "controlOnly": false,
       "label": "BET 25%",
       "solved": 518,
       "publishFloor": 1500,
@@ -968,6 +902,7 @@
     {
       "section": "texture_special",
       "id": "bet_50",
+      "controlOnly": false,
       "label": "BET 50%",
       "solved": 518,
       "publishFloor": 1500,
@@ -982,6 +917,7 @@
     {
       "section": "texture_special",
       "id": "bet_66",
+      "controlOnly": false,
       "label": "BET 66%",
       "solved": 518,
       "publishFloor": 1500,
@@ -996,6 +932,7 @@
     {
       "section": "texture_special",
       "id": "bet_75",
+      "controlOnly": false,
       "label": "BET 75%",
       "solved": 518,
       "publishFloor": 1500,
@@ -1010,6 +947,7 @@
     {
       "section": "texture_special",
       "id": "pot_bet",
+      "controlOnly": false,
       "label": "POT BET",
       "solved": 518,
       "publishFloor": 1500,
@@ -1024,6 +962,7 @@
     {
       "section": "texture_special",
       "id": "overbet_125",
+      "controlOnly": false,
       "label": "OVERBET 125%",
       "solved": 518,
       "publishFloor": 1500,
@@ -1038,6 +977,7 @@
     {
       "section": "texture_special",
       "id": "overbet_150",
+      "controlOnly": false,
       "label": "OVERBET 150%",
       "solved": 518,
       "publishFloor": 1500,
@@ -1050,8 +990,24 @@
       "priority": 1
     },
     {
+      "section": "aggr_special",
+      "id": "4bet_bluff",
+      "controlOnly": false,
+      "label": "4-BET BLUFF",
+      "solved": 642,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 1500,
+      "shortfallToPublish": 858,
+      "shortfallToCurrentGoal": 1358,
+      "shortfallToNextTarget": 858,
+      "stage": "RECOVERY_TO_PUBLISH",
+      "priority": 1
+    },
+    {
       "section": "seats",
       "id": "s9",
+      "controlOnly": false,
       "label": "S9",
       "solved": 676,
       "publishFloor": 1500,
@@ -1066,6 +1022,7 @@
     {
       "section": "seats",
       "id": "s10",
+      "controlOnly": false,
       "label": "S10",
       "solved": 676,
       "publishFloor": 1500,
@@ -1080,6 +1037,7 @@
     {
       "section": "ttype",
       "id": "turbo",
+      "controlOnly": false,
       "label": "TURBO",
       "solved": 676,
       "publishFloor": 1500,
@@ -1094,6 +1052,7 @@
     {
       "section": "ttype",
       "id": "freeze",
+      "controlOnly": false,
       "label": "FREEZE",
       "solved": 676,
       "publishFloor": 1500,
@@ -1108,6 +1067,7 @@
     {
       "section": "ttype",
       "id": "hroller",
+      "controlOnly": false,
       "label": "HROLLER",
       "solved": 676,
       "publishFloor": 1500,
@@ -1122,6 +1082,7 @@
     {
       "section": "ttype",
       "id": "sng",
+      "controlOnly": false,
       "label": "SNG",
       "solved": 676,
       "publishFloor": 1500,
@@ -1136,6 +1097,7 @@
     {
       "section": "fsize",
       "id": "250",
+      "controlOnly": false,
       "label": "FIELD 250",
       "solved": 676,
       "publishFloor": 1500,
@@ -1150,6 +1112,7 @@
     {
       "section": "pre_special",
       "id": "sb_cobtn",
+      "controlOnly": false,
       "label": "SB × CO/BTN",
       "solved": 676,
       "publishFloor": 1500,
@@ -1164,6 +1127,7 @@
     {
       "section": "pre_special",
       "id": "cobtn",
+      "controlOnly": false,
       "label": "CO / BTN",
       "solved": 676,
       "publishFloor": 1500,
@@ -1178,6 +1142,7 @@
     {
       "section": "icm_special",
       "id": "icm_5_8",
+      "controlOnly": false,
       "label": "ICM 5–8 BB",
       "solved": 676,
       "publishFloor": 1500,
@@ -1192,6 +1157,7 @@
     {
       "section": "icm_special",
       "id": "icm_9_12",
+      "controlOnly": false,
       "label": "ICM 9–12 BB",
       "solved": 676,
       "publishFloor": 1500,
@@ -1206,6 +1172,7 @@
     {
       "section": "icm_special",
       "id": "icm_19_25",
+      "controlOnly": false,
       "label": "ICM 19–25 BB",
       "solved": 676,
       "publishFloor": 1500,
@@ -1220,6 +1187,7 @@
     {
       "section": "icm_special",
       "id": "icm_final_table",
+      "controlOnly": false,
       "label": "ICM FINAL TABLE",
       "solved": 676,
       "publishFloor": 1500,
@@ -1234,6 +1202,7 @@
     {
       "section": "icm_special",
       "id": "icm_3handed",
+      "controlOnly": false,
       "label": "ICM 3-HANDED",
       "solved": 676,
       "publishFloor": 1500,
@@ -1248,6 +1217,7 @@
     {
       "section": "pko_special",
       "id": "covered_stack",
+      "controlOnly": false,
       "label": "COVERED STACK",
       "solved": 676,
       "publishFloor": 1500,
@@ -1262,6 +1232,7 @@
     {
       "section": "pos",
       "id": "BTN",
+      "controlOnly": false,
       "label": "BTN",
       "solved": 845,
       "publishFloor": 1500,
@@ -1276,6 +1247,7 @@
     {
       "section": "stack",
       "id": "20bb",
+      "controlOnly": false,
       "label": "20BB",
       "solved": 845,
       "publishFloor": 1500,
@@ -1290,6 +1262,7 @@
     {
       "section": "texture_special",
       "id": "board_paired",
+      "controlOnly": false,
       "label": "PAIRED BOARD",
       "solved": 979,
       "publishFloor": 1500,
@@ -1302,22 +1275,9 @@
       "priority": 1
     },
     {
-      "section": "stack",
-      "id": "15bb",
-      "label": "15BB",
-      "solved": 1014,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 1500,
-      "shortfallToPublish": 486,
-      "shortfallToCurrentGoal": 986,
-      "shortfallToNextTarget": 486,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "priority": 1
-    },
-    {
       "section": "aggr_special",
       "id": "squeeze",
+      "controlOnly": false,
       "label": "SQUEEZE",
       "solved": 1014,
       "publishFloor": 1500,
@@ -1332,6 +1292,7 @@
     {
       "section": "icm_special",
       "id": "icm_13_18",
+      "controlOnly": false,
       "label": "ICM 13–18 BB",
       "solved": 1014,
       "publishFloor": 1500,
@@ -1346,6 +1307,7 @@
     {
       "section": "icm_special",
       "id": "icm_bubble",
+      "controlOnly": false,
       "label": "ICM BUBBLE",
       "solved": 1014,
       "publishFloor": 1500,
@@ -1360,6 +1322,7 @@
     {
       "section": "pko_special",
       "id": "bounty_call",
+      "controlOnly": false,
       "label": "BOUNTY CALL",
       "solved": 1014,
       "publishFloor": 1500,
@@ -1374,6 +1337,7 @@
     {
       "section": "pko_special",
       "id": "bounty_shove",
+      "controlOnly": false,
       "label": "BOUNTY SHOVE",
       "solved": 1014,
       "publishFloor": 1500,
@@ -1388,6 +1352,7 @@
     {
       "section": "texture_special",
       "id": "board_monotone",
+      "controlOnly": false,
       "label": "MONOTONE BOARD",
       "solved": 1051,
       "publishFloor": 1500,
@@ -1402,6 +1367,7 @@
     {
       "section": "texture_special",
       "id": "board_low",
+      "controlOnly": false,
       "label": "LOW BOARD",
       "solved": 1107,
       "publishFloor": 1500,
@@ -1416,6 +1382,7 @@
     {
       "section": "stack",
       "id": "18bb",
+      "controlOnly": false,
       "label": "18BB",
       "solved": 1183,
       "publishFloor": 1500,
@@ -1430,6 +1397,7 @@
     {
       "section": "fsize",
       "id": "50",
+      "controlOnly": false,
       "label": "FIELD 50",
       "solved": 1352,
       "publishFloor": 1500,
@@ -1444,6 +1412,7 @@
     {
       "section": "fsize",
       "id": "350",
+      "controlOnly": false,
       "label": "FIELD 350",
       "solved": 1352,
       "publishFloor": 1500,
@@ -1458,6 +1427,7 @@
     {
       "section": "phase",
       "id": "ft",
+      "controlOnly": false,
       "label": "FT",
       "solved": 1352,
       "publishFloor": 1500,
@@ -1472,6 +1442,7 @@
     {
       "section": "icm_special",
       "id": "icm_pay_jump",
+      "controlOnly": false,
       "label": "ICM PAY JUMP",
       "solved": 1352,
       "publishFloor": 1500,
@@ -1486,6 +1457,7 @@
     {
       "section": "pko_special",
       "id": "covering_stack",
+      "controlOnly": false,
       "label": "COVERING STACK",
       "solved": 1352,
       "publishFloor": 1500,
@@ -1500,6 +1472,7 @@
     {
       "section": "pos",
       "id": "UTG",
+      "controlOnly": false,
       "label": "UTG",
       "solved": 1424,
       "publishFloor": 1500,
@@ -1512,8 +1485,39 @@
       "priority": 1
     },
     {
+      "section": "river_special",
+      "id": "thin_value",
+      "controlOnly": false,
+      "label": "THIN VALUE",
+      "solved": 1503,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 2000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 497,
+      "shortfallToNextTarget": 497,
+      "stage": "BUILD_CURRENT_GOAL",
+      "priority": 2
+    },
+    {
+      "section": "stack",
+      "id": "5bb",
+      "controlOnly": false,
+      "label": "5BB",
+      "solved": 1690,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 2000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 310,
+      "shortfallToNextTarget": 310,
+      "stage": "BUILD_CURRENT_GOAL",
+      "priority": 2
+    },
+    {
       "section": "pre_special",
       "id": "open_by_pos",
+      "controlOnly": false,
       "label": "OPEN POR POSIÇÃO",
       "solved": 1690,
       "publishFloor": 1500,
@@ -1528,6 +1532,7 @@
     {
       "section": "pos",
       "id": "HJ",
+      "controlOnly": false,
       "label": "HJ",
       "solved": 1721,
       "publishFloor": 1500,
@@ -1542,6 +1547,7 @@
     {
       "section": "fsize",
       "id": "1000+",
+      "controlOnly": false,
       "label": "FIELD 1000+",
       "solved": 1859,
       "publishFloor": 1500,
@@ -1556,21 +1562,8 @@
     {
       "section": "ttype",
       "id": "pko",
+      "controlOnly": false,
       "label": "PKO",
-      "solved": 2028,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 5000,
-      "shortfallToPublish": 0,
-      "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 2972,
-      "stage": "GROW_5000",
-      "priority": 3
-    },
-    {
-      "section": "fsize",
-      "id": "500",
-      "label": "FIELD 500",
       "solved": 2028,
       "publishFloor": 1500,
       "currentGoal": 2000,
@@ -1584,6 +1577,7 @@
     {
       "section": "pko_special",
       "id": "pko_math",
+      "controlOnly": false,
       "label": "PKO MATEMÁTICO",
       "solved": 2028,
       "publishFloor": 1500,
@@ -1596,8 +1590,24 @@
       "priority": 3
     },
     {
+      "section": "river_special",
+      "id": "value_river",
+      "controlOnly": false,
+      "label": "VALUE RIVER",
+      "solved": 2126,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 5000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 2874,
+      "stage": "GROW_5000",
+      "priority": 3
+    },
+    {
       "section": "pre_special",
       "id": "vs_open_oop",
+      "controlOnly": false,
       "label": "VS OPEN OOP",
       "solved": 2197,
       "publishFloor": 1500,
@@ -1612,6 +1622,7 @@
     {
       "section": "aggr_special",
       "id": "3bet_oop",
+      "controlOnly": false,
       "label": "3-BET OOP",
       "solved": 2197,
       "publishFloor": 1500,
@@ -1624,23 +1635,25 @@
       "priority": 3
     },
     {
-      "section": "seats",
-      "id": "s8",
-      "label": "S8",
-      "solved": 2704,
+      "section": "stack",
+      "id": "15bb",
+      "controlOnly": false,
+      "label": "15BB",
+      "solved": 2366,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 5000,
       "shortfallToPublish": 0,
       "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 2296,
+      "shortfallToNextTarget": 2634,
       "stage": "GROW_5000",
       "priority": 3
     },
     {
-      "section": "stack",
-      "id": "10bb",
-      "label": "10BB",
+      "section": "seats",
+      "id": "s8",
+      "controlOnly": false,
+      "label": "S8",
       "solved": 2704,
       "publishFloor": 1500,
       "currentGoal": 2000,
@@ -1654,6 +1667,7 @@
     {
       "section": "pre_special",
       "id": "cold_call",
+      "controlOnly": false,
       "label": "COLD CALL",
       "solved": 2704,
       "publishFloor": 1500,
@@ -1668,6 +1682,7 @@
     {
       "section": "icm_special",
       "id": "big_stack_pressure",
+      "controlOnly": false,
       "label": "BIG STACK PRESSURE",
       "solved": 2704,
       "publishFloor": 1500,
@@ -1682,6 +1697,7 @@
     {
       "section": "texture_special",
       "id": "board_connected",
+      "controlOnly": false,
       "label": "CONNECTED BOARD",
       "solved": 2898,
       "publishFloor": 1500,
@@ -1696,6 +1712,7 @@
     {
       "section": "texture_special",
       "id": "board_dynamic",
+      "controlOnly": false,
       "label": "DYNAMIC BOARD",
       "solved": 2898,
       "publishFloor": 1500,
@@ -1710,6 +1727,7 @@
     {
       "section": "icm_special",
       "id": "mid_stack_pressure",
+      "controlOnly": false,
       "label": "MID STACK PRESSURE",
       "solved": 3380,
       "publishFloor": 1500,
@@ -1724,6 +1742,7 @@
     {
       "section": "icm_special",
       "id": "short_stack_survival",
+      "controlOnly": false,
       "label": "SHORT STACK SURVIVAL",
       "solved": 3718,
       "publishFloor": 1500,
@@ -1736,8 +1755,24 @@
       "priority": 3
     },
     {
+      "section": "stack",
+      "id": "10bb",
+      "controlOnly": false,
+      "label": "10BB",
+      "solved": 4056,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 5000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 944,
+      "stage": "GROW_5000",
+      "priority": 3
+    },
+    {
       "section": "street",
       "id": "river",
+      "controlOnly": false,
       "label": "RIVER",
       "solved": 4631,
       "publishFloor": 1500,
@@ -1752,7 +1787,68 @@
     {
       "section": "seats",
       "id": "s2",
+      "controlOnly": false,
       "label": "S2",
+      "solved": 4732,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 5000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 268,
+      "stage": "GROW_5000",
+      "priority": 3
+    },
+    {
+      "section": "fskill",
+      "id": "opp50",
+      "controlOnly": false,
+      "label": "OPP50",
+      "solved": 4732,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 5000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 268,
+      "stage": "GROW_5000",
+      "priority": 3
+    },
+    {
+      "section": "fskill",
+      "id": "opp60",
+      "controlOnly": false,
+      "label": "OPP60",
+      "solved": 4732,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 5000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 268,
+      "stage": "GROW_5000",
+      "priority": 3
+    },
+    {
+      "section": "fskill",
+      "id": "opp75",
+      "controlOnly": false,
+      "label": "OPP75",
+      "solved": 4732,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 5000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 268,
+      "stage": "GROW_5000",
+      "priority": 3
+    },
+    {
+      "section": "fskill",
+      "id": "opp40",
+      "controlOnly": false,
+      "label": "OPP40",
       "solved": 4732,
       "publishFloor": 1500,
       "currentGoal": 2000,
@@ -1766,6 +1862,7 @@
     {
       "section": "blind_special",
       "id": "heads_up_2max",
+      "controlOnly": false,
       "label": "HEADS-UP 2-MAX",
       "solved": 4732,
       "publishFloor": 1500,
@@ -1780,6 +1877,7 @@
     {
       "section": "street",
       "id": "turn",
+      "controlOnly": false,
       "label": "TURN",
       "solved": 4820,
       "publishFloor": 1500,
@@ -1794,6 +1892,7 @@
     {
       "section": "stack",
       "id": "100bb",
+      "controlOnly": false,
       "label": "100BB",
       "solved": 5746,
       "publishFloor": 1500,
@@ -1808,6 +1907,7 @@
     {
       "section": "phase",
       "id": "bubble",
+      "controlOnly": false,
       "label": "BUBBLE",
       "solved": 6253,
       "publishFloor": 1500,
@@ -1822,6 +1922,7 @@
     {
       "section": "blind_special",
       "id": "blind_war",
+      "controlOnly": false,
       "label": "BLIND WAR",
       "solved": 6253,
       "publishFloor": 1500,
@@ -1836,6 +1937,7 @@
     {
       "section": "phase",
       "id": "late",
+      "controlOnly": false,
       "label": "LATE",
       "solved": 9464,
       "publishFloor": 1500,
@@ -1850,6 +1952,7 @@
     {
       "section": "texture_special",
       "id": "board_twotone",
+      "controlOnly": false,
       "label": "TWO-TONE BOARD",
       "solved": 9628,
       "publishFloor": 1500,
@@ -1864,6 +1967,7 @@
     {
       "section": "fsize",
       "id": "100",
+      "controlOnly": false,
       "label": "FIELD 100",
       "solved": 10140,
       "publishFloor": 1500,
@@ -1878,6 +1982,7 @@
     {
       "section": "pos",
       "id": "CO",
+      "controlOnly": false,
       "label": "CO",
       "solved": 10479,
       "publishFloor": 1500,
@@ -1892,6 +1997,7 @@
     {
       "section": "short_special",
       "id": "call_shove",
+      "controlOnly": false,
       "label": "CALL SHOVE",
       "solved": 10816,
       "publishFloor": 1500,
@@ -1906,6 +2012,7 @@
     {
       "section": "street",
       "id": "flop",
+      "controlOnly": false,
       "label": "FLOP",
       "solved": 11783,
       "publishFloor": 1500,
@@ -1918,106 +2025,9 @@
       "priority": 5
     },
     {
-      "section": "pre_special",
-      "id": "bb_lp",
-      "label": "BB × LP",
-      "solved": 12337,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 20000,
-      "shortfallToPublish": 0,
-      "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 7663,
-      "stage": "GROW_20000",
-      "priority": 5
-    },
-    {
-      "section": "ttype",
-      "id": "regular",
-      "label": "REGULAR",
-      "solved": 12675,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 20000,
-      "shortfallToPublish": 0,
-      "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 7325,
-      "stage": "GROW_20000",
-      "priority": 5
-    },
-    {
-      "section": "math_special",
-      "id": "pot_odds",
-      "label": "POT ODDS",
-      "solved": 13182,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 20000,
-      "shortfallToPublish": 0,
-      "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 6818,
-      "stage": "GROW_20000",
-      "priority": 5
-    },
-    {
-      "section": "math_special",
-      "id": "mdf",
-      "label": "MDF",
-      "solved": 13182,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 20000,
-      "shortfallToPublish": 0,
-      "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 6818,
-      "stage": "GROW_20000",
-      "priority": 5
-    },
-    {
-      "section": "math_special",
-      "id": "breakeven_call",
-      "label": "BREAK-EVEN CALL",
-      "solved": 13182,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 20000,
-      "shortfallToPublish": 0,
-      "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 6818,
-      "stage": "GROW_20000",
-      "priority": 5
-    },
-    {
-      "section": "pos",
-      "id": "SB",
-      "label": "SB",
-      "solved": 14957,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 20000,
-      "shortfallToPublish": 0,
-      "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 5043,
-      "stage": "GROW_20000",
-      "priority": 5
-    },
-    {
-      "section": "short_special",
-      "id": "open_shove",
-      "label": "OPEN SHOVE",
-      "solved": 15210,
-      "publishFloor": 1500,
-      "currentGoal": 2000,
-      "nextTarget": 20000,
-      "shortfallToPublish": 0,
-      "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 4790,
-      "stage": "GROW_20000",
-      "priority": 5
-    },
-    {
       "section": "math_special",
       "id": "equity_realization",
+      "controlOnly": false,
       "label": "EQUITY REALIZATION",
       "solved": 16603,
       "publishFloor": 1500,
@@ -2032,6 +2042,7 @@
     {
       "section": "texture_special",
       "id": "bet_33",
+      "controlOnly": false,
       "label": "BET 33%",
       "solved": 17608,
       "publishFloor": 1500,
@@ -2046,6 +2057,7 @@
     {
       "section": "texture_special",
       "id": "board_dry",
+      "controlOnly": false,
       "label": "DRY BOARD",
       "solved": 18336,
       "publishFloor": 1500,
@@ -2060,6 +2072,7 @@
     {
       "section": "texture_special",
       "id": "board_static",
+      "controlOnly": false,
       "label": "STATIC BOARD",
       "solved": 18336,
       "publishFloor": 1500,
@@ -2072,22 +2085,24 @@
       "priority": 5
     },
     {
-      "section": "pos",
-      "id": "BB",
-      "label": "BB",
-      "solved": 19693,
+      "section": "phase",
+      "id": "middle",
+      "controlOnly": false,
+      "label": "MIDDLE",
+      "solved": 19266,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
       "shortfallToPublish": 0,
       "shortfallToCurrentGoal": 0,
-      "shortfallToNextTarget": 307,
+      "shortfallToNextTarget": 734,
       "stage": "GROW_20000",
       "priority": 5
     },
     {
       "section": "texture_special",
       "id": "board_high_card",
+      "controlOnly": false,
       "label": "HIGH-CARD BOARD",
       "solved": 20127,
       "publishFloor": 1500,
@@ -2100,8 +2115,24 @@
       "priority": 6
     },
     {
+      "section": "fsize",
+      "id": "500",
+      "controlOnly": false,
+      "label": "FIELD 500",
+      "solved": 20956,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 20000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 0,
+      "stage": "MATURE",
+      "priority": 6
+    },
+    {
       "section": "math_special",
       "id": "blockers",
+      "controlOnly": false,
       "label": "BLOCKERS",
       "solved": 21234,
       "publishFloor": 1500,
@@ -2116,6 +2147,7 @@
     {
       "section": "short_special",
       "id": "push_fold",
+      "controlOnly": false,
       "label": "PUSH/FOLD",
       "solved": 21632,
       "publishFloor": 1500,
@@ -2128,8 +2160,24 @@
       "priority": 6
     },
     {
+      "section": "pre_special",
+      "id": "bb_lp",
+      "controlOnly": false,
+      "label": "BB × LP",
+      "solved": 21801,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 20000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 0,
+      "stage": "MATURE",
+      "priority": 6
+    },
+    {
       "section": "math_special",
       "id": "breakeven_bluff",
+      "controlOnly": false,
       "label": "BREAK-EVEN BLUFF",
       "solved": 22079,
       "publishFloor": 1500,
@@ -2144,6 +2192,7 @@
     {
       "section": "math_special",
       "id": "combos",
+      "controlOnly": false,
       "label": "COMBOS",
       "solved": 22079,
       "publishFloor": 1500,
@@ -2156,10 +2205,116 @@
       "priority": 6
     },
     {
+      "section": "math_special",
+      "id": "pot_odds",
+      "controlOnly": false,
+      "label": "POT ODDS",
+      "solved": 22646,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 20000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 0,
+      "stage": "MATURE",
+      "priority": 6
+    },
+    {
+      "section": "math_special",
+      "id": "mdf",
+      "controlOnly": false,
+      "label": "MDF",
+      "solved": 22646,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 20000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 0,
+      "stage": "MATURE",
+      "priority": 6
+    },
+    {
+      "section": "math_special",
+      "id": "breakeven_call",
+      "controlOnly": false,
+      "label": "BREAK-EVEN CALL",
+      "solved": 22646,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 20000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 0,
+      "stage": "MATURE",
+      "priority": 6
+    },
+    {
+      "section": "pos",
+      "id": "SB",
+      "controlOnly": false,
+      "label": "SB",
+      "solved": 24421,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 20000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 0,
+      "stage": "MATURE",
+      "priority": 6
+    },
+    {
+      "section": "short_special",
+      "id": "open_shove",
+      "controlOnly": false,
+      "label": "OPEN SHOVE",
+      "solved": 24674,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 20000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 0,
+      "stage": "MATURE",
+      "priority": 6
+    },
+    {
+      "section": "pos",
+      "id": "BB",
+      "controlOnly": false,
+      "label": "BB",
+      "solved": 29157,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 20000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 0,
+      "stage": "MATURE",
+      "priority": 6
+    },
+    {
+      "section": "ttype",
+      "id": "regular",
+      "controlOnly": false,
+      "label": "REGULAR",
+      "solved": 31603,
+      "publishFloor": 1500,
+      "currentGoal": 2000,
+      "nextTarget": 20000,
+      "shortfallToPublish": 0,
+      "shortfallToCurrentGoal": 0,
+      "shortfallToNextTarget": 0,
+      "stage": "MATURE",
+      "priority": 6
+    },
+    {
       "section": "street",
       "id": "pre",
+      "controlOnly": false,
       "label": "PRE",
-      "solved": 27885,
+      "solved": 46813,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
@@ -2172,8 +2327,9 @@
     {
       "section": "seats",
       "id": "s6",
+      "controlOnly": false,
       "label": "S6",
-      "solved": 39655,
+      "solved": 58583,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
@@ -2186,8 +2342,9 @@
     {
       "section": "mode",
       "id": "mtt",
+      "controlOnly": false,
       "label": "TORNEIO",
-      "solved": 49119,
+      "solved": 68047,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
@@ -2200,86 +2357,92 @@
     {
       "section": "hands",
       "id": "100",
+      "controlOnly": true,
       "label": "100 SPOTS",
-      "solved": 49119,
+      "solved": 68047,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
       "shortfallToPublish": 0,
       "shortfallToCurrentGoal": 0,
       "shortfallToNextTarget": 0,
-      "stage": "MATURE",
-      "priority": 6
+      "stage": "CONTROL_ONLY",
+      "priority": 99
     },
     {
       "section": "hands",
       "id": "250",
+      "controlOnly": true,
       "label": "250 SPOTS",
-      "solved": 49119,
+      "solved": 68047,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
       "shortfallToPublish": 0,
       "shortfallToCurrentGoal": 0,
       "shortfallToNextTarget": 0,
-      "stage": "MATURE",
-      "priority": 6
+      "stage": "CONTROL_ONLY",
+      "priority": 99
     },
     {
       "section": "hands",
       "id": "350",
+      "controlOnly": true,
       "label": "350 SPOTS",
-      "solved": 49119,
+      "solved": 68047,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
       "shortfallToPublish": 0,
       "shortfallToCurrentGoal": 0,
       "shortfallToNextTarget": 0,
-      "stage": "MATURE",
-      "priority": 6
+      "stage": "CONTROL_ONLY",
+      "priority": 99
     },
     {
       "section": "hands",
       "id": "500",
+      "controlOnly": true,
       "label": "500 SPOTS",
-      "solved": 49119,
+      "solved": 68047,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
       "shortfallToPublish": 0,
       "shortfallToCurrentGoal": 0,
       "shortfallToNextTarget": 0,
-      "stage": "MATURE",
-      "priority": 6
+      "stage": "CONTROL_ONLY",
+      "priority": 99
     },
     {
       "section": "hands",
       "id": "1000",
+      "controlOnly": true,
       "label": "1000 SPOTS",
-      "solved": 49119,
+      "solved": 68047,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
       "shortfallToPublish": 0,
       "shortfallToCurrentGoal": 0,
       "shortfallToNextTarget": 0,
-      "stage": "MATURE",
-      "priority": 6
+      "stage": "CONTROL_ONLY",
+      "priority": 99
     },
     {
       "section": "hands",
       "id": "2000",
+      "controlOnly": true,
       "label": "2000 SPOTS",
-      "solved": 49119,
+      "solved": 68047,
       "publishFloor": 1500,
       "currentGoal": 2000,
       "nextTarget": 20000,
       "shortfallToPublish": 0,
       "shortfallToCurrentGoal": 0,
       "shortfallToNextTarget": 0,
-      "stage": "MATURE",
-      "priority": 6
+      "stage": "CONTROL_ONLY",
+      "priority": 99
     }
   ]
 }
