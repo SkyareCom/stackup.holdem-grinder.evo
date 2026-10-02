@@ -1,0 +1,85 @@
+name: Build Re-entry Utility Bank
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-reentry-bank.yml"
+      - "scripts/generate-reentry-bank.py"
+      - "scripts/generate-tournament-bank.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: reentry-utility-bank
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --disable-pip-version-check numpy
+
+      - name: Download pinned MIT equity matrix
+        run: |
+          mkdir -p .stackup
+          curl --fail --location --retry 3             https://raw.githubusercontent.com/amaster97/poker_solver/f78f1b2bc338dd8cbb5226ecb8398bbdb3635676/assets/preflop_equity_169x169.npz             --output .stackup/preflop_equity_169x169.npz
+
+      - name: Generate explicit re-entry utility solves
+        env:
+          STACKUP_PREFLOP_EQUITY: ${{ github.workspace }}/.stackup/preflop_equity_169x169.npz
+          STACKUP_REENTRY_ITERATIONS: "9000"
+          STACKUP_REENTRY_MAX_NASHCONV: "0.0020"
+        run: python scripts/generate-reentry-bank.py
+
+      - name: Validate strict solved decisions
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          const d=JSON.parse(fs.readFileSync('data/solver/reentry.json','utf8'));
+          const counts={rebuy:0,addon:0};
+          for(const s of d.spots||[])for(const h of s.strategy||[]){
+            const v=fake.StackUpSolvedSpotContract.validateSolvedDecision(s,h);
+            if(!v.ok)throw new Error(s.id+'/'+h.hand+': '+v.errors.join(','));
+            for(const e of s.scenario?.extras||[])if(e in counts)counts[e]++;
+          }
+          for(const k of Object.keys(counts))if(counts[k]<1500)throw new Error(k+' below strict floor '+counts[k]);
+          console.log(counts);
+          NODE
+
+      - name: Recompute strict coverage
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+
+      - name: Commit re-entry bank safely
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "StackUp Reentry Bot"
+          git config user.email "actions@users.noreply.github.com"
+          cp data/solver/reentry.json /tmp/reentry.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/reentry.json data/solver/reentry.json
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+          git add data/solver/reentry.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Generate strict re-entry utility bank"
+          git push origin HEAD:main
