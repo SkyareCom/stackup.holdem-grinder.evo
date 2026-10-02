@@ -336,7 +336,12 @@ function matchAdjust(item,spot){
 }
 function matchAdvance(item,spot){
   const street=normStreet(spot?.scenario?.street);
-  if(["pre_special","blind_special","aggr_special","short_special","icm_special","pko_special"].includes(item.section)&&street!=="PRE-FLOP")return false;
+  if(["pre_special","blind_special","short_special","icm_special","pko_special"].includes(item.section)&&street!=="PRE-FLOP")return false;
+  if(item.section==="aggr_special"){
+    if(item.id==="pot_4bet"){
+      if(!["FLOP","TURN","RIVER"].includes(street))return false;
+    }else if(street!=="PRE-FLOP")return false;
+  }
   if(item.section==="river_special"&&street!=="RIVER")return false;
   if(["post_special","texture_special"].includes(item.section)&&!["FLOP","TURN","RIVER"].includes(street))return false;
   if(item.section==="math_special"&&["implied_odds","reverse_implied_odds"].includes(item.id)){
