@@ -9,7 +9,7 @@
     'pre_special','blind_special','aggr_special','short_special','icm_special',
     'pko_special','post_special','river_special','texture_special','math_special'
   ];
-  const PRE_ADV=new Set(['pre_special','blind_special','aggr_special','short_special','icm_special','pko_special']);
+  const PRE_ADV=new Set(['pre_special','blind_special','short_special','icm_special','pko_special']);
   const POST_ADV=new Set(['post_special','texture_special']);
   const ALL_STREETS=['pre','flop','turn','river'];
   const POST_STREETS=['flop','turn','river'];
@@ -92,6 +92,9 @@
     const selected=values||[];
     if(!selected.length)return [...ALL_STREETS];
     if(PRE_ADV.has(section))return ['pre'];
+    if(section==='aggr_special'){
+      return union(selected.map(id=>id==='pot_4bet'?POST_STREETS:['pre']));
+    }
     if(section==='river_special')return ['river'];
     if(POST_ADV.has(section))return [...POST_STREETS];
     if(section==='math_special'){
@@ -103,6 +106,7 @@
 
   function optionStreetDomain(section,option){
     if(PRE_ADV.has(section))return ['pre'];
+    if(section==='aggr_special')return option==='pot_4bet'?[...POST_STREETS]:['pre'];
     if(section==='river_special')return ['river'];
     if(POST_ADV.has(section))return OPTION_STREETS[option]||POST_STREETS;
     if(section==='math_special')return OPTION_STREETS[option]||ALL_STREETS;
