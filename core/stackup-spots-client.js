@@ -15,7 +15,8 @@
     manifest:null,
     cursor:0,
     lastStats:null,
-    coverageError:null
+    coverageError:null,
+    heavyBankDeferred:false
   };
 
   const cfg=Object.assign({
@@ -136,8 +137,26 @@
     return promise;
   }
 
+  function isMobileRuntime(){
+    try{
+      const ua=String(global.navigator?.userAgent||'');
+      return /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+    }catch(_){
+      return false;
+    }
+  }
+
+  function allowStaticPart(key){
+    // The multistack monolith is ~81 MB. Parsing it on Android/iOS can lock the
+    // WebView main thread long enough to make navigation and SPOTS appear frozen.
+    // Mobile uses the smaller solved banks; when they cannot satisfy the strict
+    // coverage floor, the UI reports coverage instead of freezing the app.
+    if(key==='preflopMultistack'&&isMobileRuntime())return false;
+    return true;
+  }
+
   function addPlan(plan,key){
-    if(STATIC_PARTS[key]&&!plan.includes(key))plan.push(key);
+    if(STATIC_PARTS[key]&&allowStaticPart(key)&&!plan.includes(key))plan.push(key);
   }
 
   function staticLoadPlan(filters){
@@ -200,6 +219,7 @@
 
   async function ensureStaticBank(filters){
     await ensureStaticManifest();
+    state.heavyBankDeferred=false;
     const sequencer=global.StackUpTrainingSequencer;
 
     // Legacy fallback needs both classic pools because it chooses by street.
@@ -212,6 +232,7 @@
 
     const activeFilters=filters||{};
     const plan=staticLoadPlan(activeFilters);
+    if(isMobileRuntime()&&!plan.includes('preflopMultistack'))state.heavyBankDeferred=true;
     let lastStats=null;
     let lastError=null;
     for(const key of plan){
