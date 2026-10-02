@@ -97,4 +97,4 @@ jobs:
             exit 0
           fi
           git commit -m "Generate targeted DCFR texture sizing bank"
-          git push origin HEAD:main
+          bash scripts/persist-solver-artifacts.sh data/solver/texture-sizing.json
