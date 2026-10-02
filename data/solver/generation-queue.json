@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T10:10:03.864Z",
+  "generatedAt": "2026-10-02T10:13:52.337Z",
   "policyVersion": 1,
   "mode": "STRICT_SOLVED_ONLY",
   "batchSize": 500,
@@ -233,102 +233,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "math_special/reverse_implied_odds",
-      "section": "math_special",
-      "id": "reverse_implied_odds",
-      "label": "REVERSE IMPLIED ODDS",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 439,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/bet_25",
-      "section": "texture_special",
-      "id": "bet_25",
-      "label": "BET 25%",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 518,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/bet_50",
-      "section": "texture_special",
-      "id": "bet_50",
-      "label": "BET 50%",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 518,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/bet_66",
-      "section": "texture_special",
-      "id": "bet_66",
-      "label": "BET 66%",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 518,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/bet_75",
-      "section": "texture_special",
-      "id": "bet_75",
-      "label": "BET 75%",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 518,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/pot_bet",
-      "section": "texture_special",
-      "id": "pot_bet",
-      "label": "POT BET",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 518,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/overbet_125",
-      "section": "texture_special",
-      "id": "overbet_125",
-      "label": "OVERBET 125%",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 518,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/overbet_150",
-      "section": "texture_special",
-      "id": "overbet_150",
-      "label": "OVERBET 150%",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 518,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
       "key": "aggr_special/4bet_value",
       "section": "aggr_special",
       "id": "4bet_value",
@@ -341,39 +245,15 @@
       "status": "QUEUED"
     },
     {
-      "key": "texture_special/board_monotone",
-      "section": "texture_special",
-      "id": "board_monotone",
-      "label": "MONOTONE BOARD",
+      "key": "math_special/reverse_implied_odds",
+      "section": "math_special",
+      "id": "reverse_implied_odds",
+      "label": "REVERSE IMPLIED ODDS",
       "priority": 1,
       "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 1051,
+      "solved": 1053,
       "target": 1500,
-      "requestedSolves": 449,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/board_paired",
-      "section": "texture_special",
-      "id": "board_paired",
-      "label": "PAIRED BOARD",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 1107,
-      "target": 1500,
-      "requestedSolves": 393,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/board_low",
-      "section": "texture_special",
-      "id": "board_low",
-      "label": "LOW BOARD",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 1107,
-      "target": 1500,
-      "requestedSolves": 393,
+      "requestedSolves": 447,
       "status": "QUEUED"
     },
     {
@@ -605,6 +485,90 @@
       "status": "QUEUED"
     },
     {
+      "key": "texture_special/bet_25",
+      "section": "texture_special",
+      "id": "bet_25",
+      "label": "BET 25%",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2103,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/bet_50",
+      "section": "texture_special",
+      "id": "bet_50",
+      "label": "BET 50%",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2103,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/bet_66",
+      "section": "texture_special",
+      "id": "bet_66",
+      "label": "BET 66%",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2103,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/bet_75",
+      "section": "texture_special",
+      "id": "bet_75",
+      "label": "BET 75%",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2103,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/pot_bet",
+      "section": "texture_special",
+      "id": "pot_bet",
+      "label": "POT BET",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2103,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/overbet_125",
+      "section": "texture_special",
+      "id": "overbet_125",
+      "label": "OVERBET 125%",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2103,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/overbet_150",
+      "section": "texture_special",
+      "id": "overbet_150",
+      "label": "OVERBET 150%",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2103,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
       "key": "river_special/value_river",
       "section": "river_special",
       "id": "value_river",
@@ -677,6 +641,30 @@
       "status": "QUEUED"
     },
     {
+      "key": "texture_special/board_monotone",
+      "section": "texture_special",
+      "id": "board_monotone",
+      "label": "MONOTONE BOARD",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 3162,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/board_paired",
+      "section": "texture_special",
+      "id": "board_paired",
+      "label": "PAIRED BOARD",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 3242,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
       "key": "icm_special/big_stack_pressure",
       "section": "icm_special",
       "id": "big_stack_pressure",
@@ -684,30 +672,6 @@
       "priority": 3,
       "stage": "GROW_5000",
       "solved": 3718,
-      "target": 5000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/board_connected",
-      "section": "texture_special",
-      "id": "board_connected",
-      "label": "CONNECTED BOARD",
-      "priority": 3,
-      "stage": "GROW_5000",
-      "solved": 4159,
-      "target": 5000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/board_dynamic",
-      "section": "texture_special",
-      "id": "board_dynamic",
-      "label": "DYNAMIC BOARD",
-      "priority": 3,
-      "stage": "GROW_5000",
-      "solved": 4159,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -965,6 +929,42 @@
       "status": "QUEUED"
     },
     {
+      "key": "texture_special/board_low",
+      "section": "texture_special",
+      "id": "board_low",
+      "label": "LOW BOARD",
+      "priority": 4,
+      "stage": "GROW_10000",
+      "solved": 8195,
+      "target": 10000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/board_connected",
+      "section": "texture_special",
+      "id": "board_connected",
+      "label": "CONNECTED BOARD",
+      "priority": 4,
+      "stage": "GROW_10000",
+      "solved": 9061,
+      "target": 10000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/board_dynamic",
+      "section": "texture_special",
+      "id": "board_dynamic",
+      "label": "DYNAMIC BOARD",
+      "priority": 4,
+      "stage": "GROW_10000",
+      "solved": 9061,
+      "target": 10000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
       "key": "aggr_special/facing_4bet",
       "section": "aggr_special",
       "id": "facing_4bet",
@@ -1133,30 +1133,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "texture_special/board_twotone",
-      "section": "texture_special",
-      "id": "board_twotone",
-      "label": "TWO-TONE BOARD",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 11520,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "street/flop",
-      "section": "street",
-      "id": "flop",
-      "label": "FLOP",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 11783,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
       "key": "aggr_special/raise_vs_3bet",
       "section": "aggr_special",
       "id": "raise_vs_3bet",
@@ -1253,6 +1229,18 @@
       "status": "QUEUED"
     },
     {
+      "key": "texture_special/board_twotone",
+      "section": "texture_special",
+      "id": "board_twotone",
+      "label": "TWO-TONE BOARD",
+      "priority": 5,
+      "stage": "GROW_20000",
+      "solved": 15244,
+      "target": 20000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
       "key": "fsize/100",
       "section": "fsize",
       "id": "100",
@@ -1325,18 +1313,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "math_special/equity_realization",
-      "section": "math_special",
-      "id": "equity_realization",
-      "label": "EQUITY REALIZATION",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 16603,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
       "key": "stack/50bb",
       "section": "stack",
       "id": "50bb",
@@ -1385,18 +1361,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "texture_special/bet_33",
-      "section": "texture_special",
-      "id": "bet_33",
-      "label": "BET 33%",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 17608,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
       "key": "pre_special/bb_mp",
       "section": "pre_special",
       "id": "bb_mp",
@@ -1428,30 +1392,6 @@
       "priority": 5,
       "stage": "GROW_20000",
       "solved": 18928,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/board_dry",
-      "section": "texture_special",
-      "id": "board_dry",
-      "label": "DRY BOARD",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 18967,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/board_static",
-      "section": "texture_special",
-      "id": "board_static",
-      "label": "STATIC BOARD",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 18967,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED"
