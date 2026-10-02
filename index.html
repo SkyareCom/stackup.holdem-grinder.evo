@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="spots-raise-technique-v7">
+<meta name="grinder-build" content="spots-raise-stable-v8">
 <title>Grinder Login</title>
 <link rel="preload" href="assets/bebrush.otf" as="font" type="font/otf" crossorigin>
 <link rel="preload" href="assets/road-rage.woff2" as="font" type="font/woff2" crossorigin>
@@ -787,20 +787,20 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 #app2{position:fixed;inset:0;z-index:100;background:#1a1a1a;display:flex;justify-content:center}
 #app2[hidden]{display:none!important}
 </style>
-<script src="core/stackup-spots-engine.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-tournament-math.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-scenario-catalog.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-filter-compatibility.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-ai-scenario-planner.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-solved-spot-contract.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-solved-spot-classifier.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-training-sequencer.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-spots-client.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-table-state.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-poker-audio.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-spot-coach.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-training-history.js?v=spots-raise-technique-v7"></script>
-<script src="core/stackup-training-performance.js?v=spots-raise-technique-v7"></script>
+<script src="core/stackup-spots-engine.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-tournament-math.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-scenario-catalog.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-filter-compatibility.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-ai-scenario-planner.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-solved-spot-contract.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-solved-spot-classifier.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-training-sequencer.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-spots-client.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-table-state.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-poker-audio.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-spot-coach.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-training-history.js?v=spots-raise-stable-v8"></script>
+<script src="core/stackup-training-performance.js?v=spots-raise-stable-v8"></script>
 <script src="core/stackup-report-library.js"></script>
 <script src="core/stackup-personal-training.js"></script>
 <script src="core/stackup-whatsapp-coach.js"></script>
@@ -2062,76 +2062,61 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   function spotRaiseOptions(){
     const state=SOLVER_TABLE_STATE;
     const table=window.StackUpTableState;
-    const engine=window.StackUpSpotsEngine;
     const pos=POSN[resolveSpotCount()]||POSN[10];
     const view=solverSpotView(pos);
     const heroPos=view?.heroPosition||SOLVER_SPOT?.scenario?.heroPosition;
-    const minTarget=Number(table?.minimumRaiseTarget?.(state,heroPos));
+    const minRaw=table?.minimumRaiseTarget?.(state,heroPos);
+    const minTarget=Number.isFinite(Number(minRaw))?Number(minRaw):2;
     const hero=table?.player?.(state,heroPos);
-    const maxTarget=hero?Number(hero.committed)+Number(hero.stack):Number(SOLVER_SPOT?.scenario?.effectiveStack);
-    const max=Number.isFinite(maxTarget)?maxTarget:100;
-    const min=Number.isFinite(minTarget)?Math.min(max,minTarget):Math.min(max,2);
+    const maxRaw=hero?Number(hero.committed)+Number(hero.stack):Number(SOLVER_SPOT?.scenario?.effectiveStack);
+    const maxTarget=Number.isFinite(maxRaw)&&maxRaw>0?maxRaw:100;
+    const min=Math.min(maxTarget,Math.max(0,minTarget));
 
-    const extras=[];
-    const add=(target,solverBacked=false)=>{
-      let v=spotRoundRaiseBb(target);
+    const currentBet=Number(state?.currentBet)||0;
+    const pot=Number(state?.pot??SOLVER_SPOT?.scenario?.pot)||0;
+    const street=String(view?.street||SOLVER_SPOT?.scenario?.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
+
+    const candidates=[];
+    const add=value=>{
+      let v=spotRoundRaiseBb(value);
       if(!Number.isFinite(v))return;
-      v=Math.min(max,v);
-      if(v<=min+1e-6)return;
-      if(extras.some(x=>Math.abs(x.target-v)<.01))return;
-      extras.push({target:v,solverBacked:!!solverBacked});
+      v=Math.min(maxTarget,v);
+      if(v<=min+.001)return;
+      if(candidates.some(x=>Math.abs(x-v)<.01))return;
+      candidates.push(v);
     };
 
-    // First preference: distinct sizings that actually exist in the solver tree
-    // for this exact combo and decision.
-    try{
-      const strategy=view?engine?.strategyForHand?.(SOLVER_SPOT,view.handKey):null;
-      const actions=Array.isArray(strategy?.actions)?strategy.actions:[];
-      const solved=[];
-      for(const action of actions){
-        if(engine?.normalizeActionKind?.(action)!=='raise')continue;
-        const target=table?.resolveActionTarget?.(state,heroPos,action);
-        if(Number.isFinite(Number(target)))solved.push(Number(target));
-      }
-      [...new Set(solved.map(v=>spotRoundRaiseBb(v)).filter(Number.isFinite))]
-        .sort((a,b)=>a-b).forEach(v=>add(v,true));
-    }catch(_){}
-
-    const street=String(view?.street||SOLVER_SPOT?.scenario?.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
-    const currentBet=Number(table?.currentBet?.(state))||0;
-    const committed=Number(hero?.committed)||0;
-    const pot=Number(state?.pot??SOLVER_SPOT?.scenario?.pot)||0;
-    const callCost=Math.max(0,currentBet-committed);
-
-    // If the solver supplies only one size, create a contrasting second size
-    // around it. This is a didactic suggestion, not relabeled as solver output.
-    if(extras.length===1){
-      const s=extras[0].target;
-      add(s*1.4,false);
-      add(Math.max(min+.5,s*.72),false);
-    }
-
-    // Contextual didactic fallbacks. Values are always absolute BB targets.
+    // Teaching sizes: two distinct raises above the legal minimum.
+    // Keep this arithmetic-only so rendering cannot block the UI.
     if(street==='PRE-FLOP'){
-      const base=currentBet>0?currentBet:1;
-      [base*2.5,base*3.5,base*3,base*4,min*1.25,min*1.5].forEach(v=>add(v,false));
+      const reference=Math.max(1,currentBet);
+      add(Math.max(min+.5,reference*2.5));
+      add(Math.max(min+1,reference*3.5));
+      add(min*1.5);
+      add(min*2);
     }else if(currentBet>0){
-      const potAfterCall=pot+callCost;
-      [currentBet+potAfterCall*.5,currentBet+potAfterCall*.75,currentBet+potAfterCall,min*1.25,min*1.5].forEach(v=>add(v,false));
+      add(Math.max(min+.5,currentBet+pot*.5));
+      add(Math.max(min+1,currentBet+pot*.75));
+      add(min*1.5);
+      add(min*2);
     }else{
-      [pot*.33,pot*.5,pot*.66,pot*.75,pot,min*1.25,min*1.5].forEach(v=>add(v,false));
+      add(Math.max(min+.5,pot*.5));
+      add(Math.max(min+1,pot*.75));
+      add(min*1.5);
+      add(min*2);
     }
 
-    // Normal stacks should already have two values. This final pass guarantees
-    // two distinct legal teaching sizes whenever stack depth permits them.
     let step=.5;
-    while(extras.length<2&&min+step<max-1e-6&&step<20){
-      add(min+step,false);
+    while(candidates.length<2&&min+step<maxTarget-.001&&step<=10){
+      add(min+step);
       step+=.5;
     }
-
-    return {minTarget:min,extras:extras.slice(0,2)};
+    return {
+      minTarget:min,
+      extras:candidates.slice(0,2).map(target=>({target,solverBacked:false}))
+    };
   }
+
   function renderSpotActions(){
     const a=SPOT_ACTION_LABELS[L()]||SPOT_ACTION_LABELS.pt;
     const raise=spotRaiseOptions();
@@ -2143,7 +2128,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }).join('');
     const extra=(key,item)=>{
       if(!item)return '<button class="spotaction solver-size" data-spot-action="'+key+'" disabled><span>RAISE —</span></button>';
-      return '<button class="spotaction solver-size" data-spot-action="'+key+'" data-spot-target="'+item.target+'" data-spot-didactic="'+(item.solverBacked?'0':'1')+'" title="'+spotEscape(item.solverBacked?'SOLVER SIZE':'TRAINING SIZE')+'"><span>'+spotEscape(spotRaiseLabel(item.target))+'</span></button>';
+      return '<button class="spotaction solver-size" data-spot-action="'+key+'" data-spot-target="'+item.target+'" data-spot-didactic="1"><span>'+spotEscape(spotRaiseLabel(item.target))+'</span></button>';
     };
     spotActions.innerHTML=
       '<div class="spotactionrow primary">'+primary+'</div>'+
@@ -2152,10 +2137,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   let spotActionBusy=false;
 
   function setSpotActionsBusy(on){
-    const changed=spotActionBusy!==!!on;
     spotActionBusy=!!on;
     spotActions.querySelectorAll('.spotaction').forEach(btn=>{btn.disabled=spotActionBusy;});
-    if(changed&&!tb.hidden)scheduleSpotTableRender(true);
+    const notice=tb.querySelector('.heroturnnotice');
+    if(notice)notice.hidden=spotActionBusy||SPOT_DECISION_SEQUENCE_RUNNING||!!currentSpotEntry()?.answer;
   }
 
   function launchSpotChips(count,duration,spread){
