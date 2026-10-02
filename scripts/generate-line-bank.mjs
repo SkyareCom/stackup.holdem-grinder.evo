@@ -16,9 +16,18 @@ await mkdir(WORK,{recursive:true});
 await mkdir(dirname(OUT),{recursive:true});
 
 const baseBank=JSON.parse(await readFile(join(ROOT,"data","solver","postflop.json"),"utf8"));
-const baseCallerOop=baseBank.find(s=>s?.matchup==="UTG vs BB"&&s?.scenario?.street==="FLOP");
-const baseAggressorOop=baseBank.find(s=>s?.matchup==="UTG vs HJ"&&s?.scenario?.street==="FLOP");
-if(!baseCallerOop||!baseAggressorOop)throw new Error("required_line_base_matchups_missing");
+const isSrp=s=>!s?.scenario?.potType||String(s.scenario.potType).toUpperCase()==="SRP";
+const callerOopBases=baseBank.filter(s=>
+  s?.scenario?.street==="FLOP"&&isSrp(s)&&
+  ["SB","BB"].includes(String(s?.scenario?.heroPosition||"").toUpperCase())&&
+  !["SB","BB"].includes(String(s?.scenario?.villainPosition||"").toUpperCase())
+).sort((a,b)=>String(a.matchup).localeCompare(String(b.matchup)));
+const aggressorOopBases=baseBank.filter(s=>
+  s?.scenario?.street==="FLOP"&&isSrp(s)&&
+  !["SB","BB"].includes(String(s?.scenario?.heroPosition||"").toUpperCase())&&
+  !["SB","BB"].includes(String(s?.scenario?.villainPosition||"").toUpperCase())
+).sort((a,b)=>String(a.matchup).localeCompare(String(b.matchup)));
+if(!callerOopBases.length||!aggressorOopBases.length)throw new Error("required_line_base_matchups_missing");
 
 const ALL_RUNOUTS=[
   {id:"a",flop:"As7d2c",turn:"Jh",river:"4s"},
@@ -314,12 +323,13 @@ function addSpot(spots,spot){if(spot)spots.push(spot);}
 const spots=[],failures=[];
 
 for(const runout of RUNOUTS){
+  const runoutOrdinal=Math.max(0,ALL_RUNOUTS.findIndex(x=>x.id===runout.id));
   // -----------------------------------------------------------------------
   // LINE A: UTG opener IP vs BB caller OOP.
   // Flop check-back -> Turn probe / delayed c-bet -> River checked-through.
   // -----------------------------------------------------------------------
   try{
-    const base=baseCallerOop;
+    const base=callerOopBases[runoutOrdinal%callerOopBases.length];
     const oop0=parseRange(base.scenario.heroRange);
     const ip0=parseRange(base.scenario.villainRange);
     const pot0=Number(base.scenario.pot);
@@ -490,7 +500,7 @@ for(const runout of RUNOUTS){
   // Flop c-bet -> call -> Turn double barrel -> call -> River triple barrel.
   // -----------------------------------------------------------------------
   try{
-    const base=baseAggressorOop;
+    const base=aggressorOopBases[runoutOrdinal%aggressorOopBases.length];
     const oop0=parseRange(base.scenario.heroRange);
     const ip0=parseRange(base.scenario.villainRange);
     const pot0=Number(base.scenario.pot);
@@ -628,7 +638,7 @@ const payload={
   solver:"DCFR_SOLVER",
   upstream:{repository:"exinori/DCFR-SOLVER",commit:"4ade6a9e15a841c41867afde1258b9d110cd6fb1",license:"MIT"},
   iterations:ITER,
-  baseMatchups:[baseCallerOop.matchup,baseAggressorOop.matchup],
+  baseMatchups:[...new Set([...callerOopBases,...aggressorOopBases].map(x=>x.matchup))],
   spots,failures
 };
 await writeFile(OUT,JSON.stringify(payload),"utf8");
