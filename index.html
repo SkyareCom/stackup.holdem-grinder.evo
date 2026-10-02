@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="internal-bg-fluid-nav-v2">
+<meta name="grinder-build" content="spots-lazy-runtime-hotfix-v1">
 <title>Grinder Login</title>
 <link rel="preload" href="assets/bebrush.otf" as="font" type="font/otf" crossorigin>
 <link rel="preload" href="assets/road-rage.woff2" as="font" type="font/woff2" crossorigin>
@@ -2484,13 +2484,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         spotSupport.hidden=true;
         setSpotActionsBusy(true);
         scheduleSpotTableRender(true);
-        // Preload while the user reviews the selected filters. Nothing from the
-        // table is revealed until INICIAR TREINO is pressed.
-        loadSolverSpot(false).then(()=>{
-          if(cur==='spots'&&!sub.spots.length&&!SPOT_TRAINING_STARTED)scheduleSpotTableRender(true);
-        }).catch(()=>{
-          if(cur==='spots'&&!sub.spots.length&&!SPOT_TRAINING_STARTED)scheduleSpotTableRender(true);
-        });
+        // Do not preload solver banks while the user is only navigating through
+        // SPOTS. Large static banks are loaded progressively only after the
+        // explicit INICIAR TREINO action so navigation stays responsive.
         return;
       }
 
