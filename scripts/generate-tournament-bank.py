@@ -574,7 +574,18 @@ ARCHETYPES.extend([
   arch("pko-bb-cover-e",["pko_math"],[88,66,49,36,8,38],[.42,.22,.13,.09,.08,.06],"LATE","500",
        sb_tags=["pko_math","bounty_shove","covered_stack"],
        bb_tags=["pko_math","bounty_call","covering_stack"],
-       tournament_type="PKO",hero_bounty=.14,villain_bounty=.055)
+       tournament_type="PKO",hero_bounty=.14,villain_bounty=.055),
+
+  # Two more materially distinct covered-stack solves take this filter beyond
+  # the immediate 2,000-decision target without metadata projection.
+  arch("pko-sb-cover-f",["pko_math"],[92,70,52,39,34,7],[.43,.22,.13,.085,.075,.05],"FINAL_TABLE","1000+",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covered_stack"],
+       tournament_type="PKO",hero_bounty=.095,villain_bounty=.145),
+  arch("pko-bb-cover-f",["pko_math"],[94,71,53,40,6,35],[.43,.22,.13,.085,.075,.05],"FINAL_TABLE","1000+",
+       sb_tags=["pko_math","bounty_shove","covered_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.15,villain_bounty=.08)
 ])
 
 RESHOVE_ARCHETYPES=[
