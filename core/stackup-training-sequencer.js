@@ -600,16 +600,22 @@
   const HAND_LEVEL_MATH=new Set(['implied_odds','reverse_implied_odds']);
 
   function candidateMathCompatible(spot,hand,special){
-    const requested=(special?.math_special||[]).map(String).filter(x=>HAND_LEVEL_MATH.has(x));
+    const requested=(special?.math_special||[]).map(String);
     if(requested.length){
+      // MATH is OR across selected alternatives. Hand-level odds and
+      // scenario-level tags must not accidentally become an AND.
+      const tags=spotTags(spot);
       const street=normStreet(spot?.scenario?.street);
-      if(!['FLOP','TURN'].includes(street))return false;
-      const profile=drawProfile(spot,hand);
-      if(!profile)return false;
+      let profile=null;
       const mathOk=requested.some(id=>{
-        if(id==='implied_odds')return spotFacesAggression(spot)&&profile.anyDraw;
-        if(id==='reverse_implied_odds')return profile.nonNutFlushDraw;
-        return false;
+        if(id==='implied_odds'||id==='reverse_implied_odds'){
+          if(!['FLOP','TURN'].includes(street))return false;
+          profile=profile||drawProfile(spot,hand);
+          if(!profile)return false;
+          if(id==='implied_odds')return spotFacesAggression(spot)&&profile.anyDraw;
+          return profile.nonNutFlushDraw;
+        }
+        return tags.has(id);
       });
       if(!mathOk)return false;
     }
@@ -617,6 +623,7 @@
     const classifier=global.StackUpSolvedSpotClassifier;
     if(classifier?.isHandLevel&&classifier?.qualifies){
       for(const [section,values] of Object.entries(special||{})){
+        if(section==='math_special')continue;
         const handLevel=(Array.isArray(values)?values:[]).map(String).filter(id=>classifier.isHandLevel(section,id));
         if(handLevel.length&&!handLevel.some(id=>classifier.qualifies(section,id,spot,hand)))return false;
       }
@@ -644,13 +651,12 @@
     if(!groups.length)return true;
     if(!specialStreetCompatible(spot,special))return false;
     const tags=spotTags(spot);
+    const classifier=global.StackUpSolvedSpotClassifier;
     return groups.every(([section,values])=>{
-      const classifier=global.StackUpSolvedSpotClassifier;
-      const spotLevel=values.map(String).filter(x=>{
-        if(section==='math_special'&&HAND_LEVEL_MATH.has(x))return false;
-        if(classifier?.isHandLevel?.(section,x))return false;
-        return true;
-      });
+      // All MATH options are evaluated in candidateMathCompatible so their
+      // OR semantics is preserved across hand-level and scenario-level math.
+      if(section==='math_special')return true;
+      const spotLevel=values.map(String).filter(x=>!classifier?.isHandLevel?.(section,x));
       if(!spotLevel.length)return true;
       return spotLevel.some(x=>tags.has(x));
     });
