@@ -24,17 +24,41 @@
       updatedAt:String(x?.updatedAt||now),
       startedAt:x?.startedAt?String(x.startedAt):null,
       completedAt:x?.completedAt?String(x.completedAt):null,
+      scheduledAt:x?.scheduledAt?String(x.scheduledAt):null,
+      dueAt:x?.dueAt?String(x.dueAt):null,
+      lastReminderAt:x?.lastReminderAt?String(x.lastReminderAt):null,
+      reminderCadenceHours:Math.max(6,Number(x?.reminderCadenceHours)||24),
       filters:x?.filters&&typeof x.filters==='object'?x.filters:{},
       meta:x?.meta&&typeof x.meta==='object'?x.meta:{}
     };
   }
-  function list(){
-    return read().map(clean).sort((a,b)=>{
-      const rank={in_progress:0,pending:1,completed:2,dismissed:3};
-      return (rank[a.status]??9)-(rank[b.status]??9)||
-        ({critical:0,high:1,medium:2,normal:3,low:4}[a.priority]??9)-({critical:0,high:1,medium:2,normal:3,low:4}[b.priority]??9)||
-        a.title.localeCompare(b.title,undefined,{sensitivity:'base',numeric:true});
-    });
+  function relevance(item,context){
+    const now=Number(context?.now)||Date.now();
+    const progress=Number(context?.progressById?.[item.id]??context?.progressByKey?.[item.externalKey]??0);
+    const priority={critical:42,high:32,medium:22,normal:12,low:5}[item.priority]??10;
+    const status={in_progress:24,pending:18,completed:-60,dismissed:-100}[item.status]??0;
+    const kind=item.kind==='weakness'?18:8;
+    const origin=item.origin==='heroes'?6:4;
+    const severity=Math.max(0,Math.min(100,Number(item.meta?.severity??item.meta?.weaknessScore??item.meta?.baselineRisk??0)))*.18;
+    const confidence=Math.max(0,Math.min(100,Number(item.meta?.confidence??0)))*.06;
+    const recurrence=Math.min(20,Math.max(0,Number(item.meta?.recurrenceCount||0))*4);
+    const due=Date.parse(item.dueAt||'');
+    const scheduled=Date.parse(item.scheduledAt||'');
+    let urgency=0;
+    if(Number.isFinite(due)){
+      const hours=(due-now)/36e5;
+      urgency=hours<0?28:hours<=24?20:hours<=72?10:0;
+    }
+    if(Number.isFinite(scheduled)&&scheduled<=now)urgency+=8;
+    const stalled=item.status==='in_progress'&&progress<100&&item.lastReminderAt&&now-Date.parse(item.lastReminderAt)>48*36e5?8:0;
+    return Math.round((priority+status+kind+origin+severity+confidence+recurrence+urgency+stalled)*10)/10;
+  }
+  function list(context){
+    return read().map(clean).sort((a,b)=>
+      relevance(b,context)-relevance(a,context)||
+      String(a.dueAt||'9999').localeCompare(String(b.dueAt||'9999'))||
+      a.title.localeCompare(b.title,undefined,{sensitivity:'base',numeric:true})
+    );
   }
   function get(v){return list().find(x=>x.id===String(v)||x.externalKey===String(v))||null;}
   function upsert(input){
@@ -63,5 +87,10 @@
   }
   function clear(){try{localStorage.removeItem(KEY);return true;}catch(_){return false;}}
 
-  global.StackUpPersonalTraining=Object.freeze({list,get,upsert,setStatus,remove,clear});
+  function markReminder(v,when){
+    const item=get(v);if(!item)return null;
+    return upsert({...item,lastReminderAt:String(when||new Date().toISOString())});
+  }
+
+  global.StackUpPersonalTraining=Object.freeze({list,get,upsert,setStatus,remove,clear,relevance,markReminder});
 })(window);
