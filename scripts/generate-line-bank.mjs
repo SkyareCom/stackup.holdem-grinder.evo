@@ -246,6 +246,10 @@ async function solveRaw({id,street,board,oopRange,ipRange,potBb,stackBb,betSizes
     "--max-raises",String(maxRaises),"--allin-threshold","0.67","--allin-pot-ratio","3",
     "--skip-cum-strategy"
   ];
+  // Action-conditioned exact ranges generally differ by suit. The upstream
+  // solver's isomorphism is board-based, so disable it after flop propagation
+  // rather than permuting asymmetric reach weights.
+  if(String(street).toUpperCase()!=="FLOP")args.push("--no-iso");
   try{
     await execFileAsync(BIN,args,{maxBuffer:48*1024*1024});
     return JSON.parse(await readFile(rawPath,"utf8"));
@@ -264,7 +268,7 @@ function materialize({
 }){
   if(!node)return null;
   const strategy=normalizeNode(node);
-  if(strategy.length<40)return null;
+  if(!strategy.length)return null;
   const nodePlayer=String(node.player||"OOP").toUpperCase()==="IP"?"IP":"OOP";
   const heroPosition=nodePlayer==="IP"?base.scenario.villainPosition:base.scenario.heroPosition;
   const villainPosition=nodePlayer==="IP"?base.scenario.heroPosition:base.scenario.villainPosition;
@@ -554,9 +558,65 @@ for(const runout of RUNOUTS){
     ];
     addSpot(spots,materialize({
       id:"triplebarrel-"+runout.id,raw:riverRaw,node:riverRoot,
-      tags:["triple_barrel","sequential_lines"],
+      tags:["triple_barrel","block_bet_20_25","sequential_lines"],
       base,oopRange:oopRiver,ipRange:ipRiver,potBb:potRiver,stackBb:stackRiver,history:histRiver
     }));
+
+    // River response families from the same independently solved river tree.
+    // This avoids requiring two prior check-backs, whose posterior ranges can
+    // legitimately become very small on some boards.
+    const riverAfterCheck=findNode(riverRaw,[{kind:"check"}]);
+    if(riverAfterCheck){
+      const over=(riverAfterCheck.combos||[]).flatMap(x=>x.actions||[])
+        .map(a=>String(a.action)).find(x=>actionKind(x)==="raise"&&Number(sizingPct(x))>=120);
+      const fallbackBet=chooseBet(ipRiver,riverAfterCheck,{minPct:50,maxPct:160});
+      const chosen=over?{label:over,pct:sizingPct(over)}:fallbackBet;
+      if(chosen){
+        const response=findNode(riverRaw,[{kind:"check"},{label:chosen.label}]);
+        const betSize=potRiver*(chosen.pct/100);
+        const responseTags=["river_bluff_catch","river_check_raise","sequential_lines"];
+        if(chosen.pct>=120)responseTags.push("vs_overbet");
+        addSpot(spots,materialize({
+          id:"barrel-river-response-"+runout.id,raw:riverRaw,node:response,tags:responseTags,
+          base,
+          oopRange:conditionRange(oopRiver,riverRoot,{kind:"check"}),
+          ipRange:conditionRange(ipRiver,riverAfterCheck,{label:chosen.label}),
+          potBb:potRiver+betSize,stackBb:stackRiver,currentBet:betSize,
+          history:[
+            ...histRiver,
+            checkEvent(base.scenario.heroPosition,"RIVER"),
+            actionEvent(base.scenario.villainPosition,chosen.label,betSize,"RIVER")
+          ]
+        }));
+      }
+    }
+
+    // Bet/fold from a real small-bet -> raise -> response branch.
+    const small=(riverRoot?.combos||[]).flatMap(x=>x.actions||[])
+      .map(a=>String(a.action)).find(x=>actionKind(x)==="raise"&&Math.abs(Number(sizingPct(x))-25)<=3);
+    if(small){
+      const afterSmall=findNode(riverRaw,[{label:small}]);
+      const raise=chooseBet(ipRiver,afterSmall,{minPct:40,maxPct:120});
+      if(raise){
+        const response=findNode(riverRaw,[{label:small},{label:raise.label}]);
+        const b1=potRiver*(sizingPct(small)/100);
+        const potAfterCall=potRiver+2*b1;
+        const raiseAmount=potAfterCall*(raise.pct/100);
+        const to=b1+raiseAmount;
+        addSpot(spots,materialize({
+          id:"barrel-betfold-"+runout.id,raw:riverRaw,node:response,tags:["bet_fold","sequential_lines"],
+          base,
+          oopRange:conditionRange(oopRiver,riverRoot,{label:small}),
+          ipRange:conditionRange(ipRiver,afterSmall,{label:raise.label}),
+          potBb:potRiver+b1+to,stackBb:stackRiver,currentBet:to,
+          history:[
+            ...histRiver,
+            actionEvent(base.scenario.heroPosition,small,b1,"RIVER"),
+            actionEvent(base.scenario.villainPosition,raise.label,to,"RIVER")
+          ]
+        }));
+      }
+    }
   }catch(error){
     failures.push({runout:runout.id,line:"BARREL",error:String(error?.message||error).slice(0,1400)});
   }
