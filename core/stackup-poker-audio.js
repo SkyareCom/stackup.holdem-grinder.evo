@@ -90,6 +90,12 @@
       tone(660,0,.075,.075,'sine');
       tone(880,.105,.095,.09,'sine');return;
     }
+    if(k==='alert'||k==='start'){
+      tone(520,0,.09,.10,'sine');
+      tone(780,.12,.11,.11,'sine');
+      tone(1040,.26,.13,.12,'triangle');
+      return;
+    }
     chip(0,.08);
   }
 
