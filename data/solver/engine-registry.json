@@ -140,8 +140,7 @@
         "pko_special/bounty_iso",
         "pko_special/multiway_bounty"
       ],
-      "strict": true,
-      "status": "ENGINE_REQUIRED"
+      "strict": true
     },
     {
       "id": "STACKUP_MULTIWAY_POSTFLOP",
