@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="stats-dashboard-v2">
+<meta name="grinder-build" content="spots-cleanup-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -1707,7 +1707,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
        Os cards de suporte começam somente abaixo dos 7 botões de ação. */
     .page.spotsmode .spotwrap{flex:0 0 var(--spot-table-height,calc(100% - 94px))!important;height:var(--spot-table-height,calc(100% - 94px))!important;min-height:0!important;max-height:none!important}
     .spotactions{flex:0 0 88px!important}
-    .spotsupport{display:flex;flex-direction:column;gap:var(--gap);padding-bottom:4px}
+    .spotsupport{display:none!important;flex-direction:column;gap:var(--gap);padding-bottom:4px}
     .spotsupport[hidden]{display:none!important}
     .spotcontrolrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
     .spotcontrol,.spotsavebutton,.spotsaveform button,.historysort button,.historyactions button{
@@ -2634,7 +2634,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const trainings=[...new Set(all.map(x=>String(x.training||'TREINO GERAL')))].sort();
     const sections=[...new Set(all.flatMap(x=>(Array.isArray(x.sections)&&x.sections.length?x.sections:[x.street||'GERAL']).map(String)))].sort();
     const sessionOpts=sessions.map(s=>({value:s.id,label:(s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt))})).sort((a,b)=>a.label.localeCompare(b.label));
-    const filters='<div class="statsfilters"><select data-stats-filter="training" aria-label="'+tx.training+'">'+statsOptions(trainings.map(x=>({value:x,label:tx.training+' · '+x})),statsTrainingFilter,tx.training+' · '+tx.all)+'</select><select data-stats-filter="section" aria-label="'+tx.section+'">'+statsOptions(sections.map(x=>({value:x,label:tx.section+' · '+x})),statsSectionFilter,tx.section+' · '+tx.all)+'</select><select data-stats-filter="session" aria-label="'+tx.session+'">'+statsOptions(sessionOpts,statsSessionFilter,tx.session+' · '+tx.all)+'</select></div>';
+    /* Filtros antigos TREINO / SEÇÃO / SESSÃO removidos do topo do dashboard. */
+    const filters='';
     const records=statsFilteredRecords(),model=statsModel(records),c=model.overall;
     const hasData=records.length>0;
     const kpis='<div class="statsgrid"><div class="statskpi"><b>'+c.total+'</b><span>'+tx.spots+'</span></div><div class="statskpi"><b>'+c.correct+'</b><span>'+tx.correct+'</span></div><div class="statskpi"><b>'+c.accuracy.toFixed(1).replace('.',',')+'%</b><span>'+tx.accuracy+'</span></div><div class="statskpi"><b>'+c.adjustable+'</b><span>'+tx.adjustable+'</span></div><div class="statskpi"><b>'+c.incorrect+'</b><span>'+tx.incorrect+'</span></div><div class="statskpi"><b>'+new Set(records.map(x=>x.sessionId)).size+'</b><span>'+tx.sessions+'</span></div></div>';
