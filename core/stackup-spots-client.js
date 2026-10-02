@@ -27,7 +27,42 @@
     requestTimeoutMs:12000
   },global.STACKUP_SOLVER_CONFIG||{});
 
-  let staticBankPromise=null;
+  let staticManifestPromise=null;
+  const staticLoads=new Map();
+  const staticBank={
+    manifest:null,
+    preflop:null,
+    postflop:null,
+    pushfold:null,
+    tournament:null,
+    reentry:null,
+    opponentProfile:null,
+    multiwayTournament:null,
+    multiwayPostflop:null,
+    preflopDecisions:null,
+    textureSizing:null,
+    preflop9max:null,
+    preflopMultistack:null,
+    preflopHu:null,
+    lineBank:null
+  };
+
+  const STATIC_PARTS=Object.freeze({
+    preflop:{file:'preflop.json',kind:'array'},
+    postflop:{file:'postflop.json',kind:'array'},
+    pushfold:{file:'pushfold-hu-v1.json',kind:'pushfold'},
+    tournament:{file:'tournament.json',kind:'spots'},
+    reentry:{file:'reentry.json',kind:'spots'},
+    opponentProfile:{file:'opponent-profile.json',kind:'spots'},
+    multiwayTournament:{file:'multiway-tournament.json',kind:'spots'},
+    multiwayPostflop:{file:'multiway-postflop.json',kind:'spots'},
+    preflopDecisions:{file:'preflop-decisions.json',kind:'spots'},
+    textureSizing:{file:'texture-sizing.json',kind:'spots'},
+    preflop9max:{file:'preflop-9max.json',kind:'spots'},
+    preflopMultistack:{file:'preflop-multistack.json',kind:'spots'},
+    preflopHu:{file:'preflop-hu.json',kind:'spots'},
+    lineBank:{file:'line-bank.json',kind:'spots'}
+  });
 
   function baseUrl(){
     return String(cfg.baseUrl||global.StackUpGrinder?.config?.apiBase||'').replace(/\/$/,'');
@@ -61,47 +96,146 @@
     catch(_){return base+file;}
   }
 
-  async function ensureStaticBank(){
-    if(staticBankPromise)return staticBankPromise;
-    staticBankPromise=(async()=>{
-      const manifest=await fetchJson(staticUrl('manifest.json'));
-      const [preflop,postflop,pushfold,tournament,reentry,opponentProfile,multiwayTournament,multiwayPostflop,preflopDecisions,textureSizing,preflop9max,preflopMultistack,preflopHu,lineBank]=await Promise.all([
-        fetchJson(staticUrl('preflop.json')),
-        fetchJson(staticUrl('postflop.json')),
-        fetchJson(staticUrl('pushfold-hu-v1.json')),
-        fetchJson(staticUrl('tournament.json')),
-        fetchJson(staticUrl('reentry.json')),
-        fetchJson(staticUrl('opponent-profile.json')),
-        fetchJson(staticUrl('multiway-tournament.json')),
-        fetchJson(staticUrl('multiway-postflop.json')),
-        fetchJson(staticUrl('preflop-decisions.json')),
-        fetchJson(staticUrl('texture-sizing.json')),
-        fetchJson(staticUrl('preflop-9max.json')),
-        fetchJson(staticUrl('preflop-multistack.json')),
-        fetchJson(staticUrl('preflop-hu.json')),
-        fetchJson(staticUrl('line-bank.json'))
-      ]);
-      if(!Array.isArray(preflop)||!preflop.length)throw new Error('static_preflop_empty');
-      if(!Array.isArray(postflop)||!postflop.length)throw new Error('static_postflop_empty');
-      if(!pushfold||typeof pushfold!=='object'||!pushfold.charts)throw new Error('static_pushfold_empty');
-      if(!tournament||typeof tournament!=='object'||!Array.isArray(tournament.spots))throw new Error('static_tournament_invalid');
-      if(!reentry||typeof reentry!=='object'||!Array.isArray(reentry.spots))throw new Error('static_reentry_invalid');
-      if(!opponentProfile||typeof opponentProfile!=='object'||!Array.isArray(opponentProfile.spots))throw new Error('static_opponent_profile_invalid');
-      if(!multiwayTournament||typeof multiwayTournament!=='object'||!Array.isArray(multiwayTournament.spots))throw new Error('static_multiway_tournament_invalid');
-      if(!multiwayPostflop||typeof multiwayPostflop!=='object'||!Array.isArray(multiwayPostflop.spots))throw new Error('static_multiway_postflop_invalid');
-      if(!preflopDecisions||typeof preflopDecisions!=='object'||!Array.isArray(preflopDecisions.spots))throw new Error('static_preflop_decisions_invalid');
-      if(!textureSizing||typeof textureSizing!=='object'||!Array.isArray(textureSizing.spots))throw new Error('static_texture_sizing_invalid');
-      if(!preflop9max||typeof preflop9max!=='object'||!Array.isArray(preflop9max.spots))throw new Error('static_preflop_9max_invalid');
-      if(!preflopMultistack||typeof preflopMultistack!=='object'||!Array.isArray(preflopMultistack.spots))throw new Error('static_preflop_multistack_invalid');
-      if(!preflopHu||typeof preflopHu!=='object'||!Array.isArray(preflopHu.spots))throw new Error('static_preflop_hu_invalid');
-      if(!lineBank||typeof lineBank!=='object'||!Array.isArray(lineBank.spots))throw new Error('static_line_bank_invalid');
-      state.manifest=manifest;
-      return {manifest,preflop,postflop,pushfold,tournament,reentry,opponentProfile,multiwayTournament,multiwayPostflop,preflopDecisions,textureSizing,preflop9max,preflopMultistack,preflopHu,lineBank};
-    })().catch(error=>{
-      staticBankPromise=null;
+  function staticPartValid(kind,value){
+    if(kind==='array')return Array.isArray(value)&&value.length>0;
+    if(kind==='pushfold')return !!(value&&typeof value==='object'&&value.charts);
+    if(kind==='spots')return !!(value&&typeof value==='object'&&Array.isArray(value.spots));
+    return false;
+  }
+
+  async function ensureStaticManifest(){
+    if(staticBank.manifest)return staticBank.manifest;
+    if(!staticManifestPromise){
+      staticManifestPromise=fetchJson(staticUrl('manifest.json')).then(manifest=>{
+        staticBank.manifest=manifest;
+        state.manifest=manifest;
+        return manifest;
+      }).catch(error=>{
+        staticManifestPromise=null;
+        throw error;
+      });
+    }
+    return staticManifestPromise;
+  }
+
+  async function loadStaticPart(key){
+    if(staticBank[key])return staticBank[key];
+    if(staticLoads.has(key))return staticLoads.get(key);
+    const spec=STATIC_PARTS[key];
+    if(!spec)throw new Error('static_bank_unknown_part:'+key);
+    const promise=fetchJson(staticUrl(spec.file)).then(value=>{
+      if(!staticPartValid(spec.kind,value))throw new Error('static_'+key+'_invalid');
+      staticBank[key]=value;
+      staticLoads.delete(key);
+      return value;
+    }).catch(error=>{
+      staticLoads.delete(key);
       throw error;
     });
-    return staticBankPromise;
+    staticLoads.set(key,promise);
+    return promise;
+  }
+
+  function addPlan(plan,key){
+    if(STATIC_PARTS[key]&&!plan.includes(key))plan.push(key);
+  }
+
+  function staticLoadPlan(filters){
+    const f=filters||{};
+    const street=normalizedStreet(f.street);
+    const tableSize=Number(f.tableSize);
+    const game=String(f.gameType||'').toUpperCase();
+    const tournamentish=game==='TOURNAMENT'||!!f.tournamentType||!!f.phase||!!f.fieldSize||!!f.opponentProfile;
+    const plan=[];
+
+    // Start with the smallest bank that is most likely to satisfy the active
+    // filter. Only add heavier banks when strict coverage is still below floor.
+    if(street==='PRE-FLOP'){
+      addPlan(plan,'preflop');
+      if(tableSize===2){addPlan(plan,'pushfold');addPlan(plan,'preflopHu');}
+      addPlan(plan,'preflopDecisions');
+      if(tournamentish){
+        addPlan(plan,'reentry');
+        addPlan(plan,'multiwayTournament');
+        addPlan(plan,'opponentProfile');
+        addPlan(plan,'tournament');
+      }
+      if(tableSize===9||tableSize===10)addPlan(plan,'preflop9max');
+      else addPlan(plan,'preflop9max');
+      // 81 MB monolith: intentionally last. It is never downloaded merely by
+      // opening SPOTS and is reached only when smaller strict banks cannot meet
+      // the selected coverage floor.
+      addPlan(plan,'preflopMultistack');
+    }else if(street==='FLOP'||street==='TURN'||street==='RIVER'){
+      addPlan(plan,'postflop');
+      addPlan(plan,'multiwayPostflop');
+      addPlan(plan,'textureSizing');
+      addPlan(plan,'lineBank');
+      addPlan(plan,'opponentProfile');
+      addPlan(plan,'multiwayTournament');
+      addPlan(plan,'tournament');
+    }else{
+      // RANDOM street: postflop is compact and usually clears the strict floor
+      // without touching the heavyweight preflop banks.
+      addPlan(plan,'postflop');
+      addPlan(plan,'preflop');
+      addPlan(plan,'preflopDecisions');
+      addPlan(plan,'multiwayPostflop');
+      addPlan(plan,'textureSizing');
+      if(tableSize===2){addPlan(plan,'pushfold');addPlan(plan,'preflopHu');}
+      addPlan(plan,'reentry');
+      addPlan(plan,'multiwayTournament');
+      addPlan(plan,'opponentProfile');
+      addPlan(plan,'tournament');
+      addPlan(plan,'lineBank');
+      addPlan(plan,'preflop9max');
+      addPlan(plan,'preflopMultistack');
+    }
+    return plan;
+  }
+
+  function yieldToBrowser(){
+    return new Promise(resolve=>setTimeout(resolve,0));
+  }
+
+  async function ensureStaticBank(filters){
+    await ensureStaticManifest();
+    const sequencer=global.StackUpTrainingSequencer;
+
+    // Legacy fallback needs both classic pools because it chooses by street.
+    if(!sequencer?.stats){
+      await loadStaticPart('preflop');
+      await yieldToBrowser();
+      await loadStaticPart('postflop');
+      return staticBank;
+    }
+
+    const activeFilters=filters||{};
+    const plan=staticLoadPlan(activeFilters);
+    let lastStats=null;
+    let lastError=null;
+    for(const key of plan){
+      try{
+        await loadStaticPart(key);
+      }catch(error){
+        lastError=error;
+        continue;
+      }
+
+      // Give touch/navigation events a chance to run between JSON parses.
+      await yieldToBrowser();
+
+      try{
+        lastStats=sequencer.stats(staticBank,activeFilters);
+        state.lastStats=lastStats;
+        if(lastStats.publishable)break;
+      }catch(error){
+        lastError=error;
+      }
+    }
+
+    if(!lastStats&&lastError)throw lastError;
+    return staticBank;
   }
 
   async function rawRequest(path,{method='GET',body=null}={}){
@@ -174,7 +308,7 @@
   }
 
   async function nextStatic(filters){
-    const bank=await ensureStaticBank();
+    const bank=await ensureStaticBank(filters);
     const sequencer=global.StackUpTrainingSequencer;
     if(sequencer?.pick){
       const activeFilters=filters||{};
