@@ -3435,6 +3435,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       targetSpots:Math.max(1,Number(item.targetSpots)||50),
       receivedAt:new Date().toISOString()
     };
+    if(item.origin==='heroes'&&item.sourceMessageId&&grinderBridge){
+      const env=grinderIncomingPrescriptions().find(x=>x.id===item.sourceMessageId);
+      if(env){
+        grinderBridge.acknowledge?.(env,'accepted',{prescriptionId:ACTIVE_STACKUP_PRESCRIPTION.id});
+        grinderBridge.consume?.(env.id);
+      }
+    }
     resetSpotTimeline();
     SOLVER_SPOT=null;
     SOLVER_TABLE_STATE=null;
