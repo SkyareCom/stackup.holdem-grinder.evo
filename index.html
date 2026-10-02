@@ -784,17 +784,17 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 #app2{position:fixed;inset:0;z-index:100;background:#1a1a1a;display:flex;justify-content:center}
 #app2[hidden]{display:none!important}
 </style>
-<script src="core/stackup-spots-engine.js"></script>
-<script src="core/stackup-tournament-math.js"></script>
-<script src="core/stackup-scenario-catalog.js"></script>
-<script src="core/stackup-ai-scenario-planner.js"></script>
-<script src="core/stackup-training-sequencer.js"></script>
-<script src="core/stackup-spots-client.js"></script>
-<script src="core/stackup-table-state.js"></script>
-<script src="core/stackup-poker-audio.js"></script>
-<script src="core/stackup-spot-coach.js"></script>
-<script src="core/stackup-training-history.js"></script>
-<script src="core/stackup-training-performance.js"></script>
+<script src="core/stackup-spots-engine.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-tournament-math.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-scenario-catalog.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-ai-scenario-planner.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-training-sequencer.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-spots-client.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-table-state.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-poker-audio.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-spot-coach.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-training-history.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-training-performance.js?v=20261001-2158-stats"></script>
 <script>
 (function(){
   /* REGRA DE TRADUCAO: todo novo item deve ser criado simultaneamente em PT, EN e ES. */
@@ -2661,7 +2661,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   }
   function statsReportHtml(model){
     const tx=statsText(),c=model.overall,rows=model.bySection.map(x=>'<tr><td>'+statsEsc(x.name)+'</td><td>'+x.grade.grade+'</td><td>'+x.counts.total+'</td><td>'+x.counts.correct+'</td><td>'+x.counts.accuracy.toFixed(1)+'%</td></tr>').join('');
-    return '<!doctype html><html lang="'+L()+'"><meta charset="utf-8"><title>StackUp Grinder - '+tx.report+'</title><style>body{font-family:Arial,sans-serif;background:#07101f;color:#fff;padding:24px;line-height:1.45}h1,h2{color:#6fa4ff}section{margin:18px 0;padding:16px;border:1px solid #526078;border-radius:12px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #344052;text-align:left}.swot{display:grid;grid-template-columns:1fr 1fr;gap:10px}.swot div{padding:10px;border:1px solid #344052;border-radius:8px}@media print{body{background:#fff;color:#111}h1,h2{color:#194f9f}section,.swot div{border-color:#bbb}}</style><body><h1>STACKUP HOLD\'EM GRINDER</h1><h2>'+tx.report+'</h2><section><b>'+tx.spots+':</b> '+c.total+' &nbsp; <b>'+tx.correct+':</b> '+c.correct+' &nbsp; <b>'+tx.accuracy+':</b> '+c.accuracy.toFixed(1)+'%</section><section><h2>'+tx.bySection+'</h2><table><tr><th>'+tx.section+'</th><th>NÍVEL</th><th>'+tx.spots+'</th><th>'+tx.correct+'</th><th>'+tx.accuracy+'</th></tr>'+rows+'</table></section><section><h2>'+tx.swot+'</h2><div class="swot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></section><section><h2>'+tx.improve+'</h2><ol>'+model.plan.map(x=>'<li>'+statsEsc(x)+'</li>').join('')+'</ol></section></body></html>';
+    return '<!doctype html><html lang="'+L()+'"><meta charset="utf-8"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0"><title>StackUp Grinder - '+tx.report+'</title><style>body{font-family:Arial,sans-serif;background:#07101f;color:#fff;padding:24px;line-height:1.45}h1,h2{color:#6fa4ff}section{margin:18px 0;padding:16px;border:1px solid #526078;border-radius:12px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #344052;text-align:left}.swot{display:grid;grid-template-columns:1fr 1fr;gap:10px}.swot div{padding:10px;border:1px solid #344052;border-radius:8px}@media print{body{background:#fff;color:#111}h1,h2{color:#194f9f}section,.swot div{border-color:#bbb}}</style><body><h1>STACKUP HOLD\'EM GRINDER</h1><h2>'+tx.report+'</h2><section><b>'+tx.spots+':</b> '+c.total+' &nbsp; <b>'+tx.correct+':</b> '+c.correct+' &nbsp; <b>'+tx.accuracy+':</b> '+c.accuracy.toFixed(1)+'%</section><section><h2>'+tx.bySection+'</h2><table><tr><th>'+tx.section+'</th><th>NÍVEL</th><th>'+tx.spots+'</th><th>'+tx.correct+'</th><th>'+tx.accuracy+'</th></tr>'+rows+'</table></section><section><h2>'+tx.swot+'</h2><div class="swot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></section><section><h2>'+tx.improve+'</h2><ol>'+model.plan.map(x=>'<li>'+statsEsc(x)+'</li>').join('')+'</ol></section></body></html>';
   }
   function statsExport(kind){
     const records=statsFilteredRecords();if(!records.length)return;
@@ -2706,6 +2706,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   function syncStats(){
     const on=cur==='menu';
     statsPanel.hidden=!on;
+    statsPanel.style.display=on?'flex':'none';
     if(on){
       const slot=$('#page .slot');if(slot)slot.hidden=true;
       hg.hidden=true;tw.hidden=true;adv.hidden=true;historyPanel.hidden=true;tb.hidden=true;spotActions.hidden=true;spotSupport.hidden=true;
@@ -2915,8 +2916,8 @@ html body #googleLoginCard.on .ic{border-color:#155bbd!important;background:rgba
 html body #googleLoginCard.on .chev{color:#6fa4ff!important}
 html body #biometricLoginCard{opacity:1!important;filter:none!important;cursor:pointer!important;pointer-events:auto!important}
 </style>
-<script src="core/stackup-runtime.js"></script>
-<script src="core/stackup-auth.js"></script>
+<script src="core/stackup-runtime.js?v=20261001-2158-stats"></script>
+<script src="core/stackup-auth.js?v=20261001-2158-stats"></script>
 <script>
 /* STACKUP GRINDER CORE: produto, analytics, auth e infraestrutura escalavel. */
 (function(){
