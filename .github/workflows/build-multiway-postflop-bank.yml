@@ -1,0 +1,85 @@
+name: Build Multiway Postflop Bank
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-multiway-postflop-bank.yml"
+      - "scripts/generate-multiway-postflop-bank.py"
+      - "data/solver/postflop.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: multiway-postflop-bank
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --disable-pip-version-check numpy treys==0.1.8
+
+      - name: Generate terminal river multiway best responses
+        env:
+          STACKUP_MULTIWAY_RIVER_SAMPLES: "1000"
+          STACKUP_MULTIWAY_RIVER_INDIFF_BB: "0.35"
+        run: python scripts/generate-multiway-postflop-bank.py
+
+      - name: Validate strict postflop multiway decisions
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          const d=JSON.parse(fs.readFileSync('data/solver/multiway-postflop.json','utf8'));
+          let valid=0;
+          for(const s of d.spots||[]){
+            if(s.scenario?.street!=='RIVER')throw new Error('non-river multiway spot '+s.id);
+            if(!(s.scenario?.tags||[]).includes('postflop_multiway'))throw new Error('tag missing '+s.id);
+            const se=Number(s.convergence?.maxEquitySE);
+            if(!Number.isFinite(se)||se>0.04)throw new Error('equity SE too high '+s.id+': '+se);
+            for(const h of s.strategy||[]){
+              const v=fake.StackUpSolvedSpotContract.validateSolvedDecision(s,h);
+              if(!v.ok)throw new Error(s.id+'/'+h.hand+': '+v.errors.join(','));
+              valid++;
+            }
+          }
+          if(valid<1500)throw new Error('postflop_multiway below 1500: '+valid);
+          console.log({validatedSolvedDecisions:valid,rootScenarios:d.spots?.length||0});
+          NODE
+
+      - name: Recompute strict coverage
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+
+      - name: Commit multiway postflop bank safely
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "StackUp Multiway Postflop Bot"
+          git config user.email "actions@users.noreply.github.com"
+          cp data/solver/multiway-postflop.json /tmp/multiway-postflop.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/multiway-postflop.json data/solver/multiway-postflop.json
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+          git add data/solver/multiway-postflop.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Generate multiway postflop solved bank"
+          git push origin HEAD:main
