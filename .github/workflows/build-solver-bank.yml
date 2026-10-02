@@ -20,11 +20,12 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     strategy:
       fail-fast: false
+      max-parallel: 12
       matrix:
-        shard: [0, 1, 2, 3, 4, 5]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +59,7 @@ jobs:
           STACKUP_POSTFLOP_ITERATIONS: "120"
           STACKUP_RANGE_MIN_WEIGHT: "0.08"
           STACKUP_MAX_MATCHUPS: "30"
-          STACKUP_SHARD_COUNT: "6"
+          STACKUP_SHARD_COUNT: "12"
           STACKUP_SHARD_INDEX: ${{ matrix.shard }}
           STACKUP_BOARDS_PER_STREET: "2"
           STACKUP_SHARD_OUT: ${{ github.workspace }}/.stackup/solver-shard
@@ -91,7 +92,7 @@ jobs:
 
       - name: Merge solver bank
         env:
-          STACKUP_SHARD_COUNT: "6"
+          STACKUP_SHARD_COUNT: "12"
           STACKUP_SHARD_INPUT: ${{ github.workspace }}/.stackup/solver-shards
         run: node scripts/merge-solver-shards.mjs
 
