@@ -390,8 +390,23 @@
   const recentFamilies=[];
   const recentPositions=[];
 
-  function persistSeen(){
+  let persistSeenHandle=null;
+  function persistSeenNow(){
+    persistSeenHandle=null;
     try{storage()?.set?.(STORAGE_KEY,seenOrder.slice(-MAX_PERSISTED_SEEN));}catch(_){}
+  }
+  function persistSeen(){
+    if(persistSeenHandle!==null)return;
+    const run=()=>persistSeenNow();
+    try{
+      if(typeof global.requestIdleCallback==='function'){
+        persistSeenHandle=global.requestIdleCallback(run,{timeout:1200});
+      }else{
+        persistSeenHandle=global.setTimeout(run,80);
+      }
+    }catch(_){
+      persistSeenHandle=global.setTimeout(run,80);
+    }
   }
 
   function markSeen(signature){
@@ -402,6 +417,8 @@
       const drop=seenOrder.splice(0,seenOrder.length-MAX_PERSISTED_SEEN);
       drop.forEach(x=>seen.delete(x));
     }
+    // Do not serialize/write up to 12k IDs before returning the first spot.
+    // In-memory dedupe is immediate; durable history is flushed after paint.
     persistSeen();
   }
 
