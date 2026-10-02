@@ -40,6 +40,7 @@ jobs:
           node --check core/stackup-spots-client.js
           node --check scripts/audit-scenario-coverage.mjs
           node --check scripts/plan-solved-spot-growth.mjs
+          node --check scripts/route-solve-queue.mjs
           node --check scripts/generate-line-bank.mjs
           node --check scripts/generate-solver-bank.mjs
           node --check scripts/generate-texture-sizing-bank.mjs
@@ -75,3 +76,4 @@ jobs:
         run: |
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
