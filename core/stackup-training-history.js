@@ -99,10 +99,14 @@
     writeItems(items);
     return clone(items[i]);
   }
+  function clear(){
+    writeItems([]);
+    return true;
+  }
   function sortPreference(value){
     if(value!==undefined)return writeSort(value);
     return readSort();
   }
 
-  global.StackUpTrainingHistory=Object.freeze({save,list,get,remove,update,sortPreference});
+  global.StackUpTrainingHistory=Object.freeze({save,list,get,remove,update,clear,sortPreference});
 })(window);
