@@ -42,15 +42,14 @@
       "strict": true
     },
     {
-      "id": "STACKUP_HU_PUSHFOLD",
+      "id": "DCFR_HEADS_UP_MULTISTACK",
       "workflow": "build-hu-pushfold-bank.yml",
-      "generator": "scripts/generate-hu-pushfold-bank.py",
+      "generator": "scripts/patch-dcfr-hu.py + scripts/stackup-preflop-export.rs",
       "handles": [
         "seats/s2",
         "blind_special/heads_up_2max"
       ],
-      "strict": true,
-      "status": "ENGINE_REQUIRED"
+      "strict": true
     },
     {
       "id": "DCFR_POSTFLOP_GENERAL",
