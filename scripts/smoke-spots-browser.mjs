@@ -40,14 +40,14 @@ await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(P
 
 let chromeBin='';
 try{
-  chromeBin=execFileSync('bash',['-lc','command -v google-chrome || command -v chromium || command -v chromium-browser'],{encoding:'utf8'}).trim();
+  chromeBin=execFileSync('bash',['-lc','command -v google-chrome-stable || command -v google-chrome || command -v chromium || command -v chromium-browser'],{encoding:'utf8'}).trim();
 }catch(_){}
 if(!chromeBin)throw new Error('Chrome/Chromium not available on runner');
 
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'stackup-chrome-'));
 console.log('SPOTS_CHROME_BIN='+chromeBin);
 const chrome=spawn(chromeBin,[
-  '--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage',
+  '--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage',
   '--remote-debugging-address=127.0.0.1',
   `--remote-debugging-port=${DEBUG_PORT}`,`--user-data-dir=${profile}`,
   '--window-size=430,932','about:blank'
