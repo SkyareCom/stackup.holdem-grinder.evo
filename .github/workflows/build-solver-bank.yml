@@ -2,6 +2,11 @@ name: Build Solver Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-solver-bank.yml"
+      - "scripts/generate-solver-bank.mjs"
+      - "scripts/merge-solver-shards.mjs"
   push:
     branches:
       - main
@@ -14,7 +19,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: solver-bank
+  group: solver-bank-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
