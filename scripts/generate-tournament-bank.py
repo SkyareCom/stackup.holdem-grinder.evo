@@ -555,7 +555,26 @@ ARCHETYPES.extend([
   arch("pko-bb-cover-c",["pko_math"],[64,50,38,29,11,30],[.38,.24,.15,.10,.08,.05],"LATE","1000+",
        sb_tags=["pko_math","bounty_shove","covered_stack"],
        bb_tags=["pko_math","bounty_call","covering_stack"],
-       tournament_type="PKO",hero_bounty=.085,villain_bounty=.045)
+       tournament_type="PKO",hero_bounty=.085,villain_bounty=.045),
+
+  # Additional independently solved covered-stack contexts. Distinct stack,
+  # bounty, field and phase states; these are not projections or suit variants.
+  arch("pko-sb-cover-d",["pko_math"],[76,58,44,33,31,9],[.40,.23,.14,.09,.08,.06],"LATE","250",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covered_stack"],
+       tournament_type="PKO",hero_bounty=.035,villain_bounty=.11),
+  arch("pko-sb-cover-e",["pko_math"],[84,63,47,35,29,8],[.42,.22,.13,.09,.08,.06],"BUBBLE","350",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covered_stack"],
+       tournament_type="PKO",hero_bounty=.075,villain_bounty=.13),
+  arch("pko-bb-cover-d",["pko_math"],[72,55,41,31,9,34],[.40,.23,.14,.09,.08,.06],"BUBBLE","250",
+       sb_tags=["pko_math","bounty_shove","covered_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.12,villain_bounty=.035),
+  arch("pko-bb-cover-e",["pko_math"],[88,66,49,36,8,38],[.42,.22,.13,.09,.08,.06],"LATE","500",
+       sb_tags=["pko_math","bounty_shove","covered_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.14,villain_bounty=.055)
 ])
 
 RESHOVE_ARCHETYPES=[
