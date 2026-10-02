@@ -137,7 +137,7 @@
       scenario:scenarioFingerprint(spot?.scenario||{}),
       hand:String(entry.hand||'').trim(),
       solver:spot?.solver||null,
-      solveId:spot?.solveId||spot?.id||null,
+      solveId:spot?.solveId||null,
       nodeId:spot?.nodeId||spot?.id||null
     })));
   }
@@ -146,7 +146,13 @@
     const errors=[];
     if(!spot||typeof spot!=='object')return Object.freeze({ok:false,id:null,errors:['spot_missing']});
     if(!String(spot.solver||'').trim())errors.push('solver_missing');
-    if(!String(spot.solveId||spot.id||'').trim())errors.push('solve_reference_missing');
+    if(!String(spot.solveId||'').trim())errors.push('solve_id_missing');
+    const provenance=spot?.scenario?.provenance||spot?.provenance;
+    if(!provenance||typeof provenance!=='object'||Array.isArray(provenance)||!Object.keys(provenance).length){
+      errors.push('provenance_missing');
+    }else if(!String(provenance.strategySource||'').trim()){
+      errors.push('provenance_strategy_source_missing');
+    }
     const projected=projectionReason(spot);
     if(projected)errors.push(projected);
     errors.push(...scenarioErrors(spot.scenario));
@@ -169,7 +175,7 @@
       errors:unique,
       hand:entry?.hand||null,
       solver:spot?.solver||null,
-      solveId:spot?.solveId||spot?.id||null,
+      solveId:spot?.solveId||null,
       scenarioFingerprint:spot?.scenario?scenarioFingerprint(spot.scenario):null
     });
   }
