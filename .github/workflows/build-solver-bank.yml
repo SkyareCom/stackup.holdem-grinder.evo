@@ -97,6 +97,7 @@ jobs:
         run: node scripts/audit-scenario-coverage.mjs
 
       - name: Commit solver bank
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "StackUp Solver Bot"
           git config user.email "actions@users.noreply.github.com"
