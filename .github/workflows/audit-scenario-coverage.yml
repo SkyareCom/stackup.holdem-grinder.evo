@@ -9,6 +9,7 @@ on:
       - "scripts/plan-solved-spot-growth.mjs"
       - "core/stackup-scenario-catalog.js"
       - "core/stackup-solved-spot-contract.js"
+      - "core/stackup-solved-spot-classifier.js"
       - "data/solver/solved-spot-policy.json"
       - "data/solver/preflop.json"
       - "data/solver/postflop.json"
