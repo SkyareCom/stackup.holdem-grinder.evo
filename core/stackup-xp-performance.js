@@ -23,11 +23,25 @@
   ]);
   const PRO_SECTIONS=new Set(['icm_special','pko_special','river_special','math_special']);
   const REG_SECTIONS=new Set(['pre_special','blind_special','aggr_special','short_special','post_special','texture_special']);
+  let memory=null;
+  let keySet=null;
+  let summaryCache=null;
 
   function read(){
-    try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[];}catch(_){return [];}
+    if(Array.isArray(memory))return memory;
+    try{
+      const v=JSON.parse(localStorage.getItem(KEY)||'[]');
+      memory=Array.isArray(v)?v:[];
+    }catch(_){memory=[];}
+    keySet=new Set(memory.map(x=>x.key));
+    return memory;
   }
-  function write(v){try{localStorage.setItem(KEY,JSON.stringify((v||[]).slice(-25000)));return true;}catch(_){return false;}}
+  function write(v){
+    memory=(Array.isArray(v)?v:[]).slice(-25000);
+    keySet=new Set(memory.map(x=>x.key));
+    summaryCache=null;
+    try{localStorage.setItem(KEY,JSON.stringify(memory));return true;}catch(_){return false;}
+  }
   function uniq(v){return [...new Set((Array.isArray(v)?v:[]).filter(Boolean).map(String))];}
   function normStreet(v){
     const x=String(v||'').toUpperCase().replace('_','-');
@@ -98,12 +112,9 @@
       status
     };
   }
-  function record(input){
-    const key=eventKey(input),items=read();
-    const old=items.find(x=>x.key===key);
-    if(old)return {...old,awarded:false};
-    const ev=evaluate(input);
-    const entry={
+  function makeEntry(input){
+    const key=eventKey(input),ev=evaluate(input);
+    return {
       key,
       sessionId:String(input?.sessionId||''),
       spotId:String(input?.spotId||''),
@@ -119,17 +130,44 @@
       villainPotential:ev.villainPotential,
       prescriptionId:input?.prescriptionId?String(input.prescriptionId):null
     };
-    items.push(entry);write(items);
+  }
+  function record(input){
+    const key=eventKey(input),items=read();
+    if(!keySet)keySet=new Set(items.map(x=>x.key));
+    if(keySet.has(key)){
+      const old=items.find(x=>x.key===key);
+      return old?{...old,awarded:false}:{key,awarded:false,xpEarned:0};
+    }
+    const entry=makeEntry(input);
+    items.push(entry);
+    keySet.add(key);
+    write(items);
     return {...entry,awarded:true};
   }
   function backfill(records){
+    const source=Array.isArray(records)?records:[];
+    const items=read();
+    if(!source.length)return 0;
+    if(!keySet)keySet=new Set(items.map(x=>x.key));
+    if(items.length>=source.length){
+      try{localStorage.setItem(MIGRATION,new Date().toISOString());}catch(_){}
+      return 0;
+    }
     let added=0;
-    (records||[]).forEach(r=>{const e=record(r);if(e.awarded)added++;});
+    for(const r of source){
+      const key=eventKey(r);
+      if(keySet.has(key))continue;
+      items.push(makeEntry(r));
+      keySet.add(key);
+      added++;
+    }
+    if(added)write(items);
     try{localStorage.setItem(MIGRATION,new Date().toISOString());}catch(_){}
     return added;
   }
-  function events(){return read();}
+  function events(){return [...read()];}
   function clear(){
+    memory=[];keySet=new Set();summaryCache=null;
     try{
       localStorage.removeItem(KEY);
       localStorage.removeItem(MIGRATION);
@@ -148,7 +186,8 @@
     };
   }
   function summary(){
-    const all=events(),heroXP=all.reduce((n,x)=>n+Number(x.xpEarned||0),0),villainXP=all.reduce((n,x)=>n+Number(x.villainPotential||0),0);
+    if(summaryCache)return summaryCache;
+    const all=read(),heroXP=all.reduce((n,x)=>n+Number(x.xpEarned||0),0),villainXP=all.reduce((n,x)=>n+Number(x.villainPotential||0),0);
     const correct=all.filter(x=>x.status==='correct').length,adjustable=all.filter(x=>x.status==='adjustable').length,incorrect=all.filter(x=>x.status==='incorrect').length;
     const total=all.length,opportunity=heroXP+villainXP;
     const byDifficulty=['REC','REG','PRO'].map(name=>{
@@ -171,7 +210,7 @@
     ordered.forEach(x=>{if(x.status==='correct'){streak++;best=Math.max(best,streak);}else streak=0;});
     let current=0;
     for(let i=ordered.length-1;i>=0;i--){if(ordered[i].status==='correct')current++;else break;}
-    return {
+    summaryCache={
       total,correct,adjustable,incorrect,
       heroXP,villainXP,opportunity,
       heroShare:opportunity?heroXP/opportunity*100:0,
@@ -181,7 +220,12 @@
       currentStreak:current,bestStreak:best,
       recent:[...all].sort((a,b)=>String(b.answeredAt).localeCompare(String(a.answeredAt))).slice(0,20)
     };
+    return summaryCache;
   }
+
+  window.addEventListener?.('storage',event=>{
+    if(String(event?.key||'')===KEY){memory=null;keySet=null;summaryCache=null;}
+  });
 
   global.StackUpXPPerformance=Object.freeze({
     WEIGHTS,RANKS,classify,evaluate,record,backfill,events,clear,summary,rank
