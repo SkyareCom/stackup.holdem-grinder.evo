@@ -7,6 +7,10 @@
       "workflow": "build-preflop-multistack.yml",
       "generator": "scripts/stackup-preflop-export.rs",
       "handles": [
+        "mode/*",
+        "seats/s6",
+        "pos/*",
+        "street/pre",
         "mode/cash",
         "phase/early",
         "phase/middle",
@@ -16,7 +20,14 @@
         "aggr_special/*",
         "short_special/chip_up"
       ],
-      "strict": true
+      "strict": true,
+      "excludes": [
+        "pos/UTG+1",
+        "pos/UTG+2",
+        "pos/LJ",
+        "seats/s9",
+        "seats/s2"
+      ]
     },
     {
       "id": "DCFR_PREFLOP_9MAX",
@@ -29,6 +40,17 @@
         "pos/LJ"
       ],
       "strict": true
+    },
+    {
+      "id": "STACKUP_HU_PUSHFOLD",
+      "workflow": "build-hu-pushfold-bank.yml",
+      "generator": "scripts/generate-hu-pushfold-bank.py",
+      "handles": [
+        "seats/s2",
+        "blind_special/heads_up_2max"
+      ],
+      "strict": true,
+      "status": "ENGINE_REQUIRED"
     },
     {
       "id": "DCFR_POSTFLOP_GENERAL",
@@ -86,7 +108,8 @@
         "pko_special/bounty_call",
         "pko_special/bounty_shove",
         "pko_special/covering_stack",
-        "pko_special/covered_stack"
+        "pko_special/covered_stack",
+        "mode/mtt"
       ],
       "strict": true
     },
