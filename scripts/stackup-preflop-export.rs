@@ -145,7 +145,10 @@ fn semantic_tags(state: &PreflopState, events: &[Event]) -> Vec<String> {
     let actions = state.actions();
     let has_raise = actions.iter().any(|a| matches!(a, PreflopAction::Raise(_) | PreflopAction::AllIn));
 
-    if active_positions(state).iter().all(|&p| p >= 4) {
+    if NUM_PLAYERS == 2 {
+        tags.insert("heads_up_2max".to_string());
+        tags.insert("blind_war".to_string());
+    } else if active_positions(state).iter().all(|&p| p >= NUM_PLAYERS.saturating_sub(2)) {
         tags.insert("blind_war".to_string());
     }
     if hero == "CO" || hero == "BTN" {
@@ -419,7 +422,7 @@ fn target_tags() -> HashSet<&'static str> {
         "vs_open_oop","cold_call","blind_war","bb_limpers","sb_limp_call",
         "sb_limp_raise","iso_limpers","limp_raise","squeeze","facing_4bet",
         "cold_call_4bet","raise_vs_3bet","3bet_ip","3bet_oop","call_3bet",
-        "fold_to_3bet","call_4bet","cold_4bet"
+        "fold_to_3bet","call_4bet","cold_4bet","heads_up_2max"
     ].into_iter().collect()
 }
 
