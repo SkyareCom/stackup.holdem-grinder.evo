@@ -74,7 +74,7 @@ jobs:
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
 
-          git add data/solver/coverage.json data/solver/growth-plan.json
+          git add data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json
           if git diff --cached --quiet; then
             echo "Coverage unchanged."
             exit 0
