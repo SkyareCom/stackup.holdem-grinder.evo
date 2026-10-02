@@ -3,6 +3,8 @@ name: Build Solver Bank
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - ".github/workflows/build-solver-bank.yml"
       - "scripts/generate-solver-bank.mjs"
