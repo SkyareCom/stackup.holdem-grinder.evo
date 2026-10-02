@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="spots-cleanup-v1">
+<meta name="grinder-build" content="stats-premium-v3">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -2470,8 +2470,73 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const statsStyle=document.createElement('style');
   statsStyle.textContent='.statspanel{display:flex;flex-direction:column;gap:10px;padding-bottom:12px}.statspanel[hidden]{display:none!important}.statsfilters{display:grid;grid-template-columns:1fr;gap:7px}.statsfilters select,.statscontact input{width:100%;height:40px;padding:0 10px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important}.statsfilters option{background:#07182f;color:#fff}.statsgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}.statskpi,.statscard,.statsswot>div,.statssubject,.statssession,.statstraining{background:var(--glass-bg);border:var(--glass-border);border-radius:var(--r-card);box-shadow:var(--glass-hl);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}.statskpi{padding:10px 6px;text-align:center}.statskpi b,.statskpi span,.statscard b,.statscard p,.statscard small,.statssubject b,.statssubject span,.statssession b,.statssession span,.statstraining b,.statstraining span,.statsswot b,.statsswot p,.statscontact label,.statscontact button{font-family:var(--f-ui);font-size:var(--fs)!important;font-weight:400}.statskpi b{display:block;color:var(--c-accent-text);font-size:16px!important}.statskpi span,.statscard small,.statssubject span,.statssession span,.statstraining span{color:var(--c-muted)}.statscard{padding:12px}.statshead{margin-bottom:9px;color:var(--c-accent-text);letter-spacing:var(--ls-label);font-family:var(--f-ui);font-size:var(--fs)!important}.statspiebox{display:flex;align-items:center;gap:14px}.statspie{width:116px;height:116px;border-radius:50%;display:grid;place-items:center;flex:none}.statspie:after{content:"";width:72px;height:72px;border-radius:50%;background:#050913;border:1px solid rgba(255,255,255,.16)}.statspievalue{position:absolute}.statspiewrap{position:relative;width:116px;height:116px;display:grid;place-items:center}.statspievalue{z-index:2;text-align:center;color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important}.statslegend{display:flex;flex-direction:column;gap:6px}.statslegend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}.statslegend span{font-family:var(--f-ui);font-size:var(--fs)!important;color:var(--c-muted)}.statslist{display:flex;flex-direction:column;gap:7px}.statssubject,.statssession,.statstraining{padding:9px;display:grid;grid-template-columns:34px minmax(0,1fr) auto;align-items:center;gap:9px}.statsminipie{width:34px;height:34px;border-radius:50%}.statsgrade{color:var(--c-accent-text);white-space:nowrap}.statsswot{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}.statsswot>div{padding:10px;min-height:110px}.statsswot b{display:block;color:var(--c-accent-text);margin-bottom:6px}.statsswot p{color:var(--c-muted);line-height:1.4}.statsplan{display:flex;flex-direction:column;gap:7px}.statsplan p{padding:9px;border-left:2px solid var(--c-accent);background:rgba(255,255,255,.04);font-family:var(--f-ui);font-size:var(--fs)!important;color:var(--c-text);line-height:1.4}.statscontact{display:grid;grid-template-columns:1fr;gap:7px}.statscontactrow{display:grid;grid-template-columns:1fr 1fr;gap:7px}.statscontact button{height:40px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);color:var(--c-text)}.statscontact button.on,.statscontact button:active{background:var(--on-bg);border:var(--on-border);color:var(--c-accent-text)}.statsempty{padding:22px;text-align:center;color:var(--c-muted);font-family:var(--f-ui);font-size:var(--fs)!important}.statssample{color:var(--c-muted);font-size:10px!important}.statshero{padding:14px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);display:flex;flex-direction:column;gap:5px}.statshero b,.statshero span{font-family:var(--f-ui);font-size:var(--fs)!important;font-weight:400}.statshero b{color:var(--c-accent-text);letter-spacing:var(--ls-label)}.statshero span{color:var(--c-text);line-height:1.35}.statstrend{display:flex;flex-direction:column;gap:8px}.statstrendrow{display:grid;grid-template-columns:minmax(78px,1fr) 2fr 42px;gap:8px;align-items:center}.statstrendrow b,.statstrendrow span{font-family:var(--f-ui);font-size:var(--fs)!important;font-weight:400}.statstrendrow b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--c-muted)}.statstrackbar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.12)}.statstrackbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,rgba(21,91,189,.58),var(--c-accent-text))}.statstrendrow span{text-align:right;color:var(--c-text)}.statsdetail{display:flex;flex-direction:column;gap:8px}.statsdetail p{font-family:var(--f-ui);font-size:var(--fs)!important;line-height:1.48;color:var(--c-text);padding:10px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10)}';
   R.appendChild(statsStyle);
+
+  const statsPremiumStyle=document.createElement('style');
+  statsPremiumStyle.textContent=`
+    .statspanel{gap:12px!important;padding:4px 0 18px!important}
+    .statshero.premium{position:relative;overflow:hidden;padding:16px!important;background:linear-gradient(145deg,rgba(21,91,189,.32),rgba(255,255,255,.055) 48%,rgba(2,7,20,.82));border:1px solid rgba(111,164,255,.48);box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 14px 34px rgba(0,0,0,.28),0 0 30px rgba(21,91,189,.12)}
+    .statshero.premium:after{content:"";position:absolute;width:170px;height:170px;right:-80px;top:-95px;border-radius:50%;background:radial-gradient(circle,rgba(111,164,255,.20),transparent 68%);pointer-events:none}
+    .statshero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .statshero-copy{min-width:0;display:flex;flex-direction:column;gap:5px}
+    .statshero-title{font-family:var(--f-ui);font-size:14px!important;letter-spacing:1.6px;color:#fff}
+    .statshero-sub{font-family:var(--f-ui);font-size:var(--fs)!important;line-height:1.45;color:var(--c-muted)}
+    .statslevel{flex:none;min-width:82px;padding:9px 10px;border-radius:14px;background:rgba(0,0,0,.30);border:1px solid rgba(111,164,255,.42);text-align:center}
+    .statslevel b{display:block!important;font-size:17px!important;color:var(--c-accent-text)!important;letter-spacing:1px}
+    .statslevel small{font-family:var(--f-ui);font-size:10px;color:var(--c-muted)}
+    .statshero-meter{margin-top:12px}
+    .statshero-meterline{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px;font-family:var(--f-ui);font-size:10px;color:var(--c-muted)}
+    .statsmeter{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.11)}
+    .statsmeter i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#155bbd,#6fa4ff);box-shadow:0 0 12px rgba(111,164,255,.38)}
+    .statsnav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;position:sticky;top:0;z-index:15;padding:5px;border-radius:16px;background:rgba(2,7,20,.88);border:1px solid rgba(255,255,255,.13);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    .statsnav button{min-width:0;height:38px;padding:0 3px;border-radius:11px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.045);color:var(--c-muted);font-family:var(--f-ui);font-size:10px!important;line-height:1.05}
+    .statsnav button.on{background:rgba(21,91,189,.30);border-color:#155bbd;color:#8db8ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 0 12px rgba(21,91,189,.26)}
+    .statsview{display:flex;flex-direction:column;gap:12px}
+    .statsview[hidden]{display:none!important}
+    .statsgrid.premium{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+    .statskpi.premium{min-height:78px;text-align:left!important;padding:11px!important;position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.18);border-radius:15px}
+    .statskpi.premium:after{content:"";position:absolute;right:-20px;bottom:-28px;width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,rgba(21,91,189,.18),transparent 70%)}
+    .statskpi.premium b{font-size:20px!important;line-height:1;color:#fff!important}
+    .statskpi.premium span{display:block;margin-top:7px;font-size:10px!important;letter-spacing:.8px;text-transform:uppercase}
+    .statskpi.premium small{display:block;margin-top:4px;font-family:var(--f-ui);font-size:9px;color:rgba(255,255,255,.45)}
+    .statscard.premium{padding:13px;background:linear-gradient(150deg,rgba(255,255,255,.065),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.17);box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 10px 24px rgba(0,0,0,.14)}
+    .statshead.premium{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+    .statshead.premium span{font-family:var(--f-ui);font-size:var(--fs)!important;color:var(--c-accent-text);letter-spacing:1px}
+    .statshead.premium small{font-family:var(--f-ui);font-size:9px;color:var(--c-muted);letter-spacing:.4px}
+    .statsbarlist{display:flex;flex-direction:column;gap:9px}
+    .statsbarrow{display:grid;grid-template-columns:minmax(82px,1fr) minmax(105px,1.6fr) 42px;align-items:center;gap:8px}
+    .statsbarrow b,.statsbarrow span{font-family:var(--f-ui);font-size:10px;font-weight:400}
+    .statsbarrow b{color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .statsbarrow span{text-align:right;color:var(--c-muted)}
+    .statsbar{height:8px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+    .statsbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,rgba(21,91,189,.72),#6fa4ff)}
+    .statsdual{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .statsmini{padding:10px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.11)}
+    .statsmini b{display:block;font-family:var(--f-ui);font-size:10px;font-weight:400;color:var(--c-accent-text);margin-bottom:4px}
+    .statsmini strong{font-family:var(--f-ui);font-size:16px;font-weight:400;color:#fff}
+    .statsmini small{display:block;margin-top:3px;font-family:var(--f-ui);font-size:9px;color:var(--c-muted)}
+    .statsadvancegrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+    .statsadvancecard{padding:11px;border-radius:15px;background:linear-gradient(145deg,rgba(21,91,189,.13),rgba(255,255,255,.028));border:1px solid rgba(111,164,255,.18);min-width:0}
+    .statsadvancecard b{display:block;font-family:var(--f-ui);font-size:10px;font-weight:400;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .statsadvancecard strong{display:block;margin-top:7px;font-family:var(--f-ui);font-size:18px;font-weight:400;color:var(--c-accent-text)}
+    .statsadvancecard span{display:block;margin-top:4px;font-family:var(--f-ui);font-size:9px;color:var(--c-muted)}
+    .statsadvancecard .statsmeter{margin-top:8px;height:6px}
+    .statstopics{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+    .statstopic{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 9px;border-radius:11px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.09)}
+    .statstopic b,.statstopic span{font-family:var(--f-ui);font-size:10px;font-weight:400}
+    .statstopic b{color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .statstopic span{color:var(--c-accent-text);white-space:nowrap}
+    .statscallout{padding:11px;border-radius:14px;border:1px solid rgba(111,164,255,.22);background:rgba(21,91,189,.09);font-family:var(--f-ui);font-size:10px;line-height:1.5;color:var(--c-text)}
+    .statscallout b{color:var(--c-accent-text);font-weight:400}
+    .statssession.premium,.statssubject.premium,.statstraining.premium{border-radius:13px!important;background:rgba(255,255,255,.035)!important;border:1px solid rgba(255,255,255,.10)!important;box-shadow:none!important}
+    .statscard .statsswot>div{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.10)}
+    .statssectionnote{font-family:var(--f-ui);font-size:9px;color:var(--c-muted);line-height:1.45;margin:-3px 0 2px}
+    .statscontact input{background:rgba(255,255,255,.045)!important}
+    @media(max-width:370px){.statsnav{gap:3px;padding:4px}.statsnav button{font-size:9px!important}.statsadvancegrid{grid-template-columns:1fr 1fr}.statsbarrow{grid-template-columns:minmax(70px,1fr) minmax(85px,1.4fr) 36px}}
+  `;
+  R.appendChild(statsPremiumStyle);
+
   const statsPanel=document.createElement('div');statsPanel.className='statspanel';statsPanel.hidden=true;$('#page').appendChild(statsPanel);
-  let statsTrainingFilter='all',statsSectionFilter='all',statsSessionFilter='all';
+  let statsTrainingFilter='all',statsSectionFilter='all',statsSessionFilter='all',statsView='overview';
 
   function statsText(){return STATS_TEXT[L()]||STATS_TEXT.pt;}
   function statsLegacyRecords(){
@@ -2629,28 +2694,150 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return '<div class="statscard"><div class="statshead">'+tx.detail+'</div><div class="statsdetail">'+lines.map(x=>'<p>'+statsEsc(x)+'</p>').join('')+'</div></div>';
   }
 
+
+  function statsPct(v){return (Number(v)||0).toFixed(1).replace('.',',')+'%';}
+  function statsLabelStreet(v){
+    const map={pre:'PRÉ-FLOP',preflop:'PRÉ-FLOP',flop:'FLOP',turn:'TURN',river:'RIVER'};
+    return map[String(v||'').toLowerCase()]||String(v||'—').toUpperCase();
+  }
+  function statsActionLabel(v){
+    const x=String(v||'').toLowerCase();
+    const map={check:'CHECK',call:'CALL',fold:'FOLD',raise:'RAISE',raise1:'RAISE 1',raise2:'RAISE 2',allin:'ALL IN',jam:'ALL IN',bet:'BET'};
+    return map[x]||String(v||'—').toUpperCase();
+  }
+  function statsBarCard(title,subtitle,groups,labelFn){
+    const max=Math.max(1,...groups.map(x=>x.counts.total));
+    const rows=(groups.length?groups:[{name:'—',counts:{total:0,accuracy:0},grade:{score:0}}]).slice(0,12).map(x=>{
+      const pct=x.counts.total/max*100;
+      const label=labelFn?labelFn(x.name):x.name;
+      return '<div class="statsbarrow"><b>'+statsEsc(label)+'</b><div class="statsbar"><i style="width:'+pct.toFixed(1)+'%"></i></div><span>'+x.counts.total+'</span></div>';
+    }).join('');
+    return '<div class="statscard premium"><div class="statshead premium"><span>'+statsEsc(title)+'</span><small>'+statsEsc(subtitle||'')+'</small></div><div class="statsbarlist">'+rows+'</div></div>';
+  }
+  function statsAdvanceDefinitions(){
+    return ADV_SECS.map(section=>{
+      const rawOptions=section.groups.flatMap(g=>g.opts||[]).filter(x=>x!=='all'&&x!=='random');
+      const names=new Set();
+      rawOptions.forEach(opt=>{
+        ['pt','en','es'].forEach(lang=>names.add(String(TR?.[lang]?.opt?.[opt]||opt)));
+      });
+      return {id:section.id,title:TR?.[L()]?.sec?.[section.id]||section.id,rawOptions,names};
+    });
+  }
+  function statsSpecialObject(record){
+    let value=record?.filters?.special;
+    if(!value)return {};
+    if(typeof value==='object')return value||{};
+    try{return JSON.parse(value)||{};}catch(_){return {};}
+  }
+  function statsAdvanceRecordMatch(record,def,opt){
+    const sections=(Array.isArray(record?.sections)?record.sections:[]).map(String);
+    if(opt){
+      const labels=new Set(['pt','en','es'].map(lang=>String(TR?.[lang]?.opt?.[opt]||opt)));
+      if(sections.some(x=>labels.has(x)))return true;
+    }else if(sections.some(x=>def.names.has(x)))return true;
+    const special=statsSpecialObject(record);
+    for(const group of ADV_SECS.find(x=>x.id===def.id)?.groups||[]){
+      let selected=special[group.id];
+      if(selected==null)continue;
+      if(!Array.isArray(selected))selected=[selected];
+      if(opt?selected.map(String).includes(String(opt)):selected.some(x=>x!=='all'&&x!=='random'))return true;
+    }
+    return false;
+  }
+  function statsAdvanceData(records){
+    const defs=statsAdvanceDefinitions();
+    return defs.map(def=>{
+      const items=records.filter(r=>statsAdvanceRecordMatch(r,def));
+      const topics=def.rawOptions.map(opt=>{
+        const topicItems=records.filter(r=>statsAdvanceRecordMatch(r,def,opt));
+        return {name:TR?.[L()]?.opt?.[opt]||opt,items:topicItems,counts:statsCounts(topicItems),grade:statsGrade(topicItems)};
+      }).filter(x=>x.counts.total>0).sort((a,b)=>b.counts.total-a.counts.total||b.grade.score-a.grade.score);
+      return {name:def.title,id:def.id,items,counts:statsCounts(items),grade:statsGrade(items),topics};
+    });
+  }
+  function statsAdvanceHtml(records){
+    const tx=statsText(),groups=statsAdvanceData(records),total=groups.reduce((n,x)=>n+x.counts.total,0);
+    const cards=groups.map(x=>'<div class="statsadvancecard"><b>'+statsEsc(x.name)+'</b><strong>'+x.counts.total+'</strong><span>'+statsPct(x.counts.technical)+' TÉCNICO · '+x.grade.grade+'</span><div class="statsmeter"><i style="width:'+Math.max(0,Math.min(100,x.counts.technical)).toFixed(1)+'%"></i></div></div>').join('');
+    const active=groups.filter(x=>x.topics.length).flatMap(x=>x.topics.map(t=>({section:x.name,...t}))).sort((a,b)=>b.counts.total-a.counts.total||b.grade.score-a.grade.score);
+    const topics=active.length?active.slice(0,30).map(x=>'<div class="statstopic"><b>'+statsEsc(x.section+' · '+x.name)+'</b><span>'+x.counts.total+' · '+statsPct(x.counts.technical)+' · '+x.grade.grade+'</span></div>').join(''):'<div class="statscallout">'+(L()==='en'?'No ADVANCE training has been recorded yet.':L()==='es'?'Aún no hay entrenos ADVANCE registrados.':'Ainda não há treinos ADVANCE registrados.')+'</div>';
+    return '<div class="statscard premium"><div class="statshead premium"><span>ADVANCE</span><small>'+total+' '+tx.spots+'</small></div><div class="statssectionnote">'+(L()==='en'?'Performance by advanced training family.':L()==='es'?'Rendimiento por familia de entrenamiento avanzado.':'Desempenho separado por família de treino avançado.')+'</div><div class="statsadvancegrid">'+cards+'</div></div>'+
+      '<div class="statscard premium"><div class="statshead premium"><span>'+(L()==='en'?'ADVANCE TOPICS':L()==='es'?'TEMAS ADVANCE':'ASSUNTOS ADVANCE')+'</span><small>'+(L()==='en'?'trained topics':L()==='es'?'temas entrenados':'tópicos treinados')+'</small></div><div class="statstopics">'+topics+'</div></div>';
+  }
+  function statsExecutiveInsight(model){
+    const c=model.overall,grade=statsGrade(model.records);
+    const strongest=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>b.grade.score-a.grade.score)[0];
+    const weakest=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>a.grade.score-b.grade.score)[0];
+    if(!c.total)return L()==='en'?'Start training to generate a data-driven technical profile.':L()==='es'?'Empieza a entrenar para generar un perfil técnico basado en datos.':'Comece a treinar para gerar um perfil técnico baseado em dados.';
+    let text=(L()==='en'?'Current level: ':L()==='es'?'Nivel actual: ':'Nível atual: ')+grade.grade+' · '+statsPct(c.technical)+'. ';
+    if(strongest)text+=(L()==='en'?'Best area: ':L()==='es'?'Mejor área: ':'Melhor área: ')+strongest.name+' ('+statsPct(strongest.grade.score)+'). ';
+    if(weakest&&(!strongest||weakest.name!==strongest.name))text+=(L()==='en'?'Main priority: ':L()==='es'?'Prioridad principal: ':'Prioridade principal: ')+weakest.name+' ('+statsPct(weakest.grade.score)+'). ';
+    text+=statsTrend(model.records);
+    return text;
+  }
+
   function renderStats(){
-    const tx=statsText(),all=statsAllRecords(),sessions=statsAllSessions();
-    const trainings=[...new Set(all.map(x=>String(x.training||'TREINO GERAL')))].sort();
-    const sections=[...new Set(all.flatMap(x=>(Array.isArray(x.sections)&&x.sections.length?x.sections:[x.street||'GERAL']).map(String)))].sort();
-    const sessionOpts=sessions.map(s=>({value:s.id,label:(s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt))})).sort((a,b)=>a.label.localeCompare(b.label));
-    /* Filtros antigos TREINO / SEÇÃO / SESSÃO removidos do topo do dashboard. */
-    const filters='';
-    const records=statsFilteredRecords(),model=statsModel(records),c=model.overall;
+    const tx=statsText(),records=statsFilteredRecords(),model=statsModel(records),c=model.overall,grade=statsGrade(records);
     const hasData=records.length>0;
-    const kpis='<div class="statsgrid"><div class="statskpi"><b>'+c.total+'</b><span>'+tx.spots+'</span></div><div class="statskpi"><b>'+c.correct+'</b><span>'+tx.correct+'</span></div><div class="statskpi"><b>'+c.accuracy.toFixed(1).replace('.',',')+'%</b><span>'+tx.accuracy+'</span></div><div class="statskpi"><b>'+c.adjustable+'</b><span>'+tx.adjustable+'</span></div><div class="statskpi"><b>'+c.incorrect+'</b><span>'+tx.incorrect+'</span></div><div class="statskpi"><b>'+new Set(records.map(x=>x.sessionId)).size+'</b><span>'+tx.sessions+'</span></div></div>';
-    const pie='<div class="statscard"><div class="statshead">'+tx.overview+'</div><div class="statspiebox"><div class="statspiewrap"><div class="statspie" style="'+statsPieStyle(c)+'"></div><div class="statspievalue">'+c.accuracy.toFixed(1).replace('.',',')+'%<br>'+tx.accuracy+'</div></div><div class="statslegend"><span><i style="background:var(--c-accent-text)"></i>'+tx.correct+' · '+c.correct+'</span><span><i style="background:rgba(255,255,255,.62)"></i>'+tx.adjustable+' · '+c.adjustable+'</span><span><i style="background:rgba(255,255,255,.22)"></i>'+tx.incorrect+' · '+c.incorrect+'</span></div></div></div>';
-    const trainingsHtml='<div class="statscard"><div class="statshead">'+tx.byTraining+'</div><div class="statslist">'+(hasData?model.byTraining.map(x=>statsMiniRow(x,'statstraining')).join(''):statsZeroRow('statstraining'))+'</div></div>';
-    const sectionsHtml='<div class="statscard"><div class="statshead">'+tx.bySection+'</div><div class="statslist">'+(hasData?model.bySection.map(x=>statsMiniRow(x,'statssubject')).join(''):statsZeroRow('statssubject'))+'</div></div>';
-    const sessionsHtml='<div class="statscard"><div class="statshead">'+tx.bySession+'</div><div class="statslist">'+(hasData?model.bySession.slice(0,20).map(x=>statsMiniRow(x,'statssession')).join(''):statsZeroRow('statssession'))+'</div></div>';
-    const sw='<div class="statscard"><div class="statshead">'+tx.swot+'</div><div class="statsswot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></div>';
-    const plan='<div class="statscard"><div class="statshead">'+tx.improve+'</div><div class="statsplan">'+model.plan.map(x=>'<p>'+statsEsc(x)+'</p>').join('')+'</div></div>';
+    const sessionsCount=new Set(records.map(x=>x.sessionId).filter(Boolean)).size;
+    const activeDays=new Set(records.map(x=>String(x.answeredAt||'').slice(0,10)).filter(Boolean)).size;
+    const avgSession=sessionsCount?c.total/sessionsCount:0;
+    const adjustableRate=c.total?c.adjustable/c.total*100:0;
+    const errorRate=c.total?c.incorrect/c.total*100:0;
+
+    const byStreet=statsGroup(records,r=>r.street||'N/D');
+    const byPosition=statsGroup(records,r=>r.heroPosition||'N/D');
+    const byAction=statsGroup(records,r=>r.chosenAction||'N/D');
+
+    const hero='<div class="statshero premium"><div class="statshero-top"><div class="statshero-copy"><div class="statshero-title">'+tx.hero+'</div><div class="statshero-sub">'+statsEsc(statsExecutiveInsight(model))+'</div></div><div class="statslevel"><b>'+grade.grade+'</b><small>'+statsPct(c.technical)+'</small></div></div><div class="statshero-meter"><div class="statshero-meterline"><span>'+(L()==='en'?'TECHNICAL SCORE':L()==='es'?'PUNTUACIÓN TÉCNICA':'SCORE TÉCNICO')+'</span><span>'+statsPct(c.technical)+'</span></div><div class="statsmeter"><i style="width:'+Math.max(0,Math.min(100,c.technical)).toFixed(1)+'%"></i></div></div></div>';
+
+    const nav='<div class="statsnav">'+
+      '<button data-stats-view="overview" class="'+(statsView==='overview'?'on':'')+'">'+(L()==='en'?'OVERVIEW':L()==='es'?'RESUMEN':'RESUMO')+'</button>'+
+      '<button data-stats-view="game" class="'+(statsView==='game'?'on':'')+'">'+(L()==='en'?'GAME':L()==='es'?'JUEGO':'JOGO')+'</button>'+
+      '<button data-stats-view="advance" class="'+(statsView==='advance'?'on':'')+'">ADVANCE</button>'+
+      '<button data-stats-view="sessions" class="'+(statsView==='sessions'?'on':'')+'">'+(L()==='en'?'SESSIONS':L()==='es'?'SESIONES':'SESSÕES')+'</button>'+
+      '<button data-stats-view="report" class="'+(statsView==='report'?'on':'')+'">'+(L()==='en'?'REPORT':L()==='es'?'INFORME':'RELATÓRIO')+'</button>'+
+      '</div>';
+
+    const kpis='<div class="statsgrid premium">'+
+      '<div class="statskpi premium"><b>'+c.total+'</b><span>'+tx.spots+'</span><small>'+(L()==='en'?'total sample':L()==='es'?'muestra total':'amostra total')+'</small></div>'+
+      '<div class="statskpi premium"><b>'+statsPct(c.technical)+'</b><span>'+(L()==='en'?'TECHNICAL':L()==='es'?'TÉCNICO':'TÉCNICO')+'</span><small>'+grade.grade+'</small></div>'+
+      '<div class="statskpi premium"><b>'+statsPct(c.accuracy)+'</b><span>'+tx.accuracy+'</span><small>'+c.correct+' '+tx.correct.toLowerCase()+'</small></div>'+
+      '<div class="statskpi premium"><b>'+c.adjustable+'</b><span>'+tx.adjustable+'</span><small>'+statsPct(adjustableRate)+'</small></div>'+
+      '<div class="statskpi premium"><b>'+c.incorrect+'</b><span>'+tx.incorrect+'</span><small>'+statsPct(errorRate)+'</small></div>'+
+      '<div class="statskpi premium"><b>'+sessionsCount+'</b><span>'+tx.sessions+'</span><small>'+avgSession.toFixed(1).replace('.',',')+' spots / sessão</small></div>'+
+      '<div class="statskpi premium"><b>'+activeDays+'</b><span>'+(L()==='en'?'ACTIVE DAYS':L()==='es'?'DÍAS ACTIVOS':'DIAS ATIVOS')+'</span><small>'+(L()==='en'?'with registered decisions':L()==='es'?'con decisiones registradas':'com decisões registradas')+'</small></div>'+
+      '<div class="statskpi premium"><b>'+model.bySection.length+'</b><span>'+(L()==='en'?'TOPICS':L()==='es'?'TEMAS':'ASSUNTOS')+'</span><small>'+(L()==='en'?'measured areas':L()==='es'?'áreas medidas':'áreas medidas')+'</small></div>'+
+      '</div>';
+
+    const overviewPie='<div class="statscard premium"><div class="statshead premium"><span>'+tx.overview+'</span><small>'+c.total+' '+tx.spots+'</small></div><div class="statspiebox"><div class="statspiewrap"><div class="statspie" style="'+statsPieStyle(c)+'"></div><div class="statspievalue">'+statsPct(c.accuracy)+'<br>'+tx.accuracy+'</div></div><div class="statslegend"><span><i style="background:var(--c-accent-text)"></i>'+tx.correct+' · '+c.correct+'</span><span><i style="background:rgba(255,255,255,.62)"></i>'+tx.adjustable+' · '+c.adjustable+'</span><span><i style="background:rgba(255,255,255,.22)"></i>'+tx.incorrect+' · '+c.incorrect+'</span><span><i style="background:rgba(255,255,255,.08)"></i>N/D · '+c.unknown+'</span></div></div></div>';
+
+    const strengths=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>b.grade.score-a.grade.score).slice(0,3);
+    const weaknesses=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>a.grade.score-b.grade.score).slice(0,3);
+    const diagnostic='<div class="statscard premium"><div class="statshead premium"><span>'+(L()==='en'?'TECHNICAL DIAGNOSTIC':L()==='es'?'DIAGNÓSTICO TÉCNICO':'DIAGNÓSTICO TÉCNICO')+'</span><small>'+(L()==='en'?'consolidated signals':L()==='es'?'señales consolidadas':'sinais consolidados')+'</small></div><div class="statsdual"><div class="statsmini"><b>'+tx.strengths+'</b><strong>'+(strengths[0]?statsPct(strengths[0].grade.score):'—')+'</strong><small>'+statsEsc(strengths[0]?.name||'—')+'</small></div><div class="statsmini"><b>'+tx.weaknesses+'</b><strong>'+(weaknesses[0]?statsPct(weaknesses[0].grade.score):'—')+'</strong><small>'+statsEsc(weaknesses[0]?.name||'—')+'</small></div></div><div class="statscallout" style="margin-top:8px"><b>'+(L()==='en'?'READING: ':L()==='es'?'LECTURA: ':'LEITURA: ')+'</b>'+statsEsc(statsExecutiveInsight(model))+'</div></div>';
+
+    const trainingsHtml='<div class="statscard premium"><div class="statshead premium"><span>'+tx.byTraining+'</span><small>'+model.byTraining.length+'</small></div><div class="statslist">'+(hasData?model.byTraining.map(x=>statsMiniRow(x,'statstraining premium')).join(''):statsZeroRow('statstraining premium'))+'</div></div>';
+    const sectionsHtml='<div class="statscard premium"><div class="statshead premium"><span>'+tx.bySection+'</span><small>'+model.bySection.length+'</small></div><div class="statslist">'+(hasData?model.bySection.map(x=>statsMiniRow(x,'statssubject premium')).join(''):statsZeroRow('statssubject premium'))+'</div></div>';
+    const sessionsHtml='<div class="statscard premium"><div class="statshead premium"><span>'+tx.bySession+'</span><small>'+sessionsCount+'</small></div><div class="statslist">'+(hasData?model.bySession.slice(0,30).map(x=>statsMiniRow(x,'statssession premium')).join(''):statsZeroRow('statssession premium'))+'</div></div>';
+
+    const gameHtml=
+      statsBarCard(L()==='en'?'BY POSITION':L()==='es'?'POR POSICIÓN':'POR POSIÇÃO',L()==='en'?'training volume':L()==='es'?'volumen entrenado':'volume treinado',byPosition,x=>x)+
+      statsBarCard(L()==='en'?'BY STREET':L()==='es'?'POR STREET':'POR STREET',L()==='en'?'decision sample':L()==='es'?'muestra de decisiones':'amostra de decisões',byStreet,statsLabelStreet)+
+      statsBarCard(L()==='en'?'ACTION PROFILE':L()==='es'?'PERFIL DE ACCIONES':'PERFIL DE AÇÕES',L()==='en'?'chosen actions':L()==='es'?'acciones elegidas':'ações escolhidas',byAction,statsActionLabel)+
+      sectionsHtml;
+
+    const sw='<div class="statscard premium"><div class="statshead premium"><span>'+tx.swot+'</span><small>'+(L()==='en'?'performance reading':L()==='es'?'lectura de rendimiento':'leitura de desempenho')+'</small></div><div class="statsswot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></div>';
+    const plan='<div class="statscard premium"><div class="statshead premium"><span>'+tx.improve+'</span><small>'+(L()==='en'?'next steps':L()==='es'?'próximos pasos':'próximos passos')+'</small></div><div class="statsplan">'+model.plan.map((x,i)=>'<p><b>'+(i+1)+'.</b> '+statsEsc(x)+'</p>').join('')+'</div></div>';
     const disabled=hasData?'':' disabled aria-disabled="true"';
-    const contact='<div class="statscard"><div class="statshead">'+tx.contact+'</div><div class="statscontact"><input type="email" data-stats-email placeholder="'+tx.email+'"'+disabled+'><input type="tel" data-stats-phone placeholder="'+tx.whatsapp+'"'+disabled+'><div class="statscontactrow"><button data-stats-export="html"'+disabled+'>'+tx.html+'</button><button data-stats-export="pdf"'+disabled+'>'+tx.pdf+'</button></div><div class="statscontactrow"><button data-stats-export="email"'+disabled+'>'+tx.sendEmail+'</button><button data-stats-export="whatsapp"'+disabled+'>'+tx.sendWhatsapp+'</button></div><button data-stats-export="share"'+disabled+'>'+tx.share+'</button></div></div>';
-    const hero='<div class="statshero"><b>'+tx.hero+'</b><span>'+tx.heroSub+'</span></div>';
-    const trend=statsTrendHtml(model);
-    const detail=statsDetailedHtml(model);
-    statsPanel.innerHTML=hero+filters+kpis+pie+trend+trainingsHtml+sectionsHtml+sessionsHtml+sw+detail+plan+contact;
+    const contact='<div class="statscard premium"><div class="statshead premium"><span>'+tx.contact+'</span><small>HTML / PDF / E-MAIL / WHATSAPP</small></div><div class="statscontact"><input type="email" data-stats-email placeholder="'+tx.email+'"'+disabled+'><input type="tel" data-stats-phone placeholder="'+tx.whatsapp+'"'+disabled+'><div class="statscontactrow"><button data-stats-export="html"'+disabled+'>'+tx.html+'</button><button data-stats-export="pdf"'+disabled+'>'+tx.pdf+'</button></div><div class="statscontactrow"><button data-stats-export="email"'+disabled+'>'+tx.sendEmail+'</button><button data-stats-export="whatsapp"'+disabled+'>'+tx.sendWhatsapp+'</button></div><button data-stats-export="share"'+disabled+'>'+tx.share+'</button></div></div>';
+
+    const overview='<div class="statsview" data-stats-panel="overview"'+(statsView==='overview'?'':' hidden')+'>'+kpis+overviewPie+statsTrendHtml(model)+diagnostic+trainingsHtml+'</div>';
+    const game='<div class="statsview" data-stats-panel="game"'+(statsView==='game'?'':' hidden')+'>'+gameHtml+'</div>';
+    const advance='<div class="statsview" data-stats-panel="advance"'+(statsView==='advance'?'':' hidden')+'>'+statsAdvanceHtml(records)+'</div>';
+    const sessions='<div class="statsview" data-stats-panel="sessions"'+(statsView==='sessions'?'':' hidden')+'>'+sessionsHtml+statsTrendHtml(model)+statsBarCard(L()==='en'?'VOLUME BY TRAINING':L()==='es'?'VOLUMEN POR ENTRENO':'VOLUME POR TREINO','',model.byTraining,x=>x)+'</div>';
+    const report='<div class="statsview" data-stats-panel="report"'+(statsView==='report'?'':' hidden')+'>'+sw+statsDetailedHtml(model)+plan+contact+'</div>';
+
+    statsPanel.innerHTML=hero+nav+overview+game+advance+sessions+report;
   }
   function statsReportText(model){
     const tx=statsText(),c=model.overall;
@@ -2703,7 +2890,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(f.dataset.statsFilter==='session')statsSessionFilter=f.value;
     renderStats();
   });
-  statsPanel.addEventListener('click',e=>{const b=e.target.closest('[data-stats-export]');if(b)statsExport(b.dataset.statsExport);});
+  statsPanel.addEventListener('click',e=>{
+    const view=e.target.closest('[data-stats-view]');
+    if(view){statsView=view.dataset.statsView||'overview';renderStats();return;}
+    const b=e.target.closest('[data-stats-export]');
+    if(b)statsExport(b.dataset.statsExport);
+  });
   function syncStats(){
     const on=cur==='menu';
     statsPanel.hidden=!on;
