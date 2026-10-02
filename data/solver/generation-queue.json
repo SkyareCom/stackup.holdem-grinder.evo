@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T06:50:08.582Z",
+  "generatedAt": "2026-10-02T06:50:36.119Z",
   "policyVersion": 1,
   "mode": "STRICT_SOLVED_ONLY",
   "batchSize": 500,
@@ -9,42 +9,6 @@
       "section": "mode",
       "id": "cash",
       "label": "CASH GAME",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 0,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "extras/rebuy",
-      "section": "extras",
-      "id": "rebuy",
-      "label": "REBUY",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 0,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "extras/addon",
-      "section": "extras",
-      "id": "addon",
-      "label": "ADDON",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 0,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "phase/early",
-      "section": "phase",
-      "id": "early",
-      "label": "EARLY",
       "priority": 1,
       "stage": "RECOVERY_TO_PUBLISH",
       "solved": 0,
@@ -857,10 +821,10 @@
       "status": "QUEUED"
     },
     {
-      "key": "fsize/250",
-      "section": "fsize",
-      "id": "250",
-      "label": "FIELD 250",
+      "key": "phase/early",
+      "section": "phase",
+      "id": "early",
+      "label": "EARLY",
       "priority": 1,
       "stage": "RECOVERY_TO_PUBLISH",
       "solved": 676,
@@ -1073,22 +1037,10 @@
       "status": "QUEUED"
     },
     {
-      "key": "stack/18bb",
-      "section": "stack",
-      "id": "18bb",
-      "label": "18BB",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 1183,
-      "target": 1500,
-      "requestedSolves": 317,
-      "status": "QUEUED"
-    },
-    {
-      "key": "fsize/50",
+      "key": "fsize/250",
       "section": "fsize",
-      "id": "50",
-      "label": "FIELD 50",
+      "id": "250",
+      "label": "FIELD 250",
       "priority": 1,
       "stage": "RECOVERY_TO_PUBLISH",
       "solved": 1352,
@@ -1169,6 +1121,30 @@
       "status": "QUEUED"
     },
     {
+      "key": "extras/rebuy",
+      "section": "extras",
+      "id": "rebuy",
+      "label": "REBUY",
+      "priority": 2,
+      "stage": "BUILD_CURRENT_GOAL",
+      "solved": 1690,
+      "target": 2000,
+      "requestedSolves": 310,
+      "status": "QUEUED"
+    },
+    {
+      "key": "extras/addon",
+      "section": "extras",
+      "id": "addon",
+      "label": "ADDON",
+      "priority": 2,
+      "stage": "BUILD_CURRENT_GOAL",
+      "solved": 1690,
+      "target": 2000,
+      "requestedSolves": 310,
+      "status": "QUEUED"
+    },
+    {
       "key": "stack/5bb",
       "section": "stack",
       "id": "5bb",
@@ -1205,10 +1181,10 @@
       "status": "QUEUED"
     },
     {
-      "key": "fsize/1000+",
-      "section": "fsize",
-      "id": "1000+",
-      "label": "FIELD 1000+",
+      "key": "stack/18bb",
+      "section": "stack",
+      "id": "18bb",
+      "label": "18BB",
       "priority": 2,
       "stage": "BUILD_CURRENT_GOAL",
       "solved": 1859,
@@ -1233,6 +1209,18 @@
       "section": "ttype",
       "id": "pko",
       "label": "PKO",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2028,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "fsize/50",
+      "section": "fsize",
+      "id": "50",
+      "label": "FIELD 50",
       "priority": 3,
       "stage": "GROW_5000",
       "solved": 2028,
@@ -1289,13 +1277,13 @@
       "status": "QUEUED"
     },
     {
-      "key": "stack/15bb",
-      "section": "stack",
-      "id": "15bb",
-      "label": "15BB",
+      "key": "fsize/1000+",
+      "section": "fsize",
+      "id": "1000+",
+      "label": "FIELD 1000+",
       "priority": 3,
       "stage": "GROW_5000",
-      "solved": 2366,
+      "solved": 2535,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -1305,6 +1293,18 @@
       "section": "seats",
       "id": "s8",
       "label": "S8",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2704,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "stack/15bb",
+      "section": "stack",
+      "id": "15bb",
+      "label": "15BB",
       "priority": 3,
       "stage": "GROW_5000",
       "solved": 2704,
@@ -1337,18 +1337,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "stack/20bb",
-      "section": "stack",
-      "id": "20bb",
-      "label": "20BB",
-      "priority": 3,
-      "stage": "GROW_5000",
-      "solved": 2737,
-      "target": 5000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
       "key": "icm_special/mid_stack_pressure",
       "section": "icm_special",
       "id": "mid_stack_pressure",
@@ -1361,6 +1349,18 @@
       "status": "QUEUED"
     },
     {
+      "key": "stack/20bb",
+      "section": "stack",
+      "id": "20bb",
+      "label": "20BB",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 3413,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
       "key": "icm_special/short_stack_survival",
       "section": "icm_special",
       "id": "short_stack_survival",
@@ -1368,18 +1368,6 @@
       "priority": 3,
       "stage": "GROW_5000",
       "solved": 3718,
-      "target": 5000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "stack/10bb",
-      "section": "stack",
-      "id": "10bb",
-      "label": "10BB",
-      "priority": 3,
-      "stage": "GROW_5000",
-      "solved": 4056,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -1404,6 +1392,18 @@
       "priority": 3,
       "stage": "GROW_5000",
       "solved": 4159,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "stack/10bb",
+      "section": "stack",
+      "id": "10bb",
+      "label": "10BB",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 4394,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -1553,18 +1553,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "fsize/100",
-      "section": "fsize",
-      "id": "100",
-      "label": "FIELD 100",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 10140,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
       "key": "pos/CO",
       "section": "pos",
       "id": "CO",
@@ -1572,6 +1560,18 @@
       "priority": 5,
       "stage": "GROW_20000",
       "solved": 10479,
+      "target": 20000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "fsize/100",
+      "section": "fsize",
+      "id": "100",
+      "label": "FIELD 100",
+      "priority": 5,
+      "stage": "GROW_20000",
+      "solved": 10816,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED"
