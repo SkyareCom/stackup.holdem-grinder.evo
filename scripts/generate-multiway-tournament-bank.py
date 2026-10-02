@@ -150,7 +150,7 @@ def main():
     if max_expl>=0.05:raise SystemExit("equilibrium source failed exploitability gate")
 
     spots=[];rejected=[];counts={"multi_shove":0,"bounty_iso":0,"multiway_bounty":0}
-    stacks=[5,6,7,8,9,10,11,12,13,14]
+    stacks=[4,5,6,7,8,9,10,11,12,13,14,15]
     for family in counts:
         for stack in stacks:
             chart_stack=str(min(stack,15))
