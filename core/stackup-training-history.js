@@ -6,7 +6,7 @@
   const KEY='saved_trainings_v2';
   const SORT_KEY='saved_trainings_sort_v1';
   const MAX_ITEMS=40;
-  const memory={items:[],sort:'date'};
+  const memory={items:[],sort:'date',itemsLoaded:false,sortLoaded:false};
 
   function storage(){ return global.StackUpGrinder?.storage||null; }
   function clone(v){
@@ -17,17 +17,21 @@
     try{return crypto.randomUUID();}catch(_){return Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);}
   }
   function readItems(){
+    if(memory.itemsLoaded)return memory.items;
     try{
       const raw=storage()?.get?.(KEY,null);
-      if(Array.isArray(raw))return raw;
+      if(Array.isArray(raw)){memory.items=raw;memory.itemsLoaded=true;return memory.items;}
       const local=localStorage.getItem('stackup:grinder:'+KEY);
-      if(local){const j=JSON.parse(local);if(Array.isArray(j))return j;}
+      if(local){const j=JSON.parse(local);if(Array.isArray(j)){memory.items=j;memory.itemsLoaded=true;return memory.items;}}
     }catch(_){}
-    return Array.isArray(memory.items)?memory.items:[];
+    memory.items=Array.isArray(memory.items)?memory.items:[];
+    memory.itemsLoaded=true;
+    return memory.items;
   }
   function writeItems(items){
     const clean=(Array.isArray(items)?items:[]).slice(0,MAX_ITEMS);
     memory.items=clean;
+    memory.itemsLoaded=true;
     try{
       if(storage()?.set)return storage().set(KEY,clean);
       localStorage.setItem('stackup:grinder:'+KEY,JSON.stringify(clean));
@@ -35,17 +39,20 @@
     return clean;
   }
   function readSort(){
+    if(memory.sortLoaded)return memory.sort||'date';
     try{
       const v=storage()?.get?.(SORT_KEY,null);
-      if(v==='alpha'||v==='date')return v;
+      if(v==='alpha'||v==='date'){memory.sort=v;memory.sortLoaded=true;return v;}
       const local=localStorage.getItem('stackup:grinder:'+SORT_KEY);
-      if(local==='alpha'||local==='date')return local;
+      if(local==='alpha'||local==='date'){memory.sort=local;memory.sortLoaded=true;return local;}
     }catch(_){}
-    return memory.sort||'date';
+    memory.sort=memory.sort||'date';memory.sortLoaded=true;
+    return memory.sort;
   }
   function writeSort(value){
     const next=value==='alpha'?'alpha':'date';
     memory.sort=next;
+    memory.sortLoaded=true;
     try{
       if(storage()?.set)storage().set(SORT_KEY,next);
       else localStorage.setItem('stackup:grinder:'+SORT_KEY,next);
@@ -107,6 +114,12 @@
     if(value!==undefined)return writeSort(value);
     return readSort();
   }
+
+  window.addEventListener?.('storage',event=>{
+    const key=String(event?.key||'');
+    if(key.includes(KEY))memory.itemsLoaded=false;
+    if(key.includes(SORT_KEY))memory.sortLoaded=false;
+  });
 
   global.StackUpTrainingHistory=Object.freeze({save,list,get,remove,update,clear,sortPreference});
 })(window);
