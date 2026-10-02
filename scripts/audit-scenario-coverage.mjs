@@ -25,6 +25,7 @@ const tournament=JSON.parse(await readFile(join(SOLVER_DIR,"tournament.json"),"u
 const reentry=JSON.parse(await readFile(join(SOLVER_DIR,"reentry.json"),"utf8"));
 const opponentProfile=JSON.parse(await readFile(join(SOLVER_DIR,"opponent-profile.json"),"utf8"));
 const multiwayTournament=JSON.parse(await readFile(join(SOLVER_DIR,"multiway-tournament.json"),"utf8"));
+const multiwayPostflop=JSON.parse(await readFile(join(SOLVER_DIR,"multiway-postflop.json"),"utf8"));
 const preflopDecisions=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-decisions.json"),"utf8"));
 const preflop9max=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-9max.json"),"utf8"));
 const preflopMultistack=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-multistack.json"),"utf8"));
@@ -92,6 +93,7 @@ const all=[
   ...((reentry?.spots)||[]),
   ...((opponentProfile?.spots)||[]),
   ...((multiwayTournament?.spots)||[]),
+  ...((multiwayPostflop?.spots)||[]),
   ...((preflopDecisions?.spots)||[]),
   ...((preflop9max?.spots)||[]),
   ...((preflopMultistack?.spots)||[]),
