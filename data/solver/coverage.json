@@ -1,13 +1,39 @@
 {
-  "generatedAt": "2026-10-02T01:29:30.654Z",
+  "generatedAt": "2026-10-02T01:33:02.355Z",
+  "mode": "STRICT_SOLVED_ONLY",
+  "countingUnit": "ONE_VALIDATED_SOLVER_DECISION_PER_SCENARIO_AND_HAND",
   "minSpots": 1500,
+  "currentGoal": 2000,
+  "longTermTarget": 20000,
+  "milestones": [
+    1500,
+    2000,
+    5000,
+    10000,
+    20000
+  ],
+  "rules": {
+    "requireSolverId": true,
+    "requireSolveReference": true,
+    "requireCompleteScenario": true,
+    "requireStrategy": true,
+    "requireFrequencyValidation": true,
+    "rejectContextProjection": true,
+    "rejectPositionProjection": true,
+    "countHandClassExpansion": false,
+    "countSuitPermutation": false,
+    "countBoardPermutation": false,
+    "countPresentationVariant": false,
+    "deduplicateResolvedDecision": true
+  },
   "counts": {
     "adjust": 58,
     "advance": 104,
     "total": 162
   },
-  "publishable": 127,
-  "incomplete": 35,
+  "publishable": 55,
+  "incomplete": 107,
+  "atCurrentGoal": 52,
   "cards": [
     {
       "section": "mode",
@@ -16,9 +42,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "cash_range_solver",
       "minSpots": 1500,
-      "baseSpots": 64,
-      "available": 131299,
-      "publishable": true
+      "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
+      "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
+      "publishable": false
     },
     {
       "section": "mode",
@@ -27,8 +58,13 @@
       "source": "DCFR_EXACT",
       "validator": "tournament_solver",
       "minSpots": 1500,
-      "baseSpots": 210,
-      "available": 347713,
+      "baseSpots": 208,
+      "solvedSpots": 49119,
+      "validatedSolvedSpots": 49119,
+      "available": 49119,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 2455.95,
       "publishable": true
     },
     {
@@ -39,7 +75,12 @@
       "validator": "table_size_ranges",
       "minSpots": 1500,
       "baseSpots": 28,
-      "available": 37128,
+      "solvedSpots": 4732,
+      "validatedSolvedSpots": 4732,
+      "available": 4732,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 236.6,
       "publishable": true
     },
     {
@@ -50,7 +91,12 @@
       "validator": "table_size_ranges",
       "minSpots": 1500,
       "baseSpots": 152,
-      "available": 270805,
+      "solvedSpots": 39655,
+      "validatedSolvedSpots": 39655,
+      "available": 39655,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 1982.75,
       "publishable": true
     },
     {
@@ -61,7 +107,12 @@
       "validator": "table_size_ranges",
       "minSpots": 1500,
       "baseSpots": 16,
-      "available": 21216,
+      "solvedSpots": 2704,
+      "validatedSolvedSpots": 2704,
+      "available": 2704,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 135.2,
       "publishable": true
     },
     {
@@ -71,9 +122,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "table_size_ranges",
       "minSpots": 1500,
-      "baseSpots": 6,
-      "available": 7956,
-      "publishable": true
+      "baseSpots": 4,
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "seats",
@@ -83,8 +139,13 @@
       "validator": "table_size_ranges",
       "minSpots": 1500,
       "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "ttype",
@@ -93,8 +154,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 139,
-      "available": 230749,
+      "baseSpots": 75,
+      "solvedSpots": 12675,
+      "validatedSolvedSpots": 12675,
+      "available": 12675,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 633.75,
       "publishable": true
     },
     {
@@ -104,9 +170,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 68,
-      "available": 136603,
-      "publishable": true
+      "baseSpots": 4,
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "ttype",
@@ -116,7 +187,12 @@
       "validator": "tournament_format",
       "minSpots": 1500,
       "baseSpots": 12,
-      "available": 15912,
+      "solvedSpots": 2028,
+      "validatedSolvedSpots": 2028,
+      "available": 2028,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 101.4,
       "publishable": true
     },
     {
@@ -126,9 +202,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 68,
-      "available": 136603,
-      "publishable": true
+      "baseSpots": 4,
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "ttype",
@@ -137,9 +218,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 68,
-      "available": 136603,
-      "publishable": true
+      "baseSpots": 4,
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "ttype",
@@ -148,9 +234,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "tournament_format",
       "minSpots": 1500,
-      "baseSpots": 68,
-      "available": 136603,
-      "publishable": true
+      "baseSpots": 4,
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "extras",
@@ -160,7 +251,12 @@
       "validator": "tournament_extra",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -171,7 +267,12 @@
       "validator": "tournament_extra",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -181,9 +282,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 72,
-      "available": 141907,
-      "publishable": true
+      "baseSpots": 8,
+      "solvedSpots": 1352,
+      "validatedSolvedSpots": 1352,
+      "available": 1352,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 67.6,
+      "publishable": false
     },
     {
       "section": "fsize",
@@ -192,8 +298,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 124,
-      "available": 210859,
+      "baseSpots": 60,
+      "solvedSpots": 10140,
+      "validatedSolvedSpots": 10140,
+      "available": 10140,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 507,
       "publishable": true
     },
     {
@@ -203,9 +314,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 68,
-      "available": 136603,
-      "publishable": true
+      "baseSpots": 4,
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "fsize",
@@ -214,9 +330,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 72,
-      "available": 141907,
-      "publishable": true
+      "baseSpots": 8,
+      "solvedSpots": 1352,
+      "validatedSolvedSpots": 1352,
+      "available": 1352,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 67.6,
+      "publishable": false
     },
     {
       "section": "fsize",
@@ -225,8 +346,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 76,
-      "available": 147211,
+      "baseSpots": 12,
+      "solvedSpots": 2028,
+      "validatedSolvedSpots": 2028,
+      "available": 2028,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 101.4,
       "publishable": true
     },
     {
@@ -236,8 +362,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "field_population_model",
       "minSpots": 1500,
-      "baseSpots": 75,
-      "available": 145885,
+      "baseSpots": 11,
+      "solvedSpots": 1859,
+      "validatedSolvedSpots": 1859,
+      "available": 1859,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 92.95,
       "publishable": true
     },
     {
@@ -248,7 +379,12 @@
       "validator": "opponent_range_model",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -259,7 +395,12 @@
       "validator": "opponent_range_model",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -270,7 +411,12 @@
       "validator": "opponent_range_model",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -281,7 +427,12 @@
       "validator": "opponent_range_model",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -291,8 +442,13 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 210,
-      "available": 347713,
+      "baseSpots": 208,
+      "solvedSpots": 49119,
+      "validatedSolvedSpots": 49119,
+      "available": 49119,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 2455.95,
       "publishable": true
     },
     {
@@ -302,8 +458,13 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 210,
-      "available": 347713,
+      "baseSpots": 208,
+      "solvedSpots": 49119,
+      "validatedSolvedSpots": 49119,
+      "available": 49119,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 2455.95,
       "publishable": true
     },
     {
@@ -313,8 +474,13 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 210,
-      "available": 347713,
+      "baseSpots": 208,
+      "solvedSpots": 49119,
+      "validatedSolvedSpots": 49119,
+      "available": 49119,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 2455.95,
       "publishable": true
     },
     {
@@ -324,8 +490,13 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 210,
-      "available": 347713,
+      "baseSpots": 208,
+      "solvedSpots": 49119,
+      "validatedSolvedSpots": 49119,
+      "available": 49119,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 2455.95,
       "publishable": true
     },
     {
@@ -335,8 +506,13 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 210,
-      "available": 347713,
+      "baseSpots": 208,
+      "solvedSpots": 49119,
+      "validatedSolvedSpots": 49119,
+      "available": 49119,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 2455.95,
       "publishable": true
     },
     {
@@ -346,8 +522,13 @@
       "source": "POKER_MATH",
       "validator": "sample_controller",
       "minSpots": 1500,
-      "baseSpots": 210,
-      "available": 347713,
+      "baseSpots": 208,
+      "solvedSpots": 49119,
+      "validatedSolvedSpots": 49119,
+      "available": 49119,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 2455.95,
       "publishable": true
     },
     {
@@ -357,9 +538,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "phase_stack_icm_model",
       "minSpots": 1500,
-      "baseSpots": 64,
-      "available": 131299,
-      "publishable": true
+      "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
+      "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
+      "publishable": false
     },
     {
       "section": "phase",
@@ -368,9 +554,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "phase_stack_icm_model",
       "minSpots": 1500,
-      "baseSpots": 64,
-      "available": 131299,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "phase",
@@ -380,7 +571,12 @@
       "validator": "phase_stack_icm_model",
       "minSpots": 1500,
       "baseSpots": 37,
-      "available": 49062,
+      "solvedSpots": 6253,
+      "validatedSolvedSpots": 6253,
+      "available": 6253,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 312.65,
       "publishable": true
     },
     {
@@ -391,7 +587,12 @@
       "validator": "phase_stack_icm_model",
       "minSpots": 1500,
       "baseSpots": 56,
-      "available": 74256,
+      "solvedSpots": 9464,
+      "validatedSolvedSpots": 9464,
+      "available": 9464,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 473.2,
       "publishable": true
     },
     {
@@ -402,8 +603,13 @@
       "validator": "phase_stack_icm_model",
       "minSpots": 1500,
       "baseSpots": 8,
-      "available": 10608,
-      "publishable": true
+      "solvedSpots": 1352,
+      "validatedSolvedSpots": 1352,
+      "available": 1352,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 67.6,
+      "publishable": false
     },
     {
       "section": "pos",
@@ -413,7 +619,12 @@
       "validator": "position_range_solver",
       "minSpots": 1500,
       "baseSpots": 81,
-      "available": 113025,
+      "solvedSpots": 14957,
+      "validatedSolvedSpots": 14957,
+      "available": 14957,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 747.85,
       "publishable": true
     },
     {
@@ -424,7 +635,12 @@
       "validator": "position_range_solver",
       "minSpots": 1500,
       "baseSpots": 83,
-      "available": 141931,
+      "solvedSpots": 19693,
+      "validatedSolvedSpots": 19693,
+      "available": 19693,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 984.65,
       "publishable": true
     },
     {
@@ -435,8 +651,13 @@
       "validator": "position_range_solver",
       "minSpots": 1500,
       "baseSpots": 8,
-      "available": 9120,
-      "publishable": true
+      "solvedSpots": 1424,
+      "validatedSolvedSpots": 1424,
+      "available": 1424,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 71.2,
+      "publishable": false
     },
     {
       "section": "pos",
@@ -446,7 +667,12 @@
       "validator": "position_range_solver",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -457,7 +683,12 @@
       "validator": "position_range_solver",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -467,9 +698,14 @@
       "source": "DCFR_EXACT",
       "validator": "position_range_solver",
       "minSpots": 1500,
-      "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
+      "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
+      "publishable": false
     },
     {
       "section": "pos",
@@ -479,7 +715,12 @@
       "validator": "position_range_solver",
       "minSpots": 1500,
       "baseSpots": 8,
-      "available": 10886,
+      "solvedSpots": 1721,
+      "validatedSolvedSpots": 1721,
+      "available": 1721,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 86.05,
       "publishable": true
     },
     {
@@ -490,7 +731,12 @@
       "validator": "position_range_solver",
       "minSpots": 1500,
       "baseSpots": 23,
-      "available": 63469,
+      "solvedSpots": 10479,
+      "validatedSolvedSpots": 10479,
+      "available": 10479,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 523.95,
       "publishable": true
     },
     {
@@ -501,8 +747,13 @@
       "validator": "position_range_solver",
       "minSpots": 1500,
       "baseSpots": 5,
-      "available": 6630,
-      "publishable": true
+      "solvedSpots": 845,
+      "validatedSolvedSpots": 845,
+      "available": 845,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 42.25,
+      "publishable": false
     },
     {
       "section": "street",
@@ -511,8 +762,13 @@
       "source": "DCFR_EXACT",
       "validator": "street_solver",
       "minSpots": 1500,
-      "baseSpots": 167,
-      "available": 221442,
+      "baseSpots": 165,
+      "solvedSpots": 27885,
+      "validatedSolvedSpots": 27885,
+      "available": 27885,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 1394.25,
       "publishable": true
     },
     {
@@ -523,7 +779,12 @@
       "validator": "street_solver",
       "minSpots": 1500,
       "baseSpots": 23,
-      "available": 69565,
+      "solvedSpots": 11783,
+      "validatedSolvedSpots": 11783,
+      "available": 11783,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 589.15,
       "publishable": true
     },
     {
@@ -534,7 +795,12 @@
       "validator": "street_solver",
       "minSpots": 1500,
       "baseSpots": 10,
-      "available": 28920,
+      "solvedSpots": 4820,
+      "validatedSolvedSpots": 4820,
+      "available": 4820,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 241,
       "publishable": true
     },
     {
@@ -545,7 +811,12 @@
       "validator": "street_solver",
       "minSpots": 1500,
       "baseSpots": 10,
-      "available": 27786,
+      "solvedSpots": 4631,
+      "validatedSolvedSpots": 4631,
+      "available": 4631,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 231.55,
       "publishable": true
     },
     {
@@ -556,8 +827,13 @@
       "validator": "effective_stack_solver",
       "minSpots": 1500,
       "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "stack",
@@ -567,7 +843,12 @@
       "validator": "effective_stack_solver",
       "minSpots": 1500,
       "baseSpots": 16,
-      "available": 21216,
+      "solvedSpots": 2704,
+      "validatedSolvedSpots": 2704,
+      "available": 2704,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 135.2,
       "publishable": true
     },
     {
@@ -578,8 +859,13 @@
       "validator": "effective_stack_solver",
       "minSpots": 1500,
       "baseSpots": 6,
-      "available": 7956,
-      "publishable": true
+      "solvedSpots": 1014,
+      "validatedSolvedSpots": 1014,
+      "available": 1014,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 50.7,
+      "publishable": false
     },
     {
       "section": "stack",
@@ -589,8 +875,13 @@
       "validator": "effective_stack_solver",
       "minSpots": 1500,
       "baseSpots": 7,
-      "available": 9282,
-      "publishable": true
+      "solvedSpots": 1183,
+      "validatedSolvedSpots": 1183,
+      "available": 1183,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 59.15,
+      "publishable": false
     },
     {
       "section": "stack",
@@ -600,8 +891,13 @@
       "validator": "effective_stack_solver",
       "minSpots": 1500,
       "baseSpots": 5,
-      "available": 6630,
-      "publishable": true
+      "solvedSpots": 845,
+      "validatedSolvedSpots": 845,
+      "available": 845,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 42.25,
+      "publishable": false
     },
     {
       "section": "stack",
@@ -611,8 +907,13 @@
       "validator": "effective_stack_solver",
       "minSpots": 1500,
       "baseSpots": 3,
-      "available": 3978,
-      "publishable": true
+      "solvedSpots": 507,
+      "validatedSolvedSpots": 507,
+      "available": 507,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.35,
+      "publishable": false
     },
     {
       "section": "stack",
@@ -622,8 +923,13 @@
       "validator": "effective_stack_solver",
       "minSpots": 1500,
       "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "stack",
@@ -633,8 +939,13 @@
       "validator": "effective_stack_solver",
       "minSpots": 1500,
       "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "stack",
@@ -643,8 +954,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "effective_stack_solver",
       "minSpots": 1500,
-      "baseSpots": 36,
-      "available": 47736,
+      "baseSpots": 34,
+      "solvedSpots": 5746,
+      "validatedSolvedSpots": 5746,
+      "available": 5746,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 287.3,
       "publishable": true
     },
     {
@@ -654,9 +970,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "preflop_limp_ranges",
       "minSpots": 1500,
-      "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "baseSpots": 1,
+      "solvedSpots": 169,
+      "validatedSolvedSpots": 169,
+      "available": 169,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 8.45,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -665,9 +986,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "bb_vs_open",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -676,9 +1002,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "bb_vs_open",
       "minSpots": 1500,
-      "baseSpots": 6,
-      "available": 7956,
-      "publishable": true
+      "baseSpots": 3,
+      "solvedSpots": 507,
+      "validatedSolvedSpots": 507,
+      "available": 507,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.35,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -687,8 +1018,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "bb_vs_open",
       "minSpots": 1500,
-      "baseSpots": 146,
-      "available": 193596,
+      "baseSpots": 73,
+      "solvedSpots": 12337,
+      "validatedSolvedSpots": 12337,
+      "available": 12337,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 616.85,
       "publishable": true
     },
     {
@@ -698,9 +1034,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "sb_vs_open",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -709,9 +1050,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "sb_vs_open",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -720,9 +1066,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "sb_vs_open",
       "minSpots": 1500,
-      "baseSpots": 8,
-      "available": 10608,
-      "publishable": true
+      "baseSpots": 4,
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -731,9 +1082,14 @@
       "source": "DCFR_EXACT",
       "validator": "late_position_rfi",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -742,9 +1098,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "ip_vs_open",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -753,9 +1114,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "late_position_play",
       "minSpots": 1500,
-      "baseSpots": 8,
-      "available": 10608,
-      "publishable": true
+      "baseSpots": 4,
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -764,8 +1130,13 @@
       "source": "DCFR_EXACT",
       "validator": "rfi_chart",
       "minSpots": 1500,
-      "baseSpots": 24,
-      "available": 31824,
+      "baseSpots": 10,
+      "solvedSpots": 1690,
+      "validatedSolvedSpots": 1690,
+      "available": 1690,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 84.5,
       "publishable": true
     },
     {
@@ -775,9 +1146,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "ip_vs_open",
       "minSpots": 1500,
-      "baseSpots": 6,
-      "available": 7956,
-      "publishable": true
+      "baseSpots": 3,
+      "solvedSpots": 507,
+      "validatedSolvedSpots": 507,
+      "available": 507,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.35,
+      "publishable": false
     },
     {
       "section": "pre_special",
@@ -786,8 +1162,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "oop_vs_open",
       "minSpots": 1500,
-      "baseSpots": 26,
-      "available": 34476,
+      "baseSpots": 13,
+      "solvedSpots": 2197,
+      "validatedSolvedSpots": 2197,
+      "available": 2197,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 109.85,
       "publishable": true
     },
     {
@@ -797,8 +1178,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "cold_call_ranges",
       "minSpots": 1500,
-      "baseSpots": 32,
-      "available": 42432,
+      "baseSpots": 16,
+      "solvedSpots": 2704,
+      "validatedSolvedSpots": 2704,
+      "available": 2704,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 135.2,
       "publishable": true
     },
     {
@@ -808,8 +1194,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "sb_bb_war",
       "minSpots": 1500,
-      "baseSpots": 74,
-      "available": 98124,
+      "baseSpots": 37,
+      "solvedSpots": 6253,
+      "validatedSolvedSpots": 6253,
+      "available": 6253,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 312.65,
       "publishable": true
     },
     {
@@ -819,9 +1210,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "bb_vs_limpers",
       "minSpots": 1500,
-      "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "baseSpots": 1,
+      "solvedSpots": 169,
+      "validatedSolvedSpots": 169,
+      "available": 169,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 8.45,
+      "publishable": false
     },
     {
       "section": "blind_special",
@@ -830,9 +1226,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "sb_limp_call",
       "minSpots": 1500,
-      "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "baseSpots": 1,
+      "solvedSpots": 169,
+      "validatedSolvedSpots": 169,
+      "available": 169,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 8.45,
+      "publishable": false
     },
     {
       "section": "blind_special",
@@ -841,9 +1242,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "sb_limp_raise",
       "minSpots": 1500,
-      "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "baseSpots": 1,
+      "solvedSpots": 169,
+      "validatedSolvedSpots": 169,
+      "available": 169,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 8.45,
+      "publishable": false
     },
     {
       "section": "blind_special",
@@ -852,9 +1258,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "isolate_limpers",
       "minSpots": 1500,
-      "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "baseSpots": 1,
+      "solvedSpots": 169,
+      "validatedSolvedSpots": 169,
+      "available": 169,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 8.45,
+      "publishable": false
     },
     {
       "section": "blind_special",
@@ -863,9 +1274,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "limp_raise",
       "minSpots": 1500,
-      "baseSpots": 2,
-      "available": 2652,
-      "publishable": true
+      "baseSpots": 1,
+      "solvedSpots": 169,
+      "validatedSolvedSpots": 169,
+      "available": 169,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 8.45,
+      "publishable": false
     },
     {
       "section": "blind_special",
@@ -874,8 +1290,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "hu_ranges",
       "minSpots": 1500,
-      "baseSpots": 56,
-      "available": 74256,
+      "baseSpots": 28,
+      "solvedSpots": 4732,
+      "validatedSolvedSpots": 4732,
+      "available": 4732,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 236.6,
       "publishable": true
     },
     {
@@ -885,9 +1306,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "squeeze_ranges",
       "minSpots": 1500,
-      "baseSpots": 12,
-      "available": 15912,
-      "publishable": true
+      "baseSpots": 6,
+      "solvedSpots": 1014,
+      "validatedSolvedSpots": 1014,
+      "available": 1014,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 50.7,
+      "publishable": false
     },
     {
       "section": "aggr_special",
@@ -896,9 +1322,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "facing_4bet",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "aggr_special",
@@ -907,9 +1338,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "cold_action",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "aggr_special",
@@ -919,7 +1355,12 @@
       "validator": "fourbet_postflop",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -929,9 +1370,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "facing_3bet",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "aggr_special",
@@ -940,9 +1386,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "threebet_ip",
       "minSpots": 1500,
-      "baseSpots": 6,
-      "available": 7956,
-      "publishable": true
+      "baseSpots": 3,
+      "solvedSpots": 507,
+      "validatedSolvedSpots": 507,
+      "available": 507,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.35,
+      "publishable": false
     },
     {
       "section": "aggr_special",
@@ -951,8 +1402,13 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "threebet_oop",
       "minSpots": 1500,
-      "baseSpots": 26,
-      "available": 34476,
+      "baseSpots": 13,
+      "solvedSpots": 2197,
+      "validatedSolvedSpots": 2197,
+      "available": 2197,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 109.85,
       "publishable": true
     },
     {
@@ -962,9 +1418,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "call_3bet",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "aggr_special",
@@ -973,9 +1434,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "fold_to_3bet",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "aggr_special",
@@ -985,7 +1451,12 @@
       "validator": "fourbet_bluff",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -996,7 +1467,12 @@
       "validator": "fourbet_value",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1006,9 +1482,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "call_4bet",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "aggr_special",
@@ -1017,9 +1498,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "cold_4bet",
       "minSpots": 1500,
-      "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "baseSpots": 2,
+      "solvedSpots": 338,
+      "validatedSolvedSpots": 338,
+      "available": 338,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 16.9,
+      "publishable": false
     },
     {
       "section": "short_special",
@@ -1028,9 +1514,14 @@
       "source": "AI_PLUS_SOLVER",
       "validator": "early_accumulation",
       "minSpots": 1500,
-      "baseSpots": 34,
-      "available": 45084,
-      "publishable": true
+      "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
+      "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
+      "publishable": false
     },
     {
       "section": "short_special",
@@ -1040,7 +1531,12 @@
       "validator": "push_fold_open",
       "minSpots": 1500,
       "baseSpots": 90,
-      "available": 119340,
+      "solvedSpots": 15210,
+      "validatedSolvedSpots": 15210,
+      "available": 15210,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 760.5,
       "publishable": true
     },
     {
@@ -1051,7 +1547,12 @@
       "validator": "push_fold_call",
       "minSpots": 1500,
       "baseSpots": 64,
-      "available": 84864,
+      "solvedSpots": 10816,
+      "validatedSolvedSpots": 10816,
+      "available": 10816,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 540.8,
       "publishable": true
     },
     {
@@ -1062,8 +1563,13 @@
       "validator": "reshove",
       "minSpots": 1500,
       "baseSpots": 3,
-      "available": 3978,
-      "publishable": true
+      "solvedSpots": 507,
+      "validatedSolvedSpots": 507,
+      "available": 507,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.35,
+      "publishable": false
     },
     {
       "section": "short_special",
@@ -1073,7 +1579,12 @@
       "validator": "multi_shove",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1084,7 +1595,12 @@
       "validator": "push_fold",
       "minSpots": 1500,
       "baseSpots": 128,
-      "available": 169728,
+      "solvedSpots": 21632,
+      "validatedSolvedSpots": 21632,
+      "available": 21632,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 1081.6,
       "publishable": true
     },
     {
@@ -1095,8 +1611,13 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "icm_special",
@@ -1106,8 +1627,13 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "icm_special",
@@ -1117,8 +1643,13 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 6,
-      "available": 7956,
-      "publishable": true
+      "solvedSpots": 1014,
+      "validatedSolvedSpots": 1014,
+      "available": 1014,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 50.7,
+      "publishable": false
     },
     {
       "section": "icm_special",
@@ -1128,8 +1659,13 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "icm_special",
@@ -1139,8 +1675,13 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 6,
-      "available": 7956,
-      "publishable": true
+      "solvedSpots": 1014,
+      "validatedSolvedSpots": 1014,
+      "available": 1014,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 50.7,
+      "publishable": false
     },
     {
       "section": "icm_special",
@@ -1150,8 +1691,13 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 8,
-      "available": 10608,
-      "publishable": true
+      "solvedSpots": 1352,
+      "validatedSolvedSpots": 1352,
+      "available": 1352,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 67.6,
+      "publishable": false
     },
     {
       "section": "icm_special",
@@ -1161,8 +1707,13 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "icm_special",
@@ -1172,8 +1723,13 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "icm_special",
@@ -1183,7 +1739,12 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 16,
-      "available": 21216,
+      "solvedSpots": 2704,
+      "validatedSolvedSpots": 2704,
+      "available": 2704,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 135.2,
       "publishable": true
     },
     {
@@ -1194,7 +1755,12 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 20,
-      "available": 26520,
+      "solvedSpots": 3380,
+      "validatedSolvedSpots": 3380,
+      "available": 3380,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 169,
       "publishable": true
     },
     {
@@ -1205,7 +1771,12 @@
       "validator": "icm_equity_solver",
       "minSpots": 1500,
       "baseSpots": 22,
-      "available": 29172,
+      "solvedSpots": 3718,
+      "validatedSolvedSpots": 3718,
+      "available": 3718,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 185.9,
       "publishable": true
     },
     {
@@ -1216,7 +1787,12 @@
       "validator": "pko_equity_solver",
       "minSpots": 1500,
       "baseSpots": 12,
-      "available": 15912,
+      "solvedSpots": 2028,
+      "validatedSolvedSpots": 2028,
+      "available": 2028,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 101.4,
       "publishable": true
     },
     {
@@ -1227,8 +1803,13 @@
       "validator": "pko_equity_solver",
       "minSpots": 1500,
       "baseSpots": 6,
-      "available": 7956,
-      "publishable": true
+      "solvedSpots": 1014,
+      "validatedSolvedSpots": 1014,
+      "available": 1014,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 50.7,
+      "publishable": false
     },
     {
       "section": "pko_special",
@@ -1238,8 +1819,13 @@
       "validator": "pko_equity_solver",
       "minSpots": 1500,
       "baseSpots": 6,
-      "available": 7956,
-      "publishable": true
+      "solvedSpots": 1014,
+      "validatedSolvedSpots": 1014,
+      "available": 1014,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 50.7,
+      "publishable": false
     },
     {
       "section": "pko_special",
@@ -1249,7 +1835,12 @@
       "validator": "pko_equity_solver",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1260,8 +1851,13 @@
       "validator": "pko_equity_solver",
       "minSpots": 1500,
       "baseSpots": 8,
-      "available": 10608,
-      "publishable": true
+      "solvedSpots": 1352,
+      "validatedSolvedSpots": 1352,
+      "available": 1352,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 67.6,
+      "publishable": false
     },
     {
       "section": "pko_special",
@@ -1271,8 +1867,13 @@
       "validator": "pko_equity_solver",
       "minSpots": 1500,
       "baseSpots": 4,
-      "available": 5304,
-      "publishable": true
+      "solvedSpots": 676,
+      "validatedSolvedSpots": 676,
+      "available": 676,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 33.8,
+      "publishable": false
     },
     {
       "section": "pko_special",
@@ -1282,7 +1883,12 @@
       "validator": "pko_equity_solver",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1293,7 +1899,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1304,7 +1915,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1315,7 +1931,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1326,7 +1947,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1337,7 +1963,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1348,7 +1979,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1359,7 +1995,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1370,7 +2011,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1381,7 +2027,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1392,7 +2043,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1403,7 +2059,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1414,7 +2075,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1425,7 +2091,12 @@
       "validator": "solver_tree_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1436,7 +2107,12 @@
       "validator": "river_solver_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1447,7 +2123,12 @@
       "validator": "river_solver_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1458,7 +2139,12 @@
       "validator": "river_solver_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1469,7 +2155,12 @@
       "validator": "river_solver_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1480,7 +2171,12 @@
       "validator": "river_solver_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1491,7 +2187,12 @@
       "validator": "river_solver_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1502,7 +2203,12 @@
       "validator": "river_solver_node",
       "minSpots": 1500,
       "baseSpots": 0,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1513,7 +2219,12 @@
       "validator": "board_texture",
       "minSpots": 1500,
       "baseSpots": 37,
-      "available": 108883,
+      "solvedSpots": 18336,
+      "validatedSolvedSpots": 18336,
+      "available": 18336,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 916.8,
       "publishable": true
     },
     {
@@ -1524,7 +2235,12 @@
       "validator": "board_texture",
       "minSpots": 1500,
       "baseSpots": 6,
-      "available": 17388,
+      "solvedSpots": 2898,
+      "validatedSolvedSpots": 2898,
+      "available": 2898,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 144.9,
       "publishable": true
     },
     {
@@ -1535,8 +2251,13 @@
       "validator": "board_texture",
       "minSpots": 1500,
       "baseSpots": 2,
-      "available": 5874,
-      "publishable": true
+      "solvedSpots": 979,
+      "validatedSolvedSpots": 979,
+      "available": 979,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 48.95,
+      "publishable": false
     },
     {
       "section": "texture_special",
@@ -1546,8 +2267,13 @@
       "validator": "board_texture",
       "minSpots": 1500,
       "baseSpots": 2,
-      "available": 5784,
-      "publishable": true
+      "solvedSpots": 1051,
+      "validatedSolvedSpots": 1051,
+      "available": 1051,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 52.55,
+      "publishable": false
     },
     {
       "section": "texture_special",
@@ -1557,7 +2283,12 @@
       "validator": "board_texture",
       "minSpots": 1500,
       "baseSpots": 20,
-      "available": 57157,
+      "solvedSpots": 9628,
+      "validatedSolvedSpots": 9628,
+      "available": 9628,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 481.4,
       "publishable": true
     },
     {
@@ -1568,7 +2299,12 @@
       "validator": "board_texture",
       "minSpots": 1500,
       "baseSpots": 41,
-      "available": 119629,
+      "solvedSpots": 20127,
+      "validatedSolvedSpots": 20127,
+      "available": 20127,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 1006.35,
       "publishable": true
     },
     {
@@ -1579,8 +2315,13 @@
       "validator": "board_texture",
       "minSpots": 1500,
       "baseSpots": 2,
-      "available": 6642,
-      "publishable": true
+      "solvedSpots": 1107,
+      "validatedSolvedSpots": 1107,
+      "available": 1107,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 55.35,
+      "publishable": false
     },
     {
       "section": "texture_special",
@@ -1590,7 +2331,12 @@
       "validator": "board_texture",
       "minSpots": 1500,
       "baseSpots": 6,
-      "available": 17388,
+      "solvedSpots": 2898,
+      "validatedSolvedSpots": 2898,
+      "available": 2898,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 144.9,
       "publishable": true
     },
     {
@@ -1601,7 +2347,12 @@
       "validator": "board_texture",
       "minSpots": 1500,
       "baseSpots": 37,
-      "available": 108883,
+      "solvedSpots": 18336,
+      "validatedSolvedSpots": 18336,
+      "available": 18336,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 916.8,
       "publishable": true
     },
     {
@@ -1612,8 +2363,13 @@
       "validator": "solver_sizing",
       "minSpots": 1500,
       "baseSpots": 1,
-      "available": 3108,
-      "publishable": true
+      "solvedSpots": 518,
+      "validatedSolvedSpots": 518,
+      "available": 518,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.9,
+      "publishable": false
     },
     {
       "section": "texture_special",
@@ -1623,7 +2379,12 @@
       "validator": "solver_sizing",
       "minSpots": 1500,
       "baseSpots": 36,
-      "available": 104515,
+      "solvedSpots": 17608,
+      "validatedSolvedSpots": 17608,
+      "available": 17608,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 880.4,
       "publishable": true
     },
     {
@@ -1634,8 +2395,13 @@
       "validator": "solver_sizing",
       "minSpots": 1500,
       "baseSpots": 1,
-      "available": 3108,
-      "publishable": true
+      "solvedSpots": 518,
+      "validatedSolvedSpots": 518,
+      "available": 518,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.9,
+      "publishable": false
     },
     {
       "section": "texture_special",
@@ -1645,8 +2411,13 @@
       "validator": "solver_sizing",
       "minSpots": 1500,
       "baseSpots": 1,
-      "available": 3108,
-      "publishable": true
+      "solvedSpots": 518,
+      "validatedSolvedSpots": 518,
+      "available": 518,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.9,
+      "publishable": false
     },
     {
       "section": "texture_special",
@@ -1656,8 +2427,13 @@
       "validator": "solver_sizing",
       "minSpots": 1500,
       "baseSpots": 1,
-      "available": 3108,
-      "publishable": true
+      "solvedSpots": 518,
+      "validatedSolvedSpots": 518,
+      "available": 518,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.9,
+      "publishable": false
     },
     {
       "section": "texture_special",
@@ -1667,8 +2443,13 @@
       "validator": "solver_sizing",
       "minSpots": 1500,
       "baseSpots": 1,
-      "available": 3108,
-      "publishable": true
+      "solvedSpots": 518,
+      "validatedSolvedSpots": 518,
+      "available": 518,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.9,
+      "publishable": false
     },
     {
       "section": "texture_special",
@@ -1678,8 +2459,13 @@
       "validator": "solver_sizing",
       "minSpots": 1500,
       "baseSpots": 1,
-      "available": 3108,
-      "publishable": true
+      "solvedSpots": 518,
+      "validatedSolvedSpots": 518,
+      "available": 518,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.9,
+      "publishable": false
     },
     {
       "section": "texture_special",
@@ -1689,8 +2475,13 @@
       "validator": "solver_sizing",
       "minSpots": 1500,
       "baseSpots": 1,
-      "available": 3108,
-      "publishable": true
+      "solvedSpots": 518,
+      "validatedSolvedSpots": 518,
+      "available": 518,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 25.9,
+      "publishable": false
     },
     {
       "section": "math_special",
@@ -1700,7 +2491,12 @@
       "validator": "math_focus",
       "minSpots": 1500,
       "baseSpots": 78,
-      "available": 103428,
+      "solvedSpots": 13182,
+      "validatedSolvedSpots": 13182,
+      "available": 13182,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 659.1,
       "publishable": true
     },
     {
@@ -1711,7 +2507,12 @@
       "validator": "math_focus",
       "minSpots": 1500,
       "baseSpots": 33,
+      "solvedSpots": 0,
+      "validatedSolvedSpots": 0,
       "available": 0,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 0,
       "publishable": false
     },
     {
@@ -1722,8 +2523,13 @@
       "validator": "math_focus",
       "minSpots": 1500,
       "baseSpots": 33,
-      "available": 2377,
-      "publishable": true
+      "solvedSpots": 439,
+      "validatedSolvedSpots": 439,
+      "available": 439,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 21.95,
+      "publishable": false
     },
     {
       "section": "math_special",
@@ -1733,7 +2539,12 @@
       "validator": "math_focus",
       "minSpots": 1500,
       "baseSpots": 78,
-      "available": 103428,
+      "solvedSpots": 13182,
+      "validatedSolvedSpots": 13182,
+      "available": 13182,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 659.1,
       "publishable": true
     },
     {
@@ -1743,8 +2554,13 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 49,
-      "available": 134227,
+      "baseSpots": 48,
+      "solvedSpots": 22079,
+      "validatedSolvedSpots": 22079,
+      "available": 22079,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 1103.95,
       "publishable": true
     },
     {
@@ -1755,7 +2571,12 @@
       "validator": "math_focus",
       "minSpots": 1500,
       "baseSpots": 78,
-      "available": 103428,
+      "solvedSpots": 13182,
+      "validatedSolvedSpots": 13182,
+      "available": 13182,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 659.1,
       "publishable": true
     },
     {
@@ -1765,8 +2586,13 @@
       "source": "POKER_MATH",
       "validator": "math_focus",
       "minSpots": 1500,
-      "baseSpots": 49,
-      "available": 134227,
+      "baseSpots": 48,
+      "solvedSpots": 22079,
+      "validatedSolvedSpots": 22079,
+      "available": 22079,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 1103.95,
       "publishable": true
     },
     {
@@ -1777,7 +2603,12 @@
       "validator": "math_focus",
       "minSpots": 1500,
       "baseSpots": 43,
-      "available": 126271,
+      "solvedSpots": 21234,
+      "validatedSolvedSpots": 21234,
+      "available": 21234,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 1061.7,
       "publishable": true
     },
     {
@@ -1788,7 +2619,12 @@
       "validator": "math_focus",
       "minSpots": 1500,
       "baseSpots": 33,
-      "available": 98485,
+      "solvedSpots": 16603,
+      "validatedSolvedSpots": 16603,
+      "available": 16603,
+      "targetSpots": 2000,
+      "longTermTargetSpots": 20000,
+      "coveragePct": 830.15,
       "publishable": true
     }
   ]
