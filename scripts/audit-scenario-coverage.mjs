@@ -20,6 +20,7 @@ const pushfold=JSON.parse(await readFile(join(SOLVER_DIR,"pushfold-hu-v1.json"),
 const tournament=JSON.parse(await readFile(join(SOLVER_DIR,"tournament.json"),"utf8"));
 const preflopDecisions=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-decisions.json"),"utf8"));
 const preflop9max=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-9max.json"),"utf8"));
+const preflopMultistack=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-multistack.json"),"utf8"));
 const textureSizing=JSON.parse(await readFile(join(SOLVER_DIR,"texture-sizing.json"),"utf8"));
 const lineBank=JSON.parse(await readFile(join(SOLVER_DIR,"line-bank.json"),"utf8"));
 
@@ -82,6 +83,7 @@ const all=[
   ...((tournament?.spots)||[]),
   ...((preflopDecisions?.spots)||[]),
   ...((preflop9max?.spots)||[]),
+  ...((preflopMultistack?.spots)||[]),
   ...((textureSizing?.spots)||[]),
   ...((lineBank?.spots)||[])
 ];
