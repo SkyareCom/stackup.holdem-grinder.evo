@@ -129,8 +129,7 @@
       "handles": [
         "fskill/*"
       ],
-      "strict": true,
-      "status": "ENGINE_REQUIRED"
+      "strict": true
     },
     {
       "id": "STACKUP_MULTIWAY_ICM",
