@@ -287,12 +287,36 @@ const preflop=charts.map(chart=>{
 });
 
 const MAX_MATCHUPS=Math.max(1,Math.min(matchups.length,Number(process.env.STACKUP_MAX_MATCHUPS||30)));
-const selectedAll=matchups
-  .filter(m=>postflopRoles(m.opener?.position,m.caller?.position))
-  .slice(0,MAX_MATCHUPS);
+const eligible=matchups.filter(m=>postflopRoles(m.opener?.position,m.caller?.position));
+function matchupBucket(m){
+  const name=String(m?.matchup||"");
+  if(/4bet vs .* call/i.test(name))return "4BET";
+  if(/open vs .* 3bet/i.test(name))return "3BET";
+  return "SRP";
+}
+const buckets={SRP:[], "3BET":[], "4BET":[]};
+for(const m of eligible)buckets[matchupBucket(m)].push(m);
+// Do not let source ordering starve 4-bet pots. Round-robin across real
+// matchup families so the solved bank always contains SRP, 3-bet and 4-bet
+// scenarios when the upstream exporter provides them.
+const selectedAll=[];
+let cursor=0;
+while(selectedAll.length<MAX_MATCHUPS){
+  let added=false;
+  for(const key of ["SRP","3BET","4BET"]){
+    const item=buckets[key][cursor];
+    if(item&&selectedAll.length<MAX_MATCHUPS){
+      selectedAll.push(item);
+      added=true;
+    }
+  }
+  if(!added)break;
+  cursor++;
+}
 const selected=selectedAll.filter((_,index)=>index%SHARD_COUNT===SHARD_INDEX);
 
 console.log("Selected postflop matchups:",selected.length,"of",selectedAll.length,"shard",SHARD_INDEX+"/"+SHARD_COUNT);
+console.log("Selected mix:",Object.fromEntries(["SRP","3BET","4BET"].map(k=>[k,selectedAll.filter(m=>matchupBucket(m)===k).length])));
 console.log(selected.map(m=>m.matchup).join(" | "));
 
 const postflop=[];

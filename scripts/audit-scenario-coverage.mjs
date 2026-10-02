@@ -336,10 +336,12 @@ function matchAdjust(item,spot){
 }
 function matchAdvance(item,spot){
   const street=normStreet(spot?.scenario?.street);
-  const preflopOnly=["pre_special","blind_special","short_special","icm_special","pko_special"].includes(item.section)||
-    (item.section==="aggr_special"&&item.id!=="pot_4bet");
-  if(preflopOnly&&street!=="PRE-FLOP")return false;
-  if(item.section==="aggr_special"&&item.id==="pot_4bet"&&!["FLOP","TURN","RIVER"].includes(street))return false;
+  if(["pre_special","blind_special","short_special","icm_special","pko_special"].includes(item.section)&&street!=="PRE-FLOP")return false;
+  if(item.section==="aggr_special"){
+    if(item.id==="pot_4bet"){
+      if(!["FLOP","TURN","RIVER"].includes(street))return false;
+    }else if(street!=="PRE-FLOP")return false;
+  }
   if(item.section==="river_special"&&street!=="RIVER")return false;
   if(["post_special","texture_special"].includes(item.section)&&!["FLOP","TURN","RIVER"].includes(street))return false;
   if(item.section==="math_special"&&["implied_odds","reverse_implied_odds"].includes(item.id)){
@@ -348,29 +350,6 @@ function matchAdvance(item,spot){
   if(solvedClassifier.isHandLevel(item.section,item.id))return true;
   return tags(spot).has(item.id);
 }
-function ljEquivalentSpots(){
-  const source=[...preflop,...((preflopDecisions?.spots)||[])].filter(s=>
-    String(s?.solver||"")==="DCFR_SOLVER"&&
-    normStreet(s?.scenario?.street)==="PRE-FLOP"&&
-    String(s?.scenario?.heroPosition||"").toUpperCase()==="UTG"
-  );
-  return source.map(base=>{
-    const spot=JSON.parse(JSON.stringify(base));
-    const s=spot.scenario||(spot.scenario={});
-    s.tableSize=9;
-    s.trainingTableSize=9;
-    s.heroPosition="LJ";
-    s.positions=["UTG","UTG+1","UTG+2","LJ","HJ","CO","BTN","SB","BB"];
-    s.actionHistory=[
-      {position:"UTG",action:"FOLD",kind:"fold",to:0},
-      {position:"UTG+1",action:"FOLD",kind:"fold",to:0},
-      {position:"UTG+2",action:"FOLD",kind:"fold",to:0},
-      ...(Array.isArray(s.actionHistory)?s.actionHistory.map(x=>({...x,position:String(x.position||"").toUpperCase()==="UTG"?"LJ":x.position})) : [])
-    ];
-    return spot;
-  });
-}
-const ljEquiv=ljEquivalentSpots();
 
 function baseSpotsFor(item){
   const direct=all.filter(spot=>item.section.endsWith("_special")?matchAdvance(item,spot):matchAdjust(item,spot));
