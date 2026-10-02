@@ -845,6 +845,7 @@
       ...pushfoldSpots(bank),
       ...((bank?.tournament?.spots)||[]),
       ...((bank?.reentry?.spots)||[]),
+      ...((bank?.opponentProfile?.spots)||[]),
       ...((bank?.preflopDecisions?.spots)||[]),
       ...((bank?.textureSizing?.spots)||[]),
       ...((bank?.preflop9max?.spots)||[]),
