@@ -847,6 +847,7 @@
       ...((bank?.reentry?.spots)||[]),
       ...((bank?.opponentProfile?.spots)||[]),
       ...((bank?.multiwayTournament?.spots)||[]),
+      ...((bank?.multiwayPostflop?.spots)||[]),
       ...((bank?.preflopDecisions?.spots)||[]),
       ...((bank?.textureSizing?.spots)||[]),
       ...((bank?.preflop9max?.spots)||[]),
