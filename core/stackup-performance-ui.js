@@ -7,6 +7,7 @@
     if(!R||!page||!xp)return null;
     let pendingClear=false;
     let lastRenderKey='';
+    let renderToken=0;
 
     const style=document.createElement('style');
     style.textContent=`
@@ -53,7 +54,18 @@
       return all[L()]||all.pt;
     }
     function date(v){try{return new Intl.DateTimeFormat(L()==='en'?'en-US':L()==='es'?'es-ES':'pt-BR',{dateStyle:'short',timeStyle:'short'}).format(new Date(v));}catch(_){return String(v||'');}}
-    function persistRecommendations(deep){if(!ctx.library)return;(deep?.recommendations||[]).forEach(r=>ctx.library.upsert(r));}
+    function persistRecommendations(deep){
+      if(!ctx.library)return;
+      (deep?.recommendations||[]).forEach(r=>{
+        const old=ctx.library.get?.(r.externalKey);
+        const unchanged=old&&
+          old.title===r.title&&old.reason===r.reason&&old.priority===r.priority&&
+          Number(old.targetSpots)===Number(r.targetSpots)&&
+          Number(old.meta?.baselineScore||0)===Number(r.meta?.baselineScore||0)&&
+          Number(old.meta?.severity||0)===Number(r.meta?.severity||0);
+        if(!unchanged)ctx.library.upsert(r);
+      });
+    }
     function priorityItems(deep){
       const all=[...(deep?.weaknesses||[]),...(deep?.threats||[]),...(deep?.opportunities||[])];
       return all.sort((a,b)=>(b.severity||0)-(a.severity||0)).slice(0,3);
@@ -128,7 +140,16 @@
       }
     });
 
-    function show(on){panel.hidden=!on;panel.style.display=on?'flex':'none';if(on)render();}
+    function show(on){
+      panel.hidden=!on;panel.style.display=on?'flex':'none';
+      const token=++renderToken;
+      if(!on)return;
+      if(!panel.childElementCount)panel.innerHTML='<div class="perfcard"><div class="perfempty">CARREGANDO...</div></div>';
+      requestAnimationFrame(()=>window.setTimeout(()=>{
+        if(token!==renderToken||panel.hidden)return;
+        render();
+      },0));
+    }
     return Object.freeze({panel,render,show});
   }
 
