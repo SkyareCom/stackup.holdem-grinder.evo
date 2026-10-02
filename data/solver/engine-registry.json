@@ -120,8 +120,7 @@
         "extras/rebuy",
         "extras/addon"
       ],
-      "strict": true,
-      "status": "ENGINE_REQUIRED"
+      "strict": true
     },
     {
       "id": "STACKUP_OPPONENT_BR",
