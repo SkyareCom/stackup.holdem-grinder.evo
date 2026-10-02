@@ -1,0 +1,40 @@
+name: Validate Native HU Patch
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/validate-native-hu.yml"
+      - "scripts/patch-dcfr-hu.py"
+      - "scripts/patch-dcfr-stack.py"
+      - "scripts/stackup-preflop-export.rs"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-native-hu-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Patch pinned upstream to HU 20bb
+        run: |
+          mkdir -p .stackup
+          git clone --depth 1 https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git -C .stackup/DCFR-SOLVER fetch --depth 1 origin 4ade6a9e15a841c41867afde1258b9d110cd6fb1
+          git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
+          python scripts/patch-dcfr-hu.py .stackup/DCFR-SOLVER/src/preflop.rs
+          python scripts/patch-dcfr-stack.py .stackup/DCFR-SOLVER/src/preflop.rs 20
+          mkdir -p .stackup/DCFR-SOLVER/src/bin
+          cp scripts/stackup-preflop-export.rs .stackup/DCFR-SOLVER/src/bin/stackup_preflop_export.rs
+
+      - name: Compile solver and exporter
+        run: cargo check --manifest-path .stackup/DCFR-SOLVER/Cargo.toml --bin dcfr-solver --bin stackup_preflop_export
