@@ -8,6 +8,8 @@
     let personalFilter='now';
     let pendingPersonalDelete=null;
     let pendingDataAction=null;
+    let personalVisible=false;
+    let profileVisible=false;
     let renderRecordsCache=null;
     let progressIndex=null;
     let lastGrinderSyncKey='';
@@ -296,18 +298,23 @@
     });
 
     function showPersonal(on){
+      const changed=personalVisible!==!!on;
+      personalVisible=!!on;
       personal.hidden=!on;personal.style.display=on?'flex':'none';
       const token=++personalRenderToken;
       if(!on)return;
+      if(!changed&&personal.childElementCount)return;
       if(!personal.childElementCount)personal.innerHTML='<div class="personalempty">CARREGANDO...</div>';
-      requestAnimationFrame(()=>window.setTimeout(()=>{
+      requestAnimationFrame(()=>{
         if(token!==personalRenderToken||personal.hidden)return;
         renderPersonal();
-      },0));
+      });
     }
     function showProfile(on){
+      const changed=profileVisible!==!!on;
+      profileVisible=!!on;
       profile.hidden=!on;profile.style.display=on?'flex':'none';
-      if(on&&(!profile.childElementCount||pendingDataAction!==null))requestAnimationFrame(renderProfile);
+      if(on&&(changed||!profile.childElementCount||pendingDataAction!==null))requestAnimationFrame(renderProfile);
     }
     function onRecord(){
       renderRecordsCache=ctx.records();
