@@ -27,12 +27,13 @@ sub_once(
 '''pub fn new_6max(config: PreflopBetConfig) -> Self {
         let mut stacks = [200; NUM_PLAYERS];
         let mut bets = [0i32; NUM_PLAYERS];
-        let sb = 0usize;
-        let bb = 1usize;
+        let sb = NUM_PLAYERS - 2;
+        let bb = NUM_PLAYERS - 1;
         stacks[sb] -= 1;
         stacks[bb] -= 2;
         bets[sb] = 1;
         bets[bb] = 2;
+
         PreflopState {
             stacks,
             bets,
@@ -55,7 +56,33 @@ sub_once(
 sub_once(
     r'pub fn new_heads_up\(config: PreflopBetConfig\) -> Self \{.*?\n    \}\n\n    pub fn active_count',
 '''pub fn new_heads_up(config: PreflopBetConfig) -> Self {
-        Self::new_6max(config)
+        let mut stacks = [0i32; NUM_PLAYERS];
+        let mut bets = [0i32; NUM_PLAYERS];
+        let mut folded = [true; NUM_PLAYERS];
+        let mut has_acted = [true; NUM_PLAYERS];
+        let sb = NUM_PLAYERS - 2;
+        let bb = NUM_PLAYERS - 1;
+        stacks[sb] = 200 - 1;
+        stacks[bb] = 200 - 2;
+        bets[sb] = 1;
+        bets[bb] = 2;
+        folded[sb] = false;
+        folded[bb] = false;
+        has_acted[sb] = false;
+        has_acted[bb] = false;
+
+        PreflopState {
+            stacks,
+            bets,
+            folded,
+            has_acted,
+            all_in: [false; NUM_PLAYERS],
+            to_act: sb as u8,
+            n_raises: 0,
+            holes: [Hand::new(); NUM_PLAYERS],
+            config,
+            last_raise_size: 2,
+        }
     }
 
     pub fn active_count''',
@@ -63,31 +90,49 @@ sub_once(
     re.S
 )
 
-s=s.replace('(p == 4 && self.config.sb_limp)','(p == 0 && self.config.sb_limp)')
-s=s.replace('depth == 0 && p == 4','depth == 0 && p == 0')
-s=s.replace('for pos in 0..4 {','for pos in 0..1 {')
+s=s.replace('(p == 4 && self.config.sb_limp)','(p == NUM_PLAYERS - 2 && self.config.sb_limp)')
+s=s.replace('depth == 0 && p == 4','depth == 0 && p == NUM_PLAYERS - 2')
+s=s.replace('for pos in 0..4 {','for pos in 0..(NUM_PLAYERS - 2) {')
 
-# Training helper blind indices.
 s=s.replace(
 '''            state.holes[4] = Hand::new().add(c1).add(c2);
             state.holes[5] = Hand::new().add(c3).add(c4);
 
             // Traverser alternates SB(4) and BB(5)
             let traverser = if i % 2 == 0 { 4 } else { 5 };''',
-'''            state.holes[0] = Hand::new().add(c1).add(c2);
-            state.holes[1] = Hand::new().add(c3).add(c4);
+'''            let sb = NUM_PLAYERS - 2;
+            let bb = NUM_PLAYERS - 1;
+            state.holes[sb] = Hand::new().add(c1).add(c2);
+            state.holes[bb] = Hand::new().add(c3).add(c4);
 
-            let traverser = if i % 2 == 0 { 0 } else { 1 };'''
+            // Traverser alternates SB and BB.
+            let traverser = if i % 2 == 0 { sb as u8 } else { bb as u8 };'''
 )
 
-# Generic postflop positional ordering if present.
-m=re.search(r'let postflop_rank = \|p: usize\| -> usize \{\s*match p \{.*?\n\s*\}\s*\};\s*let \(ip, oop\)',s,re.S)
-if m:
-    s=s[:m.start()]+'''let postflop_rank = |p: usize| -> usize { p };
-                    let (ip, oop)'''+s[m.end():]
-s=s.replace('let scaled_tax = base_tax * gap as f32 / 5.0;','let scaled_tax = base_tax * gap as f32;')
+sub_once(
+    r'let postflop_rank = \|p: usize\| -> usize \{\s*match p \{.*?\n\s*\}\s*\};\s*let \(ip, oop\)',
+'''let postflop_rank = |p: usize| -> usize {
+                        let sb = NUM_PLAYERS - 2;
+                        let bb = NUM_PLAYERS - 1;
+                        if p == sb { 0 } else if p == bb { 1 } else { p + 2 }
+                    };
+                    let (ip, oop)''',
+    "postflop rank",
+    re.S
+)
+s=s.replace(
+    'let scaled_tax = base_tax * gap as f32 / 5.0;',
+    'let scaled_tax = base_tax * gap as f32 / (NUM_PLAYERS - 1) as f32;'
+)
 
-for token in ['pub const NUM_PLAYERS: usize = 2;','["SB", "BB"]','p == 0 && self.config.sb_limp']:
+required=[
+    'pub const NUM_PLAYERS: usize = 2;',
+    'pub const POSITION_NAMES: [&str; 2] = ["SB", "BB"];',
+    'let sb = NUM_PLAYERS - 2;',
+    'p == NUM_PLAYERS - 2',
+    'base_tax * gap as f32 / (NUM_PLAYERS - 1) as f32'
+]
+for token in required:
     if token not in s:
         raise SystemExit(f"HU patch invariant missing: {token}")
 
