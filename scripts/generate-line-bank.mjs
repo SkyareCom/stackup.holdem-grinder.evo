@@ -1,30 +1,52 @@
 import {execFile} from "node:child_process";
 import {promisify} from "node:util";
 import {readFile,writeFile,mkdir,rm} from "node:fs/promises";
-import {resolve,join} from "node:path";
+import {resolve,join,dirname} from "node:path";
 import {createHash} from "node:crypto";
 
 const execFileAsync=promisify(execFile);
 const ROOT=resolve(process.cwd());
 const BIN=process.env.STACKUP_DCFR_BIN||join(ROOT,".stackup","dcfr-solver");
 const WORK=join(ROOT,".stackup","line-bank");
-const OUT=join(ROOT,"data","solver","line-bank.json");
+const OUT=process.env.STACKUP_LINE_OUT
+  ?resolve(ROOT,process.env.STACKUP_LINE_OUT)
+  :join(ROOT,"data","solver","line-bank.json");
 const ITER=Math.max(100,Number(process.env.STACKUP_LINE_ITERATIONS||160));
 await mkdir(WORK,{recursive:true});
+await mkdir(dirname(OUT),{recursive:true});
 
 const baseBank=JSON.parse(await readFile(join(ROOT,"data","solver","postflop.json"),"utf8"));
 const baseCallerOop=baseBank.find(s=>s?.matchup==="UTG vs BB"&&s?.scenario?.street==="FLOP");
 const baseAggressorOop=baseBank.find(s=>s?.matchup==="UTG vs HJ"&&s?.scenario?.street==="FLOP");
 if(!baseCallerOop||!baseAggressorOop)throw new Error("required_line_base_matchups_missing");
 
-const RUNOUTS=[
+const ALL_RUNOUTS=[
   {id:"a",flop:"As7d2c",turn:"Jh",river:"4s"},
   {id:"b",flop:"Qh8h3c",turn:"5d",river:"Ts"},
   {id:"c",flop:"9s8d6c",turn:"Kh",river:"2s"},
   {id:"d",flop:"KcQd5h",turn:"5s",river:"9c"},
   {id:"e",flop:"7s6s2d",turn:"8h",river:"Ac"},
-  {id:"f",flop:"Jc9c4d",turn:"2h",river:"Qs"}
+  {id:"f",flop:"Jc9c4d",turn:"2h",river:"Qs"},
+  {id:"g",flop:"AhKd7c",turn:"3s",river:"8d"},
+  {id:"h",flop:"Ts9h5c",turn:"Qd",river:"2c"},
+  {id:"i",flop:"8c8d3s",turn:"Kh",river:"6h"},
+  {id:"j",flop:"QsJd4h",turn:"9c",river:"Ac"},
+  {id:"k",flop:"6h5d2s",turn:"Tc",river:"Kc"},
+  {id:"l",flop:"Kd9s7h",turn:"4c",river:"Jd"},
+  {id:"m",flop:"AcQc6d",turn:"8s",river:"3h"},
+  {id:"n",flop:"JhTd3d",turn:"7s",river:"2c"},
+  {id:"o",flop:"9c7h4s",turn:"Ad",river:"5c"},
+  {id:"p",flop:"Ks8s5d",turn:"2h",river:"Qc"},
+  {id:"q",flop:"7d7c4h",turn:"Js",river:"9s"},
+  {id:"r",flop:"QcTc2h",turn:"6s",river:"Ad"},
+  {id:"s",flop:"8h6c3d",turn:"Kd",river:"Ts"},
+  {id:"t",flop:"Jd9s5h",turn:"4c",river:"2d"}
 ];
+const selectedRunoutId=String(process.env.STACKUP_LINE_RUNOUT_ID||"").trim();
+const RUNOUTS=selectedRunoutId
+  ?ALL_RUNOUTS.filter(x=>x.id===selectedRunoutId)
+  :ALL_RUNOUTS;
+if(selectedRunoutId&&!RUNOUTS.length)throw new Error("unknown_line_runout_"+selectedRunoutId);
 const POSITIONS=["UTG","HJ","CO","BTN","SB","BB"];
 const SUITS=["c","d","h","s"];
 const RANKS="AKQJT98765432";
@@ -138,15 +160,29 @@ function priorWeight(map,hand){
   return Number(map.get(comboKey(hand))?.weight||0);
 }
 function conditionRange(prior,node,spec){
-  const out=new Map();
-  if(!node)return out;
+  const raw=[];
+  if(!node)return new Map();
+  let maxWeight=0;
   for(const combo of node.combos||[]){
     const pw=priorWeight(prior,combo.hand);
     if(pw<=0)continue;
     const action=(combo.actions||[]).find(a=>actionMatches(a.action,spec));
     const p=Number(action?.weight??action?.frequency??0);
     const w=pw*p;
-    if(w>0.000001)out.set(comboKey(combo.hand),{hand:combo.hand,weight:w});
+    if(w>1e-10){
+      raw.push({hand:comboKey(combo.hand),weight:w});
+      if(w>maxWeight)maxWeight=w;
+    }
+  }
+  const out=new Map();
+  if(maxWeight<=0)return out;
+  // Bayesian conditioning changes relative combo weights. Rescaling the
+  // posterior so its largest weight is 1 preserves the exact relative range
+  // while preventing repeated street transitions from numerically pruning
+  // legitimate low-frequency combos.
+  for(const item of raw){
+    const weight=item.weight/maxWeight;
+    if(weight>1e-7)out.set(item.hand,{hand:item.hand,weight});
   }
   return out;
 }
@@ -514,7 +550,9 @@ const payload={
 };
 await writeFile(OUT,JSON.stringify(payload),"utf8");
 console.log(JSON.stringify({
+  selectedRunoutId:selectedRunoutId||null,
   spots:spots.length,failures:failures.length,
-  tags:[...new Set(spots.flatMap(s=>s.scenario?.tags||[]))].sort()
+  tags:[...new Set(spots.flatMap(s=>s.scenario?.tags||[]))].sort(),
+  failureDetails:failures
 },null,2));
-if(spots.length<12)process.exitCode=2;
+if(spots.length<(selectedRunoutId?2:12))process.exitCode=2;
