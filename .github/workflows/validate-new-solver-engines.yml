@@ -1,0 +1,103 @@
+name: Validate New Solver Engines
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/validate-new-solver-engines.yml"
+      - "scripts/generate-reentry-bank.py"
+      - "scripts/generate-opponent-profile-bank.py"
+      - "scripts/generate-multiway-tournament-bank.py"
+      - "scripts/generate-multiway-postflop-bank.py"
+      - "data/solver/opponent-profile-calibration.json"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-new-engines-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  utility-and-profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check numpy
+      - name: Fetch equity matrix
+        run: |
+          mkdir -p .stackup
+          curl --fail --location --retry 3             https://raw.githubusercontent.com/amaster97/poker_solver/f78f1b2bc338dd8cbb5226ecb8398bbdb3635676/assets/preflop_equity_169x169.npz             --output .stackup/preflop_equity_169x169.npz
+      - name: Generate re-entry and profile banks
+        env:
+          STACKUP_PREFLOP_EQUITY: ${{ github.workspace }}/.stackup/preflop_equity_169x169.npz
+          STACKUP_REENTRY_ITERATIONS: "4000"
+          STACKUP_REENTRY_MAX_NASHCONV: "0.0030"
+        run: |
+          python scripts/generate-reentry-bank.py
+          python scripts/generate-opponent-profile-bank.py
+      - name: Contract validation
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          for(const file of ['data/solver/reentry.json','data/solver/opponent-profile.json']){
+            const d=JSON.parse(fs.readFileSync(file,'utf8'));let n=0;
+            for(const s of d.spots||[])for(const h of s.strategy||[]){
+              const v=fake.StackUpSolvedSpotContract.validateSolvedDecision(s,h);
+              if(!v.ok)throw new Error(file+' '+s.id+'/'+h.hand+': '+v.errors.join(','));
+              n++;
+            }
+            if(n<3000)throw new Error(file+' smoke solved count too low '+n);
+            console.log(file,n);
+          }
+          NODE
+
+  multiway-tournament:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check numpy treys==0.1.8
+      - name: Generate multiway tournament bank
+        env:
+          STACKUP_MULTIWAY_SAMPLES: "400"
+          STACKUP_MULTIWAY_INDIFFERENCE_BB: "0.18"
+        run: python scripts/generate-multiway-tournament-bank.py
+      - name: Validate solved families
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');const d=JSON.parse(fs.readFileSync('data/solver/multiway-tournament.json','utf8'));
+          for(const k of ['multi_shove','bounty_iso','multiway_bounty'])if(Number(d.solvedByFamily?.[k]||0)<1500)throw new Error(k+' below floor');
+          console.log(d.solvedByFamily);
+          NODE
+
+  multiway-postflop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install --disable-pip-version-check numpy treys==0.1.8
+      - name: Generate multiway river bank
+        env:
+          STACKUP_MULTIWAY_RIVER_SAMPLES: "500"
+          STACKUP_MULTIWAY_RIVER_INDIFF_BB: "0.45"
+        run: python scripts/generate-multiway-postflop-bank.py
+      - name: Validate solved floor
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');const d=JSON.parse(fs.readFileSync('data/solver/multiway-postflop.json','utf8'));
+          if(Number(d.solvedPostflopMultiway||0)<1500)throw new Error('postflop multiway below floor');
+          console.log({solved:d.solvedPostflopMultiway,roots:d.spots?.length||0,rejected:d.rejected?.length||0});
+          NODE
