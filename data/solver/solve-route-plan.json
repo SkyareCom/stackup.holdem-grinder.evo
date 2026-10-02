@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-10-02T06:48:32.810Z",
+  "generatedAt": "2026-10-02T06:50:08.611Z",
   "mode": "STRICT_SOLVED_ONLY",
   "counts": {
-    "total": 139,
-    "readyToSolve": 139,
+    "total": 138,
+    "readyToSolve": 138,
     "engineRequired": 0,
     "unrouted": 0
   },
@@ -42,7 +42,6 @@
       "pre_special/sb_cobtn",
       "pre_special/cobtn",
       "pos/BTN",
-      "stack/20bb",
       "aggr_special/squeeze",
       "stack/18bb",
       "pos/UTG",
@@ -53,12 +52,12 @@
       "aggr_special/3bet_oop",
       "stack/15bb",
       "pre_special/cold_call",
+      "stack/20bb",
       "stack/10bb",
       "blind_special/heads_up_2max",
       "stack/100bb",
       "blind_special/blind_war",
-      "pos/CO",
-      "phase/middle"
+      "pos/CO"
     ],
     "build-reentry-bank.yml": [
       "extras/rebuy",
@@ -74,9 +73,6 @@
       "short_special/multi_shove",
       "pko_special/bounty_iso",
       "pko_special/multiway_bounty"
-    ],
-    "build-multiway-postflop-bank.yml": [
-      "post_special/postflop_multiway"
     ],
     "build-line-bank.yml": [
       "post_special/check_raise",
@@ -102,8 +98,8 @@
     "build-solver-bank.yml": [
       "math_special/implied_odds",
       "math_special/reverse_implied_odds",
-      "street/river",
       "street/turn",
+      "street/river",
       "street/flop",
       "math_special/equity_realization"
     ],
@@ -150,8 +146,8 @@
       "texture_special/pot_bet",
       "texture_special/overbet_125",
       "texture_special/overbet_150",
-      "texture_special/board_paired",
       "texture_special/board_monotone",
+      "texture_special/board_paired",
       "texture_special/board_low",
       "texture_special/board_connected",
       "texture_special/board_dynamic",
@@ -159,6 +155,9 @@
       "texture_special/bet_33",
       "texture_special/board_dry",
       "texture_special/board_static"
+    ],
+    "build-multiway-postflop-bank.yml": [
+      "post_special/postflop_multiway"
     ],
     "build-hu-pushfold-bank.yml": [
       "seats/s2"
@@ -362,22 +361,6 @@
       "engineId": "STACKUP_MULTIWAY_ICM",
       "workflow": "build-multiway-tournament-bank.yml",
       "generator": "scripts/generate-multiway-tournament-bank.py",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "post_special/postflop_multiway",
-      "section": "post_special",
-      "id": "postflop_multiway",
-      "label": "PÓS-FLOP MULTIWAY",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 0,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "STACKUP_MULTIWAY_POSTFLOP",
-      "workflow": "build-multiway-postflop-bank.yml",
-      "generator": "scripts/generate-multiway-postflop-bank.py",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -1485,38 +1468,6 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
-      "key": "stack/20bb",
-      "section": "stack",
-      "id": "20bb",
-      "label": "20BB",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 845,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "DCFR_PREFLOP_MULTISTACK",
-      "workflow": "build-preflop-multistack.yml",
-      "generator": "scripts/stackup-preflop-export.rs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "texture_special/board_paired",
-      "section": "texture_special",
-      "id": "board_paired",
-      "label": "PAIRED BOARD",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 979,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "DCFR_TEXTURE_SIZING",
-      "workflow": "build-texture-sizing-bank.yml",
-      "generator": "scripts/generate-texture-sizing-bank.mjs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
       "key": "aggr_special/squeeze",
       "section": "aggr_special",
       "id": "squeeze",
@@ -1606,6 +1557,22 @@
       "solved": 1051,
       "target": 1500,
       "requestedSolves": 449,
+      "status": "QUEUED",
+      "engineId": "DCFR_TEXTURE_SIZING",
+      "workflow": "build-texture-sizing-bank.yml",
+      "generator": "scripts/generate-texture-sizing-bank.mjs",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
+      "key": "texture_special/board_paired",
+      "section": "texture_special",
+      "id": "board_paired",
+      "label": "PAIRED BOARD",
+      "priority": 1,
+      "stage": "RECOVERY_TO_PUBLISH",
+      "solved": 1107,
+      "target": 1500,
+      "requestedSolves": 393,
       "status": "QUEUED",
       "engineId": "DCFR_TEXTURE_SIZING",
       "workflow": "build-texture-sizing-bank.yml",
@@ -1821,6 +1788,22 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
+      "key": "post_special/postflop_multiway",
+      "section": "post_special",
+      "id": "postflop_multiway",
+      "label": "PÓS-FLOP MULTIWAY",
+      "priority": 2,
+      "stage": "BUILD_CURRENT_GOAL",
+      "solved": 1892,
+      "target": 2000,
+      "requestedSolves": 108,
+      "status": "QUEUED",
+      "engineId": "STACKUP_MULTIWAY_POSTFLOP",
+      "workflow": "build-multiway-postflop-bank.yml",
+      "generator": "scripts/generate-multiway-postflop-bank.py",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
       "key": "ttype/pko",
       "section": "ttype",
       "id": "pko",
@@ -1965,35 +1948,19 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
-      "key": "texture_special/board_connected",
-      "section": "texture_special",
-      "id": "board_connected",
-      "label": "CONNECTED BOARD",
+      "key": "stack/20bb",
+      "section": "stack",
+      "id": "20bb",
+      "label": "20BB",
       "priority": 3,
       "stage": "GROW_5000",
-      "solved": 2898,
+      "solved": 2737,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED",
-      "engineId": "DCFR_TEXTURE_SIZING",
-      "workflow": "build-texture-sizing-bank.yml",
-      "generator": "scripts/generate-texture-sizing-bank.mjs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "texture_special/board_dynamic",
-      "section": "texture_special",
-      "id": "board_dynamic",
-      "label": "DYNAMIC BOARD",
-      "priority": 3,
-      "stage": "GROW_5000",
-      "solved": 2898,
-      "target": 5000,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "DCFR_TEXTURE_SIZING",
-      "workflow": "build-texture-sizing-bank.yml",
-      "generator": "scripts/generate-texture-sizing-bank.mjs",
+      "engineId": "DCFR_PREFLOP_MULTISTACK",
+      "workflow": "build-preflop-multistack.yml",
+      "generator": "scripts/stackup-preflop-export.rs",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -2045,19 +2012,35 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
-      "key": "street/river",
-      "section": "street",
-      "id": "river",
-      "label": "RIVER",
+      "key": "texture_special/board_connected",
+      "section": "texture_special",
+      "id": "board_connected",
+      "label": "CONNECTED BOARD",
       "priority": 3,
       "stage": "GROW_5000",
-      "solved": 4631,
+      "solved": 4159,
       "target": 5000,
-      "requestedSolves": 369,
+      "requestedSolves": 500,
       "status": "QUEUED",
-      "engineId": "DCFR_POSTFLOP_GENERAL",
-      "workflow": "build-solver-bank.yml",
-      "generator": "scripts/generate-solver-bank.mjs",
+      "engineId": "DCFR_TEXTURE_SIZING",
+      "workflow": "build-texture-sizing-bank.yml",
+      "generator": "scripts/generate-texture-sizing-bank.mjs",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
+      "key": "texture_special/board_dynamic",
+      "section": "texture_special",
+      "id": "board_dynamic",
+      "label": "DYNAMIC BOARD",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 4159,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED",
+      "engineId": "DCFR_TEXTURE_SIZING",
+      "workflow": "build-texture-sizing-bank.yml",
+      "generator": "scripts/generate-texture-sizing-bank.mjs",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -2221,6 +2204,22 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
+      "key": "street/river",
+      "section": "street",
+      "id": "river",
+      "label": "RIVER",
+      "priority": 4,
+      "stage": "GROW_10000",
+      "solved": 6523,
+      "target": 10000,
+      "requestedSolves": 500,
+      "status": "QUEUED",
+      "engineId": "DCFR_POSTFLOP_GENERAL",
+      "workflow": "build-solver-bank.yml",
+      "generator": "scripts/generate-solver-bank.mjs",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
       "key": "phase/late",
       "section": "phase",
       "id": "late",
@@ -2234,22 +2233,6 @@
       "engineId": "STACKUP_ICM_PKO",
       "workflow": "build-tournament-bank.yml",
       "generator": "scripts/generate-tournament-bank.py",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "texture_special/board_twotone",
-      "section": "texture_special",
-      "id": "board_twotone",
-      "label": "TWO-TONE BOARD",
-      "priority": 4,
-      "stage": "GROW_10000",
-      "solved": 9628,
-      "target": 10000,
-      "requestedSolves": 372,
-      "status": "QUEUED",
-      "engineId": "DCFR_TEXTURE_SIZING",
-      "workflow": "build-texture-sizing-bank.yml",
-      "generator": "scripts/generate-texture-sizing-bank.mjs",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -2298,6 +2281,22 @@
       "engineId": "STACKUP_ICM_PKO",
       "workflow": "build-tournament-bank.yml",
       "generator": "scripts/generate-tournament-bank.py",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
+      "key": "texture_special/board_twotone",
+      "section": "texture_special",
+      "id": "board_twotone",
+      "label": "TWO-TONE BOARD",
+      "priority": 5,
+      "stage": "GROW_20000",
+      "solved": 11520,
+      "target": 20000,
+      "requestedSolves": 500,
+      "status": "QUEUED",
+      "engineId": "DCFR_TEXTURE_SIZING",
+      "workflow": "build-texture-sizing-bank.yml",
+      "generator": "scripts/generate-texture-sizing-bank.mjs",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -2355,7 +2354,7 @@
       "label": "DRY BOARD",
       "priority": 5,
       "stage": "GROW_20000",
-      "solved": 18336,
+      "solved": 18967,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED",
@@ -2371,29 +2370,13 @@
       "label": "STATIC BOARD",
       "priority": 5,
       "stage": "GROW_20000",
-      "solved": 18336,
+      "solved": 18967,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED",
       "engineId": "DCFR_TEXTURE_SIZING",
       "workflow": "build-texture-sizing-bank.yml",
       "generator": "scripts/generate-texture-sizing-bank.mjs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "phase/middle",
-      "section": "phase",
-      "id": "middle",
-      "label": "MIDDLE",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 19266,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "DCFR_PREFLOP_MULTISTACK",
-      "workflow": "build-preflop-multistack.yml",
-      "generator": "scripts/stackup-preflop-export.rs",
       "routeStatus": "READY_TO_SOLVE"
     }
   ]

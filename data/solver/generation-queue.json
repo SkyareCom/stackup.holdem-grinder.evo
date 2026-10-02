@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T06:48:32.783Z",
+  "generatedAt": "2026-10-02T06:50:08.582Z",
   "policyVersion": 1,
   "mode": "STRICT_SOLVED_ONLY",
   "batchSize": 500,
@@ -141,18 +141,6 @@
       "section": "pko_special",
       "id": "multiway_bounty",
       "label": "MULTIWAY BOUNTY",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 0,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "post_special/postflop_multiway",
-      "section": "post_special",
-      "id": "postflop_multiway",
-      "label": "PÓS-FLOP MULTIWAY",
       "priority": 1,
       "stage": "RECOVERY_TO_PUBLISH",
       "solved": 0,
@@ -989,30 +977,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "stack/20bb",
-      "section": "stack",
-      "id": "20bb",
-      "label": "20BB",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 845,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/board_paired",
-      "section": "texture_special",
-      "id": "board_paired",
-      "label": "PAIRED BOARD",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 979,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
       "key": "aggr_special/squeeze",
       "section": "aggr_special",
       "id": "squeeze",
@@ -1082,6 +1046,18 @@
       "solved": 1051,
       "target": 1500,
       "requestedSolves": 449,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/board_paired",
+      "section": "texture_special",
+      "id": "board_paired",
+      "label": "PAIRED BOARD",
+      "priority": 1,
+      "stage": "RECOVERY_TO_PUBLISH",
+      "solved": 1107,
+      "target": 1500,
+      "requestedSolves": 393,
       "status": "QUEUED"
     },
     {
@@ -1241,6 +1217,18 @@
       "status": "QUEUED"
     },
     {
+      "key": "post_special/postflop_multiway",
+      "section": "post_special",
+      "id": "postflop_multiway",
+      "label": "PÓS-FLOP MULTIWAY",
+      "priority": 2,
+      "stage": "BUILD_CURRENT_GOAL",
+      "solved": 1892,
+      "target": 2000,
+      "requestedSolves": 108,
+      "status": "QUEUED"
+    },
+    {
       "key": "ttype/pko",
       "section": "ttype",
       "id": "pko",
@@ -1349,25 +1337,13 @@
       "status": "QUEUED"
     },
     {
-      "key": "texture_special/board_connected",
-      "section": "texture_special",
-      "id": "board_connected",
-      "label": "CONNECTED BOARD",
+      "key": "stack/20bb",
+      "section": "stack",
+      "id": "20bb",
+      "label": "20BB",
       "priority": 3,
       "stage": "GROW_5000",
-      "solved": 2898,
-      "target": 5000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/board_dynamic",
-      "section": "texture_special",
-      "id": "board_dynamic",
-      "label": "DYNAMIC BOARD",
-      "priority": 3,
-      "stage": "GROW_5000",
-      "solved": 2898,
+      "solved": 2737,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -1409,15 +1385,27 @@
       "status": "QUEUED"
     },
     {
-      "key": "street/river",
-      "section": "street",
-      "id": "river",
-      "label": "RIVER",
+      "key": "texture_special/board_connected",
+      "section": "texture_special",
+      "id": "board_connected",
+      "label": "CONNECTED BOARD",
       "priority": 3,
       "stage": "GROW_5000",
-      "solved": 4631,
+      "solved": 4159,
       "target": 5000,
-      "requestedSolves": 369,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/board_dynamic",
+      "section": "texture_special",
+      "id": "board_dynamic",
+      "label": "DYNAMIC BOARD",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 4159,
+      "target": 5000,
+      "requestedSolves": 500,
       "status": "QUEUED"
     },
     {
@@ -1541,6 +1529,18 @@
       "status": "QUEUED"
     },
     {
+      "key": "street/river",
+      "section": "street",
+      "id": "river",
+      "label": "RIVER",
+      "priority": 4,
+      "stage": "GROW_10000",
+      "solved": 6523,
+      "target": 10000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
       "key": "phase/late",
       "section": "phase",
       "id": "late",
@@ -1550,18 +1550,6 @@
       "solved": 9464,
       "target": 10000,
       "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "texture_special/board_twotone",
-      "section": "texture_special",
-      "id": "board_twotone",
-      "label": "TWO-TONE BOARD",
-      "priority": 4,
-      "stage": "GROW_10000",
-      "solved": 9628,
-      "target": 10000,
-      "requestedSolves": 372,
       "status": "QUEUED"
     },
     {
@@ -1596,6 +1584,18 @@
       "priority": 5,
       "stage": "GROW_20000",
       "solved": 10816,
+      "target": 20000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "texture_special/board_twotone",
+      "section": "texture_special",
+      "id": "board_twotone",
+      "label": "TWO-TONE BOARD",
+      "priority": 5,
+      "stage": "GROW_20000",
+      "solved": 11520,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -1643,7 +1643,7 @@
       "label": "DRY BOARD",
       "priority": 5,
       "stage": "GROW_20000",
-      "solved": 18336,
+      "solved": 18967,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -1655,19 +1655,7 @@
       "label": "STATIC BOARD",
       "priority": 5,
       "stage": "GROW_20000",
-      "solved": 18336,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "phase/middle",
-      "section": "phase",
-      "id": "middle",
-      "label": "MIDDLE",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 19266,
+      "solved": 18967,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED"
