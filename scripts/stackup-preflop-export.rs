@@ -7,6 +7,7 @@ use serde::Serialize;
 use std::collections::{BTreeSet, HashSet};
 use std::fs::File;
 use std::io::BufReader;
+use std::env;
 
 #[derive(Clone, Serialize)]
 struct Event {
@@ -47,6 +48,16 @@ struct Scenario {
     actionHistory: Vec<Event>,
     tags: Vec<String>,
     solverNode: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    phase: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    tournamentType: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    fieldSize: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    opponentProfile: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    extras: Vec<String>,
     provenance: serde_json::Value,
 }
 
@@ -58,6 +69,33 @@ struct Spot {
     solveId: String,
     scenario: Scenario,
     strategy: Vec<HandStrategy>,
+}
+
+fn env_opt(name: &str) -> Option<String> {
+    env::var(name).ok().map(|x| x.trim().to_string()).filter(|x| !x.is_empty())
+}
+
+fn solve_context_id() -> String {
+    env_opt("STACKUP_SOLVE_CONTEXT_ID").unwrap_or_else(|| "default".to_string())
+}
+
+fn game_type() -> String {
+    env_opt("STACKUP_GAME_TYPE").unwrap_or_else(|| "TOURNAMENT".to_string()).to_uppercase()
+}
+
+fn extra_tags() -> Vec<String> {
+    env_opt("STACKUP_EXTRA_TAGS").unwrap_or_default()
+        .split(',').map(|x| x.trim().to_string()).filter(|x| !x.is_empty()).collect()
+}
+
+fn extras() -> Vec<String> {
+    env_opt("STACKUP_EXTRAS").unwrap_or_default()
+        .split(',').map(|x| x.trim().to_string()).filter(|x| !x.is_empty()).collect()
+}
+
+fn slug(value: &str) -> String {
+    value.chars().map(|ch| if ch.is_ascii_alphanumeric() { ch.to_ascii_lowercase() } else { '-' })
+        .collect::<String>().split('-').filter(|x| !x.is_empty()).collect::<Vec<_>>().join("-")
 }
 
 fn action_kind(a: PreflopAction) -> &'static str {
@@ -272,7 +310,10 @@ fn walk(
     let villain = active.iter().copied().filter(|&p| p != hero_idx)
         .max_by_key(|&p| position_rank(POSITION_NAMES[p]))
         .map(|p| POSITION_NAMES[p].to_string());
-    let tags = semantic_tags(&state, events);
+    let mut tags = semantic_tags(&state, events);
+    tags.extend(extra_tags());
+    tags.sort();
+    tags.dedup();
     let strategy = strategy_at(bp, &state, history);
 
     if !strategy.is_empty() && !tags.is_empty() {
@@ -291,14 +332,16 @@ fn walk(
         }
         let node_id = if history.is_empty() { "root".to_string() }
             else { history.iter().map(|x| x.to_string()).collect::<Vec<_>>().join("-") };
-        let id = format!("dcfr-preflop-node-{}", node_id);
+        let context = solve_context_id();
+        let context_slug = slug(&context);
+        let id = format!("dcfr-preflop-{}-node-{}", context_slug, node_id);
         spots.push(Spot {
             id: id.clone(),
             solver: "DCFR_SOLVER".to_string(),
-            version: "preflop-blueprint-v1".to_string(),
-            solveId: format!("preflop-blueprint|{}", node_id),
+            version: "preflop-blueprint-v2-contextual".to_string(),
+            solveId: format!("preflop-blueprint|{}|{}", context, node_id),
             scenario: Scenario {
-                gameType: "TOURNAMENT".to_string(),
+                gameType: game_type(),
                 street: "PRE-FLOP".to_string(),
                 tableSize: NUM_PLAYERS,
                 heroPosition: hero,
@@ -313,11 +356,23 @@ fn walk(
                 actionHistory: events.clone(),
                 tags,
                 solverNode: node_id,
+                phase: env_opt("STACKUP_PHASE").map(|x| x.to_uppercase()),
+                tournamentType: env_opt("STACKUP_TOURNAMENT_TYPE").map(|x| x.to_uppercase()),
+                fieldSize: env_opt("STACKUP_FIELD_SIZE"),
+                opponentProfile: env_opt("STACKUP_OPPONENT_PROFILE"),
+                extras: extras(),
                 provenance: serde_json::json!({
                     "strategySource":"DCFR_PREFLOP_BLUEPRINT",
                     "upstream":"exinori/DCFR-SOLVER",
                     "license":"MIT",
-                    "iterations":bp.iterations
+                    "iterations":bp.iterations,
+                    "solveContextId":context,
+                    "gameType":game_type(),
+                    "phase":env_opt("STACKUP_PHASE"),
+                    "tournamentType":env_opt("STACKUP_TOURNAMENT_TYPE"),
+                    "fieldSize":env_opt("STACKUP_FIELD_SIZE"),
+                    "opponentProfile":env_opt("STACKUP_OPPONENT_PROFILE"),
+                    "extras":extras()
                 }),
             },
             strategy,
