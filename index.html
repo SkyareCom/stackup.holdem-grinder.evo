@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="runtime-performance-v2">
+<meta name="grinder-build" content="runtime-fluidity-v2">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -1085,6 +1085,19 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const SPOT_VISUAL_FOLDS=new Set();
   const SPOT_VISUAL_ACTIONS=new Map();
   const SPOT_ANALYSIS_CACHE=new Map();
+  let SPOT_TABLE_RENDER_KEY='';
+  let SPOT_RENDER_RAF=0;
+  let SPOT_LAST_BOX='';
+  let SPOT_LAST_CONTENT_BOX='';
+
+  function scheduleSpotTableRender(force){
+    if(force)SPOT_TABLE_RENDER_KEY='';
+    if(SPOT_RENDER_RAF)return;
+    SPOT_RENDER_RAF=requestAnimationFrame(()=>{
+      SPOT_RENDER_RAF=0;
+      if(!tb.hidden)renderTable();
+    });
+  }
 
   function cloneSpotValue(value){
     if(value===undefined)return undefined;
@@ -1675,7 +1688,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
     solverSpotLoading=true;
     if(typeof setSpotActionsBusy==='function'&&!tb.hidden)setSpotActionsBusy(true);
-    renderSpotSupport();
+    if(!spotSupport.hidden)renderSpotSupport();
     try{
       const spot=await client.next(filters);
       SOLVER_FILTER_KEY=filterKey;
@@ -1708,7 +1721,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       if(typeof setSpotActionsBusy==='function'&&!tb.hidden){
         setSpotActionsBusy(!!currentSpotEntry()?.answer||SPOT_DECISION_SEQUENCE_RUNNING);
       }
-      renderSpotSupport();
+      if(!spotSupport.hidden)renderSpotSupport();
     }
   }
 
@@ -2336,8 +2349,23 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     },animationMs);
   });
 
+  function spotTableRenderSignature(W,H){
+    const players=(SOLVER_TABLE_STATE?.players||[]).map(p=>[
+      p.position,Number(p.stack)||0,!!p.folded,!!p.allIn,Number(p.committed)||0
+    ].join(':')).join(',');
+    const actions=[...SPOT_VISUAL_ACTIONS.entries()].map(([k,v])=>k+':'+String(v?.kind||'')+':'+String(v?.label||'')).join(',');
+    return [
+      Math.round(W),Math.round(H),L(),spotMode(),
+      SPOT_TRAINING_STARTED?'1':'0',SPOT_STAGE_INTRO?'1':'0',solverSpotLoading?'1':'0',
+      SOLVER_SPOT?.id||'',Number(SOLVER_TABLE_STATE?.pot)||0,
+      players,actions,[...SPOT_VISUAL_FOLDS].join(','),currentSpotEntry()?.answer?'1':'0'
+    ].join('|');
+  }
   function renderTable(){
     const W=tb.clientWidth,H=tb.clientHeight;if(!W||!H)return;
+    const renderKey=spotTableRenderSignature(W,H);
+    if(renderKey===SPOT_TABLE_RENDER_KEY&&tb.childElementCount)return;
+    SPOT_TABLE_RENDER_KEY=renderKey;
     // Mesa GRANDE: ocupa o centro; jogadores usam a faixa externa, sem reduzir o feltro.
     const feltLeft=Math.max(64,W*.17),feltRight=W-feltLeft;
     const top=Math.max(54,H*.095),bot=H-Math.max(58,H*.095);
@@ -2404,18 +2432,37 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       startSpotTraining();
     }
   });
-  try{new ResizeObserver(()=>{if(!tb.hidden)renderTable();}).observe(tb);}catch(e){}
+  try{
+    new ResizeObserver(()=>{
+      if(tb.hidden)return;
+      const key=Math.round(tb.clientWidth)+'x'+Math.round(tb.clientHeight);
+      if(key===SPOT_LAST_BOX)return;
+      SPOT_LAST_BOX=key;
+      scheduleSpotTableRender(true);
+    }).observe(tb);
+  }catch(e){}
   function sizeSpotStage(){
     const content=$('.content'),page=$('#page');
-    if(!content||!page)return;
+    if(!content||!page)return false;
     const available=Math.max(0,content.clientHeight);
-    /* Antes de iniciar, o resumo usa toda a área disponível. Depois,
-       reservamos 88px dos botões + 6px de gap para a mesa. */
     const reserved=SPOT_TRAINING_STARTED?94:0;
     const tableHeight=Math.max(220,Math.floor(available-reserved));
-    page.style.setProperty('--spot-table-height',tableHeight+'px');
+    const next=tableHeight+'px';
+    if(page.style.getPropertyValue('--spot-table-height')===next)return false;
+    page.style.setProperty('--spot-table-height',next);
+    return true;
   }
-  try{new ResizeObserver(()=>{if(cur==='spots'&&!sub.spots.length){sizeSpotStage();requestAnimationFrame(renderTable);}}).observe($('.content'));}catch(_){}
+  try{
+    new ResizeObserver(()=>{
+      if(cur!=='spots'||sub.spots.length)return;
+      const content=$('.content');
+      const key=Math.round(content?.clientWidth||0)+'x'+Math.round(content?.clientHeight||0);
+      if(key===SPOT_LAST_CONTENT_BOX)return;
+      SPOT_LAST_CONTENT_BOX=key;
+      const changed=sizeSpotStage();
+      scheduleSpotTableRender(changed);
+    }).observe($('.content'));
+  }catch(_){};
 
   function syncSpots(){
     const on=cur==='spots'&&!sub.spots.length;
@@ -2433,13 +2480,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         spotActions.hidden=true;
         spotSupport.hidden=true;
         setSpotActionsBusy(true);
-        requestAnimationFrame(renderTable);
+        scheduleSpotTableRender(true);
         // Preload while the user reviews the selected filters. Nothing from the
         // table is revealed until INICIAR TREINO is pressed.
         loadSolverSpot(false).then(()=>{
-          if(cur==='spots'&&!sub.spots.length&&!SPOT_TRAINING_STARTED)renderTable();
+          if(cur==='spots'&&!sub.spots.length&&!SPOT_TRAINING_STARTED)scheduleSpotTableRender(true);
         }).catch(()=>{
-          if(cur==='spots'&&!sub.spots.length&&!SPOT_TRAINING_STARTED)renderTable();
+          if(cur==='spots'&&!sub.spots.length&&!SPOT_TRAINING_STARTED)scheduleSpotTableRender(true);
         });
         return;
       }
@@ -2450,7 +2497,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       spotActions.style.visibility='';
       renderSpotActions();
       setSpotActionsBusy(!!currentSpotEntry()?.answer||SPOT_DECISION_SEQUENCE_RUNNING);
-      requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
+      scheduleSpotTableRender(true);requestAnimationFrame(()=>{if(!spotSupport.hidden)renderSpotSupport();});
       loadSolverSpot(false).then(spot=>{
         if(spot&&cur==='spots'&&!sub.spots.length&&!currentSpotEntry()?.answer&&!SPOT_DECISION_SEQUENCE_RUNNING){
           playSpotDecisionSequence(spot);
@@ -3741,6 +3788,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       contain:layout style;
     }
     @media(max-width:600px){
+      .cardsbox .cards{mix-blend-mode:normal!important}
+      .felt{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+      .seat.hero.spot-turn .av,.seat.spot-acting .av{animation:none!important}
       .tower,.chip,.thead,.hbtn,.tabbar,.sectionhead,.sectiontitle,
       .statscard,.statskpi,.statshero,.statssubject,.statssession,.statstraining,
       .personalcard,.personalhero,.coachcard,.perfcard,.perfduel,.perfrank,
@@ -3753,6 +3803,24 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
   `;
   R.appendChild(runtimePerformanceStyle);
+
+  const fluidNavigationStyle=document.createElement('style');
+  fluidNavigationStyle.textContent=`
+    .content{
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      scroll-behavior:auto!important;
+    }
+    button{touch-action:manipulation}
+    .page{transform:translateZ(0)}
+    @media(max-width:600px){
+      .tower,.chip,.thead,.hbtn,.tab,.internalnav button,
+      .statsnav button,.personaltabs button,.personalactions button{
+        transition-duration:90ms!important;
+      }
+    }
+  `;
+  R.appendChild(fluidNavigationStyle);
 
   // ===== REGRA VISUAL GLOBAL: SEM MOLDURAS EXTERNAS =====
   const noOuterFramesStyle=document.createElement('style');
@@ -3869,7 +3937,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(btn.dataset.internalAction==='home')goInternalHome();
   });
 
-  function renderHome(){ hg.innerHTML=HORD.map(k=>`<button class="tower" data-k="${k}">${HICONS[k]}<b>${k==='ia'?T2[L()][k].replace(' ','\n'):k==='api'?T2[L()][k]:brk(T2[L()]['card_'+k]||T2[L()][k])}</b></button>`).join(''); }
+  let HOME_RENDER_LANG='';
+  function renderHome(force){
+    if(!force&&HOME_RENDER_LANG===L()&&hg.childElementCount)return;
+    HOME_RENDER_LANG=L();
+    hg.innerHTML=HORD.map(k=>`<button class="tower" data-k="${k}">${HICONS[k]}<b>${k==='ia'?T2[L()][k].replace(' ','\n'):k==='api'?T2[L()][k]:brk(T2[L()]['card_'+k]||T2[L()][k])}</b></button>`).join('');
+  }
   hg.addEventListener('click',e=>{ const c=e.target.closest('.tower'); if(!c)return; const k=c.dataset.k;
     c.classList.add('on');
     requestAnimationFrame(()=>{ if(HSUB.includes(k)){ sub.home.push(k); show('home',false);} else show(k,true); });
@@ -3893,10 +3966,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(a&&pg?.animate&&!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches){
       try{
         pg.getAnimations?.().forEach(anim=>{if(anim.id==='stackup-nav')anim.cancel();});
+        pg.style.willChange='transform,opacity';
         const anim=pg.animate(
-          [{transform:'translate3d('+(a>0?'8px':'-8px')+',0,0)',opacity:.86},{transform:'translate3d(0,0,0)',opacity:1}],
-          {duration:110,easing:'cubic-bezier(.2,.8,.2,1)'}
+          [{transform:'translate3d('+(a>0?'5px':'-5px')+',0,0)',opacity:.94},{transform:'translate3d(0,0,0)',opacity:1}],
+          {duration:85,easing:'cubic-bezier(.2,.75,.2,1)'}
         );
+        anim.finished.finally(()=>{pg.style.willChange='';}).catch(()=>{pg.style.willChange='';});
         anim.id='stackup-nav';
       }catch(_){}
     }
