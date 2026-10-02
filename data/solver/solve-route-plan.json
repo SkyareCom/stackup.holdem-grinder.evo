@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T06:50:36.144Z",
+  "generatedAt": "2026-10-02T06:56:41.215Z",
   "mode": "STRICT_SOLVED_ONLY",
   "counts": {
     "total": 138,
@@ -34,27 +34,27 @@
       "aggr_special/call_4bet",
       "aggr_special/cold_4bet",
       "stack/25bb",
-      "pre_special/bb_mp",
       "pre_special/vs_open_ip",
       "aggr_special/3bet_ip",
       "aggr_special/4bet_bluff",
       "phase/early",
       "pre_special/sb_cobtn",
       "pre_special/cobtn",
-      "pos/BTN",
       "aggr_special/squeeze",
       "pos/UTG",
-      "stack/5bb",
       "pre_special/open_by_pos",
       "pos/HJ",
       "stack/18bb",
+      "stack/5bb",
       "pre_special/vs_open_oop",
       "aggr_special/3bet_oop",
+      "pos/BTN",
       "stack/15bb",
       "pre_special/cold_call",
       "stack/20bb",
-      "stack/10bb",
+      "pre_special/bb_mp",
       "blind_special/heads_up_2max",
+      "stack/10bb",
       "stack/100bb",
       "blind_special/blind_war",
       "pos/CO"
@@ -64,11 +64,6 @@
       "pos/UTG+2",
       "pos/LJ",
       "seats/s9"
-    ],
-    "build-multiway-tournament-bank.yml": [
-      "short_special/multi_shove",
-      "pko_special/bounty_iso",
-      "pko_special/multiway_bounty"
     ],
     "build-line-bank.yml": [
       "post_special/check_raise",
@@ -121,7 +116,6 @@
       "phase/ft",
       "icm_special/icm_pay_jump",
       "pko_special/covering_stack",
-      "ttype/pko",
       "fsize/50",
       "pko_special/pko_math",
       "fsize/1000+",
@@ -129,10 +123,11 @@
       "icm_special/big_stack_pressure",
       "icm_special/mid_stack_pressure",
       "icm_special/short_stack_survival",
+      "ttype/pko",
       "phase/bubble",
-      "phase/late",
       "fsize/100",
-      "short_special/call_shove"
+      "short_special/call_shove",
+      "phase/late"
     ],
     "build-texture-sizing-bank.yml": [
       "texture_special/bet_25",
@@ -155,6 +150,11 @@
     "build-reentry-bank.yml": [
       "extras/rebuy",
       "extras/addon"
+    ],
+    "build-multiway-tournament-bank.yml": [
+      "short_special/multi_shove",
+      "pko_special/bounty_iso",
+      "pko_special/multiway_bounty"
     ],
     "build-multiway-postflop-bank.yml": [
       "post_special/postflop_multiway"
@@ -265,54 +265,6 @@
       "engineId": "DCFR_PREFLOP_MULTISTACK",
       "workflow": "build-preflop-multistack.yml",
       "generator": "scripts/stackup-preflop-export.rs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "short_special/multi_shove",
-      "section": "short_special",
-      "id": "multi_shove",
-      "label": "MULTI SHOVE",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 0,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "STACKUP_MULTIWAY_ICM",
-      "workflow": "build-multiway-tournament-bank.yml",
-      "generator": "scripts/generate-multiway-tournament-bank.py",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "pko_special/bounty_iso",
-      "section": "pko_special",
-      "id": "bounty_iso",
-      "label": "BOUNTY ISO",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 0,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "STACKUP_MULTIWAY_ICM",
-      "workflow": "build-multiway-tournament-bank.yml",
-      "generator": "scripts/generate-multiway-tournament-bank.py",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "pko_special/multiway_bounty",
-      "section": "pko_special",
-      "id": "multiway_bounty",
-      "label": "MULTIWAY BOUNTY",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 0,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "STACKUP_MULTIWAY_ICM",
-      "workflow": "build-multiway-tournament-bank.yml",
-      "generator": "scripts/generate-multiway-tournament-bank.py",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -972,22 +924,6 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
-      "key": "pre_special/bb_mp",
-      "section": "pre_special",
-      "id": "bb_mp",
-      "label": "BB × MP",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 507,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "DCFR_PREFLOP_MULTISTACK",
-      "workflow": "build-preflop-multistack.yml",
-      "generator": "scripts/stackup-preflop-export.rs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
       "key": "pre_special/vs_open_ip",
       "section": "pre_special",
       "id": "vs_open_ip",
@@ -1404,22 +1340,6 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
-      "key": "pos/BTN",
-      "section": "pos",
-      "id": "BTN",
-      "label": "BTN",
-      "priority": 1,
-      "stage": "RECOVERY_TO_PUBLISH",
-      "solved": 845,
-      "target": 1500,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "DCFR_PREFLOP_MULTISTACK",
-      "workflow": "build-preflop-multistack.yml",
-      "generator": "scripts/stackup-preflop-export.rs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
       "key": "aggr_special/squeeze",
       "section": "aggr_special",
       "id": "squeeze",
@@ -1692,22 +1612,6 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
-      "key": "stack/5bb",
-      "section": "stack",
-      "id": "5bb",
-      "label": "5BB",
-      "priority": 2,
-      "stage": "BUILD_CURRENT_GOAL",
-      "solved": 1690,
-      "target": 2000,
-      "requestedSolves": 310,
-      "status": "QUEUED",
-      "engineId": "DCFR_PREFLOP_MULTISTACK",
-      "workflow": "build-preflop-multistack.yml",
-      "generator": "scripts/stackup-preflop-export.rs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
       "key": "pre_special/open_by_pos",
       "section": "pre_special",
       "id": "open_by_pos",
@@ -1721,6 +1625,54 @@
       "engineId": "DCFR_PREFLOP_MULTISTACK",
       "workflow": "build-preflop-multistack.yml",
       "generator": "scripts/stackup-preflop-export.rs",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
+      "key": "short_special/multi_shove",
+      "section": "short_special",
+      "id": "multi_shove",
+      "label": "MULTI SHOVE",
+      "priority": 2,
+      "stage": "BUILD_CURRENT_GOAL",
+      "solved": 1690,
+      "target": 2000,
+      "requestedSolves": 310,
+      "status": "QUEUED",
+      "engineId": "STACKUP_MULTIWAY_ICM",
+      "workflow": "build-multiway-tournament-bank.yml",
+      "generator": "scripts/generate-multiway-tournament-bank.py",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
+      "key": "pko_special/bounty_iso",
+      "section": "pko_special",
+      "id": "bounty_iso",
+      "label": "BOUNTY ISO",
+      "priority": 2,
+      "stage": "BUILD_CURRENT_GOAL",
+      "solved": 1690,
+      "target": 2000,
+      "requestedSolves": 310,
+      "status": "QUEUED",
+      "engineId": "STACKUP_MULTIWAY_ICM",
+      "workflow": "build-multiway-tournament-bank.yml",
+      "generator": "scripts/generate-multiway-tournament-bank.py",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
+      "key": "pko_special/multiway_bounty",
+      "section": "pko_special",
+      "id": "multiway_bounty",
+      "label": "MULTIWAY BOUNTY",
+      "priority": 2,
+      "stage": "BUILD_CURRENT_GOAL",
+      "solved": 1690,
+      "target": 2000,
+      "requestedSolves": 310,
+      "status": "QUEUED",
+      "engineId": "STACKUP_MULTIWAY_ICM",
+      "workflow": "build-multiway-tournament-bank.yml",
+      "generator": "scripts/generate-multiway-tournament-bank.py",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -1772,22 +1724,6 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
-      "key": "ttype/pko",
-      "section": "ttype",
-      "id": "pko",
-      "label": "PKO",
-      "priority": 3,
-      "stage": "GROW_5000",
-      "solved": 2028,
-      "target": 5000,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "STACKUP_ICM_PKO",
-      "workflow": "build-tournament-bank.yml",
-      "generator": "scripts/generate-tournament-bank.py",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
       "key": "fsize/50",
       "section": "fsize",
       "id": "50",
@@ -1836,6 +1772,22 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
+      "key": "stack/5bb",
+      "section": "stack",
+      "id": "5bb",
+      "label": "5BB",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2197,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED",
+      "engineId": "DCFR_PREFLOP_MULTISTACK",
+      "workflow": "build-preflop-multistack.yml",
+      "generator": "scripts/stackup-preflop-export.rs",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
       "key": "pre_special/vs_open_oop",
       "section": "pre_special",
       "id": "vs_open_oop",
@@ -1881,6 +1833,22 @@
       "engineId": "STACKUP_ICM_PKO",
       "workflow": "build-tournament-bank.yml",
       "generator": "scripts/generate-tournament-bank.py",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
+      "key": "pos/BTN",
+      "section": "pos",
+      "id": "BTN",
+      "label": "BTN",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2535,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED",
+      "engineId": "DCFR_PREFLOP_MULTISTACK",
+      "workflow": "build-preflop-multistack.yml",
+      "generator": "scripts/stackup-preflop-export.rs",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -1996,6 +1964,22 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
+      "key": "pre_special/bb_mp",
+      "section": "pre_special",
+      "id": "bb_mp",
+      "label": "BB × MP",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 3887,
+      "target": 5000,
+      "requestedSolves": 500,
+      "status": "QUEUED",
+      "engineId": "DCFR_PREFLOP_MULTISTACK",
+      "workflow": "build-preflop-multistack.yml",
+      "generator": "scripts/stackup-preflop-export.rs",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
       "key": "texture_special/board_connected",
       "section": "texture_special",
       "id": "board_connected",
@@ -2025,22 +2009,6 @@
       "engineId": "DCFR_TEXTURE_SIZING",
       "workflow": "build-texture-sizing-bank.yml",
       "generator": "scripts/generate-texture-sizing-bank.mjs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "stack/10bb",
-      "section": "stack",
-      "id": "10bb",
-      "label": "10BB",
-      "priority": 3,
-      "stage": "GROW_5000",
-      "solved": 4394,
-      "target": 5000,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "DCFR_PREFLOP_MULTISTACK",
-      "workflow": "build-preflop-multistack.yml",
-      "generator": "scripts/stackup-preflop-export.rs",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -2156,6 +2124,38 @@
       "routeStatus": "READY_TO_SOLVE"
     },
     {
+      "key": "stack/10bb",
+      "section": "stack",
+      "id": "10bb",
+      "label": "10BB",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 4901,
+      "target": 5000,
+      "requestedSolves": 99,
+      "status": "QUEUED",
+      "engineId": "DCFR_PREFLOP_MULTISTACK",
+      "workflow": "build-preflop-multistack.yml",
+      "generator": "scripts/stackup-preflop-export.rs",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
+      "key": "ttype/pko",
+      "section": "ttype",
+      "id": "pko",
+      "label": "PKO",
+      "priority": 4,
+      "stage": "GROW_10000",
+      "solved": 5408,
+      "target": 10000,
+      "requestedSolves": 500,
+      "status": "QUEUED",
+      "engineId": "STACKUP_ICM_PKO",
+      "workflow": "build-tournament-bank.yml",
+      "generator": "scripts/generate-tournament-bank.py",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
       "key": "stack/100bb",
       "section": "stack",
       "id": "100bb",
@@ -2217,22 +2217,6 @@
       "engineId": "DCFR_POSTFLOP_GENERAL",
       "workflow": "build-solver-bank.yml",
       "generator": "scripts/generate-solver-bank.mjs",
-      "routeStatus": "READY_TO_SOLVE"
-    },
-    {
-      "key": "phase/late",
-      "section": "phase",
-      "id": "late",
-      "label": "LATE",
-      "priority": 4,
-      "stage": "GROW_10000",
-      "solved": 9464,
-      "target": 10000,
-      "requestedSolves": 500,
-      "status": "QUEUED",
-      "engineId": "STACKUP_ICM_PKO",
-      "workflow": "build-tournament-bank.yml",
-      "generator": "scripts/generate-tournament-bank.py",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
@@ -2313,6 +2297,22 @@
       "engineId": "DCFR_POSTFLOP_GENERAL",
       "workflow": "build-solver-bank.yml",
       "generator": "scripts/generate-solver-bank.mjs",
+      "routeStatus": "READY_TO_SOLVE"
+    },
+    {
+      "key": "phase/late",
+      "section": "phase",
+      "id": "late",
+      "label": "LATE",
+      "priority": 5,
+      "stage": "GROW_20000",
+      "solved": 14534,
+      "target": 20000,
+      "requestedSolves": 500,
+      "status": "QUEUED",
+      "engineId": "STACKUP_ICM_PKO",
+      "workflow": "build-tournament-bank.yml",
+      "generator": "scripts/generate-tournament-bank.py",
       "routeStatus": "READY_TO_SOLVE"
     },
     {
