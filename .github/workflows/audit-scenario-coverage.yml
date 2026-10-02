@@ -17,6 +17,8 @@ on:
       - "data/solver/postflop.json"
       - "data/solver/tournament.json"
       - "data/solver/reentry.json"
+      - "data/solver/opponent-profile.json"
+      - "data/solver/opponent-profile-calibration.json"
       - "data/solver/pushfold-hu-v1.json"
       - "data/solver/preflop-decisions.json"
       - "data/solver/preflop-9max.json"
