@@ -29,6 +29,8 @@ jobs:
           node-version: "22"
       - name: Validate Grinder release
         run: node scripts/validate-app.mjs
+      - name: Smoke test Spots in Android Chrome
+        run: node scripts/smoke-spots-browser.mjs
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload site
