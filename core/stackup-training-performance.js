@@ -7,7 +7,7 @@
   const SESSIONS_KEY='training_performance_sessions_v1';
   const MAX_RECORDS=5000;
   const MAX_SESSIONS=250;
-  const memory={records:[],sessions:[]};
+  const memory={records:[],sessions:[],recordsLoaded:false,sessionsLoaded:false};
 
   function storage(){ return global.StackUpGrinder?.storage||null; }
   function clone(v){
@@ -36,14 +36,18 @@
     return clean;
   }
   function records(){
-    const list=read(RECORDS_KEY,memory.records);
-    memory.records=list;
-    return list.map(clone);
+    if(!memory.recordsLoaded){
+      memory.records=read(RECORDS_KEY,memory.records);
+      memory.recordsLoaded=true;
+    }
+    return memory.records.map(clone);
   }
   function sessions(){
-    const list=read(SESSIONS_KEY,memory.sessions);
-    memory.sessions=list;
-    return list.map(clone);
+    if(!memory.sessionsLoaded){
+      memory.sessions=read(SESSIONS_KEY,memory.sessions);
+      memory.sessionsLoaded=true;
+    }
+    return memory.sessions.map(clone);
   }
   function startSession(meta){
     const now=new Date().toISOString();
@@ -60,6 +64,7 @@
     const list=sessions();
     list.unshift(item);
     memory.sessions=write(SESSIONS_KEY,list,MAX_SESSIONS);
+    memory.sessionsLoaded=true;
     return item.id;
   }
   function updateSession(id,patch){
@@ -97,13 +102,21 @@
     if(duplicate)return clone(duplicate);
     list.unshift(item);
     memory.records=write(RECORDS_KEY,list,MAX_RECORDS);
+    memory.recordsLoaded=true;
     updateSession(item.sessionId,{updatedAt:now});
     return clone(item);
   }
   function clear(){
     memory.records=[];memory.sessions=[];
+    memory.recordsLoaded=true;memory.sessionsLoaded=true;
     write(RECORDS_KEY,[],MAX_RECORDS);
     write(SESSIONS_KEY,[],MAX_SESSIONS);
   }
+  window.addEventListener?.('storage',event=>{
+    const key=String(event?.key||'');
+    if(key.includes(RECORDS_KEY))memory.recordsLoaded=false;
+    if(key.includes(SESSIONS_KEY))memory.sessionsLoaded=false;
+  });
+
   global.StackUpTrainingPerformance=Object.freeze({startSession,updateSession,record,records,sessions,clear});
 })(window);
