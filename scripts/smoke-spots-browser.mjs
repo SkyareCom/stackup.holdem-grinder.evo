@@ -45,8 +45,10 @@ try{
 if(!chromeBin)throw new Error('Chrome/Chromium not available on runner');
 
 const profile=fs.mkdtempSync(path.join(os.tmpdir(),'stackup-chrome-'));
+console.log('SPOTS_CHROME_BIN='+chromeBin);
 const chrome=spawn(chromeBin,[
   '--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage',
+  '--remote-debugging-address=127.0.0.1',
   `--remote-debugging-port=${DEBUG_PORT}`,`--user-data-dir=${profile}`,
   '--window-size=430,932','about:blank'
 ],{stdio:['ignore','pipe','pipe']});
@@ -63,7 +65,7 @@ async function waitDebug(){
     try{return await json(`http://127.0.0.1:${DEBUG_PORT}/json/version`);}
     catch(_){await sleep(100);}
   }
-  throw new Error('Chrome DevTools endpoint unavailable');
+  throw new Error('Chrome DevTools endpoint unavailable; chrome stderr='+chromeErr.slice(-4000));
 }
 
 class CDP{
