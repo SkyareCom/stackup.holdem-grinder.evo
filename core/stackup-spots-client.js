@@ -249,7 +249,10 @@
       try{
         lastStats=sequencer.stats(staticBank,activeFilters);
         state.lastStats=lastStats;
-        if(lastStats.publishable)break;
+        // On mobile, prioritize first-interaction responsiveness. The sequencer
+        // still validates every presented decision; coverage publishability is
+        // audited separately and remains visible in state.lastStats.
+        if(lastStats.publishable||(isMobileRuntime()&&lastStats.candidates>0))break;
       }catch(error){
         lastError=error;
       }
