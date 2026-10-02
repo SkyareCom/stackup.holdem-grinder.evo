@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 9
+      max-parallel: 12
       matrix:
         include:
           - { game: TOURNAMENT, stack: 5, phase: EARLY, tournament_type: REGULAR, field: "50", extra_tags: "chip_up" }
@@ -35,6 +35,23 @@ jobs:
           - { game: TOURNAMENT, stack: 30, phase: LATE, tournament_type: TURBO, field: "50", extra_tags: "" }
           - { game: TOURNAMENT, stack: 50, phase: FINAL_TABLE, tournament_type: FREEZEOUT, field: "250", extra_tags: "" }
           - { game: TOURNAMENT, stack: 100, phase: EARLY, tournament_type: HIGH_ROLLER, field: "500", extra_tags: "chip_up" }
+
+          # Extra independent stack-depth solves for semantic preflop filters such
+          # as 4bet_value. Only the changed stack depth creates new strategy;
+          # tournament metadata is contextual and is never the counting basis.
+          - { game: TOURNAMENT, stack: 8, phase: EARLY, tournament_type: REGULAR, field: "100", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 12, phase: MIDDLE, tournament_type: REGULAR, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 14, phase: MIDDLE, tournament_type: TURBO, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 16, phase: LATE, tournament_type: FREEZEOUT, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 22, phase: LATE, tournament_type: REGULAR, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 28, phase: LATE, tournament_type: HIGH_ROLLER, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 35, phase: MIDDLE, tournament_type: REGULAR, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 40, phase: LATE, tournament_type: TURBO, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 60, phase: MIDDLE, tournament_type: FREEZEOUT, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 70, phase: LATE, tournament_type: REGULAR, field: "500", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 75, phase: FINAL_TABLE, tournament_type: HIGH_ROLLER, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 80, phase: LATE, tournament_type: REGULAR, field: "1000+", extra_tags: "" }
+
           - { game: CASH, stack: 5, phase: "", tournament_type: "", field: "", extra_tags: "" }
           - { game: CASH, stack: 10, phase: "", tournament_type: "", field: "", extra_tags: "" }
           - { game: CASH, stack: 15, phase: "", tournament_type: "", field: "", extra_tags: "" }
@@ -142,7 +159,7 @@ jobs:
           const fs=require('fs'),path=require('path');
           const dir='.stackup/multistack-in';
           const files=fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort();
-          if(files.length!==18)throw new Error('expected 18 context banks, found '+files.length);
+          if(files.length!==30)throw new Error('expected 30 context banks, found '+files.length);
           const spots=[],contexts=[],ids=new Set();
           for(const file of files){
             const d=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'));
@@ -201,6 +218,17 @@ jobs:
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
           node scripts/route-solve-queue.mjs
+
+      - name: Enforce 4bet value publication floor
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const c=JSON.parse(fs.readFileSync('data/solver/coverage.json','utf8'));
+          const card=(c.cards||[]).find(x=>x.section==='aggr_special'&&x.id==='4bet_value');
+          const n=Number(card?.validatedSolvedSpots||0);
+          if(n<1500)throw new Error('4bet_value below strict 1500 floor: '+n);
+          console.log({filter:'aggr_special/4bet_value',validatedSolvedSpots:n});
+          NODE
 
       - name: Commit multistack bank safely
         if: github.ref == 'refs/heads/main'
