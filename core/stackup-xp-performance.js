@@ -129,6 +129,13 @@
     return added;
   }
   function events(){return read();}
+  function clear(){
+    try{
+      localStorage.removeItem(KEY);
+      localStorage.removeItem(MIGRATION);
+      return true;
+    }catch(_){return false;}
+  }
   function rank(totalXP){
     const xp=Math.max(0,Number(totalXP)||0);
     const r=RANKS.slice().reverse().find(x=>xp>=x.min)||RANKS[0];
@@ -177,6 +184,6 @@
   }
 
   global.StackUpXPPerformance=Object.freeze({
-    WEIGHTS,RANKS,classify,evaluate,record,backfill,events,summary,rank
+    WEIGHTS,RANKS,classify,evaluate,record,backfill,events,clear,summary,rank
   });
 })(window);
