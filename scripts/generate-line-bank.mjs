@@ -105,6 +105,20 @@ function rangeText(map,minWeight=0.00002){
     .map(x=>x.hand+":"+Math.min(1,x.weight).toFixed(7))
     .join(",");
 }
+function withoutBoard(map,board){
+  const blocked=new Set(boardCards(board).map(c=>String(c).replace(/^10/i,"T")));
+  const out=new Map();
+  for(const [key,item] of map||[]){
+    const text=String(item?.hand||key||"").replace(/10/g,"T");
+    const m=text.match(/^([2-9TJQKA][cdhs])([2-9TJQKA][cdhs])$/i);
+    if(!m)continue;
+    const a=m[1][0].toUpperCase()+m[1][1].toLowerCase();
+    const b=m[2][0].toUpperCase()+m[2][1].toLowerCase();
+    if(blocked.has(a)||blocked.has(b))continue;
+    out.set(key,item);
+  }
+  return out;
+}
 function actionKind(text){
   const s=String(text||"").toLowerCase().replace(/[ _-]+/g,"");
   if(s.includes("fold"))return "fold";
@@ -217,10 +231,15 @@ function checkEvent(position,street){return {position,action:"CHECK",kind:"check
 function callEvent(position,to,street){return {position,action:"CALL",kind:"call",to:+Number(to||0).toFixed(4),street};}
 
 async function solveRaw({id,street,board,oopRange,ipRange,potBb,stackBb,betSizes="33,75",raiseSizes="75",maxRaises=1}){
+  const cleanOop=withoutBoard(oopRange,board);
+  const cleanIp=withoutBoard(ipRange,board);
+  if(cleanOop.size<4||cleanIp.size<4){
+    throw new Error("solver_range_too_small_"+cleanOop.size+"_"+cleanIp.size+"_"+street+"_"+board);
+  }
   const rawPath=join(WORK,id+"-"+hash([street,board,potBb,stackBb,betSizes,raiseSizes].join("|"))+".json");
   const args=[
     "solve","--street",street.toLowerCase(),"--board",board,
-    "--oop-range",rangeText(oopRange),"--ip-range",rangeText(ipRange),
+    "--oop-range",rangeText(cleanOop),"--ip-range",rangeText(cleanIp),
     "--pot",String(potBb*2),"--stack",String(stackBb*2),
     "--iterations",String(ITER),"--format","json","--output",rawPath,
     "--bet-sizes",betSizes,"--raise-sizes",raiseSizes,
@@ -249,7 +268,10 @@ function materialize({
   const nodePlayer=String(node.player||"OOP").toUpperCase()==="IP"?"IP":"OOP";
   const heroPosition=nodePlayer==="IP"?base.scenario.villainPosition:base.scenario.heroPosition;
   const villainPosition=nodePlayer==="IP"?base.scenario.heroPosition:base.scenario.villainPosition;
-  const ranges=playerRanges(nodePlayer,oopRange,ipRange);
+  const boardRaw=raw.config?.board||extra.board||"";
+  const cleanOop=withoutBoard(oopRange,boardRaw);
+  const cleanIp=withoutBoard(ipRange,boardRaw);
+  const ranges=playerRanges(nodePlayer,cleanOop,cleanIp);
   return {
     id:"dcfr-line-"+id+"-"+hash(base.matchup+"|"+id+"|"+node.node),
     solver:"DCFR_SOLVER",
@@ -264,7 +286,7 @@ function materialize({
       heroPosition,villainPosition,
       heroStack:stackBb,effectiveStack:stackBb,
       pot:+potBb.toFixed(4),currentBet:+Number(currentBet||0).toFixed(4),
-      board:boardCards(raw.config?.board||extra.board||""),
+      board:boardCards(boardRaw),
       heroRange:rangeText(ranges.hero),villainRange:rangeText(ranges.villain),
       actionHistory:history,
       positions:POSITIONS,
@@ -335,11 +357,12 @@ for(const runout of RUNOUTS){
       ]
     }));
 
-    // Check-check propagation to turn.
-    const oopTurn=conditionRange(oop0,root,{kind:"check"});
-    const ipTurn=conditionRange(ip0,afterCheck,{kind:"check"});
-    if(oopTurn.size<40||ipTurn.size<40)throw new Error("lineA_checkcheck_ranges_too_small");
+    // Check-check propagation to turn. Remove the newly exposed turn card
+    // from both exact posterior ranges before solving the next street.
     const turnBoard=appendCard(runout.flop,runout.turn);
+    const oopTurn=withoutBoard(conditionRange(oop0,root,{kind:"check"}),turnBoard);
+    const ipTurn=withoutBoard(conditionRange(ip0,afterCheck,{kind:"check"}),turnBoard);
+    if(oopTurn.size<4||ipTurn.size<4)throw new Error("lineA_checkcheck_ranges_too_small_"+oopTurn.size+"_"+ipTurn.size);
     const turnRaw=await solveRaw({
       id:"caller-oop-turn-"+runout.id,street:"TURN",board:turnBoard,
       oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,
@@ -382,10 +405,10 @@ for(const runout of RUNOUTS){
 
     // Check-check turn as well -> river ranges for block bets and bluff catches.
     if(turnRoot&&turnAfterCheck){
-      const oopRiver=conditionRange(oopTurn,turnRoot,{kind:"check"});
-      const ipRiver=conditionRange(ipTurn,turnAfterCheck,{kind:"check"});
-      if(oopRiver.size>=40&&ipRiver.size>=40){
-        const riverBoard=appendCard(turnBoard,runout.river);
+      const riverBoard=appendCard(turnBoard,runout.river);
+      const oopRiver=withoutBoard(conditionRange(oopTurn,turnRoot,{kind:"check"}),riverBoard);
+      const ipRiver=withoutBoard(conditionRange(ipTurn,turnAfterCheck,{kind:"check"}),riverBoard);
+      if(oopRiver.size>=4&&ipRiver.size>=4){
         const riverRaw=await solveRaw({
           id:"caller-oop-river-"+runout.id,street:"RIVER",board:riverBoard,
           oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,
@@ -487,12 +510,12 @@ for(const runout of RUNOUTS){
       history:[actionEvent(base.scenario.heroPosition,flopBet.label,betAmt,"FLOP")]
     }));
 
-    const oopTurn=conditionRange(oop0,root,{label:flopBet.label});
-    const ipTurn=conditionRange(ip0,afterBet,{kind:"call"});
-    if(oopTurn.size<40||ipTurn.size<40)throw new Error("lineB_betcall_ranges_too_small");
+    const turnBoard=appendCard(runout.flop,runout.turn);
+    const oopTurn=withoutBoard(conditionRange(oop0,root,{label:flopBet.label}),turnBoard);
+    const ipTurn=withoutBoard(conditionRange(ip0,afterBet,{kind:"call"}),turnBoard);
+    if(oopTurn.size<4||ipTurn.size<4)throw new Error("lineB_betcall_ranges_too_small_"+oopTurn.size+"_"+ipTurn.size);
     const potTurn=pot0+2*betAmt;
     const stackTurn=stack0-betAmt;
-    const turnBoard=appendCard(runout.flop,runout.turn);
     const turnRaw=await solveRaw({
       id:"aggressor-oop-turn-"+runout.id,street:"TURN",board:turnBoard,
       oopRange:oopTurn,ipRange:ipTurn,potBb:potTurn,stackBb:stackTurn,
@@ -512,12 +535,12 @@ for(const runout of RUNOUTS){
     if(!turnBet)throw new Error("lineB_turn_bet_missing");
     const turnAfterBet=findNode(turnRaw,[{label:turnBet.label}]);
     const turnBetAmt=potTurn*(turnBet.pct/100);
-    const oopRiver=conditionRange(oopTurn,turnRoot,{label:turnBet.label});
-    const ipRiver=conditionRange(ipTurn,turnAfterBet,{kind:"call"});
-    if(oopRiver.size<40||ipRiver.size<40)throw new Error("lineB_turncall_ranges_too_small");
+    const riverBoard=appendCard(turnBoard,runout.river);
+    const oopRiver=withoutBoard(conditionRange(oopTurn,turnRoot,{label:turnBet.label}),riverBoard);
+    const ipRiver=withoutBoard(conditionRange(ipTurn,turnAfterBet,{kind:"call"}),riverBoard);
+    if(oopRiver.size<4||ipRiver.size<4)throw new Error("lineB_turncall_ranges_too_small_"+oopRiver.size+"_"+ipRiver.size);
     const potRiver=potTurn+2*turnBetAmt;
     const stackRiver=stackTurn-turnBetAmt;
-    const riverBoard=appendCard(turnBoard,runout.river);
     const riverRaw=await solveRaw({
       id:"aggressor-oop-river-"+runout.id,street:"RIVER",board:riverBoard,
       oopRange:oopRiver,ipRange:ipRiver,potBb:potRiver,stackBb:stackRiver,
