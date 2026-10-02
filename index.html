@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="stats-performance-deep-v1">
+<meta name="grinder-build" content="spot-analysis-clean-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -1825,10 +1825,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);outline:none
     }
     .spotsaveform input:focus{border:var(--on-border);box-shadow:var(--on-glow)}
-    .spotfeedback,.spotanalysis,.historysort,.historyitem,.historydetail,.historyempty{
+    .spotfeedback,.historysort,.historyitem,.historydetail,.historyempty{
       border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);
       -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);color:var(--c-text)
     }
+    .spotanalysis{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;color:var(--c-text)}
     .spotfeedback{min-height:78px;padding:16px;display:flex;flex-direction:column;justify-content:center;gap:6px;text-align:center;background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl)}
     .spotfeedback .line1{font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label);color:var(--c-text)}
     .spotfeedback .line2{font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);color:var(--c-muted)}
@@ -1838,18 +1839,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     @keyframes spotWaitingBlink{0%,100%{opacity:.35}50%{opacity:1}}
     .spotanalysis{padding:14px;display:flex;flex-direction:column;gap:12px;text-align:left}
     .spotanalysis[hidden]{display:none!important}
-    .spotanalysistitle{padding:10px 12px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);color:var(--c-accent-text);letter-spacing:var(--ls-label);font-size:var(--fs)!important}
+    .spotanalysistitle{padding:10px 12px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);color:#fff;letter-spacing:var(--ls-label);font-size:var(--fs)!important}
     .spotanalysissection{display:flex;flex-direction:column;gap:5px;padding:11px 12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl)}
-    .spotanalysissection b,.spotindicator b{font-weight:400;color:var(--c-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotanalysissection b,.spotindicator b{font-weight:400;color:#fff;font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
     .spotanalysissection p,.spotsource,.spotindicator span,.spotindicator small,.spotfinalsummary li{color:var(--c-muted);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);line-height:1.45}
-    .spotindicatorheading{padding:11px 12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);color:var(--c-accent-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotindicatorheading{padding:11px 12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);color:#fff;font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
     .spotindicatorlist{display:flex;flex-direction:column;gap:8px}
     .spotindicator{position:relative;padding:12px 12px 12px 52px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);display:flex;flex-direction:column;gap:4px;min-height:78px}
     .spotindicatorindex{position:absolute;left:12px;top:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);color:var(--c-accent-text);font-size:var(--fs)!important}
-    .spotindicator .indicatorvalue{color:var(--c-text)}
+    .spotindicator .indicatorvalue{color:var(--c-muted)}
     .spotindicator .indicatorcalc,.spotindicator .indicatorimpact{color:var(--c-muted)}
     .spotfinal{padding:12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);display:flex;flex-direction:column;gap:8px}
-    .spotfinaltitle{color:var(--c-accent-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotfinaltitle{color:#fff;font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
     .spotfinalsummary{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
     .spotfinalsummary li::marker{color:var(--c-accent-text)}
     .spotsource{padding:10px 12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl)}
@@ -1874,42 +1875,39 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div><div class="spotanalysissection"><p>'+spotEscape(analysis?.line2||'—')+'</p></div>';
       return;
     }
-    const sections=(analysis.summary||[]).map(s=>'<div class="spotanalysissection"><b>'+spotEscape(s.title)+'</b><p>'+spotEscape(s.text)+'</p></div>').join('');
+    const cleanUnavailable=value=>{
+      const raw=String(value??'').trim();
+      if(!raw)return '---';
+      if(/não disponível|nao disponivel|não se aplica|nao se aplica|not available|not applicable|no disponible|no se aplica|item não disponível|item not available|ítem no disponible/i.test(raw))return '---';
+      return raw;
+    };
+    const sections=(analysis.summary||[]).map(section=>{
+      const text=cleanUnavailable(section.text);
+      return '<div class="spotanalysissection"><b>'+spotEscape(section.title)+'</b><p>'+spotEscape(text)+'</p></div>';
+    }).join('');
     const ordered=[...(analysis.indicators||[])].sort((a,b)=>Number(a.index)-Number(b.index));
     const indicators=ordered.map(x=>{
+      const unavailable=!!x.unavailable||cleanUnavailable(x.value)==='---';
+      const value=unavailable?'---':cleanUnavailable(x.value);
       const calc=x.calculation||x.note||'—';
       const impact=x.interpretation||x.note||'—';
       return '<div class="spotindicator">'+
         '<span class="spotindicatorindex">'+spotEscape(String(x.index))+'</span>'+
         '<b>'+spotEscape(x.name)+'</b>'+
-        '<span class="indicatorvalue">'+spotEscape('RESULTADO: '+(x.value??'—'))+'</span>'+
-        (x.unavailable?'':('<small class="indicatorcalc">'+spotEscape('CÁLCULO / LEITURA: '+calc)+'</small>'+
+        '<span class="indicatorvalue">'+spotEscape('RESULTADO: '+value)+'</span>'+
+        (unavailable?'':('<small class="indicatorcalc">'+spotEscape('CÁLCULO / LEITURA: '+calc)+'</small>'+
         '<small class="indicatorimpact">'+spotEscape('IMPACTO NA DECISÃO: '+impact)+'</small>'))+
       '</div>';
     }).join('');
-    const finalSummary=ordered.map(x=>'<li><b>'+spotEscape(x.name)+'</b> — '+spotEscape(x.value??'—')+'</li>').join('');
-    const solverMeta=analysis?.solver
-      ?'<div class="spotsource"><b>SOLVER:</b> '+spotEscape(analysis.solver.id||'—')+
-        (analysis.solver.solveId?' · SOLVE '+spotEscape(analysis.solver.solveId):'')+
-        (analysis.solver.version?' · VERSÃO '+spotEscape(analysis.solver.version):'')+'</div>'
-      :'';
+    const finalSummary=ordered.map(x=>{
+      const value=(!!x.unavailable||cleanUnavailable(x.value)==='---')?'---':cleanUnavailable(x.value);
+      return '<li><b>'+spotEscape(x.name)+'</b> — '+spotEscape(value)+'</li>';
+    }).join('');
     box.hidden=false;
-    box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div>'+solverMeta+sections+
+    box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div>'+sections+
       '<div class="spotindicatorheading">'+spotEscape(tx.indicators)+'</div>'+
       '<div class="spotindicatorlist">'+indicators+'</div>'+
-      '<div class="spotfinal"><div class="spotfinaltitle">'+spotEscape(tx.indicators+' · 1–35')+'</div><ol class="spotfinalsummary">'+finalSummary+'</ol></div>'+
-      '<div class="spotsource">'+spotEscape(analysis.sourceNote||'')+'</div>';
-  }
-  function revealSpotAnalysis(){
-    const box=spotSupport.querySelector('.spotanalysis');
-    const content=$('.content');
-    if(!box||box.hidden||!content)return;
-    window.setTimeout(()=>{
-      try{
-        const br=box.getBoundingClientRect(),cr=content.getBoundingClientRect();
-        if(br.top<cr.top||br.top>cr.bottom-80)box.scrollIntoView({behavior:'smooth',block:'start'});
-      }catch(_){}
-    },80);
+      '<div class="spotfinal"><div class="spotfinaltitle">'+spotEscape(tx.indicators+' · 1–35')+'</div><ol class="spotfinalsummary">'+finalSummary+'</ol></div>';
   }
   function renderSpotSupport(){
     if(!spotSupport)return;
@@ -1946,7 +1944,6 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       line1.textContent=entry.answer.analysis.title||'—';
       line2.textContent=entry.answer.analysis.line2||'—';
       renderSpotAnalysis(entry.answer.analysis);
-      revealSpotAnalysis();
     }else{
       fb.className='spotfeedback waiting';
       line1.textContent=tx.waiting;line2.textContent='';
