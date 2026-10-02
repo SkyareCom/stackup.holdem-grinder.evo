@@ -637,8 +637,11 @@
     const street=normStreet(spot?.scenario?.street);
     for(const [section,values] of Object.entries(special||{})){
       if(!Array.isArray(values)||!values.length)continue;
-      if(['pre_special','blind_special','aggr_special','short_special','icm_special','pko_special'].includes(section)){
+      if(['pre_special','blind_special','short_special','icm_special','pko_special'].includes(section)){
         if(street!=='PRE-FLOP')return false;
+      }else if(section==='aggr_special'){
+        const domains=values.flatMap(id=>String(id)==='pot_4bet'?['FLOP','TURN','RIVER']:['PRE-FLOP']);
+        if(!domains.includes(street))return false;
       }else if(section==='river_special'){
         if(street!=='RIVER')return false;
       }else if(['post_special','texture_special'].includes(section)){
