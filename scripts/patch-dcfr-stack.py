@@ -29,7 +29,8 @@ s,n5=re.subn(r'stacks\[bb\] = 200 - 2;',f'stacks[bb] = {chips} - 2;',s)
 
 if n1<1:
     raise SystemExit("stack patch failed: full-ring initializer not found")
-if n2+n4<1 or n3+n5<1:
+hu_delegates = 'pub const NUM_PLAYERS: usize = 2;' in s and 'Self::new_6max(config)' in s
+if not hu_delegates and (n2+n4<1 or n3+n5<1):
     raise SystemExit("stack patch failed: heads-up initializer not found")
 if s==original:
     raise SystemExit("stack patch made no changes")
