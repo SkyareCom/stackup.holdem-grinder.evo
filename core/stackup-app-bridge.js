@@ -8,10 +8,10 @@
   const PREFIX='stackup.ecosystem.v1';
   const CHANNEL_NAME='stackup-holdem-ecosystem-v1';
   const DEFAULT_ORIGIN='https://skyarecom.github.io';
-  const PATHS={
+  const PATHS=Object.assign({
     heroes:'/stackup.holdem-heroes/',
     grinder:'/stackup.holdem-grinder.evo/'
-  };
+  },global.STACKUP_APP_PATHS||{});
   const TYPES=new Set([
     'player_profile',
     'training_prescription',
@@ -203,7 +203,7 @@
       const identity=sharedIdentity();
       return {
         app,version:VERSION,
-        sameOrigin:global.location?.origin===DEFAULT_ORIGIN||global.location?.hostname==='skyarecom.github.io',
+        sameOrigin:!!(global.location?.origin&&global.location.origin!=='null'),
         origin:global.location?.origin||null,
         broadcast:!!channel,
         identity,
