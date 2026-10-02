@@ -1,0 +1,186 @@
+name: Build Native HU Preflop Bank
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-hu-pushfold-bank.yml"
+      - "scripts/patch-dcfr-hu.py"
+      - "scripts/patch-dcfr-stack.py"
+      - "scripts/stackup-preflop-export.rs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: native-hu-preflop
+  cancel-in-progress: true
+
+jobs:
+  solve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 9
+      matrix:
+        stack: [5, 10, 15, 18, 20, 25, 30, 50, 100]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Checkout and patch pinned DCFR-SOLVER
+        run: |
+          mkdir -p .stackup
+          git clone https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
+          python scripts/patch-dcfr-hu.py .stackup/DCFR-SOLVER/src/preflop.rs
+          python scripts/patch-dcfr-stack.py .stackup/DCFR-SOLVER/src/preflop.rs "${{ matrix.stack }}"
+          mkdir -p .stackup/DCFR-SOLVER/src/bin
+          cp scripts/stackup-preflop-export.rs .stackup/DCFR-SOLVER/src/bin/stackup_preflop_export.rs
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ".stackup/DCFR-SOLVER -> target"
+          shared-key: "dcfr-hu-${{ matrix.stack }}"
+
+      - name: Build native HU solver
+        run: |
+          cargo build --release --manifest-path .stackup/DCFR-SOLVER/Cargo.toml --bin dcfr-solver --bin stackup_preflop_export
+          cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-hu
+          cp .stackup/DCFR-SOLVER/target/release/stackup_preflop_export .stackup/export-hu
+
+      - name: Solve HU context
+        run: |
+          .stackup/dcfr-hu preflop             --iterations 10000000             --output ".stackup/hu-${{ matrix.stack }}bb.bin"
+
+      - name: Export solved HU decisions
+        env:
+          STACKUP_SOLVE_CONTEXT_ID: "hu-${{ matrix.stack }}bb"
+          STACKUP_GAME_TYPE: TOURNAMENT
+          STACKUP_PHASE: MIDDLE
+          STACKUP_TOURNAMENT_TYPE: REGULAR
+          STACKUP_FIELD_SIZE: "50"
+          STACKUP_EXTRA_TAGS: "heads_up_2max,blind_war"
+        run: |
+          mkdir -p .stackup/hu-out
+          .stackup/export-hu             ".stackup/hu-${{ matrix.stack }}bb.bin"             ".stackup/hu-out/hu-${{ matrix.stack }}bb.json"
+
+      - name: Validate HU context
+        env:
+          EXPECT_STACK: "${{ matrix.stack }}"
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const f='.stackup/hu-out/hu-'+process.env.EXPECT_STACK+'bb.json';
+          const d=JSON.parse(fs.readFileSync(f,'utf8'));
+          if(!Array.isArray(d.spots)||!d.spots.length)throw new Error('empty HU solve');
+          for(const s of d.spots){
+            if(Number(s.scenario?.tableSize)!==2)throw new Error('non-HU spot '+s.id);
+            if(!['SB','BB'].includes(String(s.scenario?.heroPosition)))throw new Error('invalid HU position '+s.id);
+          }
+          const root=d.spots.find(s=>s.scenario?.actionHistory?.length===0);
+          if(!root)throw new Error('HU root missing');
+          if(Math.abs(Number(root.scenario?.heroStack)-Number(process.env.EXPECT_STACK))>.01)throw new Error('HU stack mismatch');
+          console.log({stack:Number(process.env.EXPECT_STACK),nodes:d.spots.length});
+          NODE
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "hu-${{ matrix.stack }}"
+          path: ".stackup/hu-out/hu-${{ matrix.stack }}bb.json"
+          retention-days: 1
+
+  aggregate:
+    needs: solve
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: hu-*
+          path: .stackup/hu-in
+          merge-multiple: true
+
+      - name: Merge native HU banks
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const dir='.stackup/hu-in';
+          const files=fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort();
+          if(files.length!==9)throw new Error('expected 9 HU banks, found '+files.length);
+          const spots=[],ids=new Set(),stacks=[];
+          let iterations=Infinity;
+          for(const file of files){
+            const d=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'));
+            iterations=Math.min(iterations,Number(d.iterations)||0);
+            const root=d.spots?.find(s=>s.scenario?.actionHistory?.length===0);
+            stacks.push(Number(root?.scenario?.heroStack));
+            for(const spot of d.spots||[]){
+              if(ids.has(spot.id))throw new Error('duplicate HU spot '+spot.id);
+              ids.add(spot.id);spots.push(spot);
+            }
+          }
+          const payload={
+            schemaVersion:1,
+            generatedAt:new Date().toISOString(),
+            solver:'DCFR_SOLVER',
+            upstream:{repository:'exinori/DCFR-SOLVER',commit:'4ade6a9e15a841c41867afde1258b9d110cd6fb1',license:'MIT'},
+            variant:'HEADS_UP_MULTISTACK_NATIVE',
+            iterations,
+            stackDepthsBb:[...new Set(stacks)].sort((a,b)=>a-b),
+            spots
+          };
+          fs.writeFileSync('data/solver/preflop-hu.json',JSON.stringify(payload));
+          NODE
+
+      - name: Validate strict HU count
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          const d=JSON.parse(fs.readFileSync('data/solver/preflop-hu.json','utf8'));
+          let valid=0;
+          for(const s of d.spots||[])for(const h of s.strategy||[]){
+            const v=fake.StackUpSolvedSpotContract.validateSolvedDecision(s,h);
+            if(!v.ok)throw new Error(s.id+'/'+h.hand+': '+v.errors.join(','));
+            valid++;
+          }
+          if(valid<2000)throw new Error('HU below current 2000 goal: '+valid);
+          console.log({validatedSolvedDecisions:valid,nodes:d.spots.length});
+          NODE
+
+      - name: Recompute strict coverage
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+
+      - name: Commit HU bank safely
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "StackUp HU Bot"
+          git config user.email "actions@users.noreply.github.com"
+          cp data/solver/preflop-hu.json /tmp/preflop-hu.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/preflop-hu.json data/solver/preflop-hu.json
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+          git add data/solver/preflop-hu.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Generate native multistack HU DCFR bank"
+          git push origin HEAD:main

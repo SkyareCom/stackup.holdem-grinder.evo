@@ -1,0 +1,223 @@
+name: Build Strict Multistack Preflop Bank
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-preflop-multistack.yml"
+      - "scripts/patch-dcfr-stack.py"
+      - "scripts/stackup-preflop-export.rs"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: strict-preflop-multistack
+  cancel-in-progress: true
+
+jobs:
+  solve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 9
+      matrix:
+        include:
+          - { game: TOURNAMENT, stack: 5, phase: EARLY, tournament_type: REGULAR, field: "50", extra_tags: "chip_up" }
+          - { game: TOURNAMENT, stack: 10, phase: MIDDLE, tournament_type: TURBO, field: "100", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 15, phase: LATE, tournament_type: FREEZEOUT, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 18, phase: FINAL_TABLE, tournament_type: HIGH_ROLLER, field: "350", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 20, phase: EARLY, tournament_type: SNG, field: "500", extra_tags: "chip_up" }
+          - { game: TOURNAMENT, stack: 25, phase: MIDDLE, tournament_type: REGULAR, field: "1000+", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 30, phase: LATE, tournament_type: TURBO, field: "50", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 50, phase: FINAL_TABLE, tournament_type: FREEZEOUT, field: "250", extra_tags: "" }
+          - { game: TOURNAMENT, stack: 100, phase: EARLY, tournament_type: HIGH_ROLLER, field: "500", extra_tags: "chip_up" }
+          - { game: CASH, stack: 5, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 10, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 15, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 18, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 20, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 25, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 30, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 50, phase: "", tournament_type: "", field: "", extra_tags: "" }
+          - { game: CASH, stack: 100, phase: "", tournament_type: "", field: "", extra_tags: "" }
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Checkout pinned DCFR-SOLVER
+        run: |
+          mkdir -p .stackup
+          git clone https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
+          python scripts/patch-dcfr-stack.py .stackup/DCFR-SOLVER/src/preflop.rs "${{ matrix.stack }}"
+          mkdir -p .stackup/DCFR-SOLVER/src/bin
+          cp scripts/stackup-preflop-export.rs .stackup/DCFR-SOLVER/src/bin/stackup_preflop_export.rs
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ".stackup/DCFR-SOLVER -> target"
+          shared-key: "strict-preflop-${{ matrix.stack }}"
+
+      - name: Build solver and exporter
+        run: |
+          cargo build --release --manifest-path .stackup/DCFR-SOLVER/Cargo.toml --bin dcfr-solver --bin stackup_preflop_export
+          cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-solver
+          cp .stackup/DCFR-SOLVER/target/release/stackup_preflop_export .stackup/stackup-preflop-export
+          chmod +x .stackup/dcfr-solver .stackup/stackup-preflop-export
+
+      - name: Solve independent preflop context
+        run: |
+          .stackup/dcfr-solver preflop             --iterations 10000000             --output ".stackup/preflop-${{ matrix.game }}-${{ matrix.stack }}.bin"
+
+      - name: Export strict solved decisions
+        env:
+          STACKUP_SOLVE_CONTEXT_ID: "${{ matrix.game }}-${{ matrix.stack }}bb-${{ matrix.phase }}-${{ matrix.tournament_type }}-${{ matrix.field }}"
+          STACKUP_GAME_TYPE: "${{ matrix.game }}"
+          STACKUP_PHASE: "${{ matrix.phase }}"
+          STACKUP_TOURNAMENT_TYPE: "${{ matrix.tournament_type }}"
+          STACKUP_FIELD_SIZE: "${{ matrix.field }}"
+          STACKUP_EXTRA_TAGS: "${{ matrix.extra_tags }}"
+        run: |
+          mkdir -p .stackup/multistack-out
+          .stackup/stackup-preflop-export             ".stackup/preflop-${{ matrix.game }}-${{ matrix.stack }}.bin"             ".stackup/multistack-out/bank-${{ matrix.game }}-${{ matrix.stack }}.json"
+
+      - name: Validate context bank
+        env:
+          EXPECT_GAME: "${{ matrix.game }}"
+          EXPECT_STACK: "${{ matrix.stack }}"
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const path='.stackup/multistack-out/bank-'+process.env.EXPECT_GAME+'-'+process.env.EXPECT_STACK+'.json';
+          const d=JSON.parse(fs.readFileSync(path,'utf8'));
+          if(!Array.isArray(d.spots)||d.spots.length<10)throw new Error('too few solved nodes: '+d.spots?.length);
+          const root=d.spots.find(s=>s.scenario?.actionHistory?.length===0);
+          if(!root)throw new Error('root node missing');
+          if(root.scenario?.gameType!==process.env.EXPECT_GAME)throw new Error('game context mismatch');
+          const expected=Number(process.env.EXPECT_STACK);
+          if(Math.abs(Number(root.scenario?.heroStack)-expected)>.01)throw new Error('stack mismatch '+root.scenario?.heroStack+' != '+expected);
+          for(const s of d.spots){
+            if(s.solver!=='DCFR_SOLVER')throw new Error('invalid solver '+s.id);
+            if(!String(s.solveId||'').includes(process.env.EXPECT_GAME))throw new Error('context solveId missing '+s.id);
+          }
+          console.log({nodes:d.spots.length,game:process.env.EXPECT_GAME,stack:expected});
+          NODE
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "preflop-ms-${{ matrix.game }}-${{ matrix.stack }}"
+          path: ".stackup/multistack-out/bank-${{ matrix.game }}-${{ matrix.stack }}.json"
+          if-no-files-found: error
+          retention-days: 1
+
+  aggregate:
+    needs: solve
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: preflop-ms-*
+          path: .stackup/multistack-in
+          merge-multiple: true
+
+      - name: Merge validated multistack banks
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const dir='.stackup/multistack-in';
+          const files=fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort();
+          if(files.length!==18)throw new Error('expected 18 context banks, found '+files.length);
+          const spots=[],contexts=[],ids=new Set();
+          for(const file of files){
+            const d=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'));
+            const sample=d.spots?.[0]?.scenario||{};
+            contexts.push({
+              file,
+              gameType:sample.gameType||null,
+              phase:sample.phase||null,
+              tournamentType:sample.tournamentType||null,
+              fieldSize:sample.fieldSize||null,
+              rootStack:d.spots?.find(s=>s.scenario?.actionHistory?.length===0)?.scenario?.heroStack??null,
+              nodes:d.spots?.length||0
+            });
+            for(const spot of d.spots||[]){
+              if(ids.has(spot.id))throw new Error('duplicate strict spot id '+spot.id);
+              ids.add(spot.id);spots.push(spot);
+            }
+          }
+          const payload={
+            schemaVersion:1,
+            generatedAt:new Date().toISOString(),
+            solver:'DCFR_SOLVER',
+            upstream:{repository:'exinori/DCFR-SOLVER',commit:'4ade6a9e15a841c41867afde1258b9d110cd6fb1',license:'MIT'},
+            iterationsPerContext:10000000,
+            mode:'STRICT_SOLVED_ONLY',
+            contexts,
+            spots,
+            failures:[]
+          };
+          fs.writeFileSync('data/solver/preflop-multistack.json',JSON.stringify(payload));
+          const size=fs.statSync('data/solver/preflop-multistack.json').size;
+          if(size>95*1024*1024)throw new Error('multistack bank exceeds GitHub safe size: '+size);
+          console.log({contexts:contexts.length,nodes:spots.length,sizeBytes:size});
+          NODE
+
+      - name: Validate all solved decisions
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          const contract=fake.StackUpSolvedSpotContract;
+          const d=JSON.parse(fs.readFileSync('data/solver/preflop-multistack.json','utf8'));
+          let valid=0;
+          for(const s of d.spots||[])for(const h of s.strategy||[]){
+            const v=contract.validateSolvedDecision(s,h);
+            if(!v.ok)throw new Error(s.id+'/'+h.hand+': '+v.errors.join(','));
+            valid++;
+          }
+          if(valid<20000)throw new Error('expected at least 20k validated decisions, found '+valid);
+          console.log({validatedSolvedDecisions:valid});
+          NODE
+
+      - name: Recompute strict coverage and deficit queue
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+
+      - name: Commit multistack bank safely
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "StackUp Multistack Bot"
+          git config user.email "actions@users.noreply.github.com"
+          cp data/solver/preflop-multistack.json /tmp/preflop-multistack.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/preflop-multistack.json data/solver/preflop-multistack.json
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+          git add data/solver/preflop-multistack.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
+          if git diff --cached --quiet; then
+            echo "Multistack bank unchanged."
+            exit 0
+          fi
+          git commit -m "Generate strict multistack DCFR preflop bank"
+          git push origin HEAD:main

@@ -3,9 +3,12 @@ name: Build Native 9max Preflop Bank
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - ".github/workflows/build-preflop-9max.yml"
       - "scripts/patch-dcfr-9max.py"
+      - "scripts/patch-dcfr-stack.py"
       - "scripts/stackup-preflop-export.rs"
 
 permissions:
@@ -16,9 +19,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  solve:
     runs-on: ubuntu-latest
     timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 9
+      matrix:
+        stack: [5, 10, 15, 18, 20, 25, 30, 50, 100]
 
     steps:
       - uses: actions/checkout@v4
@@ -28,15 +36,13 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Checkout pinned DCFR-SOLVER
+      - name: Checkout and patch pinned DCFR-SOLVER
         run: |
           mkdir -p .stackup
           git clone https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
           git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
-
-      - name: Patch DCFR to native 9-max
-        run: |
           python scripts/patch-dcfr-9max.py .stackup/DCFR-SOLVER/src/preflop.rs
+          python scripts/patch-dcfr-stack.py .stackup/DCFR-SOLVER/src/preflop.rs "${{ matrix.stack }}"
           mkdir -p .stackup/DCFR-SOLVER/src/bin
           cp scripts/stackup-preflop-export.rs .stackup/DCFR-SOLVER/src/bin/stackup_preflop_export.rs
 
@@ -44,7 +50,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: ".stackup/DCFR-SOLVER -> target"
-          shared-key: dcfr-9max
+          shared-key: "dcfr-9max-${{ matrix.stack }}"
 
       - name: Build patched solver and exporter
         run: |
@@ -55,45 +61,127 @@ jobs:
 
       - name: Train native 9-max preflop blueprint
         run: |
-          .stackup/dcfr-solver-9max preflop \
-            --iterations 10000000 \
-            --output .stackup/preflop-9max-blueprint.bin
+          .stackup/dcfr-solver-9max preflop             --iterations 10000000             --output ".stackup/preflop-9max-${{ matrix.stack }}bb.bin"
 
       - name: Export all 9-max decision nodes
+        env:
+          STACKUP_SOLVE_CONTEXT_ID: "9max-${{ matrix.stack }}bb"
+          STACKUP_GAME_TYPE: TOURNAMENT
+          STACKUP_PHASE: MIDDLE
+          STACKUP_TOURNAMENT_TYPE: REGULAR
+          STACKUP_FIELD_SIZE: "500"
         run: |
-          .stackup/stackup-preflop-export-9max \
-            .stackup/preflop-9max-blueprint.bin \
-            data/solver/preflop-9max.json
+          mkdir -p .stackup/9max-out
+          .stackup/stackup-preflop-export-9max             ".stackup/preflop-9max-${{ matrix.stack }}bb.bin"             ".stackup/9max-out/preflop-9max-${{ matrix.stack }}bb.json"
 
-      - name: Validate 9-max bank
+      - name: Validate native stack bank
+        env:
+          EXPECT_STACK: "${{ matrix.stack }}"
         run: |
           node - <<'NODE'
           const fs=require('fs');
-          const d=JSON.parse(fs.readFileSync('data/solver/preflop-9max.json','utf8'));
+          const file='.stackup/9max-out/preflop-9max-'+process.env.EXPECT_STACK+'bb.json';
+          const d=JSON.parse(fs.readFileSync(file,'utf8'));
           if(d.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
           if(Number(d.iterations)<10000000)throw new Error('9max iterations below 10M');
-          if(!Array.isArray(d.spots)||d.spots.length<30)throw new Error('too few 9max nodes: '+d.spots?.length);
-          const counts={};
-          for(const s of d.spots){
-            if(s.solver!=='DCFR_SOLVER')throw new Error('invalid solver '+s.id);
-            if(s.scenario?.street!=='PRE-FLOP')throw new Error('non-preflop '+s.id);
-            if(Number(s.scenario?.tableSize)!==9)throw new Error('non-9max '+s.id);
-            if(!Array.isArray(s.strategy)||s.strategy.length!==169)throw new Error('strategy size '+s.id);
-            const sums=s.strategy.map(h=>(h.actions||[]).reduce((n,a)=>n+Number(a.frequency||0),0));
-            if(sums.some(x=>Math.abs(x-100)>0.25))throw new Error('frequency normalization '+s.id);
-            const p=String(s.scenario?.heroPosition||'');
-            counts[p]=(counts[p]||0)+1;
-          }
-          for(const p of ['UTG+1','UTG+2']){
-            if((counts[p]||0)<1)throw new Error(p+' needs at least 1 native solved node, found '+String(counts[p]||0));
-          }
-          console.log({nodes:d.spots.length,heroPositionNodes:counts});
+          const root=d.spots?.find(s=>s.scenario?.actionHistory?.length===0);
+          if(!root)throw new Error('9max root missing');
+          if(Number(root.scenario?.tableSize)!==9)throw new Error('non-9max root');
+          if(Math.abs(Number(root.scenario?.heroStack)-Number(process.env.EXPECT_STACK))>.01)throw new Error('stack mismatch');
+          const positions=new Set((d.spots||[]).map(s=>s.scenario?.heroPosition));
+          for(const p of ['UTG+1','UTG+2','LJ'])if(!positions.has(p))throw new Error('missing native '+p);
+          console.log({stack:Number(process.env.EXPECT_STACK),nodes:d.spots.length,positions:[...positions]});
           NODE
 
-      - name: Recompute 162-card coverage
-        run: node scripts/audit-scenario-coverage.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "preflop-9max-${{ matrix.stack }}"
+          path: ".stackup/9max-out/preflop-9max-${{ matrix.stack }}bb.json"
+          if-no-files-found: error
+          retention-days: 1
 
-      - name: Commit 9-max bank safely
+  aggregate:
+    needs: solve
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: preflop-9max-*
+          path: .stackup/9max-in
+          merge-multiple: true
+
+      - name: Merge native 9-max stacks
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'),path=require('path');
+          const dir='.stackup/9max-in';
+          const files=fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort();
+          if(files.length!==9)throw new Error('expected 9 native 9max banks, found '+files.length);
+          const spots=[],ids=new Set(),stacks=[];
+          let iterations=Infinity;
+          for(const file of files){
+            const d=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'));
+            iterations=Math.min(iterations,Number(d.iterations)||0);
+            const root=d.spots?.find(s=>s.scenario?.actionHistory?.length===0);
+            stacks.push(Number(root?.scenario?.heroStack));
+            for(const spot of d.spots||[]){
+              if(ids.has(spot.id))throw new Error('duplicate 9max spot '+spot.id);
+              ids.add(spot.id);spots.push(spot);
+            }
+          }
+          const payload={
+            schemaVersion:2,
+            generatedAt:new Date().toISOString(),
+            solver:'DCFR_SOLVER',
+            upstream:{repository:'exinori/DCFR-SOLVER',commit:'4ade6a9e15a841c41867afde1258b9d110cd6fb1',license:'MIT'},
+            variant:'9MAX_MULTISTACK_NATIVE',
+            iterations,
+            stackDepthsBb:[...new Set(stacks)].sort((a,b)=>a-b),
+            spots
+          };
+          fs.writeFileSync('data/solver/preflop-9max.json',JSON.stringify(payload));
+          console.log({nodes:spots.length,stacks:payload.stackDepthsBb});
+          NODE
+
+      - name: Validate strict 9-max coverage
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          const contract=fake.StackUpSolvedSpotContract;
+          const d=JSON.parse(fs.readFileSync('data/solver/preflop-9max.json','utf8'));
+          const solvedByPos={};let valid=0;
+          for(const s of d.spots||[]){
+            if(Number(s.scenario?.tableSize)!==9)throw new Error('non-9max '+s.id);
+            for(const h of s.strategy||[]){
+              const v=contract.validateSolvedDecision(s,h);
+              if(!v.ok)throw new Error(s.id+'/'+h.hand+': '+v.errors.join(','));
+              valid++;
+              const p=String(s.scenario?.heroPosition||'');
+              solvedByPos[p]=(solvedByPos[p]||0)+1;
+            }
+          }
+          for(const p of ['UTG+1','UTG+2','LJ']){
+            if((solvedByPos[p]||0)<1500)throw new Error(p+' below strict floor: '+String(solvedByPos[p]||0));
+          }
+          console.log({validatedSolvedDecisions:valid,solvedByPos});
+          NODE
+
+      - name: Recompute strict coverage and deficit queue
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+
+      - name: Commit native 9-max bank safely
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "StackUp 9max Bot"
           git config user.email "actions@users.noreply.github.com"
@@ -102,10 +190,12 @@ jobs:
           git reset --hard origin/main
           cp /tmp/preflop-9max.json data/solver/preflop-9max.json
           node scripts/audit-scenario-coverage.mjs
-          git add data/solver/preflop-9max.json data/solver/coverage.json
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+          git add data/solver/preflop-9max.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
           if git diff --cached --quiet; then
             echo "9-max bank unchanged."
             exit 0
           fi
-          git commit -m "Generate native DCFR 9max preflop bank"
+          git commit -m "Generate native multistack DCFR 9max bank"
           git push origin HEAD:main

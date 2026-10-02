@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "mode": "STRICT_SOLVED_ONLY",
+  "engines": [
+    {
+      "id": "DCFR_PREFLOP_MULTISTACK",
+      "workflow": "build-preflop-multistack.yml",
+      "generator": "scripts/stackup-preflop-export.rs",
+      "handles": [
+        "mode/*",
+        "seats/s6",
+        "pos/*",
+        "street/pre",
+        "mode/cash",
+        "phase/early",
+        "phase/middle",
+        "stack/*",
+        "pre_special/*",
+        "blind_special/*",
+        "aggr_special/*",
+        "short_special/chip_up"
+      ],
+      "strict": true,
+      "excludes": [
+        "pos/UTG+1",
+        "pos/UTG+2",
+        "pos/LJ",
+        "seats/s9",
+        "seats/s2"
+      ]
+    },
+    {
+      "id": "DCFR_PREFLOP_9MAX",
+      "workflow": "build-preflop-9max.yml",
+      "generator": "scripts/stackup-preflop-export.rs",
+      "handles": [
+        "seats/s9",
+        "pos/UTG+1",
+        "pos/UTG+2",
+        "pos/LJ"
+      ],
+      "strict": true
+    },
+    {
+      "id": "DCFR_HEADS_UP_MULTISTACK",
+      "workflow": "build-hu-pushfold-bank.yml",
+      "generator": "scripts/patch-dcfr-hu.py + scripts/stackup-preflop-export.rs",
+      "handles": [
+        "seats/s2",
+        "blind_special/heads_up_2max"
+      ],
+      "strict": true
+    },
+    {
+      "id": "DCFR_POSTFLOP_GENERAL",
+      "workflow": "build-solver-bank.yml",
+      "generator": "scripts/generate-solver-bank.mjs",
+      "handles": [
+        "street/flop",
+        "street/turn",
+        "street/river",
+        "aggr_special/pot_4bet",
+        "math_special/*"
+      ],
+      "strict": true
+    },
+    {
+      "id": "DCFR_POSTFLOP_LINES",
+      "workflow": "build-line-bank.yml",
+      "generator": "scripts/generate-line-bank.mjs",
+      "handles": [
+        "post_special/*",
+        "river_special/*"
+      ],
+      "strict": true,
+      "excludes": [
+        "post_special/postflop_multiway"
+      ]
+    },
+    {
+      "id": "DCFR_TEXTURE_SIZING",
+      "workflow": "build-texture-sizing-bank.yml",
+      "generator": "scripts/generate-texture-sizing-bank.mjs",
+      "handles": [
+        "texture_special/*"
+      ],
+      "strict": true
+    },
+    {
+      "id": "STACKUP_ICM_PKO",
+      "workflow": "build-tournament-bank.yml",
+      "generator": "scripts/generate-tournament-bank.py",
+      "handles": [
+        "ttype/*",
+        "fsize/*",
+        "phase/bubble",
+        "phase/late",
+        "phase/ft",
+        "seats/s8",
+        "seats/s10",
+        "short_special/open_shove",
+        "short_special/call_shove",
+        "short_special/reshove",
+        "short_special/push_fold",
+        "icm_special/*",
+        "pko_special/pko_math",
+        "pko_special/bounty_call",
+        "pko_special/bounty_shove",
+        "pko_special/covering_stack",
+        "pko_special/covered_stack",
+        "mode/mtt"
+      ],
+      "strict": true
+    },
+    {
+      "id": "STACKUP_REENTRY_UTILITY",
+      "workflow": "build-reentry-bank.yml",
+      "generator": "scripts/generate-reentry-bank.py",
+      "handles": [
+        "extras/rebuy",
+        "extras/addon"
+      ],
+      "strict": true
+    },
+    {
+      "id": "STACKUP_OPPONENT_BR",
+      "workflow": "build-opponent-profile-bank.yml",
+      "generator": "scripts/generate-opponent-profile-bank.py",
+      "handles": [
+        "fskill/*"
+      ],
+      "strict": true
+    },
+    {
+      "id": "STACKUP_MULTIWAY_ICM",
+      "workflow": "build-multiway-tournament-bank.yml",
+      "generator": "scripts/generate-multiway-tournament-bank.py",
+      "handles": [
+        "short_special/multi_shove",
+        "pko_special/bounty_iso",
+        "pko_special/multiway_bounty"
+      ],
+      "strict": true
+    },
+    {
+      "id": "STACKUP_MULTIWAY_POSTFLOP",
+      "workflow": "build-multiway-postflop-bank.yml",
+      "generator": "scripts/generate-multiway-postflop-bank.py",
+      "handles": [
+        "post_special/postflop_multiway"
+      ],
+      "strict": true
+    }
+  ]
+}

@@ -19,7 +19,11 @@ if(!baseCallerOop||!baseAggressorOop)throw new Error("required_line_base_matchup
 
 const RUNOUTS=[
   {id:"a",flop:"As7d2c",turn:"Jh",river:"4s"},
-  {id:"b",flop:"Qh8h3c",turn:"5d",river:"Ts"}
+  {id:"b",flop:"Qh8h3c",turn:"5d",river:"Ts"},
+  {id:"c",flop:"9s8d6c",turn:"Kh",river:"2s"},
+  {id:"d",flop:"KcQd5h",turn:"5s",river:"9c"},
+  {id:"e",flop:"7s6s2d",turn:"8h",river:"Ac"},
+  {id:"f",flop:"Jc9c4d",turn:"2h",river:"Qs"}
 ];
 const POSITIONS=["UTG","HJ","CO","BTN","SB","BB"];
 const SUITS=["c","d","h","s"];

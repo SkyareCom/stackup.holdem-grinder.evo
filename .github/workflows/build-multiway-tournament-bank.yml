@@ -1,0 +1,81 @@
+name: Build Multiway Tournament Bank
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-multiway-tournament-bank.yml"
+      - "scripts/generate-multiway-tournament-bank.py"
+      - "data/solver/pushfold-hu-v1.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: multiway-tournament-bank
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: python -m pip install --disable-pip-version-check numpy treys==0.1.8
+
+      - name: Generate card-level multiway best responses
+        env:
+          STACKUP_MULTIWAY_SAMPLES: "700"
+          STACKUP_MULTIWAY_INDIFFERENCE_BB: "0.12"
+        run: python scripts/generate-multiway-tournament-bank.py
+
+      - name: Validate strict multiway families
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          const d=JSON.parse(fs.readFileSync('data/solver/multiway-tournament.json','utf8'));
+          const counts={multi_shove:0,bounty_iso:0,multiway_bounty:0};
+          for(const s of d.spots||[])for(const h of s.strategy||[]){
+            const v=fake.StackUpSolvedSpotContract.validateSolvedDecision(s,h);
+            if(!v.ok)throw new Error(s.id+'/'+h.hand+': '+v.errors.join(','));
+            for(const tag of s.scenario?.tags||[])if(tag in counts)counts[tag]++;
+            const se=Number(s.convergence?.maxStandardErrorBb);
+            if(!Number.isFinite(se)||se>1.5)throw new Error('multiway standard error too high '+s.id+': '+se);
+          }
+          for(const [k,n] of Object.entries(counts))if(n<1500)throw new Error(k+' below 1500: '+n);
+          console.log(counts);
+          NODE
+
+      - name: Recompute strict coverage
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+
+      - name: Commit multiway bank safely
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "StackUp Multiway Bot"
+          git config user.email "actions@users.noreply.github.com"
+          cp data/solver/multiway-tournament.json /tmp/multiway-tournament.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/multiway-tournament.json data/solver/multiway-tournament.json
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+          git add data/solver/multiway-tournament.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Generate multiway tournament solved bank"
+          git push origin HEAD:main

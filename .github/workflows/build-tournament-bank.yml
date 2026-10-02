@@ -3,6 +3,8 @@ name: Build Tournament Bank
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - ".github/workflows/build-tournament-bank.yml"
       - "scripts/generate-tournament-bank.py"
@@ -67,9 +69,13 @@ jobs:
           PY
 
       - name: Audit all 162 scenario cards
-        run: node scripts/audit-scenario-coverage.mjs
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
       - name: Commit tournament bank and coverage
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "StackUp Tournament Bot"
           git config user.email "actions@users.noreply.github.com"
@@ -84,7 +90,7 @@ jobs:
           # Coverage must be recomputed against the newest versions of every bank.
           node scripts/audit-scenario-coverage.mjs
 
-          git add data/solver/tournament.json data/solver/coverage.json
+          git add data/solver/tournament.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
           if git diff --cached --quiet; then
             echo "Tournament bank unchanged."
             exit 0

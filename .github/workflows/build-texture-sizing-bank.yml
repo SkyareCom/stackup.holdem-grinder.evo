@@ -3,6 +3,8 @@ name: Build Texture Sizing Bank
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - ".github/workflows/build-texture-sizing-bank.yml"
       - "scripts/generate-texture-sizing-bank.mjs"
@@ -58,17 +60,27 @@ jobs:
           if(d.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
           const tags=new Set((d.spots||[]).flatMap(s=>s.scenario?.tags||[]));
           const required=['board_paired','board_monotone','board_low','bet_25','bet_50','bet_66','bet_75','pot_bet','overbet_125','overbet_150'];
-          for(const tag of required)if(!tags.has(tag))throw new Error('missing targeted solve '+tag);
+          const solvedByTag={};
           for(const s of d.spots||[]){
-            if(!Array.isArray(s.strategy)||s.strategy.length<250)throw new Error('insufficient combos '+s.id);
+            if(!Array.isArray(s.strategy)||s.strategy.length<250)throw new Error('insufficient solved hands '+s.id);
+            for(const tag of s.scenario?.tags||[])solvedByTag[tag]=(solvedByTag[tag]||0)+s.strategy.length;
           }
-          console.log({spots:d.spots.length,failures:d.failures?.length||0,tags:[...tags]});
+          for(const tag of required){
+            if(!tags.has(tag))throw new Error('missing targeted solve '+tag);
+            if((solvedByTag[tag]||0)<1500)throw new Error(tag+' below strict 1500 floor: '+String(solvedByTag[tag]||0));
+          }
+          if((d.failures?.length||0)>2)throw new Error('too many texture/sizing failures: '+d.failures.length);
+          console.log({spots:d.spots.length,failures:d.failures?.length||0,solvedByTag});
           NODE
 
-      - name: Recompute 162-card coverage
-        run: node scripts/audit-scenario-coverage.mjs
+      - name: Recompute strict coverage and deficit queue
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
       - name: Commit bank and coverage safely
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "StackUp Texture Bot"
           git config user.email "actions@users.noreply.github.com"
@@ -77,7 +89,9 @@ jobs:
           git reset --hard origin/main
           cp /tmp/texture-sizing.json data/solver/texture-sizing.json
           node scripts/audit-scenario-coverage.mjs
-          git add data/solver/texture-sizing.json data/solver/coverage.json
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+          git add data/solver/texture-sizing.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
           if git diff --cached --quiet; then
             echo "Texture/sizing bank unchanged."
             exit 0

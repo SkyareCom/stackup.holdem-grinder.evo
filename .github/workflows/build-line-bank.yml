@@ -21,7 +21,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
 
     steps:
       - uses: actions/checkout@v4
@@ -66,21 +66,35 @@ jobs:
           if(bank.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
           if(!Array.isArray(bank.spots)||bank.spots.length<12)throw new Error('line bank too small');
           let valid=0;
+          const byTag={};
           for(const spot of bank.spots){
+            let spotValid=0;
             for(const entry of spot.strategy||[]){
               const result=contract.validateSolvedDecision(spot,entry);
               if(!result.ok)throw new Error(spot.id+'/'+entry.hand+': '+result.errors.join(','));
-              valid++;
+              valid++;spotValid++;
             }
+            for(const tag of spot.scenario?.tags||[])byTag[tag]=(byTag[tag]||0)+spotValid;
           }
-          if(valid<500)throw new Error('line bank has fewer than 500 validated solved decisions');
-          console.log({rootNodes:bank.spots.length,validatedSolvedDecisions:valid,failures:bank.failures?.length||0});
+          const required=[
+            'donk_bet','check_back_flop','miss_cbet','check_raise',
+            'probe_bet','vs_missed_cbet','delayed_cbet','double_barrel',
+            'triple_barrel','float_flop','sequential_lines',
+            'block_bet_20_25','river_bluff_catch','river_check_raise','bet_fold'
+          ];
+          if(valid<6000)throw new Error('line bank has fewer than 6000 validated solved decisions: '+valid);
+          for(const tag of required){
+            if((byTag[tag]||0)<1500)throw new Error(tag+' below strict 1500 floor: '+String(byTag[tag]||0));
+          }
+          if((bank.failures?.length||0)>4)throw new Error('too many targeted line failures: '+bank.failures.length);
+          console.log({rootNodes:bank.spots.length,validatedSolvedDecisions:valid,byTag,failures:bank.failures?.length||0});
           NODE
 
       - name: Recompute strict coverage and deficit queue
         run: |
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
       - name: Commit bank, coverage and queue safely
         if: github.ref == 'refs/heads/main'
@@ -95,8 +109,9 @@ jobs:
 
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
-          git add data/solver/line-bank.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json
+          git add data/solver/line-bank.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
           if git diff --cached --quiet; then
             echo "Solved line bank unchanged."
             exit 0

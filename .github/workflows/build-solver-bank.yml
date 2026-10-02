@@ -3,6 +3,8 @@ name: Build Solver Bank
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - ".github/workflows/build-solver-bank.yml"
       - "scripts/generate-solver-bank.mjs"
@@ -58,7 +60,7 @@ jobs:
           STACKUP_MAX_MATCHUPS: "30"
           STACKUP_SHARD_COUNT: "6"
           STACKUP_SHARD_INDEX: ${{ matrix.shard }}
-          STACKUP_BOARDS_PER_STREET: "1"
+          STACKUP_BOARDS_PER_STREET: "2"
           STACKUP_SHARD_OUT: ${{ github.workspace }}/.stackup/solver-shard
         run: node scripts/generate-solver-bank.mjs
 
@@ -94,13 +96,17 @@ jobs:
         run: node scripts/merge-solver-shards.mjs
 
       - name: Audit scenario coverage
-        run: node scripts/audit-scenario-coverage.mjs
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
       - name: Commit solver bank
+        if: github.ref == 'refs/heads/main'
         run: |
           git config user.name "StackUp Solver Bot"
           git config user.email "actions@users.noreply.github.com"
-          git add data/solver/preflop.json data/solver/postflop.json data/solver/manifest.json data/solver/coverage.json
+          git add data/solver/preflop.json data/solver/postflop.json data/solver/manifest.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
           if git diff --cached --quiet; then
             echo "Solver bank unchanged."
             exit 0

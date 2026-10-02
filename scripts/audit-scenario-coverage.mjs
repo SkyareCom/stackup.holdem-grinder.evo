@@ -5,21 +5,31 @@ const ROOT=resolve(process.cwd());
 const SOLVER_DIR=join(ROOT,"data","solver");
 const catalogCode=await readFile(join(ROOT,"core","stackup-scenario-catalog.js"),"utf8");
 const contractCode=await readFile(join(ROOT,"core","stackup-solved-spot-contract.js"),"utf8");
+const classifierCode=await readFile(join(ROOT,"core","stackup-solved-spot-classifier.js"),"utf8");
 const fakeWindow={};
 new Function("window",catalogCode)(fakeWindow);
 new Function("window","globalThis",contractCode)(fakeWindow,fakeWindow);
+new Function("window","globalThis",classifierCode)(fakeWindow,fakeWindow);
 const catalog=fakeWindow.StackUpScenarioCatalog;
 const solvedContract=fakeWindow.StackUpSolvedSpotContract;
+const solvedClassifier=fakeWindow.StackUpSolvedSpotClassifier;
 if(!catalog)throw new Error("scenario catalog unavailable");
 if(!solvedContract)throw new Error("solved spot contract unavailable");
+if(!solvedClassifier)throw new Error("solved spot classifier unavailable");
 const solvedPolicy=JSON.parse(await readFile(join(SOLVER_DIR,"solved-spot-policy.json"),"utf8"));
 
 const preflop=JSON.parse(await readFile(join(SOLVER_DIR,"preflop.json"),"utf8"));
 const postflop=JSON.parse(await readFile(join(SOLVER_DIR,"postflop.json"),"utf8"));
 const pushfold=JSON.parse(await readFile(join(SOLVER_DIR,"pushfold-hu-v1.json"),"utf8"));
 const tournament=JSON.parse(await readFile(join(SOLVER_DIR,"tournament.json"),"utf8"));
+const reentry=JSON.parse(await readFile(join(SOLVER_DIR,"reentry.json"),"utf8"));
+const opponentProfile=JSON.parse(await readFile(join(SOLVER_DIR,"opponent-profile.json"),"utf8"));
+const multiwayTournament=JSON.parse(await readFile(join(SOLVER_DIR,"multiway-tournament.json"),"utf8"));
+const multiwayPostflop=JSON.parse(await readFile(join(SOLVER_DIR,"multiway-postflop.json"),"utf8"));
 const preflopDecisions=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-decisions.json"),"utf8"));
 const preflop9max=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-9max.json"),"utf8"));
+const preflopMultistack=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-multistack.json"),"utf8"));
+const preflopHu=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-hu.json"),"utf8"));
 const textureSizing=JSON.parse(await readFile(join(SOLVER_DIR,"texture-sizing.json"),"utf8"));
 const lineBank=JSON.parse(await readFile(join(SOLVER_DIR,"line-bank.json"),"utf8"));
 
@@ -80,8 +90,14 @@ function pushfoldSpots(){
 const all=[
   ...preflop,...postflop,...pushfoldSpots(),
   ...((tournament?.spots)||[]),
+  ...((reentry?.spots)||[]),
+  ...((opponentProfile?.spots)||[]),
+  ...((multiwayTournament?.spots)||[]),
+  ...((multiwayPostflop?.spots)||[]),
   ...((preflopDecisions?.spots)||[]),
   ...((preflop9max?.spots)||[]),
+  ...((preflopMultistack?.spots)||[]),
+  ...((preflopHu?.spots)||[]),
   ...((textureSizing?.spots)||[]),
   ...((lineBank?.spots)||[])
 ];
@@ -163,14 +179,17 @@ function spotFacesAggression(spot){
   return actor!==hero&&/raise|bet|jam|all\s*-?\s*in/.test(kind);
 }
 function candidateMatchesItem(item,spot,hand){
-  if(item?.section!=="math_special")return true;
-  if(!["implied_odds","reverse_implied_odds"].includes(item.id))return true;
-  const street=normStreet(spot?.scenario?.street);
-  if(!["FLOP","TURN"].includes(street))return false;
-  const profile=drawProfile(spot,hand);
-  if(!profile)return false;
-  if(item.id==="implied_odds")return spotFacesAggression(spot)&&profile.anyDraw;
-  if(item.id==="reverse_implied_odds")return profile.nonNutFlushDraw;
+  if(item?.section==="math_special"&&["implied_odds","reverse_implied_odds"].includes(item.id)){
+    const street=normStreet(spot?.scenario?.street);
+    if(!["FLOP","TURN"].includes(street))return false;
+    const profile=drawProfile(spot,hand);
+    if(!profile)return false;
+    if(item.id==="implied_odds"&&!(spotFacesAggression(spot)&&profile.anyDraw))return false;
+    if(item.id==="reverse_implied_odds"&&!profile.nonNutFlushDraw)return false;
+  }
+  if(solvedClassifier.isHandLevel(item?.section,item?.id)){
+    return solvedClassifier.qualifies(item.section,item.id,spot,hand);
+  }
   return true;
 }
 function candidateCount(spots,item=null){
@@ -323,6 +342,7 @@ function matchAdvance(item,spot){
   if(item.section==="math_special"&&["implied_odds","reverse_implied_odds"].includes(item.id)){
     return ["FLOP","TURN"].includes(street);
   }
+  if(solvedClassifier.isHandLevel(item.section,item.id))return true;
   return tags(spot).has(item.id);
 }
 function ljEquivalentSpots(){

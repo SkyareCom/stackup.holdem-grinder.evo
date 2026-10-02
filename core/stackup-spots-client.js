@@ -65,26 +65,38 @@
     if(staticBankPromise)return staticBankPromise;
     staticBankPromise=(async()=>{
       const manifest=await fetchJson(staticUrl('manifest.json'));
-      const [preflop,postflop,pushfold,tournament,preflopDecisions,textureSizing,preflop9max,lineBank]=await Promise.all([
+      const [preflop,postflop,pushfold,tournament,reentry,opponentProfile,multiwayTournament,multiwayPostflop,preflopDecisions,textureSizing,preflop9max,preflopMultistack,preflopHu,lineBank]=await Promise.all([
         fetchJson(staticUrl('preflop.json')),
         fetchJson(staticUrl('postflop.json')),
         fetchJson(staticUrl('pushfold-hu-v1.json')),
         fetchJson(staticUrl('tournament.json')),
+        fetchJson(staticUrl('reentry.json')),
+        fetchJson(staticUrl('opponent-profile.json')),
+        fetchJson(staticUrl('multiway-tournament.json')),
+        fetchJson(staticUrl('multiway-postflop.json')),
         fetchJson(staticUrl('preflop-decisions.json')),
         fetchJson(staticUrl('texture-sizing.json')),
         fetchJson(staticUrl('preflop-9max.json')),
+        fetchJson(staticUrl('preflop-multistack.json')),
+        fetchJson(staticUrl('preflop-hu.json')),
         fetchJson(staticUrl('line-bank.json'))
       ]);
       if(!Array.isArray(preflop)||!preflop.length)throw new Error('static_preflop_empty');
       if(!Array.isArray(postflop)||!postflop.length)throw new Error('static_postflop_empty');
       if(!pushfold||typeof pushfold!=='object'||!pushfold.charts)throw new Error('static_pushfold_empty');
       if(!tournament||typeof tournament!=='object'||!Array.isArray(tournament.spots))throw new Error('static_tournament_invalid');
+      if(!reentry||typeof reentry!=='object'||!Array.isArray(reentry.spots))throw new Error('static_reentry_invalid');
+      if(!opponentProfile||typeof opponentProfile!=='object'||!Array.isArray(opponentProfile.spots))throw new Error('static_opponent_profile_invalid');
+      if(!multiwayTournament||typeof multiwayTournament!=='object'||!Array.isArray(multiwayTournament.spots))throw new Error('static_multiway_tournament_invalid');
+      if(!multiwayPostflop||typeof multiwayPostflop!=='object'||!Array.isArray(multiwayPostflop.spots))throw new Error('static_multiway_postflop_invalid');
       if(!preflopDecisions||typeof preflopDecisions!=='object'||!Array.isArray(preflopDecisions.spots))throw new Error('static_preflop_decisions_invalid');
       if(!textureSizing||typeof textureSizing!=='object'||!Array.isArray(textureSizing.spots))throw new Error('static_texture_sizing_invalid');
       if(!preflop9max||typeof preflop9max!=='object'||!Array.isArray(preflop9max.spots))throw new Error('static_preflop_9max_invalid');
+      if(!preflopMultistack||typeof preflopMultistack!=='object'||!Array.isArray(preflopMultistack.spots))throw new Error('static_preflop_multistack_invalid');
+      if(!preflopHu||typeof preflopHu!=='object'||!Array.isArray(preflopHu.spots))throw new Error('static_preflop_hu_invalid');
       if(!lineBank||typeof lineBank!=='object'||!Array.isArray(lineBank.spots))throw new Error('static_line_bank_invalid');
       state.manifest=manifest;
-      return {manifest,preflop,postflop,pushfold,tournament,preflopDecisions,textureSizing,preflop9max,lineBank};
+      return {manifest,preflop,postflop,pushfold,tournament,reentry,opponentProfile,multiwayTournament,multiwayPostflop,preflopDecisions,textureSizing,preflop9max,preflopMultistack,preflopHu,lineBank};
     })().catch(error=>{
       staticBankPromise=null;
       throw error;

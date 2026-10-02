@@ -1,0 +1,96 @@
+name: Validate Solved Spot Pipeline
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "core/stackup-solved-spot-contract.js"
+      - "core/stackup-solved-spot-classifier.js"
+      - "core/stackup-training-sequencer.js"
+      - "core/stackup-spots-client.js"
+      - "scripts/*.mjs"
+      - "scripts/*.py"
+      - "scripts/stackup-preflop-export.rs"
+      - "data/solver/solved-spot-policy.json"
+      - ".github/workflows/*.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-solved-pipeline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate JavaScript and ESM syntax
+        run: |
+          node --check core/stackup-solved-spot-contract.js
+          node --check core/stackup-solved-spot-classifier.js
+          node --check core/stackup-training-sequencer.js
+          node --check core/stackup-spots-client.js
+          node --check scripts/audit-scenario-coverage.mjs
+          node --check scripts/plan-solved-spot-growth.mjs
+          node --check scripts/route-solve-queue.mjs
+          node --check scripts/generate-line-bank.mjs
+          node --check scripts/generate-solver-bank.mjs
+          node --check scripts/generate-texture-sizing-bank.mjs
+
+      - name: Validate Python generators and patchers
+        run: |
+          python -m py_compile scripts/generate-tournament-bank.py
+          python -m py_compile scripts/patch-dcfr-9max.py
+          python -m py_compile scripts/patch-dcfr-stack.py
+          python -m py_compile scripts/patch-dcfr-hu.py
+          python -m py_compile scripts/generate-reentry-bank.py
+          python -m py_compile scripts/generate-opponent-profile-bank.py
+          python -m py_compile scripts/generate-multiway-tournament-bank.py
+          python -m py_compile scripts/generate-multiway-postflop-bank.py
+
+      - name: Validate solved-spot policy and bank envelopes
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const policy=JSON.parse(fs.readFileSync('data/solver/solved-spot-policy.json','utf8'));
+          if(policy.mode!=='STRICT_SOLVED_ONLY')throw new Error('strict policy required');
+          if(policy.publishFloor!==1500||policy.currentGoal!==2000)throw new Error('target drift');
+          if(policy.growth?.longTermTargetPerFilter!==20000)throw new Error('20k target drift');
+          for(const file of [
+            'data/solver/preflop-9max.json',
+            'data/solver/preflop-multistack.json',
+            'data/solver/preflop-hu.json',
+            'data/solver/reentry.json',
+            'data/solver/opponent-profile.json',
+            'data/solver/multiway-tournament.json',
+            'data/solver/multiway-postflop.json',
+            'data/solver/line-bank.json',
+            'data/solver/tournament.json',
+            'data/solver/texture-sizing.json'
+          ]){
+            const d=JSON.parse(fs.readFileSync(file,'utf8'));
+            if(!d||typeof d!=='object')throw new Error('invalid json '+file);
+          }
+          console.log({strict:true,publishFloor:policy.publishFloor,currentGoal:policy.currentGoal,longTerm:policy.growth.longTermTargetPerFilter});
+          NODE
+
+      - name: Run strict coverage audit
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
+          node - <<'NODE'
+          const fs=require('fs');
+          const r=JSON.parse(fs.readFileSync('data/solver/solve-route-plan.json','utf8'));
+          if(r.counts.unrouted!==0)throw new Error('unrouted deficits: '+r.counts.unrouted);
+          if(r.counts.engineRequired!==0)throw new Error('engines still required: '+r.counts.engineRequired);
+          console.log({readyToSolve:r.counts.readyToSolve,engineRequired:r.counts.engineRequired,unrouted:r.counts.unrouted});
+          NODE

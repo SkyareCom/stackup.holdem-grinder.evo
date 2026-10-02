@@ -601,24 +601,36 @@
 
   function candidateMathCompatible(spot,hand,special){
     const requested=(special?.math_special||[]).map(String);
-    if(!requested.length)return true;
+    if(requested.length){
+      // MATH stays OR across selected alternatives, including hand-level odds
+      // and scenario-level tags.
+      const tags=spotTags(spot);
+      const street=normStreet(spot?.scenario?.street);
+      let profile=null;
+      const mathOk=requested.some(id=>{
+        if(id==='implied_odds'||id==='reverse_implied_odds'){
+          if(!['FLOP','TURN'].includes(street))return false;
+          profile=profile||drawProfile(spot,hand);
+          if(!profile)return false;
+          if(id==='implied_odds')return spotFacesAggression(spot)&&profile.anyDraw;
+          return profile.nonNutFlushDraw;
+        }
+        return tags.has(id);
+      });
+      if(!mathOk)return false;
+    }
 
-    // Dentro de MATH os cards são alternativas (OR), exatamente como os demais
-    // grupos multi-select. Opções de nível de mão e tags de cenário não podem
-    // virar um AND acidental quando selecionadas juntas.
-    const tags=spotTags(spot);
-    const street=normStreet(spot?.scenario?.street);
-    let profile=null;
-    return requested.some(id=>{
-      if(id==='implied_odds'||id==='reverse_implied_odds'){
-        if(!['FLOP','TURN'].includes(street))return false;
-        profile=profile||drawProfile(spot,hand);
-        if(!profile)return false;
-        if(id==='implied_odds')return spotFacesAggression(spot)&&profile.anyDraw;
-        return profile.nonNutFlushDraw;
+    // Hand-level solved classifiers only classify decisions that are already
+    // solver-resolved. They never create strategy or coverage.
+    const classifier=global.StackUpSolvedSpotClassifier;
+    if(classifier?.isHandLevel&&classifier?.qualifies){
+      for(const [section,values] of Object.entries(special||{})){
+        if(section==='math_special')continue;
+        const handLevel=(Array.isArray(values)?values:[]).map(String).filter(id=>classifier.isHandLevel(section,id));
+        if(handLevel.length&&!handLevel.some(id=>classifier.qualifies(section,id,spot,hand)))return false;
       }
-      return tags.has(id);
-    });
+    }
+    return true;
   }
 
   function specialStreetCompatible(spot,special){
@@ -641,11 +653,11 @@
     if(!groups.length)return true;
     if(!specialStreetCompatible(spot,special))return false;
     const tags=spotTags(spot);
+    const classifier=global.StackUpSolvedSpotClassifier;
     return groups.every(([section,values])=>{
-      // MATH é validado por mão em candidateMathCompatible para preservar
-      // semântica OR entre todas as opções matemáticas.
+      // MATH is evaluated per hand in candidateMathCompatible to preserve OR.
       if(section==='math_special')return true;
-      const spotLevel=values.map(String);
+      const spotLevel=values.map(String).filter(x=>!classifier?.isHandLevel?.(section,x));
       if(!spotLevel.length)return true;
       return spotLevel.some(x=>tags.has(x));
     });
