@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="typography-12-footer-10-v1">
+<meta name="grinder-build" content="filter-compatibility-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -787,6 +787,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 <script src="core/stackup-spots-engine.js"></script>
 <script src="core/stackup-tournament-math.js"></script>
 <script src="core/stackup-scenario-catalog.js"></script>
+<script src="core/stackup-filter-compatibility.js"></script>
 <script src="core/stackup-ai-scenario-planner.js"></script>
 <script src="core/stackup-solved-spot-contract.js"></script>
 <script src="core/stackup-training-sequencer.js"></script>
@@ -879,6 +880,31 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   };
   const ADV_SECTION_ICON={"pre_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M180-180v-520q0-33 23.5-56.5T260-780h320q33 0 56.5 23.5T660-700v40h40q33 0 56.5 23.5T780-580v400q0 33-23.5 56.5T700-100H260q-33 0-56.5-23.5T180-180Zm80-480h320v-40H260v40Zm0 480h440v-400h-40v320H260v-80h-20v-400h20v360h320v-400H260v520Z\"/></svg>","blind_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q150 0 255 105t105 255q0 150-105 255T480-120Zm0-60q125 0 212.5-87.5T780-480q0-125-87.5-212.5T480-780q-125 0-212.5 87.5T180-480q0 125 87.5 212.5T480-180Zm0-120q-75 0-127.5-52.5T300-480q0-75 52.5-127.5T480-660q75 0 127.5 52.5T660-480q0 75-52.5 127.5T480-300Zm0-60q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Zm0-60q-25 0-42.5-17.5T420-480q0-25 17.5-42.5T480-540q25 0 42.5 17.5T540-480q0 25-17.5 42.5T480-420Z\"/></svg>","aggr_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M180-220v-60h458L514-404l42-42 196 196-196 196-42-42 124-124H180Zm600-520v60H322l124 124-42 42-196-196 196-196 42 42-124 124h458Z\"/></svg>","short_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M220-160v-120h520v120H220Zm60-180v-120h400v120H280Zm60-180v-120h280v120H340Zm60-180v-120h160v120H400Z\"/></svg>","icm_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M450-120v-540H270l150 220v80H120v-80l150-220H120v-60h330v-120h60v120h330v60H690l150 220v80H540v-80l150-220H510v540h160v60H290v-60h160ZM180-420h180l-90-132-90 132Zm420 0h180l-90-132-90 132Z\"/></svg>","pko_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M480-80 360-240H220q-25 0-42.5-17.5T160-300v-500q0-25 17.5-42.5T220-860h520q25 0 42.5 17.5T800-800v500q0 25-17.5 42.5T740-240H600L480-80Zm0-100 90-120h170v-500H220v500h170l90 120Zm0-200 62-122 138-20-100-98 24-138-124 65-124-65 24 138-100 98 138 20 62 122Z\"/></svg>","post_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M120-260v-440q0-25 17.5-42.5T180-760h120q25 0 42.5 17.5T360-700v440q0 25-17.5 42.5T300-200H180q-25 0-42.5-17.5T120-260Zm240 0v-440q0-25 17.5-42.5T420-760h120q25 0 42.5 17.5T600-700v440q0 25-17.5 42.5T540-200H420q-25 0-42.5-17.5T360-260Zm240 0v-440q0-25 17.5-42.5T660-760h120q25 0 42.5 17.5T840-700v440q0 25-17.5 42.5T780-200H660q-25 0-42.5-17.5T600-260Z\"/></svg>","river_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M80-240q80-80 160-80t160 80q80 80 160 80t160-80q80-80 160-80v80q-80 0-160 80t-160 80q-80 0-160-80t-160-80q-80 0-160 80v-80Zm0-220q80-80 160-80t160 80q80 80 160 80t160-80q80-80 160-80v80q-80 0-160 80t-160 80q-80 0-160-80t-160-80q-80 0-160 80v-80Zm0-220q80-80 160-80t160 80q80 80 160 80t160-80q80-80 160-80v80q-80 0-160 80t-160 80q-80 0-160-80t-160-80q-80 0-160 80v-80Z\"/></svg>","texture_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M140-140v-680h680v680H140Zm60-60h250v-250H200v250Zm310 0h250v-250H510v250ZM200-510h250v-250H200v250Zm310 0h250v-250H510v250Z\"/></svg>","math_special":"<svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M180-100q-25 0-42.5-17.5T120-160v-640q0-25 17.5-42.5T180-860h600q25 0 42.5 17.5T840-800v640q0 25-17.5 42.5T780-100H180Zm0-60h600v-640H180v640Zm100-460h160v-60H280v60Zm30 200h100v-60H310v60Zm320-200h60v-60h-60v60Zm0 200h60v-60h-60v60ZM300-250l42-42 58 58 58-58 42 42-58 58 58 58-42 42-58-58-58 58-42-42 58-58-58-58Zm320 58h100v-60H620v60Zm0-116h100v-60H620v60Z\"/></svg>"};
   const sel={}; [...SECS,...ADV_SECS].forEach(s=>s.groups.forEach(g=>sel[g.id]=new Set(g.def)));
+
+  function filterStateSnapshot(){
+    const out={};
+    Object.keys(sel).forEach(id=>out[id]=[...sel[id]]);
+    return out;
+  }
+  function applyFilterState(next){
+    Object.entries(next||{}).forEach(([id,values])=>{
+      const S=sel[id]; if(!S)return;
+      S.clear(); (Array.isArray(values)?values:[]).forEach(v=>S.add(v));
+    });
+  }
+  function normalizeFilterSelections(trigger){
+    const engine=window.StackUpFilterCompatibility;
+    if(!engine?.normalize)return false;
+    const result=engine.normalize(filterStateSnapshot(),trigger||{});
+    applyFilterState(result.state);
+    return !!result.changed;
+  }
+  function compatibilityReason(group,option){
+    try{return window.StackUpFilterCompatibility?.disabled?.(filterStateSnapshot(),group,option)||null;}catch(_){return null;}
+  }
+  function compatibilityClass(group,option){return compatibilityReason(group,option)?' compat-off':'';}
+  function compatibilityDisabled(group,option){return !!compatibilityReason(group,option);}
+
   let openSec='mode';
   const tw=document.createElement('div');tw.className='trainwrap';tw.hidden=true;
   $('#page').appendChild(tw);
@@ -945,14 +971,14 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         <div class="stitle">${t.sec[s.id]}${dis?`<small>${t.note}</small>`:''}</div>
         <div class="tbody">${s.groups.map(g=>`
           ${(s.groups.length>1&&s.id!=='ttype')?`<div class="glabel">${t.grp[g.id]}</div>`:''}
-          ${true?`<div class="towers${g.tower?' mode':''}" style="grid-template-columns:repeat(${g.tower?3:g.cols},minmax(0,1fr))">${g.opts.map(o=>`<button class="tower${sel[g.id].has(o)?' on':''}${coverageBlocked(g.id,o)?' coverage-off':''}" data-g="${g.id}" data-o="${o}" aria-pressed="${sel[g.id].has(o)}"${(dis||coverageBlocked(g.id,o))?' disabled':''}${coverageAttr(g.id,o)}>${g.plain?'':((g.id==='street'||g.id==='phase'||g.id==='stack'||g.id==='pos'||g.special)&&o==='all'?ICONS.random:(g.id==='phase'&&o==='late'?ICONS.itm:(g.id==='stack'?ICONS[({'5bb':'<10 bb','10bb':'10–20 bb','15bb':'10–20 bb','18bb':'10–20 bb','20bb':'20–40 bb','25bb':'20–40 bb','30bb':'20–40 bb','50bb':'40–60 bb','100bb':'60–100 bb'})[o]]:(g.special?(ICONS[SPECIAL_ICON[o]]||ICONS.cbet):(g.id==='pos'&&o==='UTG+2'?ICONS['UTG+1']:(g.id==='pos'&&o==='LJ'?ICONS.MP:(ICONS[g.id+'_'+o]||ICONS[o])))))))}<b>${g.plain?lab(o):brk(g.id==='street'&&o==='all'?t.opt.random:(g.toggle&&!sel[g.id].has(o)?t.opt['no_'+o]:lab(o)))}</b></button>`).join('')}</div>`:
+          ${true?`<div class="towers${g.tower?' mode':''}" style="grid-template-columns:repeat(${g.tower?3:g.cols},minmax(0,1fr))">${g.opts.map(o=>`<button class="tower${sel[g.id].has(o)?' on':''}${coverageBlocked(g.id,o)?' coverage-off':''}${compatibilityClass(g.id,o)}" data-g="${g.id}" data-o="${o}" aria-pressed="${sel[g.id].has(o)}"${(dis||coverageBlocked(g.id,o)||compatibilityDisabled(g.id,o))?' disabled':''}${coverageAttr(g.id,o)}>${g.plain?'':((g.id==='street'||g.id==='phase'||g.id==='stack'||g.id==='pos'||g.special)&&o==='all'?ICONS.random:(g.id==='phase'&&o==='late'?ICONS.itm:(g.id==='stack'?ICONS[({'5bb':'<10 bb','10bb':'10–20 bb','15bb':'10–20 bb','18bb':'10–20 bb','20bb':'20–40 bb','25bb':'20–40 bb','30bb':'20–40 bb','50bb':'40–60 bb','100bb':'60–100 bb'})[o]]:(g.special?(ICONS[SPECIAL_ICON[o]]||ICONS.cbet):(g.id==='pos'&&o==='UTG+2'?ICONS['UTG+1']:(g.id==='pos'&&o==='LJ'?ICONS.MP:(ICONS[g.id+'_'+o]||ICONS[o])))))))}<b>${g.plain?lab(o):brk(g.id==='street'&&o==='all'?t.opt.random:(g.toggle&&!sel[g.id].has(o)?t.opt['no_'+o]:lab(o)))}</b></button>`).join('')}</div>`:
           `<div class="chips" style="grid-template-columns:repeat(${g.cols},1fr)">${g.opts.map(o=>
-            `<button class="chip${sel[g.id].has(o)?' on':''}${coverageBlocked(g.id,o)?' coverage-off':''}" data-g="${g.id}" data-o="${o}" aria-pressed="${sel[g.id].has(o)}"${(dis||coverageBlocked(g.id,o))?' disabled':''}${coverageAttr(g.id,o)}>${lab(o)}</button>`).join('')}</div>`}`).join('')}
+            `<button class="chip${sel[g.id].has(o)?' on':''}${coverageBlocked(g.id,o)?' coverage-off':''}${compatibilityClass(g.id,o)}" data-g="${g.id}" data-o="${o}" aria-pressed="${sel[g.id].has(o)}"${(dis||coverageBlocked(g.id,o)||compatibilityDisabled(g.id,o))?' disabled':''}${coverageAttr(g.id,o)}>${lab(o)}</button>`).join('')}</div>`}`).join('')}
         </div></section>`}).join('')+
 '';
   }
   const coverageStyle=document.createElement('style');
-  coverageStyle.textContent='.tower.coverage-off,.chip.coverage-off{opacity:.28!important;filter:grayscale(1);cursor:not-allowed!important}.tower.coverage-off.on,.chip.coverage-off.on{box-shadow:none!important}';
+  coverageStyle.textContent='.tower.coverage-off,.chip.coverage-off,.tower.compat-off,.chip.compat-off{opacity:.28!important;filter:grayscale(1);cursor:not-allowed!important}.tower.coverage-off.on,.chip.coverage-off.on,.tower.compat-off.on,.chip.compat-off.on{box-shadow:none!important}';
   document.head.appendChild(coverageStyle);
 
   tw.addEventListener('click',e=>{
@@ -962,6 +988,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const c=e.target.closest('.chip,.tower');
     if(c){const g=SECS.flatMap(s=>s.groups).find(x=>x.id===c.dataset.g),S=sel[g.id],o=c.dataset.o;
       if(g.toggle){ S.has(o)?S.delete(o):S.add(o); } else if(g.multi){ if(o==='all'){S.clear();S.add('all');} else { S.delete('all'); if(S.has(o)){S.delete(o); if(!S.size)S.add('all');} else S.add(o); } } else {S.clear();S.add(o);}
+      normalizeFilterSelections({group:g.id,option:o,source:'ajustes'});
       renderTrain();orgAll();return;}
     const st=e.target.closest('#tstart');
     if(st){st.classList.add('on');setTimeout(()=>st.classList.remove('on'),600);
@@ -1343,21 +1370,23 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return v.length===1?v[0]:null;
   }
   function buildSolverSpotFilters(){
+    normalizeFilterSelections({source:'solver'});
     const mode=selectedOne('mode');
+    const tournament=mode==='mtt';
     const seats=selectedOne('seats');
-    const tournamentType=selectedOne('ttype');
-    const fieldSize=selectedOne('fsize');
-    const opponentProfile=selectedOne('fskill');
+    const tournamentType=tournament?selectedOne('ttype'):null;
+    const fieldSize=tournament?selectedOne('fsize'):null;
+    const opponentProfile=tournament?selectedOne('fskill'):null;
     const sampleSize=Number(selectedOne('hands'))||null;
-    const extras=selectedValues('extras');
-    const phases=selectedValues('phase');
+    const extras=tournament?selectedValues('extras'):[];
+    const phases=tournament?selectedValues('phase'):[];
     const positions=selectedValues('pos');
     const streetValues=selectedValues('street');
-    const stackValues=selectedValues('stack');
+    const stackValues=tournament?selectedValues('stack'):[];
     const streets=streetValues.map(v=>v==='pre'?'PRE-FLOP':v==='flop'?'FLOP':v==='turn'?'TURN':v==='river'?'RIVER':null).filter(Boolean);
     const effectiveStacks=stackValues.map(v=>Number(String(v).replace(/bb$/i,''))).filter(v=>Number.isFinite(v)&&v>0);
     const special={};
-    ADV_SECS.forEach(s=>{
+    if(tournament)ADV_SECS.forEach(s=>{
       const values=selectedValues(s.id);
       if(values.length)special[s.id]=values;
     });
@@ -2308,7 +2337,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const g=s.groups[0],S=sel[g.id];
       return `<section class="advblock" data-adv-section="${s.id}">
         <div class="stitle">${t.sec[s.id]}</div>
-        <div class="towers advscenarios">${g.opts.map(o=>`<button class="tower${S.has(o)?' on':''}${coverageBlocked(g.id,o)?' coverage-off':''}" data-ag="${g.id}" data-ao="${o}" aria-pressed="${S.has(o)}"${coverageBlocked(g.id,o)?' disabled':''}${coverageAttr(g.id,o)}>${advIcon(o)}<b>${brk(o==='all'?t.opt.random:lab(o))}</b></button>`).join('')}</div>
+        <div class="towers advscenarios">${g.opts.map(o=>`<button class="tower${S.has(o)?' on':''}${coverageBlocked(g.id,o)?' coverage-off':''}${compatibilityClass(g.id,o)}" data-ag="${g.id}" data-ao="${o}" aria-pressed="${S.has(o)}"${(coverageBlocked(g.id,o)||compatibilityDisabled(g.id,o))?' disabled':''}${coverageAttr(g.id,o)}>${advIcon(o)}<b>${brk(o==='all'?t.opt.random:lab(o))}</b></button>`).join('')}</div>
       </section>`;
     }).join('');
   }
@@ -2317,7 +2346,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const g=ADV_SECS.flatMap(s=>s.groups).find(x=>x.id===b.dataset.ag),S=sel[g.id],o=b.dataset.ao;
     if(o==='all'){S.clear();S.add('all');}
     else{S.delete('all');if(S.has(o)){S.delete(o);if(!S.size)S.add('all');}else S.add(o);}
+    normalizeFilterSelections({group:g.id,option:o,source:'advance'});
     renderAdvance();
+    if(cur==='train')renderTrain();
   });
   function syncAdvance(){
     const on=cur==='profile';
