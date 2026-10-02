@@ -2,6 +2,11 @@ name: Build Multiway Tournament Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-multiway-tournament-bank.yml"
+      - "scripts/generate-multiway-tournament-bank.py"
+      - "data/solver/pushfold-hu-v1.json"
   push:
     branches:
       - main
@@ -34,7 +39,7 @@ jobs:
 
       - name: Generate card-level multiway best responses
         env:
-          STACKUP_MULTIWAY_SAMPLES: "700"
+          STACKUP_MULTIWAY_SAMPLES: "1000"
           STACKUP_MULTIWAY_INDIFFERENCE_BB: "0.12"
         run: python scripts/generate-multiway-tournament-bank.py
 
@@ -53,7 +58,7 @@ jobs:
             const se=Number(s.convergence?.maxStandardErrorBb);
             if(!Number.isFinite(se)||se>1.5)throw new Error('multiway standard error too high '+s.id+': '+se);
           }
-          for(const [k,n] of Object.entries(counts))if(n<1500)throw new Error(k+' below 1500: '+n);
+          for(const [k,n] of Object.entries(counts))if(n<2000)throw new Error(k+' below strict 2000 floor: '+n);
           console.log(counts);
           NODE
 
