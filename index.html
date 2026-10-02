@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="spots-action-cards-result-audio-v1">
+<meta name="grinder-build" content="spots-actions-persist-fold-hide-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -1071,6 +1071,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   let SPOT_STATS_SESSION_ID=null;
   let SPOT_ACTIVE_ACTION=null;
   const SPOT_VISUAL_FOLDS=new Set();
+  const SPOT_VISUAL_ACTIONS=new Map();
   const SPOT_ANALYSIS_CACHE=new Map();
 
   function cloneSpotValue(value){
@@ -1191,11 +1192,23 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   }
   function spotLastActionForPosition(position){
     const pos=String(position||'').toUpperCase();
+    const visual=SPOT_VISUAL_ACTIONS.get(pos);
+    if(visual)return visual;
     const history=Array.isArray(SOLVER_TABLE_STATE?.history)?SOLVER_TABLE_STATE.history:[];
     for(let i=history.length-1;i>=0;i--){
       if(spotHistoryActor(history[i])===pos)return history[i];
     }
     return null;
+  }
+  function setSpotVisualAction(position,label,kind){
+    const pos=String(position||'').toUpperCase();
+    if(!pos)return;
+    SPOT_VISUAL_ACTIONS.set(pos,{position:pos,kind:String(kind||''),label:String(label||'')});
+    paintSpotActorAction();
+  }
+  function spotVisualActionLabel(entry){
+    if(!entry)return '';
+    return entry.label?String(entry.label):spotHistoryLabel(entry);
   }
   function paintSpotActorAction(){
     tb.querySelectorAll('.seat.spot-acting').forEach(el=>{
@@ -1207,7 +1220,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const line=seat.querySelector('.spotactiontext');
       if(!line)return;
       const last=spotLastActionForPosition(pos);
-      line.textContent=last?spotHistoryLabel(last):'';
+      line.textContent=spotVisualActionLabel(last);
     });
     const active=SPOT_ACTIVE_ACTION;
     if(!active)return;
@@ -1227,29 +1240,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const pos=String(seat.dataset.pos||'').toUpperCase();
     if(pos)SPOT_VISUAL_FOLDS.add(pos);
     const cards=seat.querySelector('.backs,.herohand');
-    const center=tb.querySelector('.centerbox');
-    if(!cards||!center){
-      seat.classList.add('spot-state-folded');
-      return;
-    }
-    const from=cards.getBoundingClientRect(),to=center.getBoundingClientRect();
-    const dx=(to.left+to.width/2)-(from.left+from.width/2);
-    const dy=(to.top+to.height/2)-(from.top+from.height/2);
-    const finish=()=>{
+    if(cards){
       cards.getAnimations?.().forEach(a=>{try{a.cancel();}catch(_){}});
       cards.style.display='none';
-      seat.classList.add('spot-state-folded');
-    };
-    if(cards.animate){
-      const anim=cards.animate([
-        {transform:'translateX(-50%) translate(0,0) rotate(0deg) scale(1)',opacity:1},
-        {transform:'translateX(-50%) translate('+dx*.58+'px,'+dy*.58+'px) rotate(7deg) scale(.88)',opacity:.9,offset:.58},
-        {transform:'translateX(-50%) translate('+dx+'px,'+dy+'px) rotate(15deg) scale(.58)',opacity:0}
-      ],{duration:620,easing:'cubic-bezier(.22,.72,.22,1)',fill:'forwards'});
-      anim.finished.then(finish).catch(finish);
-    }else{
-      window.setTimeout(finish,620);
+      cards.style.opacity='0';
+      cards.style.visibility='hidden';
     }
+    seat.classList.add('spot-state-folded');
   }
   function launchSpotChipsFromSeat(seat,count,duration,spread){
     const center=tb.querySelector('.centerbox');
@@ -1290,7 +1287,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const seat=[...tb.querySelectorAll('.seat[data-pos]')].find(el=>String(el.dataset.pos).toUpperCase()===pos);
     if(!seat)return;
     const kind=spotHistoryKind(entry);
-    SPOT_ACTIVE_ACTION={pos,kind,label:spotHistoryLabel(entry)};
+    const label=spotHistoryLabel(entry);
+    SPOT_ACTIVE_ACTION={pos,kind,label};
+    SPOT_VISUAL_ACTIONS.set(pos,{position:pos,kind,label});
     paintSpotActorAction();
     window.StackUpPokerAudio?.play?.(kind);
     if(kind==='fold'){
@@ -1334,6 +1333,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     SPOT_DECISION_SEQUENCE_RUNNING=true;
     clearSpotActorAction();
     SPOT_VISUAL_FOLDS.clear();
+    SPOT_VISUAL_ACTIONS.clear();
     const entry=currentSpotEntry();
     if(entry?.answer){
       SPOT_DECISION_SEQUENCE_RUNNING=false;
@@ -2124,10 +2124,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const seat=[...tb.querySelectorAll('.seat[data-pos]')].find(el=>el.dataset.pos===p.position);
       if(!seat)return;
       const visualFold=SPOT_VISUAL_FOLDS.has(String(p.position||'').toUpperCase());
-      seat.classList.toggle('spot-state-folded',!!p.folded||visualFold);
-      if(visualFold){
-        const cards=seat.querySelector('.backs,.herohand');
-        if(cards)cards.style.display='none';
+      const folded=!!p.folded||visualFold;
+      seat.classList.toggle('spot-state-folded',folded);
+      const cards=seat.querySelector('.backs,.herohand');
+      if(cards){
+        cards.style.display=folded?'none':'';
+        cards.style.opacity=folded?'0':'';
+        cards.style.visibility=folded?'hidden':'';
       }
       seat.classList.toggle('spot-state-allin',!!p.allIn);
       const stk=seat.querySelector('.stk');
@@ -2145,6 +2148,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(!b||spotActionBusy)return;
 
     const uiAction=b.dataset.spotAction;
+    const heroPosForAction=String(resolveHeroPosition(POSN[resolveSpotCount()]||POSN[10])||'').toUpperCase();
+    const heroActionLabel=(b.querySelector('b')?.textContent||b.childNodes?.[0]?.textContent||b.textContent||uiAction).trim();
+    if(heroPosForAction)setSpotVisualAction(heroPosForAction,heroActionLabel,uiAction);
     b.classList.add('on');
     setTimeout(()=>b.classList.remove('on'),180);
     setSpotActionsBusy(true);
@@ -2339,7 +2345,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const settled=!!currentSpotEntry()?.answer;
       const stateClass=statePlayer?((statePlayer.folded&&settled)?' spot-state-folded':'')+(statePlayer.allIn?' spot-state-allin':''):'';
       const lastAction=spotLastActionForPosition(p);
-      const actionText=lastAction?spotHistoryLabel(lastAction):'';
+      const actionText=spotVisualActionLabel(lastAction);
       const actionCard=hero
         ?`<div class="spotactiontext heroaction">${spotEscape(actionText)}</div>`
         :`<div class="spotactiontext">${spotEscape(actionText)}</div>`;
