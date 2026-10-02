@@ -3211,7 +3211,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   }
   function reportsCombinedHtml(items){
     const body=items.map(item=>'<section class="saved"><h2>'+statsEsc(item.name)+'</h2><p class="meta">'+statsEsc(reportFormatDate(item.createdAt))+'</p>'+reportBodyHtml(item)+'</section>').join('');
-    return '<!doctype html><html lang="'+L()+'"><meta charset="utf-8"><title>StackUp Grinder - Relatórios</title><style>body{font-family:Arial,sans-serif;background:#07101f;color:#fff;padding:24px;line-height:1.45}h1,h2{color:#6fa4ff}.saved{margin:0 0 24px;padding:18px;border:1px solid #526078;border-radius:12px}.meta{opacity:.7}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #344052;text-align:left}@media print{body{background:#fff;color:#111}h1,h2{color:#194f9f}.saved{border-color:#bbb}}</style><body><h1>STACKUP HOLD\\'EM GRINDER</h1>'+body+'</body></html>';
+    return '<!doctype html><html lang="'+L()+'"><meta charset="utf-8"><title>StackUp Grinder - Relatórios</title><style>body{font-family:Arial,sans-serif;background:#07101f;color:#fff;padding:24px;line-height:1.45}h1,h2{color:#6fa4ff}.saved{margin:0 0 24px;padding:18px;border:1px solid #526078;border-radius:12px}.meta{opacity:.7}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #344052;text-align:left}@media print{body{background:#fff;color:#111}h1,h2{color:#194f9f}.saved{border-color:#bbb}}</style><body><h1>STACKUP HOLD&apos;EM GRINDER</h1>'+body+'</body></html>';
   }
   function reportActionItems(scopeId){
     const ids=scopeId?[String(scopeId)]:[...reportsSelected];
