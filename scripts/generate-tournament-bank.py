@@ -508,6 +508,56 @@ ARCHETYPES=[
        tournament_type="PKO",hero_bounty=.075,villain_bounty=.04)
 ]
 
+
+# Strict-coverage expansion: additional materially distinct exact-ICM / PKO
+# contexts. These are independently solved; no projection or presentation
+# multiplication is used to meet the solved-spot floor.
+ARCHETYPES.extend([
+  arch("icm-5-8-c",["icm_5_8","short_stack_survival"],[40,32,25,19,14,11,8,36],[.32,.20,.14,.105,.08,.065,.05,.04],"BUBBLE","250"),
+  arch("icm-5-8-d",["icm_5_8","icm_pay_jump"],[46,35,27,21,15,12,7,41],[.34,.22,.15,.10,.075,.055,.035,.025],"LATE","500"),
+  arch("icm-5-8-e",["icm_5_8","mid_stack_pressure"],[52,39,30,23,17,13,6,45],[.31,.21,.14,.105,.08,.065,.05,.04],"BUBBLE","1000+"),
+
+  arch("icm-9-12-c",["icm_9_12","icm_bubble"],[41,33,26,20,16,13,11,37],[.31,.21,.14,.105,.08,.065,.05,.04],"BUBBLE","250"),
+  arch("icm-9-12-d",["icm_9_12","icm_pay_jump"],[47,36,28,22,17,14,10,42],[.34,.22,.15,.10,.075,.055,.035,.025],"LATE","500"),
+  arch("icm-9-12-e",["icm_9_12","mid_stack_pressure"],[55,42,32,25,19,15,9,48],[.31,.21,.14,.105,.08,.065,.05,.04],"BUBBLE","1000+"),
+
+  arch("icm-13-18-c",["icm_13_18","icm_bubble"],[54,43,34,27,21,18,15,49],[.31,.21,.14,.105,.08,.065,.05,.04],"BUBBLE","350"),
+  arch("icm-13-18-d",["icm_13_18","icm_pay_jump"],[61,47,36,28,22,17,13,55],[.34,.22,.15,.10,.075,.055,.035,.025],"LATE","1000+"),
+
+  arch("icm-19-25-a",["icm_19_25","mid_stack_pressure"],[62,49,38,30,25,22,19,56],[.31,.21,.14,.105,.08,.065,.05,.04],"LATE","250"),
+  arch("icm-19-25-b",["icm_19_25","icm_bubble"],[68,52,40,31,26,23,20,60],[.31,.21,.14,.105,.08,.065,.05,.04],"BUBBLE","500"),
+  arch("icm-19-25-c",["icm_19_25","icm_pay_jump"],[74,56,43,33,27,24,21,65],[.34,.22,.15,.10,.075,.055,.035,.025],"LATE","1000+"),
+
+  arch("bubble-c",["icm_bubble","mid_stack_pressure"],[63,48,36,27,20,14,9,57],[.31,.21,.14,.105,.08,.065,.05,.04],"BUBBLE","350"),
+  arch("bubble-d",["icm_bubble","short_stack_survival"],[70,52,39,29,21,15,7,62],[.31,.21,.14,.105,.08,.065,.05,.04],"BUBBLE","1000+"),
+  arch("payjump-c",["icm_pay_jump","mid_stack_pressure"],[50,38,29,21,15,10],[.42,.24,.14,.09,.07,.04],"LATE","350"),
+
+  arch("ft-c",["icm_final_table","big_stack_pressure"],[74,57,44,34,27,21,16,12,9],[.30,.20,.14,.10,.08,.06,.05,.04,.03],"FINAL_TABLE","500"),
+  arch("ft-d",["icm_final_table","mid_stack_pressure"],[66,54,43,35,29,24,19,15,11],[.30,.20,.14,.10,.08,.06,.05,.04,.03],"FINAL_TABLE","1000+"),
+  arch("ft-e",["icm_final_table","short_stack_survival"],[80,60,46,35,27,20,15,10,7],[.30,.20,.14,.10,.08,.06,.05,.04,.03],"FINAL_TABLE","250"),
+
+  arch("3h-c",["icm_3handed","mid_stack_pressure"],[58,31,21],[.50,.30,.20],"FINAL_TABLE","50"),
+  arch("3h-d",["icm_3handed","big_stack_pressure"],[64,24,12],[.50,.30,.20],"FINAL_TABLE","250"),
+  arch("3h-e",["icm_3handed","short_stack_survival"],[44,38,18],[.50,.30,.20],"FINAL_TABLE","500"),
+
+  arch("10max-c",["mid_stack_pressure"],[74,61,50,41,34,28,23,18,14,31],[.28,.19,.14,.105,.08,.065,.05,.04,.03,.02],"LATE","250"),
+  arch("10max-d",["big_stack_pressure"],[92,70,55,43,34,27,21,16,11,48],[.28,.19,.14,.105,.08,.065,.05,.04,.03,.02],"BUBBLE","500"),
+  arch("10max-e",["short_stack_survival"],[70,58,48,40,33,27,22,17,12,9],[.28,.19,.14,.105,.08,.065,.05,.04,.03,.02],"BUBBLE","1000+"),
+
+  arch("pko-even-c",["pko_math"],[62,48,36,28,20,20],[.38,.24,.15,.10,.08,.05],"LATE","250",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.045,villain_bounty=.055),
+  arch("pko-sb-cover-c",["pko_math"],[68,52,39,30,28,11],[.38,.24,.15,.10,.08,.05],"BUBBLE","500",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covered_stack"],
+       tournament_type="PKO",hero_bounty=.065,villain_bounty=.09),
+  arch("pko-bb-cover-c",["pko_math"],[64,50,38,29,11,30],[.38,.24,.15,.10,.08,.05],"LATE","1000+",
+       sb_tags=["pko_math","bounty_shove","covered_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.085,villain_bounty=.045)
+])
+
 RESHOVE_ARCHETYPES=[
   {
     "id":"reshove-late-12","positions":["UTG","HJ","CO","BTN","SB","BB"],
@@ -528,6 +578,46 @@ RESHOVE_ARCHETYPES=[
     "phase":"LATE","fieldSize":"1000+","tournamentType":"REGULAR"
   }
 ]
+
+
+RESHOVE_ARCHETYPES.extend([
+  {
+    "id":"reshove-bubble-10","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"HJ","heroPosition":"CO","openSizeBb":2.1,
+    "stacks":[42,29,10,26,22,18],"payouts":[.40,.25,.16,.10,.09,0],
+    "phase":"BUBBLE","fieldSize":"250","tournamentType":"REGULAR"
+  },
+  {
+    "id":"reshove-late-14","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"UTG","heroPosition":"HJ","openSizeBb":2.2,
+    "stacks":[33,14,28,25,21,19],"payouts":[.38,.24,.15,.10,.08,.05],
+    "phase":"LATE","fieldSize":"350","tournamentType":"REGULAR"
+  },
+  {
+    "id":"reshove-bubble-16","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"HJ","heroPosition":"BTN","openSizeBb":2.0,
+    "stacks":[48,34,28,16,22,19],"payouts":[.40,.25,.16,.10,.09,0],
+    "phase":"BUBBLE","fieldSize":"500","tournamentType":"TURBO"
+  },
+  {
+    "id":"reshove-late-20","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"CO","heroPosition":"BTN","openSizeBb":2.2,
+    "stacks":[54,42,31,20,26,23],"payouts":[.38,.24,.15,.10,.08,.05],
+    "phase":"LATE","fieldSize":"1000+","tournamentType":"FREEZEOUT"
+  },
+  {
+    "id":"reshove-bubble-22","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"UTG","heroPosition":"CO","openSizeBb":2.1,
+    "stacks":[40,35,22,29,24,18],"payouts":[.40,.25,.16,.10,.09,0],
+    "phase":"BUBBLE","fieldSize":"500","tournamentType":"HIGH_ROLLER"
+  },
+  {
+    "id":"reshove-late-25","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"HJ","heroPosition":"CO","openSizeBb":2.2,
+    "stacks":[58,39,25,32,27,21],"payouts":[.38,.24,.15,.10,.08,.05],
+    "phase":"LATE","fieldSize":"250","tournamentType":"SNG"
+  }
+])
 
 def main():
     if not EQ_PATH.exists(): raise SystemExit(f"missing equity matrix: {EQ_PATH}")
