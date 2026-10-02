@@ -332,8 +332,41 @@
   }
 
   async function nextStatic(filters){
-    const bank=await ensureStaticBank(filters);
     const sequencer=global.StackUpTrainingSequencer;
+
+    if(isMobileRuntime()&&sequencer?.pickRuntime){
+      await ensureStaticManifest();
+      state.heavyBankDeferred=false;
+      const activeFilters=filters||{};
+      const plan=staticLoadPlan(activeFilters);
+      if(!plan.includes('preflopMultistack'))state.heavyBankDeferred=true;
+      let lastError=null;
+
+      for(const key of plan){
+        try{
+          await loadStaticPart(key);
+          await yieldToBrowser();
+          const spot=sequencer.pickRuntime(staticBank,activeFilters);
+          if(spot){
+            state.lastStats={
+              filterKey:sequencer.filterKey?.(activeFilters)||'',
+              runtimeIncremental:true,
+              publishable:null,
+              candidates:null,
+              required:null,
+              heavyBankDeferred:state.heavyBankDeferred
+            };
+            return spot;
+          }
+        }catch(error){
+          lastError=error;
+        }
+      }
+      if(lastError)throw lastError;
+      return null;
+    }
+
+    const bank=await ensureStaticBank(filters);
     if(sequencer?.pick){
       const activeFilters=filters||{};
       const spot=sequencer.pick(bank,filters||{});
