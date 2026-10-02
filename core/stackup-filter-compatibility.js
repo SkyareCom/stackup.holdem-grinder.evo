@@ -238,7 +238,7 @@
 
     // RANDOM and CASH are authoritative mode choices. CASH cannot carry tournament-only ADVANCE.
     if(group==='mode'&&(option==='cash'||option==='random')){
-      if(option==='cash'||activeAdvance(state).length)clearTournamentAdvance(state);
+      clearTournamentAdvance(state);
     }
 
     // Any explicit tournament context or ADVANCE card makes the mode tournament.
@@ -309,36 +309,14 @@
       if(p.length&&allowed.length)setMany(state,'pos',intersection(p,allowed).length?intersection(p,allowed):allowed,'all');
     }
 
-    // ICM stack bands and short-stack scenarios integrate with AJUSTES stack.
+    // Stack e fase explícitos em AJUSTES têm precedência e removem apenas
+    // cards ADVANCE incompatíveis. Se estiverem em RANDOM, o próprio card
+    // ADVANCE define o domínio sem reescrever visualmente AJUSTES.
     const explicitStacks=concrete(state,'stack').map(v=>Number(String(v).replace(/bb$/i,''))).filter(Number.isFinite);
     if(group==='stack'&&option!=='all')pruneAdvanceByStack(state,explicitStacks);
-    if(isAdvance&&option!=='all'){
-      const stackDomains=[];
-      for(const section of ['short_special','icm_special']){
-        for(const id of concrete(state,section)){
-          const d=optionStackDomain(section,id);if(d)stackDomains.push(d);
-        }
-      }
-      if(stackDomains.length){
-        const allowed=union(stackDomains);
-        const current=concrete(state,'stack').map(v=>Number(String(v).replace(/bb$/i,''))).filter(Number.isFinite);
-        const next=current.length?intersection(current,allowed):allowed;
-        if(next.length)setMany(state,'stack',next.map(v=>String(v)+'bb'),'all');
-      }
-    }
 
-    // ICM phase cards integrate with tournament phase.
     const explicitPhases=concrete(state,'phase');
     if(group==='phase'&&option!=='all')pruneAdvanceByPhase(state,explicitPhases);
-    if(group==='icm_special'&&option!=='all'){
-      const domains=concrete(state,'icm_special').map(id=>optionPhaseDomain('icm_special',id)).filter(Boolean);
-      if(domains.length){
-        const allowed=union(domains);
-        const current=concrete(state,'phase');
-        const next=current.length?intersection(current,allowed):allowed;
-        if(next.length)setMany(state,'phase',next,'all');
-      }
-    }
 
     // Defensive pass: no active ADVANCE combination may have an empty street domain.
     let domain=[...ALL_STREETS];
@@ -411,7 +389,7 @@
   function policy(){
     return {
       groupSemantics:{
-        mode:'exclusive',seats:'exclusive',ttype:'exclusive',extras:'cumulative',
+        mode:'exclusive',seats:'exclusive',ttype:'exclusive',extras:'cumulative-and',
         fsize:'exclusive',fskill:'exclusive',hands:'exclusive',
         phase:'cumulative-or',pos:'cumulative-or',street:'cumulative-or',stack:'cumulative-or',
         pre_special:'cumulative-or',blind_special:'cumulative-or',aggr_special:'cumulative-or',
