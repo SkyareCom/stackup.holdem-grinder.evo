@@ -784,7 +784,11 @@
         candidates,
         required,
         publishable:candidates.length>=required,
-        remaining:candidates.length>=required?shuffle(candidates.map((_,i)=>i)):[],
+        // Runtime eligibility and publication coverage are separate concerns:
+        // every candidate below is still STRICT_SOLVED_ONLY validated. A
+        // coverage shortfall must not make the trainer unusable.
+        runtimeEligible:candidates.length>0,
+        remaining:candidates.length?shuffle(candidates.map((_,i)=>i)):[],
         cycle:(bag?.cycle||0)+1
       };
       bags.set(key,bag);
@@ -827,7 +831,7 @@
 
   function pick(bank,filters){
     let bag=bagFor(bank,filters);
-    if(!bag.candidates.length||!bag.publishable)return null;
+    if(!bag.candidates.length||!bag.runtimeEligible)return null;
 
     let candidate=chooseFromBag(bag);
     if(!candidate&&bag.remaining.length===0){
