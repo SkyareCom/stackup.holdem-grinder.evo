@@ -185,6 +185,49 @@
     if(m)return Number(m[1]);
     return null;
   }
+  function minimumRaiseTarget(state,position){
+    if(!state)return null;
+    const p=byPos(state,position);
+    if(!p)return null;
+    const maxTarget=p.committed+Math.max(0,n(p.stack));
+    const before=currentBet(state);
+    const street=String(state.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
+
+    // Stack/pot values are expressed in BB throughout the trainer.
+    // Unopened pre-flop: minimum legal open is 2 BB total.
+    // Unopened post-flop: minimum legal bet is 1 BB.
+    if(before<=1e-9){
+      const minOpen=street==='PRE-FLOP'?2:1;
+      return Math.min(maxTarget,Math.max(p.committed,minOpen));
+    }
+
+    // Minimum re-raise = current wager + the size of the last full raise.
+    // Pre-flop starts from the forced 1 BB level even when blind posting is
+    // not represented as an explicit action in the scenario history.
+    let previousLevel=street==='PRE-FLOP'?1:0;
+    let lastFullIncrement=street==='PRE-FLOP'?1:Math.max(1,before);
+    let sawAggression=false;
+    for(const entry of state.history||[]){
+      const kind=kindOf(entry);
+      if(kind!=='raise'&&kind!=='jam')continue;
+      const target=n(entry?.target,amountOf(entry));
+      if(!Number.isFinite(target)||target<=previousLevel)continue;
+      const increment=target-previousLevel;
+      if(!sawAggression||increment+1e-9>=lastFullIncrement){
+        lastFullIncrement=Math.max(.01,increment);
+        sawAggression=true;
+      }
+      previousLevel=Math.max(previousLevel,target);
+    }
+    if(!sawAggression){
+      lastFullIncrement=street==='PRE-FLOP'
+        ?Math.max(1,before-1)
+        :Math.max(1,before);
+    }
+    const target=before+lastFullIncrement;
+    return Math.min(maxTarget,Math.max(before,target));
+  }
+
   function resolveActionTarget(state,position,action){
     if(!state)return null;
     const p=byPos(state,position);
@@ -206,14 +249,24 @@
     return Number.isFinite(direct)?Math.min(p.committed+p.stack,direct):null;
   }
 
-  function applyHeroUiAction(state,result,uiAction){
+  function applyHeroUiAction(state,result,uiAction,explicitTarget){
     if(!state)return null;
     const selected=result?.selected||{};
     let action={kind:selected.kind||uiAction,action:selected.action||uiAction};
     if(uiAction==='allin')action.kind='jam';
-    const target=resolveActionTarget(state,state.heroPosition,action);
-    if(Number.isFinite(target))action.to=target;
-    else if(Number.isFinite(Number(selected.to)))action.to=Number(selected.to);
+    if(uiAction==='raise'||uiAction==='raise1'||uiAction==='raise2')action.kind='raise';
+
+    const requested=Number(explicitTarget);
+    if(Number.isFinite(requested)&&action.kind==='raise'){
+      action.to=Math.min(
+        byPos(state,state.heroPosition)?.committed+n(byPos(state,state.heroPosition)?.stack),
+        requested
+      );
+    }else{
+      const target=resolveActionTarget(state,state.heroPosition,action);
+      if(Number.isFinite(target))action.to=target;
+      else if(Number.isFinite(Number(selected.to)))action.to=Number(selected.to);
+    }
     return apply(state,state.heroPosition,action);
   }
   function snapshot(state){
@@ -232,6 +285,7 @@
     apply,
     applyHeroUiAction,
     resolveActionTarget,
+    minimumRaiseTarget,
     normalizeActionKind:kindOf
   });
 })(window);
