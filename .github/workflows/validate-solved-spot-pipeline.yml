@@ -66,7 +66,7 @@ jobs:
             ['lineBank','line-bank.json']
           ];
           for(const [key,file] of banks){
-            if(!client.includes("fetchJson(staticUrl('"+file+"'))"))throw new Error('runtime client missing '+file);
+            if(!client.includes("file:'"+file+"'"))throw new Error('runtime client missing '+file);
             if(!sequencer.includes('bank?.'+key+'?.spots'))throw new Error('sequencer missing '+key);
             if(!audit.includes(key+'?.spots'))throw new Error('coverage auditor missing '+key);
           }
