@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T10:19:40.962Z",
+  "generatedAt": "2026-10-02T10:26:38.106Z",
   "policyVersion": 1,
   "mode": "STRICT_SOLVED_ONLY",
   "batchSize": 500,
@@ -449,18 +449,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "pko_special/covered_stack",
-      "section": "pko_special",
-      "id": "covered_stack",
-      "label": "COVERED STACK",
-      "priority": 2,
-      "stage": "BUILD_CURRENT_GOAL",
-      "solved": 1690,
-      "target": 2000,
-      "requestedSolves": 310,
-      "status": "QUEUED"
-    },
-    {
       "key": "pko_special/multiway_bounty",
       "section": "pko_special",
       "id": "multiway_bounty",
@@ -482,6 +470,18 @@
       "solved": 1892,
       "target": 2000,
       "requestedSolves": 108,
+      "status": "QUEUED"
+    },
+    {
+      "key": "pko_special/covered_stack",
+      "section": "pko_special",
+      "id": "covered_stack",
+      "label": "COVERED STACK",
+      "priority": 3,
+      "stage": "GROW_5000",
+      "solved": 2028,
+      "target": 5000,
+      "requestedSolves": 500,
       "status": "QUEUED"
     },
     {
@@ -587,7 +587,7 @@
       "label": "BOUNTY CALL",
       "priority": 3,
       "stage": "GROW_5000",
-      "solved": 2197,
+      "solved": 2535,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -599,7 +599,7 @@
       "label": "BOUNTY SHOVE",
       "priority": 3,
       "stage": "GROW_5000",
-      "solved": 2197,
+      "solved": 2535,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -617,22 +617,22 @@
       "status": "QUEUED"
     },
     {
-      "key": "pko_special/covering_stack",
-      "section": "pko_special",
-      "id": "covering_stack",
-      "label": "COVERING STACK",
+      "key": "icm_special/icm_pay_jump",
+      "section": "icm_special",
+      "id": "icm_pay_jump",
+      "label": "ICM PAY JUMP",
       "priority": 3,
       "stage": "GROW_5000",
-      "solved": 2704,
+      "solved": 3042,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED"
     },
     {
-      "key": "icm_special/icm_pay_jump",
-      "section": "icm_special",
-      "id": "icm_pay_jump",
-      "label": "ICM PAY JUMP",
+      "key": "pko_special/covering_stack",
+      "section": "pko_special",
+      "id": "covering_stack",
+      "label": "COVERING STACK",
       "priority": 3,
       "stage": "GROW_5000",
       "solved": 3042,
@@ -672,18 +672,6 @@
       "priority": 3,
       "stage": "GROW_5000",
       "solved": 3718,
-      "target": 5000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
-      "key": "pko_special/pko_math",
-      "section": "pko_special",
-      "id": "pko_math",
-      "label": "PKO MATEMÁTICO",
-      "priority": 3,
-      "stage": "GROW_5000",
-      "solved": 4394,
       "target": 5000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -746,6 +734,18 @@
       "solved": 4820,
       "target": 5000,
       "requestedSolves": 180,
+      "status": "QUEUED"
+    },
+    {
+      "key": "pko_special/pko_math",
+      "section": "pko_special",
+      "id": "pko_math",
+      "label": "PKO MATEMÁTICO",
+      "priority": 4,
+      "stage": "GROW_10000",
+      "solved": 5070,
+      "target": 10000,
+      "requestedSolves": 500,
       "status": "QUEUED"
     },
     {
@@ -905,18 +905,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "ttype/pko",
-      "section": "ttype",
-      "id": "pko",
-      "label": "PKO",
-      "priority": 4,
-      "stage": "GROW_10000",
-      "solved": 7774,
-      "target": 10000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
       "key": "fsize/350",
       "section": "fsize",
       "id": "350",
@@ -936,6 +924,18 @@
       "priority": 4,
       "stage": "GROW_10000",
       "solved": 8195,
+      "target": 10000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "ttype/pko",
+      "section": "ttype",
+      "id": "pko",
+      "label": "PKO",
+      "priority": 4,
+      "stage": "GROW_10000",
+      "solved": 8450,
       "target": 10000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -1085,18 +1085,6 @@
       "status": "QUEUED"
     },
     {
-      "key": "fsize/1000+",
-      "section": "fsize",
-      "id": "1000+",
-      "label": "FIELD 1000+",
-      "priority": 5,
-      "stage": "GROW_20000",
-      "solved": 10309,
-      "target": 20000,
-      "requestedSolves": 500,
-      "status": "QUEUED"
-    },
-    {
       "key": "ttype/freeze",
       "section": "ttype",
       "id": "freeze",
@@ -1116,6 +1104,18 @@
       "priority": 5,
       "stage": "GROW_20000",
       "solved": 10647,
+      "target": 20000,
+      "requestedSolves": 500,
+      "status": "QUEUED"
+    },
+    {
+      "key": "fsize/1000+",
+      "section": "fsize",
+      "id": "1000+",
+      "label": "FIELD 1000+",
+      "priority": 5,
+      "stage": "GROW_20000",
+      "solved": 10985,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -1187,7 +1187,7 @@
       "label": "FT",
       "priority": 5,
       "stage": "GROW_20000",
-      "solved": 13182,
+      "solved": 13858,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED"
@@ -1307,7 +1307,7 @@
       "label": "CALL SHOVE",
       "priority": 5,
       "stage": "GROW_20000",
-      "solved": 15886,
+      "solved": 16224,
       "target": 20000,
       "requestedSolves": 500,
       "status": "QUEUED"
