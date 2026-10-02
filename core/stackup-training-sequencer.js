@@ -874,58 +874,61 @@
     const groups=runtimeSources(bank);
     if(!groups.length)return null;
 
-    const spots=[];
-    for(const group of groups){
-      for(const spot of group)spots.push(spot);
-    }
-    if(!spots.length)return null;
-
-    let cursor=runtimeCursors.get(key)||0;
     let fallback=null;
     const contract=global.StackUpSolvedSpotContract;
 
-    for(let step=0;step<spots.length;step++){
-      const spotIndex=(cursor+step)%spots.length;
-      const spot=spots[spotIndex];
-      if(!compatible(spot,normalized))continue;
-      const strategy=Array.isArray(spot?.strategy)?spot.strategy:[];
-      if(!strategy.length)continue;
+    // Scan one loaded bank at a time. Do not flatten/copy every loaded spot into
+    // a new array on each mobile decision; that can create large main-thread
+    // allocations after several banks have been visited in the same session.
+    for(let groupIndex=0;groupIndex<groups.length;groupIndex++){
+      const group=groups[groupIndex];
+      if(!Array.isArray(group)||!group.length)continue;
+      const cursorKey=key+':'+groupIndex;
+      const cursor=runtimeCursors.get(cursorKey)||0;
 
-      const handStart=(cursor+step)%strategy.length;
-      for(let handStep=0;handStep<strategy.length;handStep++){
-        const entry=strategy[(handStart+handStep)%strategy.length];
-        if(!entry?.hand||!Array.isArray(entry.actions)||!entry.actions.length)continue;
-        const hand=String(entry.hand);
-        if(!candidateMathCompatible(spot,hand,normalized.special))continue;
-        const verdict=contract?.validateSolvedDecision
-          ?contract.validateSolvedDecision(spot,entry)
-          :{ok:true,id:exactSignature(spot,hand)};
-        if(!verdict?.ok)continue;
+      for(let step=0;step<group.length;step++){
+        const spotIndex=(cursor+step)%group.length;
+        const spot=group[spotIndex];
+        if(!compatible(spot,normalized))continue;
+        const strategy=Array.isArray(spot?.strategy)?spot.strategy:[];
+        if(!strategy.length)continue;
 
-        const exact=verdict.id||exactSignature(spot,hand);
-        const candidate={spot,hand,exact,family:familySignature(spot),position:normPosition(spot?.scenario?.heroPosition)};
-        if(!fallback)fallback=candidate;
-        if(seen.has(exact))continue;
+        const handStart=(cursor+step)%strategy.length;
+        for(let handStep=0;handStep<strategy.length;handStep++){
+          const entry=strategy[(handStart+handStep)%strategy.length];
+          if(!entry?.hand||!Array.isArray(entry.actions)||!entry.actions.length)continue;
+          const hand=String(entry.hand);
+          if(!candidateMathCompatible(spot,hand,normalized.special))continue;
+          const verdict=contract?.validateSolvedDecision
+            ?contract.validateSolvedDecision(spot,entry)
+            :{ok:true,id:exactSignature(spot,hand)};
+          if(!verdict?.ok)continue;
 
-        runtimeCursors.set(key,(spotIndex+1)%spots.length);
-        const out=clone(spot);
-        out.hand=hand;
-        out.solvedSpotId=exact;
-        out.validationMode='STRICT_SOLVED_ONLY';
-        out.trainingSignature=exact;
-        out.trainingFamily=candidate.family;
-        out.trainingCycle=0;
-        out.id=String(out.id||out.solveId||'solver-spot')+'-'+hand+'-'+exact.slice(0,8);
-        markSeen(exact);
-        pushRecent(recentFamilies,candidate.family,MAX_RECENT_FAMILIES);
-        pushRecent(recentPositions,candidate.position,MAX_RECENT_POSITIONS);
-        return out;
+          const exact=verdict.id||exactSignature(spot,hand);
+          const candidate={spot,hand,exact,family:familySignature(spot),position:normPosition(spot?.scenario?.heroPosition)};
+          if(!fallback)fallback={...candidate,cursorKey,next:(spotIndex+1)%group.length};
+          if(seen.has(exact))continue;
+
+          runtimeCursors.set(cursorKey,(spotIndex+1)%group.length);
+          const out=clone(spot);
+          out.hand=hand;
+          out.solvedSpotId=exact;
+          out.validationMode='STRICT_SOLVED_ONLY';
+          out.trainingSignature=exact;
+          out.trainingFamily=candidate.family;
+          out.trainingCycle=0;
+          out.id=String(out.id||out.solveId||'solver-spot')+'-'+hand+'-'+exact.slice(0,8);
+          markSeen(exact);
+          pushRecent(recentFamilies,candidate.family,MAX_RECENT_FAMILIES);
+          pushRecent(recentPositions,candidate.position,MAX_RECENT_POSITIONS);
+          return out;
+        }
       }
     }
 
     // Only after the loaded validated set is exhausted do we permit a repeat.
     if(fallback){
-      runtimeCursors.set(key,(cursor+1)%spots.length);
+      runtimeCursors.set(fallback.cursorKey,fallback.next);
       const out=clone(fallback.spot);
       out.hand=fallback.hand;
       out.solvedSpotId=fallback.exact;
