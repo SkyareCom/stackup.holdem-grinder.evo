@@ -112,5 +112,4 @@ jobs:
             exit 0
           fi
           git commit -m "Generate production DCFR solver bank"
-          git pull --rebase origin main
-          git push
+          bash scripts/persist-solver-artifacts.sh data/solver/preflop.json data/solver/postflop.json data/solver/manifest.json
