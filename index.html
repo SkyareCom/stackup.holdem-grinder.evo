@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="spots-sequence-alert-1s-v1">
+<meta name="grinder-build" content="spots-action-cards-result-audio-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -1142,11 +1142,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     .seat .av{position:relative;overflow:visible}
     .seat.hero.spot-turn .av{background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);animation:spotHeroTurn 1.1s ease-in-out infinite}
     .seat.spot-acting .av{animation:spotActorPulse .48s ease-in-out infinite alternate}
-    /* Hierarquia fixa: avatar/posição -> stack -> ação. Nunca sobrepor o avatar. */
-    .spotactiontext{min-height:14px;margin-top:2px;padding:2px 5px;border-radius:7px;color:var(--c-muted);font-family:var(--f-ui);font-size:9px!important;line-height:1;letter-spacing:.35px;text-align:center;white-space:nowrap;pointer-events:none;opacity:.92}
-    .seat.hero .spotactiontext{font-size:10px!important}
-    .seat.spot-acting .spotactiontext{color:var(--c-accent-text);background:rgba(21,91,189,.16);border:1px solid rgba(111,164,255,.24);box-shadow:0 0 10px rgba(21,91,189,.16)}
-    .spotactiontext:empty{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+    /* Card de ação usa exatamente o mesmo padrão visual do card de stack. */
+    .spotactiontext{margin-top:1px;min-width:58px;white-space:nowrap;padding:3px 7px;border-radius:var(--r-card);background:rgba(0,0,0,.72);border:var(--glass-border);box-shadow:var(--glass-hl);color:var(--c-text);font-family:var(--f-ui);font-size:10px!important;line-height:1;letter-spacing:.5px;text-align:center;pointer-events:none}
+    .seat.spot-acting .spotactiontext{color:var(--c-accent-text);border-color:rgba(111,164,255,.38);box-shadow:var(--glass-hl),0 0 10px rgba(21,91,189,.20)}
+    .spotactiontext:empty{display:none!important}
+    /* Herói não usa o espaço abaixo do stack: sua ação fica acima das cartas. */
+    .seat.hero>.spotactiontext.heroaction{position:absolute;left:50%;top:-103px;transform:translateX(-50%);z-index:8;margin:0;min-width:66px;font-size:10px!important}
     @keyframes spotActorPulse{from{filter:brightness(1)}to{filter:brightness(1.4)}}
     @keyframes spotHeroTurn{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}
     .spotintro{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 6px;font-family:var(--f-ui);font-size:var(--fs)!important}
@@ -2110,6 +2111,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return 790;
   }
 
+  function playSpotResultSound(status,delay){
+    const kind=status==='correct'?'positive':status==='incorrect'?'negative':status==='adjustable'?'adjustable':null;
+    if(!kind)return;
+    window.setTimeout(()=>window.StackUpPokerAudio?.play?.(kind),Math.max(0,Number(delay)||0));
+  }
+
   function syncSpotTableStateDom(){
     const state=SOLVER_TABLE_STATE;
     if(!state)return;
@@ -2168,6 +2175,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       language:L()
     })||{status:'unknown',title:spotText().analysis,line2:'—',summary:[],indicators:[]};
     if(analysis&&!SPOT_ANALYSIS_CACHE.has(analysisKey))SPOT_ANALYSIS_CACHE.set(analysisKey,analysis);
+    playSpotResultSound(analysis?.status,Math.max(280,animationMs));
 
     const entry=currentSpotEntry();
     if(entry){
@@ -2332,7 +2340,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const stateClass=statePlayer?((statePlayer.folded&&settled)?' spot-state-folded':'')+(statePlayer.allIn?' spot-state-allin':''):'';
       const lastAction=spotLastActionForPosition(p);
       const actionText=lastAction?spotHistoryLabel(lastAction):'';
-      html+=`<div class="seat${hero?' hero':''}${stateClass}" data-pos="${p}" style="left:${x}px;top:${y}px">${hand}<div class="playerbox"><div class="av" data-pos="${p}">${p}</div><div class="stk">${fmtStack(stack)}</div><div class="spotactiontext">${spotEscape(actionText)}</div></div></div>`;
+      const actionCard=hero
+        ?`<div class="spotactiontext heroaction">${spotEscape(actionText)}</div>`
+        :`<div class="spotactiontext">${spotEscape(actionText)}</div>`;
+      html+=`<div class="seat${hero?' hero':''}${stateClass}" data-pos="${p}" style="left:${x}px;top:${y}px">${hero?actionCard:''}${hand}<div class="playerbox"><div class="av" data-pos="${p}">${p}</div><div class="stk">${fmtStack(stack)}</div>${hero?'':actionCard}</div></div>`;
 
 
     }
