@@ -2958,13 +2958,16 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(recent<previous-4)return tx.trendDown;
     return tx.trendFlat;
   }
-  function statsModel(records){
+  function statsModel(records,options){
+    const opts=options||{};
     const overall=statsCounts(records);
     const byTraining=statsGroup(records,r=>r.training||'TREINO GERAL');
     const bySection=statsGroup(records,r=>(Array.isArray(r.sections)&&r.sections.length?r.sections:[r.street||'GERAL']));
-    const sessionNames=new Map(statsAllSessions().map(s=>[s.id,s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt)]));
-    const bySession=statsGroup(records,r=>sessionNames.get(r.sessionId)||formatHistoryDate(r.answeredAt));
-    const deep=window.StackUpPerformanceAnalysis?.analyze?.(records,L())||{strengths:[],weaknesses:[],opportunities:[],threats:[],recommendations:[],accessMessage:''};
+    const sessionNames=opts.sessions===false?null:new Map(statsAllSessions().map(s=>[s.id,s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt)]));
+    const bySession=sessionNames?statsGroup(records,r=>sessionNames.get(r.sessionId)||formatHistoryDate(r.answeredAt)):[];
+    const deep=opts.deep===false
+      ?{strengths:[],weaknesses:[],opportunities:[],threats:[],recommendations:[],accessMessage:''}
+      :(window.StackUpPerformanceAnalysis?.analyze?.(records,L())||{strengths:[],weaknesses:[],opportunities:[],threats:[],recommendations:[],accessMessage:''});
     if(!overall.total){
       return {
         records,overall,byTraining:[],bySection:[],bySession:[],deep,
@@ -3245,25 +3248,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const signature=statsRenderSignature(records);
     if(!force&&signature===statsLastRenderKey&&statsPanel.childElementCount)return;
     statsLastRenderKey=signature;
-    const tx=statsText(),model=statsModel(records),c=model.overall,grade=statsGrade(records);
+
+    const needDeep=statsView==='report';
+    const needSessions=statsView==='sessions'||statsView==='report';
+    const tx=statsText(),model=statsModel(records,{deep:needDeep,sessions:needSessions}),c=model.overall,grade=statsGrade(records);
     const hasData=records.length>0;
     const sessionsCount=new Set(records.map(x=>x.sessionId).filter(Boolean)).size;
-    const activeDays=new Set(records.map(x=>String(x.answeredAt||'').slice(0,10)).filter(Boolean)).size;
-    const avgSession=sessionsCount?c.total/sessionsCount:0;
-    const adjustableRate=c.total?c.adjustable/c.total*100:0;
-    const errorRate=c.total?c.incorrect/c.total*100:0;
-
-    const byStreet=statsGroup(records,r=>r.street||'N/D');
-    const byPosition=statsGroup(records,r=>r.heroPosition||'N/D');
-    const byAction=statsGroup(records,r=>r.chosenAction||'N/D');
-    const byStack=statsGroup(records,r=>{const v=statsScenarioValue(r,'effectiveStack');return v?String(v)+'BB':'N/D';});
-    const byPhase=statsGroup(records,r=>statsScenarioValue(r,'phase')||'N/D');
-    const byTable=statsGroup(records,r=>{const v=statsScenarioValue(r,'tableSize');return v?String(v)+'-MAX':'N/D';});
-    const byTournament=statsGroup(records,r=>statsScenarioValue(r,'tournamentType')||'N/D');
-    const byField=statsGroup(records,r=>statsScenarioValue(r,'fieldSize')||'N/D');
-    const byProfile=statsGroup(records,r=>statsScenarioValue(r,'opponentProfile')||'N/D');
-    const byGame=statsGroup(records,r=>statsScenarioValue(r,'gameType')||'N/D');
-    const bySolver=statsGroup(records,r=>statsScenarioValue(r,'solver')||'N/D');
 
     const hero='<div class="statshero premium"><div class="statshero-top"><div class="statshero-copy"><div class="statshero-title">'+tx.hero+'</div><div class="statshero-sub">'+statsEsc(statsExecutiveInsight(model))+'</div></div><div class="statslevel"><b>'+grade.grade+'</b><small>'+statsPct(c.technical)+'</small></div></div><div class="statshero-meter"><div class="statshero-meterline"><span>'+(L()==='en'?'TECHNICAL SCORE':L()==='es'?'PUNTUACIÓN TÉCNICA':'SCORE TÉCNICO')+'</span><span>'+statsPct(c.technical)+'</span></div><div class="statsmeter"><i style="width:'+Math.max(0,Math.min(100,c.technical)).toFixed(1)+'%"></i></div></div></div>';
 
@@ -3275,55 +3265,69 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       '<button data-stats-view="report" class="'+(statsView==='report'?'on':'')+'">'+(L()==='en'?'REPORT':L()==='es'?'INFORME':'RELATÓRIO')+'</button>'+
       '</div>';
 
-    const kpis='<div class="statsgrid premium">'+
-      '<div class="statskpi premium"><b>'+c.total+'</b><span>'+tx.spots+'</span><small>'+(L()==='en'?'total sample':L()==='es'?'muestra total':'amostra total')+'</small></div>'+
-      '<div class="statskpi premium"><b>'+statsPct(c.technical)+'</b><span>TÉCNICO</span><small>'+grade.grade+'</small></div>'+
-      '<div class="statskpi premium"><b>'+statsPct(c.accuracy)+'</b><span>'+tx.accuracy+'</span><small>'+c.correct+' '+tx.correct.toLowerCase()+'</small></div>'+
-      '<div class="statskpi premium"><b>'+c.adjustable+'</b><span>'+tx.adjustable+'</span><small>'+statsPct(adjustableRate)+'</small></div>'+
-      '<div class="statskpi premium"><b>'+c.incorrect+'</b><span>'+tx.incorrect+'</span><small>'+statsPct(errorRate)+'</small></div>'+
-      '<div class="statskpi premium"><b>'+sessionsCount+'</b><span>'+tx.sessions+'</span><small>'+avgSession.toFixed(1).replace('.',',')+' spots / sessão</small></div>'+
-      '<div class="statskpi premium"><b>'+activeDays+'</b><span>'+(L()==='en'?'ACTIVE DAYS':L()==='es'?'DÍAS ACTIVOS':'DIAS ATIVOS')+'</span><small>'+(L()==='en'?'with registered decisions':L()==='es'?'con decisiones registradas':'com decisões registradas')+'</small></div>'+
-      '<div class="statskpi premium"><b>'+model.bySection.length+'</b><span>'+(L()==='en'?'TOPICS':L()==='es'?'TEMAS':'ASSUNTOS')+'</span><small>'+(L()==='en'?'measured areas':L()==='es'?'áreas medidas':'áreas medidas')+'</small></div>'+
-      '</div>';
+    let body='';
 
-    const overviewPie='<div class="statscard premium"><div class="statshead premium"><span>'+tx.overview+'</span><small>'+c.total+' '+tx.spots+'</small></div><div class="statspiebox"><div class="statspiewrap"><div class="statspie" style="'+statsPieStyle(c)+'"></div><div class="statspievalue">'+statsPct(c.accuracy)+'<br>'+tx.accuracy+'</div></div><div class="statslegend"><span><i style="background:var(--c-accent-text)"></i>'+tx.correct+' · '+c.correct+'</span><span><i style="background:rgba(255,255,255,.62)"></i>'+tx.adjustable+' · '+c.adjustable+'</span><span><i style="background:rgba(255,255,255,.22)"></i>'+tx.incorrect+' · '+c.incorrect+'</span><span><i style="background:rgba(255,255,255,.08)"></i>N/D · '+c.unknown+'</span></div></div></div>';
-
-    const strengths=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>b.grade.score-a.grade.score).slice(0,3);
-    const weaknesses=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>a.grade.score-b.grade.score).slice(0,3);
-    const diagnostic='<div class="statscard premium"><div class="statshead premium"><span>'+(L()==='en'?'TECHNICAL DIAGNOSTIC':L()==='es'?'DIAGNÓSTICO TÉCNICO':'DIAGNÓSTICO TÉCNICO')+'</span><small>'+(L()==='en'?'consolidated signals':L()==='es'?'señales consolidadas':'sinais consolidados')+'</small></div><div class="statsdual"><div class="statsmini"><b>'+tx.strengths+'</b><strong>'+(strengths[0]?statsPct(strengths[0].grade.score):'—')+'</strong><small>'+statsEsc(strengths[0]?.name||'—')+'</small></div><div class="statsmini"><b>'+tx.weaknesses+'</b><strong>'+(weaknesses[0]?statsPct(weaknesses[0].grade.score):'—')+'</strong><small>'+statsEsc(weaknesses[0]?.name||'—')+'</small></div></div><div class="statscallout" style="margin-top:8px"><b>'+(L()==='en'?'READING: ':L()==='es'?'LECTURA: ':'LEITURA: ')+'</b>'+statsEsc(statsExecutiveInsight(model))+'</div></div>';
-
-    const trainingsHtml='<div class="statscard premium"><div class="statshead premium"><span>'+tx.byTraining+'</span><small>'+model.byTraining.length+'</small></div><div class="statslist">'+(hasData?model.byTraining.map(x=>statsMiniRow(x,'statstraining premium')).join(''):statsZeroRow('statstraining premium'))+'</div></div>';
-    const sectionsHtml='<div class="statscard premium"><div class="statshead premium"><span>'+tx.bySection+'</span><small>'+model.bySection.length+'</small></div><div class="statslist">'+(hasData?model.bySection.map(x=>statsMiniRow(x,'statssubject premium')).join(''):statsZeroRow('statssubject premium'))+'</div></div>';
-    const sessionsHtml='<div class="statscard premium"><div class="statshead premium"><span>'+tx.bySession+'</span><small>'+sessionsCount+'</small></div><div class="statslist">'+(hasData?model.bySession.slice(0,40).map(x=>statsMiniRow(x,'statssession premium')).join(''):statsZeroRow('statssession premium'))+'</div></div>';
-
-    const gameHtml=
-      statsBarCard(L()==='en'?'BY GAME TYPE':L()==='es'?'POR MODALIDAD':'POR MODALIDADE','',byGame,x=>String(x).toUpperCase())+
-      statsBarCard(L()==='en'?'BY TABLE SIZE':L()==='es'?'POR JUGADORES':'POR PLAYERS/MESA','',byTable,x=>x)+
-      statsBarCard(L()==='en'?'BY TOURNAMENT TYPE':L()==='es'?'POR TIPO DE TORNEO':'POR TIPO DE TORNEIO','',byTournament,x=>String(x).toUpperCase())+
-      statsBarCard(L()==='en'?'BY FIELD SIZE':L()==='es'?'POR TAMAÑO DE FIELD':'POR TAMANHO DO FIELD','',byField,x=>String(x).toUpperCase())+
-      statsBarCard(L()==='en'?'BY FIELD PROFILE':L()==='es'?'POR PERFIL DE FIELD':'POR PERFIL DO FIELD','',byProfile,x=>String(x).toUpperCase())+
-      statsBarCard(L()==='en'?'BY PHASE':L()==='es'?'POR FASE':'POR FASE DO TORNEIO','',byPhase,x=>String(x).toUpperCase())+
-      statsBarCard(L()==='en'?'BY STACK':L()==='es'?'POR STACK':'POR STACK','',byStack,x=>x)+
-      statsBarCard(L()==='en'?'BY POSITION':L()==='es'?'POR POSICIÓN':'POR POSIÇÃO','',byPosition,x=>x)+
-      statsBarCard(L()==='en'?'BY STREET':L()==='es'?'POR STREET':'POR STREET','',byStreet,statsLabelStreet)+
-      statsBarCard(L()==='en'?'DECISIONS BY ACTION':L()==='es'?'DECISIONES POR ACCIÓN':'DECISÕES POR AÇÃO','',byAction,statsActionLabel)+
-      statsBarCard('SOLVER',L()==='en'?'sample by engine':L()==='es'?'muestra por motor':'amostra por motor',bySolver,x=>String(x).toUpperCase())+
-      sectionsHtml;
-
-    const sw='<div class="statscard premium"><div class="statshead premium"><span>'+tx.swot+'</span><small>'+(L()==='en'?'performance reading':L()==='es'?'lectura de rendimiento':'leitura de desempenho')+'</small></div><div class="statsswot"><div><b>'+tx.strengths+'</b><p>'+statsEsc(model.swot.strengths)+'</p></div><div><b>'+tx.weaknesses+'</b><p>'+statsEsc(model.swot.weaknesses)+'</p></div><div><b>'+tx.opportunities+'</b><p>'+statsEsc(model.swot.opportunities)+'</p></div><div><b>'+tx.threats+'</b><p>'+statsEsc(model.swot.threats)+'</p></div></div></div>';
-    const plan='<div class="statscard premium"><div class="statshead premium"><span>'+tx.improve+'</span><small>'+(L()==='en'?'next steps':L()==='es'?'próximos pasos':'próximos passos')+'</small></div><div class="statsplan">'+model.plan.map((x,i)=>'<p><b>'+(i+1)+'.</b> '+statsEsc(x)+'</p>').join('')+'</div></div>';
-    const disabled=hasData?'':' disabled aria-disabled="true"';
-    const contact='<div class="statscard premium"><div class="statshead premium"><span>'+tx.contact+'</span><small>HTML / PDF / E-MAIL / WHATSAPP</small></div><div class="statscontact"><input type="email" data-stats-email placeholder="'+tx.email+'"'+disabled+'><input type="tel" data-stats-phone placeholder="'+tx.whatsapp+'"'+disabled+'><div class="statscontactrow"><button data-stats-export="html"'+disabled+'>'+tx.html+'</button><button data-stats-export="pdf"'+disabled+'>'+tx.pdf+'</button></div><div class="statscontactrow"><button data-stats-export="email"'+disabled+'>'+tx.sendEmail+'</button><button data-stats-export="whatsapp"'+disabled+'>'+tx.sendWhatsapp+'</button></div><div class="statscontactrow"><button data-stats-export="save"'+disabled+'>'+(L()==='en'?'SAVE REPORT':L()==='es'?'GUARDAR INFORME':'SALVAR RELATÓRIO')+'</button><button data-stats-export="share"'+disabled+'>'+tx.share+'</button></div></div></div>';
-
-    const overview='<div class="statsview" data-stats-panel="overview"'+(statsView==='overview'?'':' hidden')+'>'+kpis+diagnostic+overviewPie+statsTrendHtml(model)+trainingsHtml+'</div>';
-    const evolution='<div class="statsview" data-stats-panel="evolution"'+(statsView==='evolution'?'':' hidden')+'>'+statsEvolutionHtml(records,model)+'</div>';
-    const situations='<div class="statsview" data-stats-panel="situations"'+(statsView==='situations'?'':' hidden')+'>'+gameHtml+statsAdvanceHtml(records)+statsCoverageHtml(records)+'</div>';
-    const sessions='<div class="statsview" data-stats-panel="sessions"'+(statsView==='sessions'?'':' hidden')+'>'+sessionsHtml+statsTrendHtml(model)+statsBarCard(L()==='en'?'VOLUME BY TRAINING':L()==='es'?'VOLUMEN POR ENTRENO':'VOLUME POR TREINO','',model.byTraining,x=>x)+'</div>';
-    const report='<div class="statsview" data-stats-panel="report"'+(statsView==='report'?'':' hidden')+'>'+statsDetailedHtml(model)+statsDeepAnalysisHtml(model)+plan+contact+statsPerformanceCta(model)+'</div>';
+    if(statsView==='overview'){
+      const activeDays=new Set(records.map(x=>String(x.answeredAt||'').slice(0,10)).filter(Boolean)).size;
+      const avgSession=sessionsCount?c.total/sessionsCount:0;
+      const adjustableRate=c.total?c.adjustable/c.total*100:0;
+      const errorRate=c.total?c.incorrect/c.total*100:0;
+      const kpis='<div class="statsgrid premium">'+
+        '<div class="statskpi premium"><b>'+c.total+'</b><span>'+tx.spots+'</span><small>'+(L()==='en'?'total sample':L()==='es'?'muestra total':'amostra total')+'</small></div>'+
+        '<div class="statskpi premium"><b>'+statsPct(c.technical)+'</b><span>TÉCNICO</span><small>'+grade.grade+'</small></div>'+
+        '<div class="statskpi premium"><b>'+statsPct(c.accuracy)+'</b><span>'+tx.accuracy+'</span><small>'+c.correct+' '+tx.correct.toLowerCase()+'</small></div>'+
+        '<div class="statskpi premium"><b>'+c.adjustable+'</b><span>'+tx.adjustable+'</span><small>'+statsPct(adjustableRate)+'</small></div>'+
+        '<div class="statskpi premium"><b>'+c.incorrect+'</b><span>'+tx.incorrect+'</span><small>'+statsPct(errorRate)+'</small></div>'+
+        '<div class="statskpi premium"><b>'+sessionsCount+'</b><span>'+tx.sessions+'</span><small>'+avgSession.toFixed(1).replace('.',',')+' spots / sessão</small></div>'+
+        '<div class="statskpi premium"><b>'+activeDays+'</b><span>'+(L()==='en'?'ACTIVE DAYS':L()==='es'?'DÍAS ACTIVOS':'DIAS ATIVOS')+'</span><small>'+(L()==='en'?'with registered decisions':L()==='es'?'con decisiones registradas':'com decisões registradas')+'</small></div>'+
+        '<div class="statskpi premium"><b>'+model.bySection.length+'</b><span>'+(L()==='en'?'TOPICS':L()==='es'?'TEMAS':'ASSUNTOS')+'</span><small>'+(L()==='en'?'measured areas':L()==='es'?'áreas medidas':'áreas medidas')+'</small></div>'+
+        '</div>';
+      const overviewPie='<div class="statscard premium"><div class="statshead premium"><span>'+tx.overview+'</span><small>'+c.total+' '+tx.spots+'</small></div><div class="statspiebox"><div class="statspiewrap"><div class="statspie" style="'+statsPieStyle(c)+'"></div><div class="statspievalue">'+statsPct(c.accuracy)+'<br>'+tx.accuracy+'</div></div><div class="statslegend"><span><i style="background:var(--c-accent-text)"></i>'+tx.correct+' · '+c.correct+'</span><span><i style="background:rgba(255,255,255,.62)"></i>'+tx.adjustable+' · '+c.adjustable+'</span><span><i style="background:rgba(255,255,255,.22)"></i>'+tx.incorrect+' · '+c.incorrect+'</span><span><i style="background:rgba(255,255,255,.08)"></i>N/D · '+c.unknown+'</span></div></div></div>';
+      const strengths=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>b.grade.score-a.grade.score).slice(0,3);
+      const weaknesses=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>a.grade.score-b.grade.score).slice(0,3);
+      const diagnostic='<div class="statscard premium"><div class="statshead premium"><span>'+(L()==='en'?'TECHNICAL DIAGNOSTIC':L()==='es'?'DIAGNÓSTICO TÉCNICO':'DIAGNÓSTICO TÉCNICO')+'</span><small>'+(L()==='en'?'consolidated signals':L()==='es'?'señales consolidadas':'sinais consolidados')+'</small></div><div class="statsdual"><div class="statsmini"><b>'+tx.strengths+'</b><strong>'+(strengths[0]?statsPct(strengths[0].grade.score):'—')+'</strong><small>'+statsEsc(strengths[0]?.name||'—')+'</small></div><div class="statsmini"><b>'+tx.weaknesses+'</b><strong>'+(weaknesses[0]?statsPct(weaknesses[0].grade.score):'—')+'</strong><small>'+statsEsc(weaknesses[0]?.name||'—')+'</small></div></div><div class="statscallout" style="margin-top:8px"><b>'+(L()==='en'?'READING: ':L()==='es'?'LECTURA: ':'LEITURA: ')+'</b>'+statsEsc(statsExecutiveInsight(model))+'</div></div>';
+      const trainingsHtml='<div class="statscard premium"><div class="statshead premium"><span>'+tx.byTraining+'</span><small>'+model.byTraining.length+'</small></div><div class="statslist">'+(hasData?model.byTraining.map(x=>statsMiniRow(x,'statstraining premium')).join(''):statsZeroRow('statstraining premium'))+'</div></div>';
+      body=kpis+diagnostic+overviewPie+statsTrendHtml(model)+trainingsHtml;
+    }else if(statsView==='evolution'){
+      body=statsEvolutionHtml(records,model);
+    }else if(statsView==='situations'){
+      const byStreet=statsGroup(records,r=>r.street||'N/D');
+      const byPosition=statsGroup(records,r=>r.heroPosition||'N/D');
+      const byAction=statsGroup(records,r=>r.chosenAction||'N/D');
+      const byStack=statsGroup(records,r=>{const v=statsScenarioValue(r,'effectiveStack');return v?String(v)+'BB':'N/D';});
+      const byPhase=statsGroup(records,r=>statsScenarioValue(r,'phase')||'N/D');
+      const byTable=statsGroup(records,r=>{const v=statsScenarioValue(r,'tableSize');return v?String(v)+'-MAX':'N/D';});
+      const byTournament=statsGroup(records,r=>statsScenarioValue(r,'tournamentType')||'N/D');
+      const byField=statsGroup(records,r=>statsScenarioValue(r,'fieldSize')||'N/D');
+      const byProfile=statsGroup(records,r=>statsScenarioValue(r,'opponentProfile')||'N/D');
+      const byGame=statsGroup(records,r=>statsScenarioValue(r,'gameType')||'N/D');
+      const sectionsHtml='<div class="statscard premium"><div class="statshead premium"><span>'+tx.bySection+'</span><small>'+model.bySection.length+'</small></div><div class="statslist">'+(hasData?model.bySection.map(x=>statsMiniRow(x,'statssubject premium')).join(''):statsZeroRow('statssubject premium'))+'</div></div>';
+      body=
+        statsBarCard(L()==='en'?'BY GAME TYPE':L()==='es'?'POR MODALIDAD':'POR MODALIDADE','',byGame,x=>String(x).toUpperCase())+
+        statsBarCard(L()==='en'?'BY TABLE SIZE':L()==='es'?'POR JUGADORES':'POR PLAYERS/MESA','',byTable,x=>x)+
+        statsBarCard(L()==='en'?'BY TOURNAMENT TYPE':L()==='es'?'POR TIPO DE TORNEO':'POR TIPO DE TORNEIO','',byTournament,x=>String(x).toUpperCase())+
+        statsBarCard(L()==='en'?'BY FIELD SIZE':L()==='es'?'POR TAMAÑO DE FIELD':'POR TAMANHO DO FIELD','',byField,x=>String(x).toUpperCase())+
+        statsBarCard(L()==='en'?'BY FIELD PROFILE':L()==='es'?'POR PERFIL DE FIELD':'POR PERFIL DO FIELD','',byProfile,x=>String(x).toUpperCase())+
+        statsBarCard(L()==='en'?'BY PHASE':L()==='es'?'POR FASE':'POR FASE DO TORNEIO','',byPhase,x=>String(x).toUpperCase())+
+        statsBarCard(L()==='en'?'BY STACK':L()==='es'?'POR STACK':'POR STACK','',byStack,x=>x)+
+        statsBarCard(L()==='en'?'BY POSITION':L()==='es'?'POR POSICIÓN':'POR POSIÇÃO','',byPosition,x=>x)+
+        statsBarCard(L()==='en'?'BY STREET':L()==='es'?'POR STREET':'POR STREET','',byStreet,statsLabelStreet)+
+        statsBarCard(L()==='en'?'DECISIONS BY ACTION':L()==='es'?'DECISIONES POR ACCIÓN':'DECISÕES POR AÇÃO','',byAction,statsActionLabel)+
+        sectionsHtml+statsAdvanceHtml(records)+statsCoverageHtml(records);
+    }else if(statsView==='sessions'){
+      const sessionsHtml='<div class="statscard premium"><div class="statshead premium"><span>'+tx.bySession+'</span><small>'+sessionsCount+'</small></div><div class="statslist">'+(hasData?model.bySession.slice(0,40).map(x=>statsMiniRow(x,'statssession premium')).join(''):statsZeroRow('statssession premium'))+'</div></div>';
+      body=sessionsHtml+statsTrendHtml(model)+statsBarCard(L()==='en'?'VOLUME BY TRAINING':L()==='es'?'VOLUMEN POR ENTRENO':'VOLUME POR TREINO','',model.byTraining,x=>x);
+    }else{
+      const plan='<div class="statscard premium"><div class="statshead premium"><span>'+tx.improve+'</span><small>'+(L()==='en'?'next steps':L()==='es'?'próximos pasos':'próximos passos')+'</small></div><div class="statsplan">'+model.plan.map((x,i)=>'<p><b>'+(i+1)+'.</b> '+statsEsc(x)+'</p>').join('')+'</div></div>';
+      const disabled=hasData?'':' disabled aria-disabled="true"';
+      const contact='<div class="statscard premium"><details class="sudisclosure"><summary>'+tx.contact+'</summary><div class="sudisclosurebody statscontact"><input type="email" data-stats-email placeholder="'+tx.email+'"'+disabled+'><input type="tel" data-stats-phone placeholder="'+tx.whatsapp+'"'+disabled+'><div class="statscontactrow"><button data-stats-export="html"'+disabled+'>'+tx.html+'</button><button data-stats-export="pdf"'+disabled+'>'+tx.pdf+'</button></div><div class="statscontactrow"><button data-stats-export="email"'+disabled+'>'+tx.sendEmail+'</button><button data-stats-export="whatsapp"'+disabled+'>'+tx.sendWhatsapp+'</button></div><div class="statscontactrow"><button data-stats-export="save"'+disabled+'>'+(L()==='en'?'SAVE REPORT':L()==='es'?'GUARDAR INFORME':'SALVAR RELATÓRIO')+'</button><button data-stats-export="share"'+disabled+'>'+tx.share+'</button></div></div></details></div>';
+      body=statsDetailedHtml(model)+statsDeepAnalysisHtml(model)+plan+contact+statsPerformanceCta(model);
+    }
 
     const savedBanner=statsReportOverride?'<div class="statsreportbanner">'+(L()==='en'?'SAVED REPORT: ':L()==='es'?'INFORME GUARDADO: ':'RELATÓRIO SALVO: ')+statsEsc(statsReportOverride.item?.name||'')+'</div>':'';
-    statsPanel.innerHTML=savedBanner+hero+nav+overview+evolution+situations+sessions+report;
+    statsPanel.innerHTML=savedBanner+hero+nav+'<div class="statsview" data-stats-panel="'+statsEsc(statsView)+'">'+body+'</div>';
   }
+
   function statsReportText(model){
     const tx=statsText(),c=model.overall,d=model.deep||{};
     const lines=['STACKUP HOLD\'EM GRINDER — '+tx.report,'',tx.spots+': '+c.total,tx.correct+': '+c.correct,tx.adjustable+': '+c.adjustable,tx.incorrect+': '+c.incorrect,tx.accuracy+': '+c.accuracy.toFixed(1)+'%','','GRADUAÇÃO POR ASSUNTO'];
