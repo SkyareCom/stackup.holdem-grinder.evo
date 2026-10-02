@@ -390,11 +390,7 @@
       'The solver reference for '+hand+' is '+best+' at '+pct(bestFreq)+'.',
       'La referencia del solver para '+hand+' es '+best+' en '+pct(bestFreq)+'.'
     );
-    const unavailableMessage=p(
-      'ITEM NÃO DISPONÍVEL OU CONSIDERADO NESTA AÇÃO.',
-      'ITEM NOT AVAILABLE OR CONSIDERED FOR THIS ACTION.',
-      'ÍTEM NO DISPONIBLE O CONSIDERADO EN ESTA ACCIÓN.'
-    );
+    const unavailableMessage='---';
     const unavailable=(_why)=>({
       unavailable:true,
       value:unavailableMessage,
@@ -931,13 +927,8 @@
         {title:T.diagnosis,text:diagnosis}
       ],
       indicators:makeIndicators({spot,view,result,uiAction,tableState,language}),
-      solver:{
-        id:spot.solver||'—',
-        solveId:spot.solveId||'—',
-        version:spot.version||'—',
-        convergence:spot.convergence||null
-      },
-      sourceNote:T.source+': '+(spot.solver||'solver')+' · '+(spot.solveId||'solve n/d')
+      solver:null,
+      sourceNote:''
     };
   }
 
