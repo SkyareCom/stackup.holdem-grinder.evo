@@ -194,10 +194,10 @@
       addPlan(plan,'multiwayTournament');
       addPlan(plan,'tournament');
     }else{
-      // RANDOM street: postflop is compact and usually clears the strict floor
-      // without touching the heavyweight preflop banks.
-      addPlan(plan,'postflop');
+      // RANDOM street: start from the tiny validated preflop bank (~149 KB)
+      // so mobile can present the first solved decision immediately.
       addPlan(plan,'preflop');
+      addPlan(plan,'postflop');
       addPlan(plan,'preflopDecisions');
       addPlan(plan,'multiwayPostflop');
       addPlan(plan,'textureSizing');
