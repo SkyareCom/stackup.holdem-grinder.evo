@@ -230,6 +230,14 @@ function actionEvent(position,label,to,street){
 function checkEvent(position,street){return {position,action:"CHECK",kind:"check",to:0,street};}
 function callEvent(position,to,street){return {position,action:"CALL",kind:"call",to:+Number(to||0).toFixed(4),street};}
 
+function solverErrorText(error){
+  const parts=[
+    String(error?.stderr||"").trim(),
+    String(error?.stdout||"").trim(),
+    String(error?.message||error||"").trim()
+  ].filter(Boolean);
+  return parts.join("\n").slice(-6000);
+}
 async function solveRaw({id,street,board,oopRange,ipRange,potBb,stackBb,betSizes="33,75",raiseSizes="75",maxRaises=1}){
   const cleanOop=withoutBoard(oopRange,board);
   const cleanIp=withoutBoard(ipRange,board);
@@ -249,6 +257,8 @@ async function solveRaw({id,street,board,oopRange,ipRange,potBb,stackBb,betSizes
   try{
     await execFileAsync(BIN,args,{maxBuffer:48*1024*1024});
     return JSON.parse(await readFile(rawPath,"utf8"));
+  }catch(error){
+    throw new Error(solverErrorText(error));
   }finally{
     await rm(rawPath,{force:true}).catch(()=>{});
   }
