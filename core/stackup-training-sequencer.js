@@ -106,34 +106,42 @@
           {action:'CALL',kind:'call',frequency:aggressive*100,ev:null}
         ]};
       });
+      const version=String(pf.version||'v1');
+      const provenance={
+        strategySource:'POKER_SOLVER_PUSHFOLD',
+        upstream:'amaster97/poker_solver',
+        sourceAsset:'data/solver/pushfold-hu-v1.json',
+        modelVersion:version,
+        iterations:Number(pf.iterations_per_solve)||0,
+        exploitabilityBbPer100:expl,
+        stackDepthBb:stack
+      };
       out.push({
         id:'pushfold-hu-sb-'+stack+'bb',
         solver:'POKER_SOLVER_PUSHFOLD',
-        version:String(pf.version||'v1'),
-        solveId:'pushfold-hu-sb-'+stack,
+        version,
+        solveId:'pushfold-hu|'+version+'|SB|'+stack+'bb',
         convergence:{exploitabilityBbPer100:expl,iterations:Number(pf.iterations_per_solve)||0},
         scenario:{
           gameType:'TOURNAMENT',street:'PRE-FLOP',tableSize:2,trainingTableSize:2,
           heroPosition:'SB',villainPosition:'BB',effectiveStack:stack,pot:1.5,board:[],
           positions:['SB','BB'],playerStacks:{SB:stack,BB:stack},actionHistory:[],
-          tags:['open_shove','push_fold','heads_up_2max','blind_war'],
-          provenance:{strategySource:'POKER_SOLVER_PUSHFOLD',license:'MIT',upstream:'amaster97/poker_solver'}
+          tags:['open_shove','push_fold','heads_up_2max','blind_war'],provenance
         },
         strategy:jamStrategy
       });
       out.push({
         id:'pushfold-hu-bb-'+stack+'bb',
         solver:'POKER_SOLVER_PUSHFOLD',
-        version:String(pf.version||'v1'),
-        solveId:'pushfold-hu-bb-'+stack,
+        version,
+        solveId:'pushfold-hu|'+version+'|BB|'+stack+'bb',
         convergence:{exploitabilityBbPer100:expl,iterations:Number(pf.iterations_per_solve)||0},
         scenario:{
           gameType:'TOURNAMENT',street:'PRE-FLOP',tableSize:2,trainingTableSize:2,
           heroPosition:'BB',villainPosition:'SB',effectiveStack:stack,pot:stack+1,board:[],
           positions:['SB','BB'],playerStacks:{SB:stack,BB:stack},
           actionHistory:[{position:'SB',action:'ALL IN',kind:'jam',to:stack}],
-          tags:['call_shove','push_fold','heads_up_2max','blind_war'],
-          provenance:{strategySource:'POKER_SOLVER_PUSHFOLD',license:'MIT',upstream:'amaster97/poker_solver'}
+          tags:['call_shove','push_fold','heads_up_2max','blind_war'],provenance
         },
         strategy:callStrategy
       });
