@@ -1,0 +1,105 @@
+name: Build Strict Solved Line Bank
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/build-line-bank.yml"
+      - "scripts/generate-line-bank.mjs"
+      - "core/stackup-solved-spot-contract.js"
+      - "data/solver/solved-spot-policy.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: strict-solved-line-bank
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Checkout pinned DCFR-SOLVER
+        run: |
+          mkdir -p .stackup
+          git clone https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ".stackup/DCFR-SOLVER -> target"
+
+      - name: Build DCFR-SOLVER
+        run: |
+          cargo build --release --manifest-path .stackup/DCFR-SOLVER/Cargo.toml --bin dcfr-solver
+          cp .stackup/DCFR-SOLVER/target/release/dcfr-solver .stackup/dcfr-solver
+          chmod +x .stackup/dcfr-solver
+
+      - name: Generate solved line bank
+        env:
+          STACKUP_DCFR_BIN: ${{ github.workspace }}/.stackup/dcfr-solver
+          STACKUP_LINE_ITERATIONS: "160"
+        run: node scripts/generate-line-bank.mjs
+
+      - name: Validate every generated solved decision
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};
+          new Function('window','globalThis',code)(fake,fake);
+          const contract=fake.StackUpSolvedSpotContract;
+          const bank=JSON.parse(fs.readFileSync('data/solver/line-bank.json','utf8'));
+          if(bank.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
+          if(!Array.isArray(bank.spots)||bank.spots.length<12)throw new Error('line bank too small');
+          let valid=0;
+          for(const spot of bank.spots){
+            for(const entry of spot.strategy||[]){
+              const result=contract.validateSolvedDecision(spot,entry);
+              if(!result.ok)throw new Error(spot.id+'/'+entry.hand+': '+result.errors.join(','));
+              valid++;
+            }
+          }
+          if(valid<500)throw new Error('line bank has fewer than 500 validated solved decisions');
+          console.log({rootNodes:bank.spots.length,validatedSolvedDecisions:valid,failures:bank.failures?.length||0});
+          NODE
+
+      - name: Recompute strict coverage and deficit queue
+        run: |
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+
+      - name: Commit bank, coverage and queue safely
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "StackUp Solved Spot Bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          cp data/solver/line-bank.json /tmp/line-bank.json
+          git fetch origin main
+          git reset --hard origin/main
+          cp /tmp/line-bank.json data/solver/line-bank.json
+
+          node scripts/audit-scenario-coverage.mjs
+          node scripts/plan-solved-spot-growth.mjs
+
+          git add data/solver/line-bank.json data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json
+          if git diff --cached --quiet; then
+            echo "Solved line bank unchanged."
+            exit 0
+          fi
+          git commit -m "Generate strict solved postflop line bank"
+          git push origin HEAD:main

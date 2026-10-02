@@ -1,6 +1,6 @@
-/* StackUp Hold'em Grinder EVO — Training Sequencer V2.
-   Expands solver scenarios into hand-level training candidates, shuffles them,
-   and prevents exact/structural repetition without changing solver strategy. */
+/* StackUp Hold'em Grinder EVO — Training Sequencer V3 STRICT SOLVED.
+   One candidate == one validated solver decision for one scenario + hand.
+   No combo, suit, board, context or position expansion may increase coverage. */
 (function(global){
   'use strict';
 
@@ -832,43 +832,30 @@
       ...((bank?.preflopDecisions?.spots)||[]),
       ...((bank?.textureSizing?.spots)||[]),
       ...((bank?.preflop9max?.spots)||[]),
-      ...ljEquivalentSpots(bank),
-      ...contextualChipEvSpots(bank,filters)
+      ...((bank?.lineBank?.spots)||[])
     ];
     const candidates=[];
+    const contract=global.StackUpSolvedSpotContract;
     for(let spotIndex=0;spotIndex<all.length;spotIndex++){
       const spot=all[spotIndex];
       if(!compatible(spot,filters))continue;
       const hands=(spot.strategy||[]).filter(h=>h?.hand&&Array.isArray(h.actions)&&h.actions.length);
       for(let handIndex=0;handIndex<hands.length;handIndex++){
-        const hand=String(hands[handIndex].hand);
+        const entry=hands[handIndex];
+        const hand=String(entry.hand);
         if(!candidateMathCompatible(spot,hand,filters.special))continue;
-        const classCombos=normStreet(spot?.scenario?.street)==='PRE-FLOP'&&!isExactHand(hand)?handClassCombos(hand):[];
-        if(classCombos.length){
-          for(const heroCards of classCombos){
-            const exact=presentationSignature(spot,hand,heroCards,0);
-            candidates.push({
-              spotIndex,spot,hand,heroCards,suitVariant:0,exact,
-              family:familySignature(spot),
-              position:normPosition(spot?.scenario?.heroPosition),
-              street:normStreet(spot?.scenario?.street)
-            });
-          }
-          continue;
-        }
-        const variants=isExactHand(hand)?SUIT_PERMS.length:1;
-        const signatures=new Set();
-        for(let suitVariant=0;suitVariant<variants;suitVariant++){
-          const exact=presentationSignature(spot,hand,null,suitVariant);
-          if(signatures.has(exact))continue;
-          signatures.add(exact);
-          candidates.push({
-            spotIndex,spot,hand,suitVariant,exact,
-            family:familySignature(spot),
-            position:normPosition(spot?.scenario?.heroPosition),
-            street:normStreet(spot?.scenario?.street)
-          });
-        }
+        const verdict=contract?.validateSolvedDecision
+          ?contract.validateSolvedDecision(spot,entry)
+          :{ok:true,id:exactSignature(spot,hand)};
+        if(!verdict?.ok)continue;
+        const exact=verdict.id||exactSignature(spot,hand);
+        candidates.push({
+          spotIndex,spot,hand,suitVariant:0,exact,
+          solvedDecisionId:exact,
+          family:familySignature(spot),
+          position:normPosition(spot?.scenario?.heroPosition),
+          street:normStreet(spot?.scenario?.street)
+        });
       }
     }
     return candidates;
@@ -947,8 +934,8 @@
 
     const spot=clone(candidate.spot);
     spot.hand=candidate.hand;
-    if(Array.isArray(candidate.heroCards)&&candidate.heroCards.length===2)spot.heroCards=[...candidate.heroCards];
-    applySuitVariant(spot,candidate.suitVariant||0);
+    spot.solvedSpotId=candidate.solvedDecisionId||candidate.exact;
+    spot.validationMode='STRICT_SOLVED_ONLY';
     spot.trainingSignature=candidate.exact;
     spot.trainingFamily=candidate.family;
     spot.trainingCycle=bag.cycle;

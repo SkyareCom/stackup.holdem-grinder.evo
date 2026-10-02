@@ -4,10 +4,15 @@ import {resolve,join} from "node:path";
 const ROOT=resolve(process.cwd());
 const SOLVER_DIR=join(ROOT,"data","solver");
 const catalogCode=await readFile(join(ROOT,"core","stackup-scenario-catalog.js"),"utf8");
+const contractCode=await readFile(join(ROOT,"core","stackup-solved-spot-contract.js"),"utf8");
 const fakeWindow={};
 new Function("window",catalogCode)(fakeWindow);
+new Function("window","globalThis",contractCode)(fakeWindow,fakeWindow);
 const catalog=fakeWindow.StackUpScenarioCatalog;
+const solvedContract=fakeWindow.StackUpSolvedSpotContract;
 if(!catalog)throw new Error("scenario catalog unavailable");
+if(!solvedContract)throw new Error("solved spot contract unavailable");
+const solvedPolicy=JSON.parse(await readFile(join(SOLVER_DIR,"solved-spot-policy.json"),"utf8"));
 
 const preflop=JSON.parse(await readFile(join(SOLVER_DIR,"preflop.json"),"utf8"));
 const postflop=JSON.parse(await readFile(join(SOLVER_DIR,"postflop.json"),"utf8"));
@@ -16,6 +21,7 @@ const tournament=JSON.parse(await readFile(join(SOLVER_DIR,"tournament.json"),"u
 const preflopDecisions=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-decisions.json"),"utf8"));
 const preflop9max=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-9max.json"),"utf8"));
 const textureSizing=JSON.parse(await readFile(join(SOLVER_DIR,"texture-sizing.json"),"utf8"));
+const lineBank=JSON.parse(await readFile(join(SOLVER_DIR,"line-bank.json"),"utf8"));
 
 const SUIT_PERMS=[
   {s:"s",h:"h",d:"d",c:"c"},
@@ -76,7 +82,8 @@ const all=[
   ...((tournament?.spots)||[]),
   ...((preflopDecisions?.spots)||[]),
   ...((preflop9max?.spots)||[]),
-  ...((textureSizing?.spots)||[])
+  ...((textureSizing?.spots)||[]),
+  ...((lineBank?.spots)||[])
 ];
 function transformCard(card,perm){
   const text=String(card||"");
@@ -167,17 +174,16 @@ function candidateMatchesItem(item,spot,hand){
   return true;
 }
 function candidateCount(spots,item=null){
-  let total=0;
+  const unique=new Set();
   for(const spot of spots){
-    const pre=normStreet(spot?.scenario?.street)==="PRE-FLOP";
-    for(const h of spot?.strategy||[]){
-      if(!h?.hand||!Array.isArray(h.actions)||!h.actions.length)continue;
-      if(!candidateMatchesItem(item,spot,h.hand))continue;
-      if(pre&&!isExactHand(h.hand))total+=classComboCount(h.hand);
-      else total+=handVariants(spot,h.hand);
+    for(const entry of spot?.strategy||[]){
+      if(!entry?.hand||!Array.isArray(entry.actions)||!entry.actions.length)continue;
+      if(!candidateMatchesItem(item,spot,entry.hand))continue;
+      const verdict=solvedContract.validateSolvedDecision(spot,entry);
+      if(verdict.ok)unique.add(verdict.id);
     }
   }
-  return total;
+  return unique.size;
 }
 function normStreet(value){
   const s=String(value||"").toUpperCase().replace("PREFLOP","PRE-FLOP");
@@ -344,63 +350,7 @@ function ljEquivalentSpots(){
 const ljEquiv=ljEquivalentSpots();
 
 function baseSpotsFor(item){
-  const universe=[...all,...ljEquiv];
-  const direct=universe.filter(spot=>item.section.endsWith("_special")?matchAdvance(item,spot):matchAdjust(item,spot));
-  const dcfr=[...preflop,...postflop,...((preflopDecisions?.spots)||[]),...((preflop9max?.spots)||[])]
-    .filter(s=>String(s?.solver||"")==="DCFR_SOLVER");
-
-  // Exact same context-projection rule used by the runtime sequencer:
-  // chip-EV solves are invariant to CASH and to EARLY/MIDDLE labels when
-  // stacks/blinds/positions are unchanged. No projection is allowed for
-  // Bubble/FT/PKO/opponent-model/rebuy contexts.
-  if(item.section==="mode"&&item.id==="cash")return dcfr;
-  if(item.section==="phase"&&["early","middle"].includes(item.id))return dcfr;
-  if(item.section==="ttype"&&["regular","turbo","freeze","hroller","sng"].includes(item.id)){
-    return [...direct,...dcfr];
-  }
-  if(item.section==="fsize")return [...direct,...dcfr];
-
-  if(item.section==="pos"&&["UTG+1","UTG+2"].includes(item.id)&&direct.length){
-    const projected=[];
-    for(const spot of direct){
-      const cash=JSON.parse(JSON.stringify(spot));
-      cash.scenario={...(cash.scenario||{}),gameType:"CASH"};
-      delete cash.scenario.phase;delete cash.scenario.tournamentType;delete cash.scenario.fieldSize;
-      const early=JSON.parse(JSON.stringify(spot));
-      early.scenario={...(early.scenario||{}),gameType:"TOURNAMENT",phase:"EARLY",tournamentType:"REGULAR",fieldSize:"100"};
-      projected.push(cash,early);
-    }
-    return projected;
-  }
-
-  // Sparse preflop semantic nodes are independently trainable in two distinct,
-  // solver-equivalent chip-EV contexts: CASH and MTT EARLY.
-  if(["pre_special","blind_special","aggr_special"].includes(item.section)&&direct.length){
-    const projected=[];
-    for(const spot of direct){
-      const cash=JSON.parse(JSON.stringify(spot));
-      cash.scenario={...(cash.scenario||{}),gameType:"CASH"};
-      delete cash.scenario.phase;delete cash.scenario.tournamentType;delete cash.scenario.fieldSize;
-      const early=JSON.parse(JSON.stringify(spot));
-      early.scenario={...(early.scenario||{}),gameType:"TOURNAMENT",phase:"EARLY",tournamentType:"REGULAR",fieldSize:"100"};
-      projected.push(cash,early);
-    }
-    return projected;
-  }
-
-  if(item.section==="short_special"&&item.id==="chip_up"){
-    const projected=[];
-    for(const spot of dcfr){
-      if(normStreet(spot?.scenario?.street)!=="PRE-FLOP")continue;
-      const aggressive=(spot?.strategy||[]).some(h=>(h?.actions||[]).some(a=>["raise","jam"].includes(String(a?.kind||"").toLowerCase())&&Number(a?.frequency||0)>=5));
-      if(!aggressive)continue;
-      const early=JSON.parse(JSON.stringify(spot));
-      early.scenario={...(early.scenario||{}),gameType:"TOURNAMENT",phase:"EARLY",tournamentType:"REGULAR",fieldSize:"100"};
-      early.scenario.tags=[...new Set([...(early.scenario.tags||[]),"chip_up"])];
-      projected.push(early);
-    }
-    return projected;
-  }
+  const direct=all.filter(spot=>item.section.endsWith("_special")?matchAdvance(item,spot):matchAdjust(item,spot));
   return direct;
 }
 
@@ -416,17 +366,29 @@ for(const item of catalog.ALL){
     validator:item.validator,
     minSpots:item.minSpots,
     baseSpots:spots.length,
+    solvedSpots:available,
+    validatedSolvedSpots:available,
     available,
+    targetSpots:Number(solvedPolicy.currentGoal)||2000,
+    longTermTargetSpots:Number(solvedPolicy.growth?.longTermTargetPerFilter)||20000,
+    coveragePct:Number((((available)/(Number(solvedPolicy.currentGoal)||2000))*100).toFixed(2)),
     publishable:available>=item.minSpots
   });
 }
 
 const summary={
   generatedAt:new Date().toISOString(),
+  mode:"STRICT_SOLVED_ONLY",
+  countingUnit:solvedPolicy.countingUnit,
   minSpots:catalog.MIN_SPOTS,
+  currentGoal:Number(solvedPolicy.currentGoal)||2000,
+  longTermTarget:Number(solvedPolicy.growth?.longTermTargetPerFilter)||20000,
+  milestones:solvedPolicy.milestones||[1500,2000,5000,10000,20000],
+  rules:solvedPolicy.rules||{},
   counts:catalog.count(),
   publishable:cards.filter(x=>x.publishable).length,
   incomplete:cards.filter(x=>!x.publishable).length,
+  atCurrentGoal:cards.filter(x=>x.validatedSolvedSpots>=(Number(solvedPolicy.currentGoal)||2000)).length,
   cards
 };
 
@@ -435,6 +397,9 @@ console.log(JSON.stringify({
   generatedAt:summary.generatedAt,
   counts:summary.counts,
   minSpots:summary.minSpots,
+  currentGoal:summary.currentGoal,
+  longTermTarget:summary.longTermTarget,
   publishable:summary.publishable,
-  incomplete:summary.incomplete
+  incomplete:summary.incomplete,
+  atCurrentGoal:summary.atCurrentGoal
 },null,2));
