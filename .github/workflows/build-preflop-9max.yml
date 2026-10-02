@@ -198,4 +198,4 @@ jobs:
             exit 0
           fi
           git commit -m "Generate native multistack DCFR 9max bank"
-          git push origin HEAD:main
+          bash scripts/persist-solver-artifacts.sh data/solver/preflop-9max.json

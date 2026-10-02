@@ -117,4 +117,4 @@ jobs:
             exit 0
           fi
           git commit -m "Generate strict solved postflop line bank"
-          git push origin HEAD:main
+          bash scripts/persist-solver-artifacts.sh data/solver/line-bank.json

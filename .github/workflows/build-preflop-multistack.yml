@@ -220,4 +220,4 @@ jobs:
             exit 0
           fi
           git commit -m "Generate strict multistack DCFR preflop bank"
-          git push origin HEAD:main
+          bash scripts/persist-solver-artifacts.sh data/solver/preflop-multistack.json

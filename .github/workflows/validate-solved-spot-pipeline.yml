@@ -44,6 +44,7 @@ jobs:
           node --check scripts/generate-line-bank.mjs
           node --check scripts/generate-solver-bank.mjs
           node --check scripts/generate-texture-sizing-bank.mjs
+          bash -n scripts/persist-solver-artifacts.sh
 
       - name: Validate runtime / audit solved-bank parity
         run: |
