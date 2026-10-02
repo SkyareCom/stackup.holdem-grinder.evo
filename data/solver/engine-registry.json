@@ -145,12 +145,11 @@
     {
       "id": "STACKUP_MULTIWAY_POSTFLOP",
       "workflow": "build-multiway-postflop-bank.yml",
-      "generator": "scripts/generate-multiway-postflop-bank.mjs",
+      "generator": "scripts/generate-multiway-postflop-bank.py",
       "handles": [
         "post_special/postflop_multiway"
       ],
-      "strict": true,
-      "status": "ENGINE_REQUIRED"
+      "strict": true
     }
   ]
 }
