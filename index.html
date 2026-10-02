@@ -3050,7 +3050,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const sessions='<div class="statsview" data-stats-panel="sessions"'+(statsView==='sessions'?'':' hidden')+'>'+sessionsHtml+statsTrendHtml(model)+statsBarCard(L()==='en'?'VOLUME BY TRAINING':L()==='es'?'VOLUMEN POR ENTRENO':'VOLUME POR TREINO','',model.byTraining,x=>x)+'</div>';
     const report='<div class="statsview" data-stats-panel="report"'+(statsView==='report'?'':' hidden')+'>'+sw+statsDetailedHtml(model)+plan+contact+'</div>';
 
-    statsPanel.innerHTML=hero+nav+overview+evolution+game+advance+sessions+report;
+    const savedBanner=statsReportOverride?'<div class="statsreportbanner">'+(L()==='en'?'SAVED REPORT: ':L()==='es'?'INFORME GUARDADO: ':'RELATÓRIO SALVO: ')+statsEsc(statsReportOverride.item?.name||'')+'</div>':'';
+    statsPanel.innerHTML=savedBanner+hero+nav+overview+evolution+game+advance+sessions+report;
   }
   function statsReportText(model){
     const tx=statsText(),c=model.overall;
@@ -3154,8 +3155,196 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     statsPanel.style.display=on?'flex':'none';
     if(on){
       const slot=$('#page .slot');if(slot)slot.hidden=true;
-      hg.hidden=true;tw.hidden=true;adv.hidden=true;historyPanel.hidden=true;tb.hidden=true;spotActions.hidden=true;spotSupport.hidden=true;
+      hg.hidden=true;tw.hidden=true;adv.hidden=true;historyPanel.hidden=true;reportsPanel.hidden=true;tb.hidden=true;spotActions.hidden=true;spotSupport.hidden=true;
       renderStats();
+      const content=$('.content');if(content)content.scrollTop=0;
+    }
+  }
+
+
+  // ===== RELATÓRIOS: biblioteca persistente dos relatórios gerados no STATS =====
+  const REPORTS_TEXT={
+    pt:{alpha:'ORDEM ALFABÉTICA',empty:'NENHUM RELATÓRIO SALVO',selected:'SELECIONADOS',selectAll:'SELECIONAR TODOS',clear:'LIMPAR SELEÇÃO',delete:'APAGAR',cancel:'CANCELAR',confirm:'CONFIRMAR',html:'GERAR HTML',pdf:'GERAR PDF',whatsapp:'ENVIAR WHATSAPP',email:'ENVIAR E-MAIL',emailField:'E-MAIL',phoneField:'WHATSAPP',deleted:'RELATÓRIO(S) APAGADO(S)',choose:'SELECIONE UM OU MAIS RELATÓRIOS',deleteFirst:'SELECIONE APAGAR ANTES DE CONFIRMAR',noData:'OS DADOS DETALHADOS DESTE RELATÓRIO NÃO ESTÃO MAIS DISPONÍVEIS',sections:'SEÇÕES INTEGRADAS',spots:'SPOTS',technical:'TÉCNICO'},
+    en:{alpha:'ALPHABETICAL ORDER',empty:'NO SAVED REPORTS',selected:'SELECTED',selectAll:'SELECT ALL',clear:'CLEAR SELECTION',delete:'DELETE',cancel:'CANCEL',confirm:'CONFIRM',html:'GENERATE HTML',pdf:'GENERATE PDF',whatsapp:'SEND WHATSAPP',email:'SEND EMAIL',emailField:'EMAIL',phoneField:'WHATSAPP',deleted:'REPORT(S) DELETED',choose:'SELECT ONE OR MORE REPORTS',deleteFirst:'SELECT DELETE BEFORE CONFIRMING',noData:'DETAILED DATA FOR THIS REPORT IS NO LONGER AVAILABLE',sections:'INTEGRATED SECTIONS',spots:'SPOTS',technical:'TECHNICAL'},
+    es:{alpha:'ORDEN ALFABÉTICO',empty:'NINGÚN INFORME GUARDADO',selected:'SELECCIONADOS',selectAll:'SELECCIONAR TODOS',clear:'LIMPIAR SELECCIÓN',delete:'BORRAR',cancel:'CANCELAR',confirm:'CONFIRMAR',html:'GENERAR HTML',pdf:'GENERAR PDF',whatsapp:'ENVIAR WHATSAPP',email:'ENVIAR EMAIL',emailField:'EMAIL',phoneField:'WHATSAPP',deleted:'INFORME(S) BORRADO(S)',choose:'SELECCIONA UNO O MÁS INFORMES',deleteFirst:'SELECCIONA BORRAR ANTES DE CONFIRMAR',noData:'LOS DATOS DETALLADOS DE ESTE INFORME YA NO ESTÁN DISPONIBLES',sections:'SECCIONES INTEGRADAS',spots:'SPOTS',technical:'TÉCNICO'}
+  };
+  const reportsStyle=document.createElement('style');
+  reportsStyle.textContent=
+    '.reportspanel{display:flex;flex-direction:column;gap:10px;padding-bottom:14px}.reportspanel[hidden]{display:none!important}'+
+    '.reportshead,.reportsbatch,.reportdetail{padding:12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}'+
+    '.reportshead{display:flex;align-items:center;justify-content:space-between;gap:8px}.reportshead b,.reportshead span,.reportitem b,.reportitem small,.reportdetail b,.reportdetail small,.reportsbatch b{font-family:var(--f-ui);font-size:var(--fs)!important;font-weight:400}.reportshead b{color:var(--c-accent-text);letter-spacing:var(--ls-label)}.reportshead span{color:var(--c-muted)}'+
+    '.reportsselectrow,.reportsactions,.reportsections,.reportitemactions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.reportsections{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:8px}.reportitemactions{margin-top:9px}'+
+    '.reportsselectrow button,.reportsactions button,.reportsections button,.reportitemactions button{min-height:38px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.15);color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important}.reportsactions button.on,.reportitemactions button.on{background:var(--on-bg);border:var(--on-border);color:var(--c-accent-text);box-shadow:var(--on-glow)}'+
+    '.reportscontact{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0}.reportscontact input{width:100%;height:40px;padding:0 10px;border-radius:12px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.15);color:#fff;font-family:var(--f-ui);font-size:var(--fs)!important}'+
+    '.reportslist{display:flex;flex-direction:column;gap:8px}.reportitem{width:100%;padding:12px;border-radius:var(--r-card);background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.12);display:grid;grid-template-columns:24px minmax(0,1fr);gap:9px;align-items:center;text-align:left}.reportitem.on{background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow)}'+
+    '.reportcheck{width:20px;height:20px;border-radius:6px;border:1px solid rgba(255,255,255,.35);display:grid;place-items:center;color:transparent}.reportitem.on .reportcheck{color:var(--c-accent-text);border-color:var(--c-accent-text);background:rgba(21,91,189,.22)}'+
+    '.reportitem b{display:block;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.reportitem small{display:block;margin-top:4px;color:var(--c-muted);line-height:1.35}.reportdetail{margin-top:-3px}.reportdetail>small{display:block;color:var(--c-muted);margin-top:4px}.reportsections button{min-height:42px}.reportempty{padding:22px;text-align:center;border-radius:var(--r-card);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.10);color:var(--c-muted);font-family:var(--f-ui);font-size:var(--fs)!important}'+
+    '.statsreportbanner{padding:9px 11px;border-radius:13px;background:rgba(21,91,189,.16);border:1px solid rgba(111,164,255,.28);font-family:var(--f-ui);font-size:var(--fs)!important;color:var(--c-accent-text)}';
+  R.appendChild(reportsStyle);
+
+  const reportsPanel=document.createElement('div');
+  reportsPanel.className='reportspanel';
+  reportsPanel.hidden=true;
+  $('#page').appendChild(reportsPanel);
+  const reportsSelected=new Set();
+  let reportsPendingDelete=new Set();
+
+  function reportsText(){return REPORTS_TEXT[L()]||REPORTS_TEXT.pt;}
+  function reportLibraryItems(){return window.StackUpReportLibrary?.list?.()||[];}
+  function reportResolveRecords(item){
+    const keys=new Set(Array.isArray(item?.recordKeys)?item.recordKeys:[]);
+    if(!keys.size)return [];
+    return statsAllRecords().filter(r=>keys.has(statsRecordKey(r)));
+  }
+  function reportFormatDate(value){
+    try{return new Intl.DateTimeFormat(L()==='en'?'en-US':L()==='es'?'es-ES':'pt-BR',{dateStyle:'short',timeStyle:'short'}).format(new Date(value));}
+    catch(_){return String(value||'—');}
+  }
+  function reportBodyHtml(item){
+    const html=String(item?.html||'');
+    const m=html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    if(m)return m[1];
+    return '<pre style="white-space:pre-wrap">'+statsEsc(item?.text||'')+'</pre>';
+  }
+  function reportsCombinedText(items){
+    return items.map(item=>'===== '+item.name+' =====\n'+String(item.text||'')).join('\n\n');
+  }
+  function reportsCombinedHtml(items){
+    const body=items.map(item=>'<section class="saved"><h2>'+statsEsc(item.name)+'</h2><p class="meta">'+statsEsc(reportFormatDate(item.createdAt))+'</p>'+reportBodyHtml(item)+'</section>').join('');
+    return '<!doctype html><html lang="'+L()+'"><meta charset="utf-8"><title>StackUp Grinder - Relatórios</title><style>body{font-family:Arial,sans-serif;background:#07101f;color:#fff;padding:24px;line-height:1.45}h1,h2{color:#6fa4ff}.saved{margin:0 0 24px;padding:18px;border:1px solid #526078;border-radius:12px}.meta{opacity:.7}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #344052;text-align:left}@media print{body{background:#fff;color:#111}h1,h2{color:#194f9f}.saved{border-color:#bbb}}</style><body><h1>STACKUP HOLD\\'EM GRINDER</h1>'+body+'</body></html>';
+  }
+  function reportActionItems(scopeId){
+    const ids=scopeId?[String(scopeId)]:[...reportsSelected];
+    const byId=new Map(reportLibraryItems().map(x=>[x.id,x]));
+    return ids.map(id=>byId.get(id)).filter(Boolean);
+  }
+  function reportContact(selector){
+    return reportsPanel.querySelector(selector)?.value?.trim?.()||'';
+  }
+  function runReportAction(kind,scopeId){
+    const tx=reportsText(),items=reportActionItems(scopeId);
+    if(kind==='cancel'){
+      reportsPendingDelete.clear();
+      renderReports();
+      return;
+    }
+    if(kind==='confirm'){
+      if(!reportsPendingDelete.size){showSpotToast(tx.deleteFirst);return;}
+      window.StackUpReportLibrary?.removeMany?.([...reportsPendingDelete]);
+      [...reportsPendingDelete].forEach(id=>reportsSelected.delete(id));
+      reportsPendingDelete.clear();
+      renderReports();
+      showSpotToast(tx.deleted);
+      return;
+    }
+    if(!items.length){showSpotToast(tx.choose);return;}
+    if(kind==='delete'){
+      reportsPendingDelete=new Set(items.map(x=>x.id));
+      renderReports();
+      return;
+    }
+    const html=reportsCombinedHtml(items),textReport=reportsCombinedText(items);
+    const fileName='stackup-grinder-relatorios-'+new Date().toISOString().slice(0,10)+'.html';
+    if(kind==='html'){
+      const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);return;
+    }
+    if(kind==='pdf'){
+      const w=window.open('','_blank');if(!w)return;
+      w.document.open();w.document.write(html);w.document.close();window.setTimeout(()=>{try{w.focus();w.print();}catch(_){}},350);return;
+    }
+    if(kind==='email'){
+      const email=reportContact('[data-reports-email]');
+      const subject='StackUp Grinder - '+(items.length===1?items[0].name:(items.length+' relatórios'));
+      window.location.href='mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(textReport.slice(0,12000));return;
+    }
+    if(kind==='whatsapp'){
+      const phone=reportContact('[data-reports-phone]').replace(/\D/g,'');
+      const base=phone?'https://wa.me/'+phone:'https://wa.me/';
+      window.open(base+'?text='+encodeURIComponent(textReport.slice(0,8000)),'_blank');
+    }
+  }
+  function openSavedReportSection(reportId,view){
+    const item=window.StackUpReportLibrary?.get?.(reportId);
+    if(!item)return;
+    const records=reportResolveRecords(item);
+    if(!records.length){
+      if(view==='report'&&item.html){
+        const w=window.open('','_blank');
+        if(w){w.document.open();w.document.write(item.html);w.document.close();}
+      }else showSpotToast(reportsText().noData);
+      return;
+    }
+    statsReportOverride={id:item.id,item,records};
+    statsTrainingFilter='all';statsSectionFilter='all';statsSessionFilter='all';
+    statsView=view||item.view||'overview';
+    sub.home.length=0;
+    show('menu',true);
+    const content=$('.content');if(content)content.scrollTop=0;
+  }
+  function renderReports(){
+    const tx=reportsText(),items=reportLibraryItems();
+    [...reportsSelected].forEach(id=>{if(!items.some(x=>x.id===id))reportsSelected.delete(id);});
+    const selected=items.filter(x=>reportsSelected.has(x.id));
+    const selectedCount=selected.length;
+    const allSelected=items.length>0&&selectedCount===items.length;
+    const pending=reportsPendingDelete.size>0;
+    const head='<div class="reportshead"><b>'+spotEscape(tx.alpha)+'</b><span>'+items.length+'</span></div>'+
+      '<div class="reportsselectrow"><button data-report-select="all" class="'+(allSelected?'on':'')+'">'+spotEscape(tx.selectAll)+'</button><button data-report-select="none">'+spotEscape(tx.clear)+'</button></div>';
+    if(!items.length){reportsPanel.innerHTML=head+'<div class="reportempty">'+spotEscape(tx.empty)+'</div>';return;}
+
+    const batch='<div class="reportsbatch"><b>'+spotEscape(tx.selected)+': '+selectedCount+'</b>'+
+      '<div class="reportscontact"><input data-reports-email type="email" placeholder="'+spotEscape(tx.emailField)+'"><input data-reports-phone type="tel" placeholder="'+spotEscape(tx.phoneField)+'"></div>'+
+      '<div class="reportsactions"><button data-report-action="pdf">'+spotEscape(tx.pdf)+'</button><button data-report-action="html">'+spotEscape(tx.html)+'</button><button data-report-action="whatsapp">'+spotEscape(tx.whatsapp)+'</button><button data-report-action="email">'+spotEscape(tx.email)+'</button><button data-report-action="delete" class="'+(pending?'on':'')+'">'+spotEscape(tx.delete)+'</button><button data-report-action="cancel">'+spotEscape(tx.cancel)+'</button><button data-report-action="confirm" class="'+(pending?'on':'')+'">'+spotEscape(tx.confirm)+'</button></div></div>';
+
+    const views=[
+      ['overview',L()==='en'?'OVERVIEW':L()==='es'?'RESUMEN':'RESUMO'],
+      ['evolution',L()==='en'?'EVOLUTION':L()==='es'?'EVOLUCIÓN':'EVOLUÇÃO'],
+      ['game',L()==='en'?'GAME':L()==='es'?'JUEGO':'JOGO'],
+      ['advance','ADVANCE'],
+      ['sessions',L()==='en'?'SESSIONS':L()==='es'?'SESIONES':'SESSÕES'],
+      ['report',L()==='en'?'REPORT':L()==='es'?'INFORME':'RELATÓRIO']
+    ];
+    const list=items.map(item=>{
+      const on=reportsSelected.has(item.id),sum=item.summary||{};
+      const meta=reportFormatDate(item.createdAt)+' · '+String(sum.total||0)+' '+tx.spots+' · '+Number(sum.technical||0).toFixed(1).replace('.',',')+'% '+tx.technical+(sum.grade?' · '+sum.grade:'');
+      let detail='';
+      if(on){
+        const itemPending=reportsPendingDelete.has(item.id);
+        detail='<div class="reportdetail"><b>'+spotEscape(tx.sections)+'</b><div class="reportsections">'+views.map(v=>'<button data-report-section="'+v[0]+'" data-report-id="'+spotEscape(item.id)+'">'+spotEscape(v[1])+'</button>').join('')+'</div>'+
+          '<div class="reportitemactions"><button data-report-action="pdf" data-report-scope="'+spotEscape(item.id)+'">'+spotEscape(tx.pdf)+'</button><button data-report-action="html" data-report-scope="'+spotEscape(item.id)+'">'+spotEscape(tx.html)+'</button><button data-report-action="whatsapp" data-report-scope="'+spotEscape(item.id)+'">'+spotEscape(tx.whatsapp)+'</button><button data-report-action="email" data-report-scope="'+spotEscape(item.id)+'">'+spotEscape(tx.email)+'</button><button data-report-action="delete" data-report-scope="'+spotEscape(item.id)+'" class="'+(itemPending?'on':'')+'">'+spotEscape(tx.delete)+'</button><button data-report-action="cancel" data-report-scope="'+spotEscape(item.id)+'">'+spotEscape(tx.cancel)+'</button><button data-report-action="confirm" data-report-scope="'+spotEscape(item.id)+'" class="'+(itemPending?'on':'')+'">'+spotEscape(tx.confirm)+'</button></div></div>';
+      }
+      return '<button class="reportitem '+(on?'on':'')+'" data-report-id="'+spotEscape(item.id)+'" aria-pressed="'+(on?'true':'false')+'"><span class="reportcheck">✓</span><span><b>'+spotEscape(item.name)+'</b><small>'+spotEscape(meta)+'</small></span></button>'+detail;
+    }).join('');
+    reportsPanel.innerHTML=head+batch+'<div class="reportslist">'+list+'</div>';
+  }
+  reportsPanel.addEventListener('click',e=>{
+    const section=e.target.closest('[data-report-section][data-report-id]');
+    if(section){openSavedReportSection(section.dataset.reportId,section.dataset.reportSection);return;}
+    const action=e.target.closest('[data-report-action]');
+    if(action){runReportAction(action.dataset.reportAction,action.dataset.reportScope||null);return;}
+    const select=e.target.closest('[data-report-select]');
+    if(select){
+      if(select.dataset.reportSelect==='all')reportLibraryItems().forEach(x=>reportsSelected.add(x.id));
+      else{reportsSelected.clear();reportsPendingDelete.clear();}
+      renderReports();return;
+    }
+    const item=e.target.closest('.reportitem[data-report-id]');
+    if(item){
+      const id=item.dataset.reportId;
+      if(reportsSelected.has(id)){reportsSelected.delete(id);reportsPendingDelete.delete(id);}else reportsSelected.add(id);
+      renderReports();
+    }
+  });
+  function syncReports(){
+    const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null;
+    const on=hs==='reports';
+    reportsPanel.hidden=!on;
+    reportsPanel.style.display=on?'flex':'none';
+    if(on){
+      const slot=$('#page .slot');if(slot)slot.hidden=true;
+      hg.hidden=true;tw.hidden=true;adv.hidden=true;historyPanel.hidden=true;statsPanel.hidden=true;statsPanel.style.display='none';tb.hidden=true;spotActions.hidden=true;spotSupport.hidden=true;
+      renderReports();
       const content=$('.content');if(content)content.scrollTop=0;
     }
   }
@@ -3167,7 +3356,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null, key=hs||cur;
     const title=T2[L()]['ti_'+key];
     $('#ptitle').textContent=title; $('#sectiontitle').textContent=title;
-    $('#pslotT').textContent=T2[L()]['soon']; $('#pslotS').textContent=T2[L()]['ds_'+key]; syncTrain(); syncSpots(); syncAdvance(); syncHistory(); syncStats();
+    $('#pslotT').textContent=T2[L()]['soon']; $('#pslotS').textContent=T2[L()]['ds_'+key]; syncTrain(); syncSpots(); syncAdvance(); syncHistory(); syncStats(); syncReports();
     const hm=cur==='home'&&!hs; hg.hidden=!hm; if(hm){ $('#page .slot').hidden=true; renderHome(); } }
   function show(t,push,dir){
     const prev=cur; cur=t;
@@ -3241,6 +3430,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         Object.keys(sub).forEach(k=>sub[k]=[]);
         historySelectedId=null;
         historyPendingAction=null;
+        statsReportOverride=null;
+        reportsPendingDelete.clear();
         const content=$('.content');
         if(content)content.scrollTop=0;
         show('home',false,0);
@@ -3251,12 +3442,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   });
   $$('.tab').forEach(t=>t.onclick=()=>{
     const target=t.dataset.t;
+    if(target==='menu'){
+      statsReportOverride=null;
+      statsTrainingFilter='all';statsSectionFilter='all';statsSessionFilter='all';statsView='overview';
+    }
     if(target==='home'){
       // HOME no rodapé é sempre a raiz: limpa qualquer subtela antiga e
       // força nova renderização mesmo quando HOME já está selecionado.
       sub.home.length=0;
       historySelectedId=null;
       historyPendingAction=null;
+      statsReportOverride=null;
+      reportsPendingDelete.clear();
       const content=$('.content');
       if(content)content.scrollTop=0;
       show('home',false,0);
