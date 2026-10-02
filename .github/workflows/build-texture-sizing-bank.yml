@@ -3,6 +3,8 @@ name: Build Texture Sizing Bank
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - ".github/workflows/build-texture-sizing-bank.yml"
       - "scripts/generate-texture-sizing-bank.mjs"
