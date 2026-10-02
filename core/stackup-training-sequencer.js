@@ -624,10 +624,17 @@
     // solver-resolved. They never create strategy or coverage.
     const classifier=global.StackUpSolvedSpotClassifier;
     if(classifier?.isHandLevel&&classifier?.qualifies){
+      const tags=spotTags(spot);
       for(const [section,values] of Object.entries(special||{})){
         if(section==='math_special')continue;
-        const handLevel=(Array.isArray(values)?values:[]).map(String).filter(id=>classifier.isHandLevel(section,id));
-        if(handLevel.length&&!handLevel.some(id=>classifier.qualifies(section,id,spot,hand)))return false;
+        const selected=(Array.isArray(values)?values:[]).map(String);
+        const handLevel=selected.filter(id=>classifier.isHandLevel(section,id));
+        if(!handLevel.length)continue;
+        const spotLevel=selected.filter(id=>!classifier.isHandLevel(section,id));
+        // OR within a filter group: a scenario-level alternative can satisfy
+        // the group without also forcing a hand-level classifier match.
+        if(spotLevel.some(id=>tags.has(id)))continue;
+        if(!handLevel.some(id=>classifier.qualifies(section,id,spot,hand)))return false;
       }
     }
     return true;
@@ -660,9 +667,14 @@
     return groups.every(([section,values])=>{
       // MATH is evaluated per hand in candidateMathCompatible to preserve OR.
       if(section==='math_special')return true;
-      const spotLevel=values.map(String).filter(x=>!classifier?.isHandLevel?.(section,x));
-      if(!spotLevel.length)return true;
-      return spotLevel.some(x=>tags.has(x));
+      const selected=values.map(String);
+      const handLevel=selected.filter(x=>classifier?.isHandLevel?.(section,x));
+      const spotLevel=selected.filter(x=>!classifier?.isHandLevel?.(section,x));
+      if(spotLevel.some(x=>tags.has(x)))return true;
+      // Hand-level alternatives are checked against the exact solved hand
+      // later; keep this group alive instead of turning mixed OR into AND.
+      if(handLevel.length)return true;
+      return !spotLevel.length;
     });
   }
 
