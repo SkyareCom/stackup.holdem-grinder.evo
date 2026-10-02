@@ -74,15 +74,27 @@ function pushfoldSpots(){
   for(const stack of (pushfold.stack_depths_bb||[]).map(Number).filter(v=>v>=2&&v<=15)){
     const jam=pushfold.charts?.sb_jam?.[String(stack)]||{};
     const call=pushfold.charts?.bb_call_vs_jam?.[String(stack)]||{};
+    const version=String(pushfold.version||"v1");
+    const provenance={
+      strategySource:"POKER_SOLVER_PUSHFOLD",
+      upstream:"amaster97/poker_solver",
+      sourceAsset:"data/solver/pushfold-hu-v1.json",
+      modelVersion:version,
+      iterations:Number(pushfold.iterations_per_solve)||0,
+      exploitabilityBbPer100:expl,
+      stackDepthBb:stack
+    };
     out.push({
-      id:"pushfold-hu-sb-"+stack+"bb",solver:"POKER_SOLVER_PUSHFOLD",
-      scenario:{gameType:"TOURNAMENT",street:"PRE-FLOP",tableSize:2,trainingTableSize:2,heroPosition:"SB",villainPosition:"BB",effectiveStack:stack,pot:1.5,board:[],actionHistory:[],tags:["open_shove","push_fold","heads_up_2max","blind_war"]},
-      strategy:classes.map(hand=>{const p=Math.max(0,Math.min(1,Number(jam[hand])||0));return {hand,actions:[{action:"FOLD",frequency:(1-p)*100},{action:"ALL IN",frequency:p*100}]};})
+      id:"pushfold-hu-sb-"+stack+"bb",solver:"POKER_SOLVER_PUSHFOLD",version,
+      solveId:"pushfold-hu|"+version+"|SB|"+stack+"bb",
+      scenario:{gameType:"TOURNAMENT",street:"PRE-FLOP",tableSize:2,trainingTableSize:2,heroPosition:"SB",villainPosition:"BB",effectiveStack:stack,pot:1.5,board:[],actionHistory:[],tags:["open_shove","push_fold","heads_up_2max","blind_war"],provenance},
+      strategy:classes.map(hand=>{const p=Math.max(0,Math.min(1,Number(jam[hand])||0));return {hand,actions:[{action:"FOLD",kind:"fold",frequency:(1-p)*100},{action:"ALL IN",kind:"jam",frequency:p*100}]};})
     });
     out.push({
-      id:"pushfold-hu-bb-"+stack+"bb",solver:"POKER_SOLVER_PUSHFOLD",
-      scenario:{gameType:"TOURNAMENT",street:"PRE-FLOP",tableSize:2,trainingTableSize:2,heroPosition:"BB",villainPosition:"SB",effectiveStack:stack,pot:stack+1,board:[],actionHistory:[{position:"SB",action:"ALL IN",kind:"jam",to:stack}],tags:["call_shove","push_fold","heads_up_2max","blind_war"]},
-      strategy:classes.map(hand=>{const p=Math.max(0,Math.min(1,Number(call[hand])||0));return {hand,actions:[{action:"FOLD",frequency:(1-p)*100},{action:"CALL",frequency:p*100}]};})
+      id:"pushfold-hu-bb-"+stack+"bb",solver:"POKER_SOLVER_PUSHFOLD",version,
+      solveId:"pushfold-hu|"+version+"|BB|"+stack+"bb",
+      scenario:{gameType:"TOURNAMENT",street:"PRE-FLOP",tableSize:2,trainingTableSize:2,heroPosition:"BB",villainPosition:"SB",effectiveStack:stack,pot:stack+1,board:[],actionHistory:[{position:"SB",action:"ALL IN",kind:"jam",to:stack}],tags:["call_shove","push_fold","heads_up_2max","blind_war"],provenance},
+      strategy:classes.map(hand=>{const p=Math.max(0,Math.min(1,Number(call[hand])||0));return {hand,actions:[{action:"FOLD",kind:"fold",frequency:(1-p)*100},{action:"CALL",kind:"call",frequency:p*100}]};})
     });
   }
   return out;
