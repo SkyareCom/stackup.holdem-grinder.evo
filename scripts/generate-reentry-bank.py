@@ -133,6 +133,7 @@ REBUY=[
  archetype("REBUY","c",[62,48,36,28,15,15],[.38,.24,.15,.10,.08,.05],"MIDDLE","250",{"kind":"REBUY","rebuyStackBb":20,"costPrizeValue":.025}),
  archetype("REBUY","d",[70,53,40,30,18,18],[.38,.24,.15,.10,.08,.05],"MIDDLE","500",{"kind":"REBUY","rebuyStackBb":30,"costPrizeValue":.038}),
  archetype("REBUY","e",[80,60,45,34,20,20],[.38,.24,.15,.10,.08,.05],"MIDDLE","1000+",{"kind":"REBUY","rebuyStackBb":25,"costPrizeValue":.030}),
+ archetype("REBUY","f",[67,51,39,29,17,17],[.38,.24,.15,.10,.08,.05],"MIDDLE","350",{"kind":"REBUY","rebuyStackBb":22,"costPrizeValue":.027}),
 ]
 ADDON=[
  archetype("ADDON","a",[45,36,29,23,14,14],[.38,.24,.15,.10,.08,.05],"MIDDLE","50",{"kind":"ADDON","addonStackBb":10,"costPrizeValue":.014}),
@@ -140,6 +141,7 @@ ADDON=[
  archetype("ADDON","c",[60,46,35,27,18,18],[.38,.24,.15,.10,.08,.05],"MIDDLE","250",{"kind":"ADDON","addonStackBb":20,"costPrizeValue":.026}),
  archetype("ADDON","d",[68,51,39,29,20,20],[.38,.24,.15,.10,.08,.05],"MIDDLE","500",{"kind":"ADDON","addonStackBb":25,"costPrizeValue":.032}),
  archetype("ADDON","e",[76,57,43,32,22,22],[.38,.24,.15,.10,.08,.05],"MIDDLE","1000+",{"kind":"ADDON","addonStackBb":30,"costPrizeValue":.038}),
+ archetype("ADDON","f",[64,49,37,28,19,19],[.38,.24,.15,.10,.08,.05],"MIDDLE","350",{"kind":"ADDON","addonStackBb":18,"costPrizeValue":.024}),
 ]
 
 def main():
