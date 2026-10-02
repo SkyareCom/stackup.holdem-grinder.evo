@@ -199,7 +199,7 @@ function candidateCount(spots,item=null){
       if(!entry?.hand||!Array.isArray(entry.actions)||!entry.actions.length)continue;
       if(!candidateMatchesItem(item,spot,entry.hand))continue;
       const verdict=solvedContract.validateSolvedDecision(spot,entry);
-      if(verdict.ok)unique.add(verdict.id);
+      if(verdict.ok)unique.add(verdict.strategicId||verdict.id);
     }
   }
   return unique.size;
