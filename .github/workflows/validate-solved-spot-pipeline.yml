@@ -45,6 +45,33 @@ jobs:
           node --check scripts/generate-solver-bank.mjs
           node --check scripts/generate-texture-sizing-bank.mjs
 
+      - name: Validate runtime / audit solved-bank parity
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const client=fs.readFileSync('core/stackup-spots-client.js','utf8');
+          const sequencer=fs.readFileSync('core/stackup-training-sequencer.js','utf8');
+          const audit=fs.readFileSync('scripts/audit-scenario-coverage.mjs','utf8');
+          const banks=[
+            ['reentry','reentry.json'],
+            ['opponentProfile','opponent-profile.json'],
+            ['multiwayTournament','multiway-tournament.json'],
+            ['multiwayPostflop','multiway-postflop.json'],
+            ['preflopMultistack','preflop-multistack.json'],
+            ['preflopHu','preflop-hu.json'],
+            ['preflopDecisions','preflop-decisions.json'],
+            ['preflop9max','preflop-9max.json'],
+            ['textureSizing','texture-sizing.json'],
+            ['lineBank','line-bank.json']
+          ];
+          for(const [key,file] of banks){
+            if(!client.includes("fetchJson(staticUrl('"+file+"'))"))throw new Error('runtime client missing '+file);
+            if(!sequencer.includes('bank?.'+key+'?.spots'))throw new Error('sequencer missing '+key);
+            if(!audit.includes(key+'?.spots'))throw new Error('coverage auditor missing '+key);
+          }
+          console.log({runtimeAuditParity:true,banks:banks.length});
+          NODE
+
       - name: Validate Python generators and patchers
         run: |
           python -m py_compile scripts/generate-tournament-bank.py
