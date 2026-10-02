@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 120
     strategy:
       fail-fast: false
-      max-parallel: 9
+      max-parallel: 12
       matrix:
         include:
           - { game: TOURNAMENT, stack: 5, phase: EARLY, tournament_type: REGULAR, field: "50", extra_tags: "chip_up" }
@@ -218,6 +218,17 @@ jobs:
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
           node scripts/route-solve-queue.mjs
+
+      - name: Enforce 4bet value publication floor
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const c=JSON.parse(fs.readFileSync('data/solver/coverage.json','utf8'));
+          const card=(c.cards||[]).find(x=>x.section==='aggr_special'&&x.id==='4bet_value');
+          const n=Number(card?.validatedSolvedSpots||0);
+          if(n<1500)throw new Error('4bet_value below strict 1500 floor: '+n);
+          console.log({filter:'aggr_special/4bet_value',validatedSolvedSpots:n});
+          NODE
 
       - name: Commit multistack bank safely
         if: github.ref == 'refs/heads/main'
