@@ -22,6 +22,7 @@ const preflop=JSON.parse(await readFile(join(SOLVER_DIR,"preflop.json"),"utf8"))
 const postflop=JSON.parse(await readFile(join(SOLVER_DIR,"postflop.json"),"utf8"));
 const pushfold=JSON.parse(await readFile(join(SOLVER_DIR,"pushfold-hu-v1.json"),"utf8"));
 const tournament=JSON.parse(await readFile(join(SOLVER_DIR,"tournament.json"),"utf8"));
+const reentry=JSON.parse(await readFile(join(SOLVER_DIR,"reentry.json"),"utf8"));
 const preflopDecisions=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-decisions.json"),"utf8"));
 const preflop9max=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-9max.json"),"utf8"));
 const preflopMultistack=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-multistack.json"),"utf8"));
@@ -86,6 +87,7 @@ function pushfoldSpots(){
 const all=[
   ...preflop,...postflop,...pushfoldSpots(),
   ...((tournament?.spots)||[]),
+  ...((reentry?.spots)||[]),
   ...((preflopDecisions?.spots)||[]),
   ...((preflop9max?.spots)||[]),
   ...((preflopMultistack?.spots)||[]),
