@@ -33,6 +33,9 @@ hu_delegates = 'pub const NUM_PLAYERS: usize = 2;' in s and 'Self::new_6max(conf
 if not hu_delegates and (n2+n4<1 or n3+n5<1):
     raise SystemExit("stack patch failed: heads-up initializer not found")
 if s==original:
+    if chips==200:
+        print("DCFR preflop starting stack already equals 100bb (200 chips); no patch required.")
+        raise SystemExit(0)
     raise SystemExit("stack patch made no changes")
 
 path.write_text(s,encoding="utf-8")
