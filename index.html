@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="spots-actions-persist-fold-hide-v1">
+<meta name="grinder-build" content="spot-analysis-visible-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -1801,8 +1801,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
        Os cards de suporte começam somente abaixo dos 7 botões de ação. */
     .page.spotsmode .spotwrap{flex:0 0 var(--spot-table-height,calc(100% - 94px))!important;height:var(--spot-table-height,calc(100% - 94px))!important;min-height:0!important;max-height:none!important}
     .spotactions{flex:0 0 88px!important}
-    .spotsupport{display:none!important;flex-direction:column;gap:var(--gap);padding-bottom:4px}
+    .spotsupport{display:flex!important;flex-direction:column;gap:var(--gap);padding-bottom:14px}
     .spotsupport[hidden]{display:none!important}
+    .spotanalysis{scroll-margin-top:12px}
     .spotcontrolrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
     .spotcontrol,.spotsavebutton,.spotsaveform button,.historysort button,.historyactions button{
       min-width:0;height:40px;padding:0 8px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);
@@ -1886,12 +1887,28 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       '</div>';
     }).join('');
     const finalSummary=ordered.map(x=>'<li><b>'+spotEscape(x.name)+'</b> — '+spotEscape(x.value??'—')+'</li>').join('');
+    const solverMeta=analysis?.solver
+      ?'<div class="spotsource"><b>SOLVER:</b> '+spotEscape(analysis.solver.id||'—')+
+        (analysis.solver.solveId?' · SOLVE '+spotEscape(analysis.solver.solveId):'')+
+        (analysis.solver.version?' · VERSÃO '+spotEscape(analysis.solver.version):'')+'</div>'
+      :'';
     box.hidden=false;
-    box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div>'+sections+
+    box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div>'+solverMeta+sections+
       '<div class="spotindicatorheading">'+spotEscape(tx.indicators)+'</div>'+
       '<div class="spotindicatorlist">'+indicators+'</div>'+
       '<div class="spotfinal"><div class="spotfinaltitle">'+spotEscape(tx.indicators+' · 1–35')+'</div><ol class="spotfinalsummary">'+finalSummary+'</ol></div>'+
       '<div class="spotsource">'+spotEscape(analysis.sourceNote||'')+'</div>';
+  }
+  function revealSpotAnalysis(){
+    const box=spotSupport.querySelector('.spotanalysis');
+    const content=$('.content');
+    if(!box||box.hidden||!content)return;
+    window.setTimeout(()=>{
+      try{
+        const br=box.getBoundingClientRect(),cr=content.getBoundingClientRect();
+        if(br.top<cr.top||br.top>cr.bottom-80)box.scrollIntoView({behavior:'smooth',block:'start'});
+      }catch(_){}
+    },80);
   }
   function renderSpotSupport(){
     if(!spotSupport)return;
@@ -1928,6 +1945,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       line1.textContent=entry.answer.analysis.title||'—';
       line2.textContent=entry.answer.analysis.line2||'—';
       renderSpotAnalysis(entry.answer.analysis);
+      revealSpotAnalysis();
     }else{
       fb.className='spotfeedback waiting';
       line1.textContent=tx.waiting;line2.textContent='';
