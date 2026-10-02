@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="runtime-performance-v1">
+<meta name="grinder-build" content="runtime-performance-v2">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -2773,6 +2773,26 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 
   const statsPanel=document.createElement('div');statsPanel.className='statspanel';statsPanel.hidden=true;$('#page').appendChild(statsPanel);
   let statsTrainingFilter='all',statsSectionFilter='all',statsSessionFilter='all',statsView='overview',statsReportOverride=null;
+  let statsRenderToken=0,statsLastRenderKey='';
+
+  function statsRenderSignature(records){
+    const r=Array.isArray(records)?records:[];
+    const first=r[0]||{},last=r[r.length-1]||{};
+    return [
+      L(),statsView,statsTrainingFilter,statsSectionFilter,statsSessionFilter,
+      statsReportOverride?.id||'',r.length,
+      first.id||'',first.answeredAt||'',first.status||'',
+      last.id||'',last.answeredAt||'',last.status||''
+    ].join('|');
+  }
+  function queueStatsRender(force){
+    const token=++statsRenderToken;
+    if(!statsPanel.childElementCount)statsPanel.innerHTML='<div class="statscard"><div class="statscallout">CARREGANDO...</div></div>';
+    requestAnimationFrame(()=>window.setTimeout(()=>{
+      if(token!==statsRenderToken||statsPanel.hidden||cur!=='menu')return;
+      renderStats(!!force);
+    },0));
+  }
 
   function statsText(){return STATS_TEXT[L()]||STATS_TEXT.pt;}
   const STATS_DATA_CACHE={records:null,recordsAt:0,sessions:null,sessionsAt:0};
@@ -3163,8 +3183,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       qualityCard+statsCoverageHtml(records);
   }
 
-  function renderStats(){
-    const tx=statsText(),records=statsFilteredRecords(),model=statsModel(records),c=model.overall,grade=statsGrade(records);
+  function renderStats(force){
+    const records=statsFilteredRecords();
+    const signature=statsRenderSignature(records);
+    if(!force&&signature===statsLastRenderKey&&statsPanel.childElementCount)return;
+    statsLastRenderKey=signature;
+    const tx=statsText(),model=statsModel(records),c=model.overall,grade=statsGrade(records);
     const hasData=records.length>0;
     const sessionsCount=new Set(records.map(x=>x.sessionId).filter(Boolean)).size;
     const activeDays=new Set(records.map(x=>String(x.answeredAt||'').slice(0,10)).filter(Boolean)).size;
@@ -3371,12 +3395,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const f=e.target.closest('[data-stats-filter]');if(!f)return;
     if(f.dataset.statsFilter==='training')statsTrainingFilter=f.value;
     if(f.dataset.statsFilter==='section')statsSectionFilter=f.value;
-    if(f.dataset.statsFilter==='session')statsSessionFilter=f.value;
-    renderStats();
+    if(f.dataset.statsFilter==='session')statsSessionFilter=f.value;queueStatsRender(true);
   });
   statsPanel.addEventListener('click',e=>{
     const view=e.target.closest('[data-stats-view]');
-    if(view){statsView=view.dataset.statsView||'overview';renderStats();return;}
+    if(view){statsView=view.dataset.statsView||'overview';queueStatsRender(true);return;}
     const perf=e.target.closest('[data-stats-performance]');
     if(perf){
       sub.home.length=0;sub.home.push('plans');show('home',false,0);
@@ -3392,8 +3415,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(on){
       const slot=$('#page .slot');if(slot)slot.hidden=true;
       hg.hidden=true;tw.hidden=true;adv.hidden=true;historyPanel.hidden=true;reportsPanel.hidden=true;tb.hidden=true;spotActions.hidden=true;spotSupport.hidden=true;
-      renderStats();
-      const content=$('.content');if(content)content.scrollTop=0;
+      queueStatsRender(false);
+      const content=$('.content');if(content&&content.scrollTop<4)content.scrollTop=0;
+    }else{
+      statsRenderToken++;
     }
   }
 
@@ -3859,8 +3884,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       try{
         pg.getAnimations?.().forEach(anim=>{if(anim.id==='stackup-nav')anim.cancel();});
         const anim=pg.animate(
-          [{transform:'translate3d('+(a>0?'14px':'-14px')+',0,0)',opacity:.72},{transform:'translate3d(0,0,0)',opacity:1}],
-          {duration:150,easing:'cubic-bezier(.2,.7,.2,1)'}
+          [{transform:'translate3d('+(a>0?'8px':'-8px')+',0,0)',opacity:.86},{transform:'translate3d(0,0,0)',opacity:1}],
+          {duration:110,easing:'cubic-bezier(.2,.8,.2,1)'}
         );
         anim.id='stackup-nav';
       }catch(_){}
@@ -3990,7 +4015,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     function end(){ if(!drag)return; drag=false; if(lock!=='x')return;
       const w=box.clientWidth, dt=Math.max(1,performance.now()-t0), v=Math.abs(dx)/dt, i=TORDER.indexOf(cur), dir=dx<0?1:-1, j=i+dir;
       const go=(Math.abs(dx)>w*.22||(v>.45&&Math.abs(dx)>30))&&j>=0&&j<TORDER.length;
-      if(go){ const ms=reduce?0:170;
+      if(go){ const ms=reduce?0:130;
         pg.style.transition=`transform ${ms}ms ease-in, opacity ${ms}ms`; pg.style.transform=`translateX(${-dir*w}px)`; pg.style.opacity='0';
         setTimeout(()=>{ pg.style.transition='none'; pg.style.transform=''; pg.style.opacity=''; show(TORDER[j],true,dir); },ms);
       } else { pg.style.transition='transform .22s ease, opacity .22s'; pg.style.transform=''; pg.style.opacity=''; }
