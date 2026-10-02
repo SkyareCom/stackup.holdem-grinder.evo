@@ -21,7 +21,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: strict-solved-line-bank
+  group: strict-solved-line-bank-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
