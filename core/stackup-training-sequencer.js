@@ -602,8 +602,8 @@
   function candidateMathCompatible(spot,hand,special){
     const requested=(special?.math_special||[]).map(String);
     if(requested.length){
-      // MATH is OR across selected alternatives. Hand-level odds and
-      // scenario-level tags must not accidentally become an AND.
+      // MATH stays OR across selected alternatives, including hand-level odds
+      // and scenario-level tags.
       const tags=spotTags(spot);
       const street=normStreet(spot?.scenario?.street);
       let profile=null;
@@ -620,6 +620,8 @@
       if(!mathOk)return false;
     }
 
+    // Hand-level solved classifiers only classify decisions that are already
+    // solver-resolved. They never create strategy or coverage.
     const classifier=global.StackUpSolvedSpotClassifier;
     if(classifier?.isHandLevel&&classifier?.qualifies){
       for(const [section,values] of Object.entries(special||{})){
@@ -653,8 +655,7 @@
     const tags=spotTags(spot);
     const classifier=global.StackUpSolvedSpotClassifier;
     return groups.every(([section,values])=>{
-      // All MATH options are evaluated in candidateMathCompatible so their
-      // OR semantics is preserved across hand-level and scenario-level math.
+      // MATH is evaluated per hand in candidateMathCompatible to preserve OR.
       if(section==='math_special')return true;
       const spotLevel=values.map(String).filter(x=>!classifier?.isHandLevel?.(section,x));
       if(!spotLevel.length)return true;
@@ -850,15 +851,9 @@
       ...(bank?.postflop||[]),
       ...pushfoldSpots(bank),
       ...((bank?.tournament?.spots)||[]),
-      ...((bank?.reentry?.spots)||[]),
-      ...((bank?.opponentProfile?.spots)||[]),
-      ...((bank?.multiwayTournament?.spots)||[]),
-      ...((bank?.multiwayPostflop?.spots)||[]),
       ...((bank?.preflopDecisions?.spots)||[]),
       ...((bank?.textureSizing?.spots)||[]),
       ...((bank?.preflop9max?.spots)||[]),
-      ...((bank?.preflopMultistack?.spots)||[]),
-      ...((bank?.preflopHu?.spots)||[]),
       ...((bank?.lineBank?.spots)||[])
     ];
     const candidates=[];

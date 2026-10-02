@@ -90,6 +90,32 @@
       tone(660,0,.075,.075,'sine');
       tone(880,.105,.095,.09,'sine');return;
     }
+    if(k==='alert'||k==='start'){
+      tone(520,0,.09,.10,'sine');
+      tone(780,.12,.11,.11,'sine');
+      tone(1040,.26,.13,.12,'triangle');
+      return;
+    }
+    if(k==='positive'||k==='correct'||k==='success'){
+      tone(523,0,.10,.10,'sine');
+      tone(659,.10,.11,.105,'sine');
+      tone(784,.22,.15,.12,'triangle');
+      chip(.28,.055);
+      return;
+    }
+    if(k==='negative'||k==='incorrect'||k==='error'){
+      tone(330,0,.11,.09,'triangle');
+      tone(247,.12,.13,.095,'triangle');
+      tone(165,.27,.18,.10,'sine');
+      noise(.03,.08,.04,520);
+      return;
+    }
+    if(k==='adjustable'||k==='neutral'){
+      tone(440,0,.10,.075,'sine');
+      tone(554,.13,.12,.085,'triangle');
+      tone(440,.29,.10,.065,'sine');
+      return;
+    }
     chip(0,.08);
   }
 

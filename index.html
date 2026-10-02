@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="stats-report-library-v1">
+<meta name="grinder-build" content="spot-analysis-clean-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -799,14 +799,37 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 <script src="core/stackup-training-history.js"></script>
 <script src="core/stackup-training-performance.js"></script>
 <script src="core/stackup-report-library.js"></script>
+<script src="core/stackup-personal-training.js"></script>
+<script src="core/stackup-whatsapp-coach.js"></script>
+<script src="core/stackup-xp-performance.js"></script>
+<script src="core/stackup-performance-analysis.js"></script>
+<script src="core/stackup-performance-ui.js"></script>
+<script src="core/stackup-personal-ui.js"></script>
+<script src="core/stackup-app-bridge.js"></script>
 <script>
 (function(){
   /* REGRA DE TRADUCAO: todo novo item deve ser criado simultaneamente em PT, EN e ES. */
-  const T2={"pt":{"back":"Voltar","main":"Menu principal","home":"HOME","profile":"ADVANCE","spots":"SPOTS","train":"AJUSTES","card_train":"AJUSTES","menu":"STATS","ti_home":"HOME","ti_profile":"ADVANCE","ti_spots":"SPOTS","ti_train":"AJUSTES","ti_menu":"STATS","ds_home":"Resumo do seu progresso e atalhos rápidos","ds_profile":"Seus objetivos e metas de treino","perfil":"Perfil","ti_perfil":"PERFIL DO TREINO","ds_perfil":"Seus dados, estatísticas e conquistas","ds_spots":"Biblioteca de spots para estudar","ds_train":"Sessões de treino e simulações","ds_menu":"Gráficos do seu desempenho","ia":"Assistência IA","api":"API x API","ti_ia":"ASSISTÊNCIA IA","ti_api":"API X API","ds_ia":"Conecte assistentes de IA ao seu treino","ds_api":"Conecte ferramentas e dados externos","account":"PERSONAL","plans":"Planos","apps":"Loja","ti_account":"PERSONAL","ti_plans":"PLANOS","ti_apps":"LOJA","ds_account":"Configuração e personalização do seu treino","ds_plans":"Sua assinatura e os planos disponíveis","ds_apps":"Produtos, recursos e ofertas StackUp","soon":"Conteúdo em construção","history":"Histórico","ti_history":"HISTÓRICO","ds_history":"Histórico das suas sessões e decisões","reports":"Relatórios","ti_reports":"RELATÓRIOS","ds_reports":"Relatórios detalhados de desempenho"},"en":{"back":"Back","main":"Main menu","home":"HOME","profile":"ADVANCE","spots":"SPOTS","train":"SETTINGS","card_train":"SETTINGS","menu":"STATS","ti_home":"HOME","ti_profile":"ADVANCE","ti_spots":"SPOTS","ti_train":"SETTINGS","ti_menu":"STATS","ds_home":"Your progress overview and quick shortcuts","ds_profile":"Your training goals and targets","perfil":"Profile","ti_perfil":"TRAINING PROFILE","ds_perfil":"Your data, stats and achievements","ds_spots":"Spot library to study","ds_train":"Training sessions and simulations","ds_menu":"Your performance charts","ia":"AI Assistance","api":"API x API","ti_ia":"AI ASSISTANCE","ti_api":"API X API","ds_ia":"Connect AI assistants to your training","ds_api":"Connect external tools and data","account":"PERSONAL","plans":"Plans","apps":"Store","ti_account":"PERSONAL","ti_plans":"PLANS","ti_apps":"STORE","ds_account":"Your training configuration and personalization","ds_plans":"Your subscription and available plans","ds_apps":"StackUp products, features and offers","soon":"Content under construction","history":"History","ti_history":"HISTORY","ds_history":"History of your sessions and decisions","reports":"Reports","ti_reports":"REPORTS","ds_reports":"Detailed performance reports"},"es":{"back":"Volver","main":"Menú principal","home":"INICIO","profile":"ADVANCE","spots":"SPOTS","train":"AJUSTES","card_train":"AJUSTES","menu":"STATS","ti_home":"INICIO","ti_profile":"ADVANCE","ti_spots":"SPOTS","ti_train":"AJUSTES","ti_menu":"STATS","ds_home":"Resumen de tu progreso y accesos rápidos","ds_profile":"Tus objetivos y metas de entrenamiento","perfil":"Perfil","ti_perfil":"PERFIL DEL ENTRENO","ds_perfil":"Tus datos, estadísticas y logros","ds_spots":"Biblioteca de spots para estudiar","ds_train":"Sesiones de entrenamiento y simulaciones","ds_menu":"Gráficos de tu rendimiento","ia":"Asistencia IA","api":"API x API","ti_ia":"ASISTENCIA IA","ti_api":"API X API","ds_ia":"Conecta asistentes de IA a tu entreno","ds_api":"Conecta herramientas y datos externos","account":"PERSONAL","plans":"Planes","apps":"Tienda","ti_account":"PERSONAL","ti_plans":"PLANES","ti_apps":"TIENDA","ds_account":"Configuración y personalización de tu entrenamiento","ds_plans":"Tu suscripción y los planes disponibles","ds_apps":"Productos, recursos y ofertas StackUp","soon":"Contenido en construcción","history":"Historial","ti_history":"HISTORIAL","ds_history":"Historial de tus sesiones y decisiones","reports":"Informes","ti_reports":"INFORMES","ds_reports":"Informes detallados de rendimiento"}};
+  const T2={"pt":{"back":"Voltar","main":"Menu principal","home":"HOME","profile":"ADVANCE","spots":"SPOTS","train":"AJUSTES","card_train":"AJUSTES","menu":"STATS","ti_home":"HOME","ti_profile":"ADVANCE","ti_spots":"SPOTS","ti_train":"AJUSTES","ti_menu":"STATS","ds_home":"Resumo do seu progresso e atalhos rápidos","ds_profile":"Seus objetivos e metas de treino","perfil":"Perfil","ti_perfil":"PERFIL","ds_perfil":"Seus dados, estatísticas e conquistas","ds_spots":"Biblioteca de spots para estudar","ds_train":"Sessões de treino e simulações","ds_menu":"Gráficos do seu desempenho","ia":"Assistência IA","api":"API x API","ti_ia":"ASSISTÊNCIA IA","ti_api":"API X API","ds_ia":"Conecte assistentes de IA ao seu treino","ds_api":"Conecte ferramentas e dados externos","account":"PERSONAL","plans":"Performance","apps":"Loja","ti_account":"PERSONAL","ti_plans":"PERFORMANCE","ti_apps":"LOJA","ds_account":"Treinos indicados pelo HEROES e pelo GRINDER para fraquezas e reforço","ds_plans":"XP, ranking pessoal e comparação Eu Herói x Eu Vilão","ds_apps":"Produtos, recursos e ofertas StackUp","soon":"Conteúdo em construção","history":"Histórico","ti_history":"HISTÓRICO","ds_history":"Histórico das suas sessões e decisões","reports":"Relatórios","ti_reports":"RELATÓRIOS","ds_reports":"Relatórios detalhados de desempenho"},"en":{"back":"Back","main":"Main menu","home":"HOME","profile":"ADVANCE","spots":"SPOTS","train":"SETTINGS","card_train":"SETTINGS","menu":"STATS","ti_home":"HOME","ti_profile":"ADVANCE","ti_spots":"SPOTS","ti_train":"SETTINGS","ti_menu":"STATS","ds_home":"Your progress overview and quick shortcuts","ds_profile":"Your training goals and targets","perfil":"Profile","ti_perfil":"PROFILE","ds_perfil":"Your data, stats and achievements","ds_spots":"Spot library to study","ds_train":"Training sessions and simulations","ds_menu":"Your performance charts","ia":"AI Assistance","api":"API x API","ti_ia":"AI ASSISTANCE","ti_api":"API X API","ds_ia":"Connect AI assistants to your training","ds_api":"Connect external tools and data","account":"PERSONAL","plans":"Performance","apps":"Store","ti_account":"PERSONAL","ti_plans":"PERFORMANCE","ti_apps":"STORE","ds_account":"Training prescribed by HEROES and GRINDER for weaknesses and reinforcement","ds_plans":"XP, personal ranking and Hero Me vs Villain Me","ds_apps":"StackUp products, features and offers","soon":"Content under construction","history":"History","ti_history":"HISTORY","ds_history":"History of your sessions and decisions","reports":"Reports","ti_reports":"REPORTS","ds_reports":"Detailed performance reports"},"es":{"back":"Volver","main":"Menú principal","home":"INICIO","profile":"ADVANCE","spots":"SPOTS","train":"AJUSTES","card_train":"AJUSTES","menu":"STATS","ti_home":"INICIO","ti_profile":"ADVANCE","ti_spots":"SPOTS","ti_train":"AJUSTES","ti_menu":"STATS","ds_home":"Resumen de tu progreso y accesos rápidos","ds_profile":"Tus objetivos y metas de entrenamiento","perfil":"Perfil","ti_perfil":"PERFIL","ds_perfil":"Tus datos, estadísticas y logros","ds_spots":"Biblioteca de spots para estudiar","ds_train":"Sesiones de entrenamiento y simulaciones","ds_menu":"Gráficos de tu rendimiento","ia":"Asistencia IA","api":"API x API","ti_ia":"ASISTENCIA IA","ti_api":"API X API","ds_ia":"Conecta asistentes de IA a tu entreno","ds_api":"Conecta herramientas y datos externos","account":"PERSONAL","plans":"Performance","apps":"Tienda","ti_account":"PERSONAL","ti_plans":"PERFORMANCE","ti_apps":"TIENDA","ds_account":"Entrenos indicados por HEROES y GRINDER para debilidades y refuerzo","ds_plans":"XP, ranking personal y Yo Héroe x Yo Villano","ds_apps":"Productos, recursos y ofertas StackUp","soon":"Contenido en construcción","history":"Historial","ti_history":"HISTORIAL","ds_history":"Historial de tus sesiones y decisiones","reports":"Informes","ti_reports":"INFORMES","ds_reports":"Informes detallados de rendimiento"}};
   const host=document.getElementById('app2');
   const R=host.attachShadow({mode:'open'});
   R.innerHTML='<style>'+":host{color-scheme:dark;background:#1a1a1a;\n  --concreto:#86827d;--preto:#000;--branco:#fff;--cinza:#bdbab5;--elefante-esc:#4a4744;\n  --brush:'Bebrush',sans-serif;--rage:'Bebrush',sans-serif}\n*{box-sizing:border-box;margin:0;padding:0}\n\nbody{background:#1a1a1a;color:#fff;font-family:var(--brush);display:flex;justify-content:center;-webkit-tap-highlight-color:transparent}\nbutton{font-family:inherit;color:inherit;cursor:pointer}\n.screen{position:relative;width:100%;max-width:430px;height:100%;max-height:932px;overflow:hidden;background:var(--concreto);display:flex;flex-direction:column}\n@media(min-width:500px){.screen{border-radius:44px;box-shadow:0 0 0 10px #0c0c0c,0 30px 80px rgba(0,0,0,.6);margin-block:auto}}\n/* concreto */\n.concrete{position:absolute;inset:0;z-index:0;pointer-events:none}\n.concrete svg{width:100%;height:100%;display:block}\n.vignette{position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 50% 40%,transparent 40%,rgba(0,0,0,.45) 100%)}\n/* ---------- CABE\u00c7ALHO ---------- */\n.header{position:relative;z-index:2;padding:calc(env(safe-area-inset-top) + 1.4vh) 22px 1.4vh;display:flex;flex-direction:column;gap:1.2vh}\n.brandrow{display:flex;align-items:center;gap:12px}\n.brandrow img{width:min(7.5vh,56px);height:min(7.5vh,56px);flex:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45))}\n.brandtxt{flex:1;min-width:0;line-height:.9}\n.brandtxt .brand{font-size:min(2.4vh,17px);letter-spacing:1.5px;color:#111;white-space:nowrap}\n.brandtxt .title{font-family:var(--brush);font-size:min(5.6vh,42px);color:#111;letter-spacing:1.5px;line-height:.95}\n.navbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px}\n.hbtn{height:min(6.4vh,50px);border-radius:14px;background:#000;border:1px solid #fff;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;letter-spacing:1px;transition:background .15s}\n.hbtn svg{width:18px;height:18px;flex:none}\n.hbtn.on{background:rgba(255,255,255,.7);color:#000;border:2px solid #000;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}\n.divider{height:1px;background:rgba(0,0,0,.35);box-shadow:0 1px 0 rgba(255,255,255,.18)}\n/* ---------- CONTE\u00daDO (\u00e1rea livre da tela) ---------- */\n.content{position:relative;z-index:1;flex:1;min-height:0;overflow-y:auto;padding:2vh 22px;display:flex;flex-direction:column;gap:12px}\n.slot{flex:1;min-height:140px;border:1px dashed rgba(0,0,0,.45);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:16px;background:rgba(0,0,0,.06)}\n.slot b{font-weight:400;font-size:14px;letter-spacing:1px;color:#111}\n.slot small{font-size:12px;color:#222;opacity:.8;letter-spacing:.5px}\n/* ---------- RODAP\u00c9: 5 atalhos ---------- */\n.tabbar{position:relative;z-index:2;background:#000;border-top:1px solid #fff;padding:8px 8px calc(env(safe-area-inset-bottom) + 8px);display:grid;grid-template-columns:repeat(5,1fr);gap:4px}\n.tab{background:none;border:2px solid transparent;border-radius:14px;height:min(8.4vh,64px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;letter-spacing:.5px;color:#fff;transition:background .15s}\n.tab svg{width:min(3.4vh,24px);height:min(3.4vh,24px)}\n.tab span{white-space:nowrap}\n.tab.on{background:rgba(255,255,255,.7);color:#000;border-color:#000}\n.tab:focus-visible,.hbtn:focus-visible,.toast{position:absolute;left:50%;bottom:calc(min(8.4vh,64px) + 30px + env(safe-area-inset-bottom));transform:translate(-50%,10px);background:#111;color:#fff;padding:10px 16px;border-radius:12px;font-size:12px;letter-spacing:.5px;opacity:0;transition:.25s;z-index:40;border:1px solid #fff;white-space:nowrap;pointer-events:none}\n.toast.show{opacity:1;transform:translate(-50%,0)}\n@media (prefers-reduced-motion:reduce){*{transition:none!important}}\n\n\n/* v3: cabe\u00e7alho mais proporcional e compacto */\n.header{padding:calc(env(safe-area-inset-top) + 1vh) 22px 1vh!important;gap:1vh!important}\n.brandrow{justify-content:center;gap:12px!important}\n.brandrow img{width:min(8.6vh,66px)!important;height:min(8.6vh,66px)!important}\n.brandtxt{flex:0 1 auto!important;display:flex;flex-direction:column;justify-content:center}\n.brandtxt .brand{font-size:min(2.9vh,21px)!important;letter-spacing:2px!important;line-height:1}\n.brandtxt .title{font-size:min(6.6vh,50px)!important;line-height:.9!important;letter-spacing:2px!important;margin-top:2px}\n.navbtns{gap:10px!important}\n.hbtn{height:min(6vh,46px)!important}\n.content{padding-top:1.4vh!important}\n\n\n/* v4b: layout da v3; s\u00f3 GRINDER em Road Rage */\n.brandtxt .title{font-family:'Road Rage','Bebrush',sans-serif!important;-webkit-text-stroke:1.8px #111;paint-order:stroke fill;letter-spacing:2px!important}\n\n\n/* v5: par de ases ao fundo, igual \u00e0 tela inicial */\n.cardsbox{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}\n.cardsbox .cards{position:absolute;left:129.5%;top:44%;height:147.3%;width:auto;max-width:none;opacity:.12;\n  transform:translate(-50%,-50%) rotate(-20deg);user-select:none}\n\n.trainwrap{display:flex;flex-direction:column;gap:10px;padding-bottom:4px}\n.tsec{border:1px solid #fff;border-radius:14px;background:#000;overflow:hidden;transition:opacity .15s}\n.tsec.dis{opacity:.45}\n.thead{width:100%;display:flex;align-items:center;gap:10px;padding:13px 14px;background:none;border:0;text-align:left;color:#fff}\n.thead b{font-weight:400;font-size:14px;letter-spacing:1px;flex:none;max-width:62%}\n.thead small{flex:1;min-width:0;text-align:right;font-size:12px;color:#bdbab5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.thead svg{width:16px;height:16px;flex:none;transition:transform .2s}\n.tsec.open .thead svg{transform:rotate(180deg)}\n.tbody{display:none;flex-direction:column;gap:12px;padding:2px 12px 14px}\n.tsec.open .tbody{display:flex}\n.glabel{font-size:12px;color:#bdbab5;letter-spacing:1px}\n.chips{display:grid;gap:8px}\n.chip{min-height:38px;padding:6px 8px;border-radius:12px;background:#000;border:1px solid #fff;font-size:12px;letter-spacing:.5px;color:#fff;line-height:1.15}\n.chip.on{background:rgba(255,255,255,.7);color:#000;border:2px solid #000}\n.chip:disabled{cursor:not-allowed}\n.towers{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}\n.tower{min-height:min(21vh,158px);border-radius:16px;background:#000;border:1px solid #fff;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;padding:min(3vh,22px) 6px 12px;text-align:center}\n.tower svg{width:min(5.4vh,40px);height:min(5.4vh,40px)}\n.tower b{font-weight:400;font-size:14px;letter-spacing:1px;line-height:1.1}\n.tower small{font-size:12px;color:#bdbab5;letter-spacing:.3px;line-height:1.2}\n.tower.on{background:rgba(255,255,255,.7);color:#000;border:2px solid #000}\n.tower.on small{color:#4a4744}\n.tower:focus-visible{outline:2px solid #fff;outline-offset:2px}\n.tnote{font-size:12px;color:#bdbab5;letter-spacing:.5px}\n.tstartbar{position:sticky;bottom:-2vh;margin-top:4px;padding:10px 0 2vh;background:linear-gradient(180deg,rgba(134,130,125,0),#86827d 40%)}\n.tstart{width:100%;height:min(6.8vh,52px);border-radius:14px;background:#000;border:1px solid #fff;color:#fff;font-size:14px;letter-spacing:1.5px}\n.tstart.on{background:rgba(255,255,255,.7);color:#000;border:2px solid #000}\n\n/* gavetas: cabe\u00e7alho \u00e9 o bot\u00e3o; conte\u00fado abre direto no fundo, sem borda secund\u00e1ria */\n.tsec{background:none!important;border:0!important;border-radius:0!important;overflow:visible!important}\n.thead{background:#000;border:1px solid #fff!important;border-radius:14px}\n.tsec.open .thead{border-radius:14px}\n.tbody{padding:10px 0 6px!important}\n.glabel{color:#2a2826!important}\n.tnote{color:#2a2826!important}\n.trainwrap{gap:10px!important}\n/* REGRA: cards e bot\u00f5es sempre 12px \u2014 hierarquia s\u00f3 pela cor */\n.hbtn,.tab,.tab span,.thead b,.thead small,.chip,.tower b,.tower small,.tstart,.slot b,.slot small,.glabel,.tnote{font-size:12px!important}\n.tower b,.thead b,.slot b{color:inherit}\n.thead b{color:#fff}.thead small{color:#bdbab5}\n/* gaveta aberta = efeito de clique (vidro branco) at\u00e9 tocar de novo */\n.tsec.open .thead{background:rgba(255,255,255,.7)!important;border:2px solid #000!important;color:#000!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}\n.tsec.open .thead b{color:#000!important}.tsec.open .thead small{color:#4a4744!important}\n/* paleta A \u00b7 Grafite \u2014 cards secund\u00e1rios das gavetas */\n.chip,.tower{background:#2b2926!important;border:1px solid rgba(255,255,255,.35)!important;color:#e8e6e2!important}\n.tower small{color:#a8a49e!important}\n.chip.on,.tower.on{background:rgba(255,255,255,.7)!important;border:2px solid #000!important;color:#000!important}\n.tower.on small{color:#4a4744!important}\n\n*{font-weight:400!important;-webkit-text-stroke:0!important}\n/* Modo de jogo: torres em roxo escuro */\n.tower{background:rgba(20,6,40,.9)!important;border:1px solid #fff!important;color:#c9a6ff!important;\n  -webkit-backdrop-filter:blur(12px) saturate(150%);backdrop-filter:blur(12px) saturate(150%)}\n.tower svg{color:#c9a6ff}\n.tower b{color:#c9a6ff!important}\n.tower small{color:#fff!important;white-space:pre-line}\n.tower.on{background:rgba(255,255,255,.7)!important;border:2px solid #000!important;color:#000!important}\n.tower.on svg,.tower.on b{color:#000!important}\n.tower.on small{color:#4a4744!important}\n/* Modo de jogo: cor por modo (formato regular) */\n.towers{gap:8px!important;align-items:stretch}\n.tower{min-height:min(14vh,108px)!important;justify-content:center!important;padding:10px 6px!important;gap:10px!important}\n.tower[data-o=\"cash\"]{background:rgba(4,40,20,.86)!important}\n.tower[data-o=\"cash\"] svg,.tower[data-o=\"cash\"] b{color:#4ade80!important}\n.tower[data-o=\"mtt\"]{background:rgba(46,32,2,.86)!important}\n.tower[data-o=\"mtt\"] svg,.tower[data-o=\"mtt\"] b{color:#f5c542!important}\n.tower.on{background:rgba(255,255,255,.7)!important;border:2px solid #000!important}\n.tower.on svg,.tower.on b{color:#000!important}\n/* cards internos: clique = invers\u00e3o das cores do card */\n.chip.on{background:#e8e6e2!important;color:#2b2926!important;border:1px solid #2b2926!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}\n.tower.on{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1px solid #000!important}\n.tower[data-o=\"random\"].on{background:#c9a6ff!important}\n.tower[data-o=\"random\"].on svg,.tower[data-o=\"random\"].on b{color:#140628!important}\n.tower[data-o=\"cash\"].on{background:#4ade80!important}\n.tower[data-o=\"cash\"].on svg,.tower[data-o=\"cash\"].on b{color:#042814!important}\n.tower[data-o=\"mtt\"].on{background:#f5c542!important}\n.tower[data-o=\"mtt\"].on svg,.tower[data-o=\"mtt\"].on b{color:#2e2002!important}\n/* cards internos (op\u00e7\u00f5es): sem clique = branco/borda preta; clicado = preto/borda branca */\n.chip{background:#f2f0ec!important;border:1px solid #000!important;color:#111!important}\n.chip.on{background:#000!important;border:1px solid #fff!important;color:#fff!important}\n/* Modo de jogo segue o padr\u00e3o dos cards internos (sem cores) */\n.tower,.tower[data-o]{background:#f2f0ec!important;border:1px solid #000!important;color:#111!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}\n.tower svg,.tower b,.tower[data-o] svg,.tower[data-o] b{color:#111!important}\n.tower.on,.tower[data-o].on{background:#000!important;border:1px solid #fff!important}\n.tower.on svg,.tower.on b,.tower[data-o].on svg,.tower[data-o].on b{color:#fff!important}\n*,.hbtn,.tab,.ptitle,.slot,.thead,.tsec .thead,.chip,.chip.on,.tower,.tower.on,.tower[data-o],.tower[data-o].on,.tabbar{border-width:2px!important}\n.chip[data-o=\"all\"]{grid-column:1/-1}\n/* todos os cards internos: \u00edcone + t\u00edtulo */\n.towers{display:grid;gap:8px!important}\n.towers:not(.mode) .tower{min-height:min(10.5vh,80px)!important;padding:8px 4px!important;gap:6px!important}\n.towers:not(.mode) .tower svg{width:min(3.6vh,26px);height:min(3.6vh,26px)}\n.towers .tower[data-o=\"all\"]{grid-column:1/-1;flex-direction:row;min-height:min(6.4vh,48px)!important;gap:10px!important}\n.tower b{line-height:1.15}\n.tower:disabled{cursor:not-allowed}\n/* cards internos quadrados, como o Modo de jogo */\n.towers .tower{min-width:0;overflow-wrap:normal}\n.towers:not(.mode) .tower b{letter-spacing:.2px!important}\n.towers .tower,.towers:not(.mode) .tower,.towers .tower[data-o=\"all\"]{aspect-ratio:1/1;min-height:0!important;height:auto;grid-column:auto!important;flex-direction:column!important;justify-content:center!important;padding:6px 4px!important;gap:6px!important}\n.towers.mode .tower svg{width:min(5vh,38px);height:min(5vh,38px)}\n.towers:not(.mode) .tower svg{width:min(3.6vh,28px);height:min(3.6vh,28px)}\n.tower b{white-space:pre-line}\n\n/* FUNDO: preto absoluto -> azul bem escuro (aprovado) */\n.screen{background:linear-gradient(180deg,#07182f 0%,#000000 40%,#010713 70%,#010713 100%)!important}\n.concrete{display:none!important}\n.vignette{background:none!important}\n\n.cardsbox .cards{opacity:.16!important;filter:none!important}\n.brandtxt .brand,.brandtxt .title{color:#ece9e4!important}\n.divider{background:rgba(255,255,255,.16)!important;box-shadow:none!important}\n.slot{border-color:rgba(255,255,255,.3)!important}\n.slot b{color:#ece9e4!important}.slot small{color:#a8a49e!important}\n.glabel,.tnote{color:#a8a49e!important}\n/* REGRA: bot\u00f5es em vidro transparente */\n.hbtn,.thead,.tsec .thead{background:rgba(255,255,255,.06)!important;-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}\n.hbtn.on,.tsec.open .thead{background:rgba(255,255,255,.7)!important}\n.tower,.tower[data-o]{background:rgba(255,255,255,.72)!important;-webkit-backdrop-filter:blur(14px) saturate(140%)!important;backdrop-filter:blur(14px) saturate(140%)!important}\n.tower.on,.tower[data-o].on{background:rgba(255,255,255,.08)!important}\n.tabbar{background:rgba(0,0,0,.35)!important;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}\n.tab.on{background:rgba(255,255,255,.7)!important}\n/* REGRA: bot\u00f5es com borda 1px de vidro transparente */\n.hbtn,.hbtn.on,.thead,.tsec .thead,.tsec.open .thead,.tower,.tower.on,.tower[data-o],.tower[data-o].on,.tab,.tab.on,.chip,.chip.on{\n  border:1px solid rgba(255,255,255,.38)!important;\n  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.06)!important}\n.tab{border-color:transparent!important;box-shadow:none!important}\n.tab.on{border-color:rgba(255,255,255,.38)!important}\n.cardsbox .cards{position:absolute!important;left:50%!important;top:50%!important;height:70%!important;width:auto!important;max-width:95%!important;transform:translate(-50%,-50%) rotate(-20deg)!important;opacity:.11!important;filter:grayscale(1) sepia(1) saturate(850%) hue-rotate(178deg) brightness(.42) contrast(1.22)!important;mix-blend-mode:screen!important;pointer-events:none!important;user-select:none!important}\n.brandtxt .title{color:#2f6be0!important}\n.brandtxt .title{background:linear-gradient(180deg,rgba(110,150,230,.95) 0%,rgba(40,85,190,.8) 42%,rgba(22,58,150,.62) 58%,rgba(70,115,215,.88) 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;-webkit-text-fill-color:transparent!important;filter:drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 6px 14px rgba(22,58,150,.4))}\n.brandrow img{filter:drop-shadow(0 4px 8px rgba(0,0,0,.45))!important}\n.brandrow img{object-fit:contain!important;aspect-ratio:1/1}\n.brandtxt .title{background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;color:#155bbd!important;-webkit-text-fill-color:#155bbd!important;filter:none!important}\n.brandtxt .title{background:linear-gradient(180deg,rgba(95,150,235,.95) 0%,rgba(21,91,189,.88) 42%,rgba(14,66,145,.7) 58%,rgba(55,120,215,.92) 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;-webkit-text-fill-color:transparent!important;filter:drop-shadow(0 1px 0 rgba(255,255,255,.3)) drop-shadow(0 6px 14px rgba(21,91,189,.4))!important}\n/* REGRA: clique = vidro azul (tom do GRINDER), borda azul, t\u00edtulo azul, descri\u00e7\u00e3o branca */\n.hbtn.on,.tsec.open .thead,.tower.on,.tower[data-o].on,.chip.on,.tab.on{background:rgba(21,91,189,.32)!important;border:1px solid #155bbd!important;\n  -webkit-backdrop-filter:blur(14px) saturate(150%)!important;backdrop-filter:blur(14px) saturate(150%)!important;\n  box-shadow:inset 0 1px 0 rgba(140,185,255,.35),0 0 14px rgba(21,91,189,.35)!important;color:#6fa4ff!important}\n.hbtn.on span,.hbtn.on svg,.tsec.open .thead b,.tsec.open .thead svg,.tower.on b,.tower.on svg,.tower[data-o].on b,.tower[data-o].on svg,.chip.on,.tab.on span,.tab.on svg{color:#6fa4ff!important}\n.tsec.open .thead small{color:#fff!important}\n/* cards internos sem clique = mesmo padr\u00e3o dos bot\u00f5es (vidro escuro, borda de vidro, texto branco) */\n.tower:not(.on),.tower[data-o]:not(.on),.chip:not(.on){background:rgba(255,255,255,.06)!important;border:1px solid rgba(255,255,255,.38)!important;\n  -webkit-backdrop-filter:blur(14px) saturate(140%)!important;backdrop-filter:blur(14px) saturate(140%)!important;\n  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.06)!important;color:#fff!important}\n.tower:not(.on) b,.tower:not(.on) svg,.tower[data-o]:not(.on) b,.tower[data-o]:not(.on) svg{color:#fff!important}\n/* t\u00edtulos das se\u00e7\u00f5es em vidro */\n.ptitle{background:rgba(255,255,255,.08)!important;border:1px solid rgba(255,255,255,.38)!important;\n  -webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);\n  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.06)!important;color:#fff!important}\n.chip:focus-visible,.thead:focus-visible,.tstart:focus-visible{outline:2px solid #fff;outline-offset:2px}\n\n/* ===== Mesa de treino (Spots) ===== */\n.spotwrap{\n  position:relative;flex:1 1 auto;height:auto;min-height:0;margin:0 -10px 0;overflow:visible;\n  background:transparent!important;\n  border:none!important;border-radius:0!important;box-shadow:none!important\n}\n.spotwrap[hidden]{display:none!important}\n.felt{\n  position:absolute;border-radius:999px;\n  background:\n    radial-gradient(ellipse at 50% 45%,rgba(21,91,189,.52) 0%,rgba(21,91,189,.27) 45%,rgba(4,14,42,.96) 100%);\n  border:2px solid rgba(111,164,255,.72);\n  box-shadow:\n    0 0 0 9px rgba(255,255,255,.05),\n    0 0 0 11px rgba(21,91,189,.35),\n    inset 0 1px 0 rgba(255,255,255,.28),\n    inset 0 0 52px rgba(21,91,189,.48),\n    0 0 28px rgba(21,91,189,.45);\n  -webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px)\n}\n.felt::before{\n  content:\"\";position:absolute;inset:14px;border-radius:999px;\n  border:1px solid rgba(111,164,255,.30);\n  box-shadow:inset 0 0 28px rgba(21,91,189,.20)\n}\n.felt::after{\n  content:\"STACKUP\";position:absolute;left:50%;top:61%;transform:translate(-50%,-50%);\n  font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:3px;color:rgba(255,255,255,.10)\n}\n.seat{position:absolute;width:0;height:0;z-index:5}\n.playerbox{position:absolute;left:0;top:0;transform:translate(-50%,-22px);display:flex;flex-direction:column;align-items:center;gap:2px;z-index:4}\n.seat .av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);border:var(--glass-border);box-shadow:var(--glass-hl),0 4px 10px rgba(0,0,0,.42);color:var(--c-text);font-family:var(--f-ui);font-size:10px!important;letter-spacing:.5px;text-align:center}\n.seat.hero .av{width:48px;height:48px;font-size:12px!important}\n.seat .av[data-pos=BTN]{background:rgba(238,244,247,.92)!important;border:2px solid #000!important;color:#000!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.75),0 4px 10px rgba(0,0,0,.28)!important;-webkit-backdrop-filter:blur(10px) saturate(120%);backdrop-filter:blur(10px) saturate(120%)}\n.seat .stk{margin-top:1px;min-width:58px;white-space:nowrap;padding:3px 7px;border-radius:var(--r-card);background:rgba(0,0,0,.72);border:var(--glass-border);box-shadow:var(--glass-hl);color:var(--c-text);font-family:var(--f-ui);font-size:10px!important;letter-spacing:.5px;text-align:center}\n.seat .backs{position:absolute;left:50%;top:-45px;transform:translateX(-50%);width:42px;height:27px;display:flex;align-items:flex-end;justify-content:center;z-index:3}\n.seat .backs i{display:block;width:19px;height:27px;border-radius:5px;margin-left:-10px;transform:rotate(-7deg);background:repeating-linear-gradient(45deg,rgba(255,255,255,.18) 0 2px,transparent 2px 5px),linear-gradient(145deg,var(--c-accent),var(--c-bg-bottom));border:1px solid rgba(255,255,255,.52);box-shadow:0 2px 4px rgba(0,0,0,.55)}\n.seat .backs i:first-child{margin-left:0;transform:rotate(7deg)}\n.herohand{position:absolute;left:50%;top:-61px;transform:translateX(-50%);display:flex;justify-content:center;z-index:4}\n.herohand .pcard{width:32px;height:45px;margin-left:3px}\n.herohand .pcard:first-child{margin-left:0}\n.seatbet{position:absolute;padding:3px 7px;border-radius:var(--r-card);white-space:nowrap;background:rgba(0,0,0,.72);border:var(--glass-border);box-shadow:var(--glass-hl);color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important;z-index:5}\n.dealer{\n  position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;\n  background:var(--c-text);color:var(--c-bg-bottom);\n  display:flex;align-items:center;justify-content:center;\n  font-family:var(--f-ui);font-size:var(--fs)!important;\n  border:1px solid rgba(255,255,255,.38);box-shadow:0 2px 5px rgba(0,0,0,.58);z-index:6\n}\n.centerbox{\n  position:absolute;left:50%;transform:translate(-50%,-50%);\n  min-width:78%;display:flex;flex-direction:column;align-items:center;gap:7px;z-index:3\n}\n.board{display:flex;justify-content:center;gap:4px;min-height:44px}\n.board .pcard{width:29px;height:42px}\n.board .pcard svg{width:15px;height:15px}\n.pcard{\n  position:relative;width:31px;height:45px;border-radius:5px;background:#f5f5f2;\n  box-shadow:0 2px 4px rgba(0,0,0,.62);\n  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;\n  font-family:var(--f-ui);font-size:var(--fs)!important;line-height:1\n}\n.pcard svg{width:16px;height:16px}\n.pcard.pempty{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.32);box-shadow:none}\n.pcard.s{color:#111}.pcard.h{color:#d42a2a}.pcard.d{color:#1e5bd6}.pcard.c{color:#1d8a3a}\n.potline{\n  padding:4px 10px;border-radius:var(--r-card);\n  background:rgba(0,0,0,.62);border:var(--glass-border);box-shadow:var(--glass-hl);\n  color:var(--c-text);font-family:var(--f-ui);font-size:10px!important;letter-spacing:.5px;white-space:nowrap\n}\n.potline.side{color:var(--c-muted)}\n.herohand{\n  position:absolute;left:50%;top:-74px;transform:translateX(-50%);\n  display:flex;justify-content:center;z-index:4\n}\n.herohand .pcard{width:32px;height:45px;margin-left:3px}\n.herohand .pcard:first-child{margin-left:0}\n.header{display:none!important}\n.sectionhead{position:relative;flex:none;height:62px;display:flex;align-items:center;justify-content:center;padding:4px 22px;background:rgba(0,0,0,.35);border-bottom:1px solid rgba(255,255,255,.16);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);z-index:3}\n.sectionhead img{position:absolute;left:22px;top:50%;transform:translateY(-50%);width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 3px 6px rgba(0,0,0,.45))}\n.sectiontitle{display:inline-block;max-width:calc(100% - 130px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.38);padding:8px 22px;color:#fff;font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-faixa);transform:rotate(-1.5deg);-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.06)}\n#ptitle{display:none!important}\n.content.spotsmode{padding-top:6px!important;padding-bottom:6px!important;overflow:visible!important}\n.page.spotsmode{height:100%!important;min-height:0!important;overflow:visible!important;gap:6px!important}\n.spotactions{flex:0 0 88px;display:flex;flex-direction:column;gap:6px;margin:-6px 0 0;padding:0}\n.spotactions[hidden]{display:none!important}\n.spotactionrow{display:grid;gap:8px}\n.spotactionrow.primary{grid-template-columns:repeat(4,minmax(0,1fr))}\n.spotactionrow.raise{grid-template-columns:repeat(3,minmax(0,1fr))}\n.spotaction{min-width:0;height:40px;padding:0 4px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}\n.spotaction.solver-size{display:flex;align-items:center;justify-content:center;white-space:nowrap;line-height:1}\n.spotaction.solver-size span{display:block;font-family:var(--f-ui);font-size:var(--fs)!important;font-weight:400;line-height:1}\n.spotaction:active,.spotaction.on{background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);color:var(--c-accent-text);-webkit-backdrop-filter:var(--on-blur);backdrop-filter:var(--on-blur)}\n.spotaction:disabled{opacity:.58;pointer-events:none}\n/* SPOTS: efeitos transitorios de acao; nenhuma geometria permanente e alterada */\n.spotchipfx{position:absolute;width:12px;height:12px;border-radius:50%;pointer-events:none;z-index:14;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.95) 0 10%,rgba(111,164,255,.95) 12% 29%,rgba(21,91,189,.98) 31% 66%,rgba(4,14,42,.98) 68% 100%);border:1px solid rgba(255,255,255,.72);box-shadow:0 0 7px rgba(21,91,189,.72),0 2px 4px rgba(0,0,0,.55);transform:translate(-50%,-50%)}\n.seat.hero.spot-check .av,.seat.hero.spot-check .stk{animation:spotCheckPulse .52s ease}\n.seat.hero.spot-call .av,.seat.hero.spot-call .stk{animation:spotActionPulse .62s ease}\n.seat.hero.spot-raise .av,.seat.hero.spot-raise .stk{animation:spotRaisePulse .72s ease}\n.seat.hero.spot-allin .av,.seat.hero.spot-allin .stk{animation:spotAllInPulse .88s ease}\n.seat.hero.spot-fold .av,.seat.hero.spot-fold .stk{animation:spotFoldSeat .72s ease forwards}\n.herohand.spot-fold-cards{animation:spotFoldCards .72s cubic-bezier(.4,0,.2,1) forwards}\n.centerbox.spot-pot-hit .potline{animation:spotPotPulse .58s ease}\n.centerbox.spot-pot-allin .potline{animation:spotPotAllIn .88s ease}\n@keyframes spotCheckPulse{0%,100%{transform:scale(1);filter:brightness(1)}45%{transform:scale(1.08);filter:brightness(1.38)}}\n@keyframes spotActionPulse{0%,100%{transform:scale(1);filter:brightness(1)}42%{transform:scale(1.06);filter:brightness(1.28)}}\n@keyframes spotRaisePulse{0%,100%{transform:scale(1);filter:brightness(1)}38%{transform:scale(1.1);filter:brightness(1.48)}68%{transform:scale(.98)}}\n@keyframes spotAllInPulse{0%,100%{transform:scale(1);filter:brightness(1)}28%{transform:scale(1.14);filter:brightness(1.58)}56%{transform:scale(.97)}76%{transform:scale(1.07)}}\n@keyframes spotFoldSeat{0%{opacity:1;filter:brightness(1)}100%{opacity:.34;filter:grayscale(.7) brightness(.65)}}\n@keyframes spotFoldCards{0%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}100%{opacity:0;transform:translateX(-50%) translateY(-22px) scale(.72)}}\n@keyframes spotPotPulse{0%,100%{transform:scale(1);filter:brightness(1)}45%{transform:scale(1.12);filter:brightness(1.45)}}\n@keyframes spotPotAllIn{0%,100%{transform:scale(1);filter:brightness(1)}30%{transform:scale(1.18);filter:brightness(1.65)}62%{transform:scale(.98)}}\n@media (prefers-reduced-motion:reduce){.seat.hero.spot-check .av,.seat.hero.spot-check .stk,.seat.hero.spot-call .av,.seat.hero.spot-call .stk,.seat.hero.spot-raise .av,.seat.hero.spot-raise .stk,.seat.hero.spot-allin .av,.seat.hero.spot-allin .stk,.seat.hero.spot-fold .av,.seat.hero.spot-fold .stk,.herohand.spot-fold-cards,.centerbox.spot-pot-hit .potline,.centerbox.spot-pot-allin .potline{animation-duration:.12s!important}.spotchipfx{display:none!important}}\n\n.hbtn.off,.hbtn:disabled{opacity:.35!important;cursor:not-allowed;pointer-events:none}\n.slot[hidden]{display:none!important}\n.trainwrap[hidden]{display:none!important}\n.homegrid[hidden]{display:none!important}\n.homegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-content:start}\n.homegrid .tower{width:100%;cursor:pointer;font:inherit}\n:host{display:flex;justify-content:center;width:100%;height:100%}\n/* t\u00edtulos das telas \u2014 mesmo container da faixa da tela de login */\n.ptitle{align-self:center;display:inline-block;max-width:calc(100% - 12px);white-space:nowrap;background:#111;color:#fff;\n  border:1px solid #fff;padding:8px 22px;font-size:min(2.6vh,18px);letter-spacing:2px;transform:rotate(-1.5deg);margin-block:.4vh 1vh}\n.page{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px;animation:pgIn .22s ease}\n.ptitle,.toast,.tstart,.slot b,.slot small{font-size:12px!important}\n@keyframes slideInR{from{opacity:0;transform:translateX(36%)}to{opacity:1;transform:none}}\n@keyframes slideInL{from{opacity:0;transform:translateX(-36%)}to{opacity:1;transform:none}}\n@keyframes pgIn{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}\n@media (prefers-reduced-motion:reduce){.page{animation:none!important}}\n:host{\n  --f-ui:'Bebrush',sans-serif; --f-brand:'Road Rage',sans-serif;\n  --fs:12px; --ls-label:1px; --ls-desc:.5px; --ls-faixa:2px;\n  --c-bg-top:#000; --c-bg-bottom:rgb(4,14,42);\n  --c-text:#fff; --c-muted:#a8a49e; --c-accent:#155bbd; --c-accent-text:#6fa4ff;\n  --glass-bg:rgba(255,255,255,.06); --glass-bg-strong:rgba(255,255,255,.08);\n  --glass-border:1px solid rgba(255,255,255,.38);\n  --glass-blur:blur(14px) saturate(140%);\n  --glass-hl:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(255,255,255,.06);\n  --on-bg:rgba(21,91,189,.32); --on-border:1px solid #155bbd; --on-blur:blur(14px) saturate(150%);\n  --on-glow:inset 0 1px 0 rgba(140,185,255,.35),0 0 14px rgba(21,91,189,.35);\n  --r-card:16px; --gap:8px; --icon:40px;\n}\n/* ===== PADR\u00c3O GRINDER (camada final \u2014 vence as anteriores) ===== */\n/* 1. Tipografia: Bebrush 12px em tudo; Road Rage s\u00f3 no GRINDER */\n.hbtn,.hbtn span,.tab,.tab span,.ptitle,.tower b,.tower small,.chip,.thead b,.thead small,.glabel,.tnote,.tstart,.slot b,.slot small,.toast{\n  font-family:var(--f-ui)!important;font-size:var(--fs)!important}\n.hbtn span,.tab span,.tower b,.chip,.thead b,.tstart,.slot b{letter-spacing:var(--ls-label)!important}\n.thead small,.tower small,.slot small,.glabel,.tnote{letter-spacing:var(--ls-desc)!important}\n.ptitle{letter-spacing:var(--ls-faixa)!important}\n/* 2. Cards/bot\u00f5es: vidro, borda de vidro 1px, raio \u00fanico */\n.hbtn,.tab,.tower,.chip,.thead,.tsec,.slot,.tstart{border-radius:var(--r-card)!important}\n.towers,.homegrid,.chips{gap:var(--gap)!important}\n.tower svg{width:var(--icon)!important;height:var(--icon)!important}\n.tsec{border:0!important;background:transparent!important}\n\n\n/* 5. Ajustes do treino: sem cards de cabe\u00e7alho; cards de torre direto na tela; linha azul entre se\u00e7\u00f5es */\n.trainwrap{gap:0!important}\n.trainwrap .tsec{padding:14px 0!important;border-radius:0!important}\n.trainwrap .tsec+.tsec{border-top:1px solid #155bbd!important}\n.trainwrap .tbody{display:flex!important;padding:0!important}\n.stitle{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:0 2px 10px;color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}\n.stitle small{color:var(--c-muted);font-size:var(--fs)!important;letter-spacing:var(--ls-desc)}\n/* 3. \u00cdcones: Material Symbols Outlined em tudo, cor do texto */\n.tab svg{width:24px!important;height:24px!important;fill:currentColor;stroke:none!important}\n.hbtn svg{width:22px!important;height:22px!important;fill:currentColor;stroke:none!important}\n.thead svg{fill:currentColor;stroke:none!important}\n/* 4. Cards de torre: sempre 3 colunas e quadrados, em todas as telas */\n.towers,.homegrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}\n.towers.c4{grid-template-columns:repeat(4,minmax(0,1fr))!important}\n.towers.c4 .tower{padding:6px 2px!important;gap:6px!important}\n.towers.c4 .tower b{letter-spacing:.2px!important}\n.towers.c4 .tower svg{width:32px!important;height:32px!important}\n.tower{aspect-ratio:1/1!important;min-height:0!important;height:auto!important;padding:8px 6px!important}\n/* REGRA FINAL: todos os cards e botoes em 12px */\n.hbtn,.hbtn span,.tab,.tab span,.tower,.tower b,.tower small,.chip,.thead,.thead b,.thead small,.tstart{font-size:12px!important}\n/* AMOSTRAGEM DE SPOTS: 6 cards na linha, sem icones */\n.tsec[data-s=sample] .towers{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px!important}\n.tsec[data-s=sample] .tower{width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;aspect-ratio:auto!important;padding:4px 1px!important;gap:0!important}\n.tsec[data-s=sample] .tower svg{display:none!important}\n.tsec[data-s=sample] .tower b{font-size:12px!important;line-height:1!important;letter-spacing:0!important;white-space:nowrap!important}\n/* TREINO POR STREET: mesmo formato torre do STACK */\n.tsec[data-s=street] .towers{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}\n.tsec[data-s=street] .tower{width:100%!important;min-width:0!important;height:96px!important;min-height:96px!important;aspect-ratio:auto!important;padding:8px 3px!important;gap:7px!important;justify-content:center!important}\n.tsec[data-s=street] .tower svg{display:block!important;width:28px!important;height:34px!important}\n.tsec[data-s=street] .tower b{font-size:12px!important;line-height:1.05!important;letter-spacing:0!important;white-space:pre-line!important}\n/* TREINO POR FASE: mesmo formato torre do STACK */\n.tsec[data-s=phase] .towers{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important}\n.tsec[data-s=phase] .tower{width:100%!important;min-width:0!important;height:96px!important;min-height:96px!important;aspect-ratio:auto!important;padding:8px 2px!important;gap:7px!important;justify-content:center!important}\n.tsec[data-s=phase] .tower svg{display:block!important;width:28px!important;height:34px!important}\n.tsec[data-s=phase] .tower b{font-size:12px!important;line-height:1.05!important;letter-spacing:0!important;white-space:pre-line!important;overflow-wrap:anywhere!important}\n/* TREINO POR STACK: 10 torres, 5 por linha, altura maior que largura */\n.tsec[data-s=stack] .towers{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}\n.tsec[data-s=stack] .tower{width:100%!important;min-width:0!important;height:96px!important;min-height:96px!important;aspect-ratio:auto!important;padding:8px 3px!important;gap:7px!important;justify-content:center!important}\n.tsec[data-s=stack] .tower svg{display:block!important;width:28px!important;height:34px!important}\n.tsec[data-s=stack] .tower b{font-size:12px!important;line-height:1.05!important;letter-spacing:0!important;white-space:nowrap!important}\n/* POSIÇÃO: 10 torres, 5 por linha, altura maior que largura */\n.tsec[data-s=pos] .towers{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}\n.tsec[data-s=pos] .tower{width:100%!important;min-width:0!important;height:96px!important;min-height:96px!important;aspect-ratio:auto!important;padding:8px 3px!important;gap:7px!important;justify-content:center!important}\n.tsec[data-s=pos] .tower svg{display:block!important;width:28px!important;height:34px!important}\n.tsec[data-s=pos] .tower b{font-size:12px!important;line-height:1.05!important;letter-spacing:0!important;white-space:nowrap!important}\n/* ADVANCE: usa o mesmo padrao estrutural/visual de AJUSTES */\n.advancewrap[hidden]{display:none!important}\n.advancewrap{display:flex!important;flex-direction:column!important;gap:0!important;padding-bottom:8px!important}\n.advancewrap .advblock{padding:14px 0!important;border:0!important;background:transparent!important;border-radius:0!important}\n.advancewrap .advblock:first-child{padding-top:0!important}\n.advancewrap .advblock+.advblock{border-top:1px solid #155bbd!important}\n.advancewrap .stitle{display:flex!important;justify-content:space-between!important;align-items:baseline!important;gap:8px!important;margin:0 2px 10px!important;color:var(--c-text)!important;font-family:var(--f-ui)!important;font-size:var(--fs)!important;letter-spacing:var(--ls-label)!important}\n.advancewrap .advscenarios{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:var(--gap)!important;overflow-x:hidden!important}\n.advancewrap .advscenarios .tower{width:100%!important;min-width:0!important;max-width:100%!important;aspect-ratio:1/1!important;height:auto!important;min-height:0!important;padding:8px 6px!important;overflow:hidden!important}\n.advancewrap .advscenarios .tower svg{display:block!important;width:var(--icon)!important;height:var(--icon)!important;max-width:var(--icon)!important;max-height:var(--icon)!important;flex:0 0 auto!important}\n.advancewrap .advscenarios .tower .advibadge{min-width:42px!important;max-width:64px!important;height:31px!important;padding:0 6px!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;border:2px solid currentColor!important;border-radius:7px!important;font-family:var(--f-ui)!important;font-size:11px!important;line-height:1!important;letter-spacing:0!important;color:currentColor!important;overflow:hidden!important}\n.advancewrap .advscenarios .tower b{display:block!important;width:100%!important;max-width:100%!important;font-size:var(--fs)!important;line-height:1.1!important;letter-spacing:var(--ls-label)!important;white-space:pre-line!important;overflow-wrap:anywhere!important;overflow:hidden!important}\n/* TRAIN SETTINGS LAYOUT ONLY - entrada intocada */\n/* Tipo de torneio: 3 colunas; ultima linha = Sit & Go / Sem rebuys-reentries / Sem add-on */\n.tsec[data-s=ttype] .tbody{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}\n.tsec[data-s=ttype] .tbody>.towers{display:contents!important}\n.tsec[data-s=ttype] .tower{width:100%!important;min-width:0!important;aspect-ratio:1/1!important}\n/* Tamanho do field: seis numeros, sem icones, todos na mesma linha */\n.tsec[data-s=field] .towers{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px!important}\n.tsec[data-s=field] .tower{width:100%!important;min-width:0!important;height:48px!important;min-height:48px!important;aspect-ratio:auto!important;padding:4px 1px!important;gap:0!important}\n.tsec[data-s=field] .tower svg{display:none!important}\n.tsec[data-s=field] .tower b{font-size:12px!important;line-height:1!important;letter-spacing:0!important;white-space:nowrap!important}\n/* Nivel dos oponentes: quatro torres na mesma linha */\n.tsec[data-s=opponents] .towers{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}\n.tsec[data-s=opponents] .tower{width:100%!important;min-width:0!important;aspect-ratio:1/1!important;padding:5px 2px!important;gap:2px!important}\n.tsec[data-s=opponents] .tower svg{display:none!important}\n.tsec[data-s=opponents] .tower b{font-size:12px!important;line-height:1.3!important;white-space:pre-line!important;letter-spacing:0!important}\n"+'</style>'+"<main class=\"screen\">\n  <div class=\"concrete\" aria-hidden=\"true\">\n    <svg viewBox=\"0 0 430 932\" preserveAspectRatio=\"xMidYMid slice\" xmlns=\"http://www.w3.org/2000/svg\">\n      <defs>\n        <filter id=\"grain2\" x=\"0\" y=\"0\" width=\"100%\" height=\"100%\"><feTurbulence type=\"fractalNoise\" baseFrequency=\".9\" numOctaves=\"3\" seed=\"4\"/><feColorMatrix values=\"0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 .9\"/></filter>\n        <filter id=\"blotch2\" x=\"0\" y=\"0\" width=\"100%\" height=\"100%\"><feTurbulence type=\"fractalNoise\" baseFrequency=\".012\" numOctaves=\"4\" seed=\"11\"/><feColorMatrix values=\"0 0 0 0 .18  0 0 0 0 .17  0 0 0 0 .15  0 0 0 -2.2 1.25\"/></filter>\n        <linearGradient id=\"drip2\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#3b3833\" stop-opacity=\".35\"/><stop offset=\"1\" stop-color=\"#3b3833\" stop-opacity=\"0\"/></linearGradient>\n      </defs>\n      <rect width=\"430\" height=\"932\" fill=\"#86827d\"/>\n      <rect width=\"430\" height=\"932\" filter=\"url(#blotch2)\" opacity=\".55\"/>\n      <rect width=\"430\" height=\"932\" filter=\"url(#grain2)\" opacity=\".18\"/>\n      <rect x=\"60\" y=\"0\" width=\"26\" height=\"340\" fill=\"url(#drip2)\"/>\n      <rect x=\"300\" y=\"310\" width=\"18\" height=\"260\" fill=\"url(#drip2)\"/>\n      <g stroke=\"#6f6c66\" stroke-width=\"1.6\" opacity=\".7\"><line x1=\"0\" y1=\"310\" x2=\"430\" y2=\"310\"/><line x1=\"0\" y1=\"620\" x2=\"430\" y2=\"620\"/><line x1=\"215\" y1=\"0\" x2=\"215\" y2=\"932\"/></g>\n      <g stroke=\"#c9c6c0\" stroke-width=\"1\" opacity=\".5\"><line x1=\"0\" y1=\"312\" x2=\"430\" y2=\"312\"/><line x1=\"0\" y1=\"622\" x2=\"430\" y2=\"622\"/><line x1=\"217\" y1=\"0\" x2=\"217\" y2=\"932\"/></g>\n    </svg>\n  </div>\n  <div class=\"vignette\" aria-hidden=\"true\"></div>\n  <div class=\"cardsbox\" aria-hidden=\"true\"><img class=\"cards\" alt=\"\" src=\"assets/cartas-relevo.png\"></div>\n\n  <header class=\"header\">\n    <div class=\"brandrow\">\n      <img alt=\"StackUp Hold'em\" src=\"assets/logo-stackup-200.png\">\n      <div class=\"brandtxt\"><div class=\"brand\">STACKUP HOLD'EM</div><div class=\"title\">GRINDER</div></div>\n    </div>\n    <div class=\"navbtns\">\n      <button class=\"hbtn\" data-h=\"back\">\n        <svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M561-240 320-481l241-241 43 43-198 198 198 198-43 43Z\"/></svg>\n        <span data-i=\"back\">Voltar</span>\n      </button>\n      <button class=\"hbtn\" data-h=\"main\">\n        <svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M120-510v-330h330v330H120Zm0 390v-330h330v330H120Zm390-390v-330h330v330H510Zm0 390v-330h330v330H510ZM180-570h210v-210H180v210Zm390 0h210v-210H570v210Zm0 390h210v-210H570v210Zm-390 0h210v-210H180v210Zm390-390Zm0 180Zm-180 0Zm0-180Z\"/></svg>\n        <span data-i=\"main\">Menu principal</span>\n      </button>\n    </div>\n    <div class=\"divider\"></div>\n  </header>\n\n  <section class=\"content\"><div class=\"page\" id=\"page\"><div class=\"ptitle\" id=\"ptitle\"></div><div class=\"slot\"><b id=\"pslotT\"></b><small id=\"pslotS\"></small></div></div></section>\n\n  <nav class=\"tabbar\" aria-label=\"Atalhos\">\n    <button class=\"tab on\" data-t=\"home\" aria-current=\"page\">\n      <svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M220-180h150v-250h220v250h150v-390L480-765 220-570v390Zm-60 60v-480l320-240 320 240v480H530v-250H430v250H160Zm320-353Z\"/></svg>\n      <span data-i=\"home\">Home</span>\n    </button>\n    <button class=\"tab\" data-t=\"train\">\n      <svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"m388-80-20-126q-19-7-40-19t-37-25l-118 54-93-164 108-79q-2-9-2.5-20.5T185-480q0-9 .5-20.5T188-521L80-600l93-164 118 54q16-13 37-25t40-18l20-127h184l20 126q19 7 40.5 18.5T669-710l118-54 93 164-108 77q2 10 2.5 21.5t.5 21.5q0 10-.5 21t-2.5 21l108 78-93 164-118-54q-16 13-36.5 25.5T592-206L572-80H388Zm48-60h88l14-112q33-8 62.5-25t53.5-41l106 46 40-72-94-69q4-17 6.5-33.5T715-480q0-17-2-33.5t-7-33.5l94-69-40-72-106 46q-23-26-52-43.5T538-708l-14-112h-88l-14 112q-34 7-63.5 24T306-642l-106-46-40 72 94 69q-4 17-6.5 33.5T245-480q0 17 2.5 33.5T254-413l-94 69 40 72 106-46q24 24 53.5 41t62.5 25l14 112Zm44-210q54 0 92-38t38-92q0-54-38-92t-92-38q-54 0-92 38t-38 92q0 54 38 92t92 38Zm0-130Z\"/></svg>\n      <span data-i=\"train\">Ajustes</span>\n    </button>\n    <button class=\"tab\" data-t=\"spots\">\n      <svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"m604-389 40-145-124-85-40 145 124 85ZM195-160l-66-27q-32.17-14.03-43.58-48.01Q74-269 92-302l103-245v387Zm142 58q-33.83 0-57.91-24Q255-150 255-184v-313l137 368q3 8 6.5 14t9.5 13h-71Zm183-25q-23 8-45.93-2.2Q451.14-139.41 443-162L251-684q-8-23 2.44-45.88Q263.88-752.75 287-761l319-115q23-8 46.5 2t31.5 33l193 521q8 23-2.2 45.87Q864.59-251.25 842-243L520-127Zm-20-57 318-116-191-519-318 115 191 520Zm64-318Z\"/></svg>\n      <span data-i=\"spots\">Spots</span>\n    </button>\n    <button class=\"tab\" data-t=\"profile\">\n      <svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M324-111.5Q251-143 197-197t-85.5-127Q80-397 80-480t31.5-156Q143-709 197-763t127-85.5Q397-880 480-880t156 31.5Q709-817 763-763t85.5 127Q880-563 880-480t-31.5 156Q817-251 763-197t-127 85.5Q563-80 480-80t-156-31.5ZM721-239q99-99 99-241t-99-241q-99-99-241-99t-241 99q-99 99-99 241t99 241q99 99 241 99t241-99Zm-411-71q-70-70-70-170t70-170q70-70 170-70t170 70q70 70 70 170t-70 170q-70 70-170 70t-170-70Zm297.5-42.5Q660-405 660-480t-52.5-127.5Q555-660 480-660t-127.5 52.5Q300-555 300-480t52.5 127.5Q405-300 480-300t127.5-52.5Zm-184-71Q400-447 400-480t23.5-56.5Q447-560 480-560t56.5 23.5Q560-513 560-480t-23.5 56.5Q513-400 480-400t-56.5-23.5Z\"/></svg>\n      <span data-i=\"profile\">Alvo</span>\n    </button>\n    <button class=\"tab\" data-t=\"menu\">\n      <svg viewBox=\"0 -960 960 960\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M120-120v-76l60-60v136h-60Zm165 0v-236l60-60v296h-60Zm165 0v-296l60 61v235h-60Zm165 0v-235l60-60v295h-60Zm165 0v-396l60-60v456h-60ZM120-356v-85l280-278 160 160 280-281v85L560-474 400-634 120-356Z\"/></svg>\n      <span data-i=\"menu\">RUN</span>\n    </button>\n  </nav>\n  <div class=\"toast\" id=\"toast\"></div>\n</main>";
-  const $=s=>R.querySelector(s),$$=s=>R.querySelectorAll(s);
+  const $=s=>R.querySelector(s),qa=s=>R.querySelectorAll(s);
+  const grinderBridge=window.StackUpAppBridge?.create?.('grinder')||null;
+  let ACTIVE_STACKUP_PRESCRIPTION=null;
+  let personalUI=null;
+  let performanceUI=null;
+  function grinderIntegrationStatus(){return grinderBridge?.status?.()||{app:'grinder',sameOrigin:false,inbox:0,outbox:0};}
+  function grinderIncomingPrescriptions(){
+    return (grinderBridge?.inbox?.()||[]).filter(x=>x?.type==='training_prescription'&&x?.source==='heroes');
+  }
+  window.StackUpGrinderIntegration=Object.freeze({
+    status:grinderIntegrationStatus,
+    prescriptions:grinderIncomingPrescriptions,
+    applyPrescription:id=>applyIncomingPrescription(id),
+    activePrescription:()=>ACTIVE_STACKUP_PRESCRIPTION,
+    openHeroes:()=>grinderBridge?.openTarget?.('heroes',grinderBridge.send('capabilities','heroes',{product:'grinder',accepts:['player_profile','training_prescription'],returns:['training_progress','training_completed']})),
+    bridge:grinderBridge
+  });
   ['home','train','profile','spots','menu'].forEach(function(k){
     const b=R.querySelector('.tab[data-t="'+k+'"]');
     const bar=R.querySelector('.tabbar');
@@ -1050,6 +1073,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   let SPOT_STATS_SESSION_ID=null;
   let SPOT_ACTIVE_ACTION=null;
   const SPOT_VISUAL_FOLDS=new Set();
+  const SPOT_VISUAL_ACTIONS=new Map();
   const SPOT_ANALYSIS_CACHE=new Map();
 
   function cloneSpotValue(value){
@@ -1116,16 +1140,17 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     .seat.spot-state-folded .av{text-decoration:none!important}
     .seat.spot-state-folded .backs,.seat.spot-state-folded .herohand{display:none!important;opacity:0!important;visibility:hidden!important}
     .seat.spot-state-allin .av{box-shadow:var(--glass-hl),0 0 0 2px rgba(21,91,189,.72),0 0 14px rgba(21,91,189,.42)!important}
-    .spotcommit{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 3px);font-size:9px;line-height:1;color:#fff;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.32);border-radius:7px;padding:2px 5px;white-space:nowrap;pointer-events:none}
-    .seat.hero .spotcommit{font-size:10px}
+    /* Apostas entram visualmente direto no pote. Não exibimos committed/bet ao lado do jogador. */
+    .spotcommit,.seatbet{display:none!important}
     .seat .av{position:relative;overflow:visible}
     .seat.hero.spot-turn .av{background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);animation:spotHeroTurn 1.1s ease-in-out infinite}
     .seat.spot-acting .av{animation:spotActorPulse .48s ease-in-out infinite alternate}
-    /* A ação fica CENTRADA SOBRE O AVATAR durante 1,5s; a posição permanece explícita. */
-    .spotactoraction{position:absolute;left:50%;top:50%;z-index:30;min-width:70px;max-width:112px;padding:6px 8px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);-webkit-backdrop-filter:var(--on-blur);backdrop-filter:var(--on-blur);color:var(--c-accent-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label);line-height:1.05;text-align:center;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%);animation:spotActionBadgeIn .18s ease-out}
-    .spotactoraction span,.spotactoraction small{display:block;font-family:var(--f-ui);font-size:var(--fs)!important;font-weight:400}
-    .spotactoraction small{margin-top:2px;color:var(--c-text);letter-spacing:var(--ls-desc)}
-    @keyframes spotActionBadgeIn{from{opacity:0;transform:translate(-50%,-50%) scale(.72)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+    /* Card de ação usa exatamente o mesmo padrão visual do card de stack. */
+    .spotactiontext{margin-top:1px;min-width:58px;white-space:nowrap;padding:3px 7px;border-radius:var(--r-card);background:rgba(0,0,0,.72);border:var(--glass-border);box-shadow:var(--glass-hl);color:var(--c-text);font-family:var(--f-ui);font-size:10px!important;line-height:1;letter-spacing:.5px;text-align:center;pointer-events:none}
+    .seat.spot-acting .spotactiontext{color:var(--c-accent-text);border-color:rgba(111,164,255,.38);box-shadow:var(--glass-hl),0 0 10px rgba(21,91,189,.20)}
+    .spotactiontext:empty{display:none!important}
+    /* Herói não usa o espaço abaixo do stack: sua ação fica acima das cartas. */
+    .seat.hero>.spotactiontext.heroaction{position:absolute;left:50%;top:-103px;transform:translateX(-50%);z-index:8;margin:0;min-width:66px;font-size:10px!important}
     @keyframes spotActorPulse{from{filter:brightness(1)}to{filter:brightness(1.4)}}
     @keyframes spotHeroTurn{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}
     .spotintro{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 6px;font-family:var(--f-ui);font-size:var(--fs)!important}
@@ -1167,27 +1192,46 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if((kind==='raise'||kind==='bet')&&Number.isFinite(target)&&target>0)label+=' '+fmtStack(target);
     return label;
   }
+  function spotLastActionForPosition(position){
+    const pos=String(position||'').toUpperCase();
+    const visual=SPOT_VISUAL_ACTIONS.get(pos);
+    if(visual)return visual;
+    const history=Array.isArray(SOLVER_TABLE_STATE?.history)?SOLVER_TABLE_STATE.history:[];
+    for(let i=history.length-1;i>=0;i--){
+      if(spotHistoryActor(history[i])===pos)return history[i];
+    }
+    return null;
+  }
+  function setSpotVisualAction(position,label,kind){
+    const pos=String(position||'').toUpperCase();
+    if(!pos)return;
+    SPOT_VISUAL_ACTIONS.set(pos,{position:pos,kind:String(kind||''),label:String(label||'')});
+    paintSpotActorAction();
+  }
+  function spotVisualActionLabel(entry){
+    if(!entry)return '';
+    return entry.label?String(entry.label):spotHistoryLabel(entry);
+  }
   function paintSpotActorAction(){
-    tb.querySelectorAll('.spotactoraction').forEach(el=>el.remove());
     tb.querySelectorAll('.seat.spot-acting').forEach(el=>{
       el.classList.remove('spot-acting');
       delete el.dataset.actionKind;
     });
+    tb.querySelectorAll('.seat[data-pos]').forEach(seat=>{
+      const pos=String(seat.dataset.pos||'').toUpperCase();
+      const line=seat.querySelector('.spotactiontext');
+      if(!line)return;
+      const last=spotLastActionForPosition(pos);
+      line.textContent=spotVisualActionLabel(last);
+    });
     const active=SPOT_ACTIVE_ACTION;
     if(!active)return;
     const seat=[...tb.querySelectorAll('.seat[data-pos]')].find(el=>String(el.dataset.pos).toUpperCase()===active.pos);
-    const avatar=seat?.querySelector('.av');
-    if(!seat||!avatar)return;
+    const line=seat?.querySelector('.spotactiontext');
+    if(!seat||!line)return;
     seat.classList.add('spot-acting');
     seat.dataset.actionKind=active.kind;
-    const bubble=document.createElement('div');
-    bubble.className='spotactoraction';
-    const actionLine=document.createElement('span');
-    actionLine.textContent=active.label;
-    const positionLine=document.createElement('small');
-    positionLine.textContent=active.pos;
-    bubble.append(actionLine,positionLine);
-    avatar.appendChild(bubble);
+    line.textContent=active.label;
   }
   function clearSpotActorAction(){
     SPOT_ACTIVE_ACTION=null;
@@ -1198,29 +1242,13 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const pos=String(seat.dataset.pos||'').toUpperCase();
     if(pos)SPOT_VISUAL_FOLDS.add(pos);
     const cards=seat.querySelector('.backs,.herohand');
-    const center=tb.querySelector('.centerbox');
-    if(!cards||!center){
-      seat.classList.add('spot-state-folded');
-      return;
-    }
-    const from=cards.getBoundingClientRect(),to=center.getBoundingClientRect();
-    const dx=(to.left+to.width/2)-(from.left+from.width/2);
-    const dy=(to.top+to.height/2)-(from.top+from.height/2);
-    const finish=()=>{
+    if(cards){
       cards.getAnimations?.().forEach(a=>{try{a.cancel();}catch(_){}});
       cards.style.display='none';
-      seat.classList.add('spot-state-folded');
-    };
-    if(cards.animate){
-      const anim=cards.animate([
-        {transform:'translateX(-50%) translate(0,0) rotate(0deg) scale(1)',opacity:1},
-        {transform:'translateX(-50%) translate('+dx*.58+'px,'+dy*.58+'px) rotate(7deg) scale(.88)',opacity:.9,offset:.58},
-        {transform:'translateX(-50%) translate('+dx+'px,'+dy+'px) rotate(15deg) scale(.58)',opacity:0}
-      ],{duration:620,easing:'cubic-bezier(.22,.72,.22,1)',fill:'forwards'});
-      anim.finished.then(finish).catch(finish);
-    }else{
-      window.setTimeout(finish,620);
+      cards.style.opacity='0';
+      cards.style.visibility='hidden';
     }
+    seat.classList.add('spot-state-folded');
   }
   function launchSpotChipsFromSeat(seat,count,duration,spread){
     const center=tb.querySelector('.centerbox');
@@ -1261,7 +1289,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const seat=[...tb.querySelectorAll('.seat[data-pos]')].find(el=>String(el.dataset.pos).toUpperCase()===pos);
     if(!seat)return;
     const kind=spotHistoryKind(entry);
-    SPOT_ACTIVE_ACTION={pos,kind,label:spotHistoryLabel(entry)};
+    const label=spotHistoryLabel(entry);
+    SPOT_ACTIVE_ACTION={pos,kind,label};
+    SPOT_VISUAL_ACTIONS.set(pos,{position:pos,kind,label});
     paintSpotActorAction();
     window.StackUpPokerAudio?.play?.(kind);
     if(kind==='fold'){
@@ -1281,11 +1311,31 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     clearSpotActorAction();
     tb.querySelector('.seat.hero')?.classList.remove('spot-turn');
   }
+  function spotCanonicalActionOrder(street,positions){
+    const available=new Set((positions||[]).map(x=>String(x).toUpperCase()));
+    const pre=(available.size===2)
+      ?['SB','BB']
+      :['UTG','UTG+1','UTG+2','MP','LJ','HJ','CO','BTN','SB','BB'];
+    const post=['SB','BB','UTG','UTG+1','UTG+2','MP','LJ','HJ','CO','BTN'];
+    return (String(street||'').toUpperCase()==='PRE-FLOP'?pre:post).filter(p=>available.has(p));
+  }
+  function spotHistoryUntilHero(history,heroPosition){
+    const hero=String(heroPosition||'').toUpperCase();
+    if(!hero)return history||[];
+    const out=[];
+    for(const action of history||[]){
+      if(spotHistoryActor(action)===hero)break;
+      out.push(action);
+    }
+    return out;
+  }
+
   async function playSpotDecisionSequence(spot){
     const token=++SPOT_DECISION_SEQUENCE_TOKEN;
     SPOT_DECISION_SEQUENCE_RUNNING=true;
     clearSpotActorAction();
     SPOT_VISUAL_FOLDS.clear();
+    SPOT_VISUAL_ACTIONS.clear();
     const entry=currentSpotEntry();
     if(entry?.answer){
       SPOT_DECISION_SEQUENCE_RUNNING=false;
@@ -1307,12 +1357,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const raw=Array.isArray(currentStreetHistory)?currentStreetHistory:(Array.isArray(scenario.actionHistory)?scenario.actionHistory:[]);
     let history=raw.filter(a=>spotHistoryActor(a)&&['check','call','fold','raise','bet','jam'].includes(spotHistoryKind(a)));
     const street=String(scenario.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
+    const heroPos=String(view?.heroPosition||scenario.heroPosition||'').toUpperCase();
 
-    // RFI charts do not carry explicit folds. Recreate only the logically required
-    // pre-hero folds so the street is shown from its first action.
+    // Nunca reproduzir ações depois que a decisão chegou ao herói.
+    history=spotHistoryUntilHero(history,heroPos);
+
+    // RFI sem histórico explícito: reconstruir folds pela ordem REAL de ação pré-flop,
+    // e parar exatamente antes do herói.
     if(!history.length&&street==='PRE-FLOP'&&/rfi/i.test(String(spot?.id||scenario.solverNode||''))){
-      const order=Array.isArray(scenario.positions)?scenario.positions.map(x=>String(x).toUpperCase()):[];
-      const heroPos=String(scenario.heroPosition||'').toUpperCase();
+      const available=Array.isArray(view?.positions)&&view.positions.length
+        ?view.positions
+        :(Array.isArray(scenario.positions)?scenario.positions:tablePositions);
+      const order=spotCanonicalActionOrder(street,available);
       const heroIndex=order.indexOf(heroPos);
       if(heroIndex>0)history=order.slice(0,heroIndex).map(position=>({position,kind:'fold',street}));
     }
@@ -1323,10 +1379,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       if(cards)cards.style.display='';
     });
 
+    // Abertura do spot: alerta sonoro -> 1 segundo de pausa -> começa a mão.
+    try{await window.StackUpPokerAudio?.unlock?.();}catch(_){}
+    if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
+    window.StackUpPokerAudio?.play?.('alert');
+    await spotSleep(1000);
+    if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
+
     for(const action of history){
       if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
       const kind=spotHistoryKind(action);
       const actor=spotHistoryActor(action);
+      if(actor===heroPos)break;
 
       showSpotActorAction(action);
 
@@ -1336,12 +1400,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
           if(kind!=='fold')syncSpotTableStateDom();
           else window.setTimeout(()=>{
             if(token===SPOT_DECISION_SEQUENCE_TOKEN&&!tb.hidden)syncSpotTableStateDom();
-          },660);
+          },520);
         }catch(_){}
       }
 
-      // Cada jogador ocupa exatamente 1,5 s da sequência antes do próximo.
-      await spotSleep(1500);
+      // Uma ação por segundo, respeitando a sequência cronológica do histórico.
+      await spotSleep(1000);
       if(token!==SPOT_DECISION_SEQUENCE_TOKEN||tb.hidden)return;
       clearSpotActorAction();
       syncSpotTableStateDom();
@@ -1739,8 +1803,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
        Os cards de suporte começam somente abaixo dos 7 botões de ação. */
     .page.spotsmode .spotwrap{flex:0 0 var(--spot-table-height,calc(100% - 94px))!important;height:var(--spot-table-height,calc(100% - 94px))!important;min-height:0!important;max-height:none!important}
     .spotactions{flex:0 0 88px!important}
-    .spotsupport{display:none!important;flex-direction:column;gap:var(--gap);padding-bottom:4px}
+    .spotsupport{display:flex!important;flex-direction:column;gap:var(--gap);padding-bottom:14px}
     .spotsupport[hidden]{display:none!important}
+    .spotanalysis{scroll-margin-top:12px}
     .spotcontrolrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
     .spotcontrol,.spotsavebutton,.spotsaveform button,.historysort button,.historyactions button{
       min-width:0;height:40px;padding:0 8px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);
@@ -1761,10 +1826,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       color:var(--c-text);font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);outline:none
     }
     .spotsaveform input:focus{border:var(--on-border);box-shadow:var(--on-glow)}
-    .spotfeedback,.spotanalysis,.historysort,.historyitem,.historydetail,.historyempty{
+    .spotfeedback,.historysort,.historyitem,.historydetail,.historyempty{
       border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);
       -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);color:var(--c-text)
     }
+    .spotanalysis{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;color:var(--c-text)}
     .spotfeedback{min-height:78px;padding:16px;display:flex;flex-direction:column;justify-content:center;gap:6px;text-align:center;background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl)}
     .spotfeedback .line1{font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-label);color:var(--c-text)}
     .spotfeedback .line2{font-family:var(--f-ui);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);color:var(--c-muted)}
@@ -1774,18 +1840,18 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     @keyframes spotWaitingBlink{0%,100%{opacity:.35}50%{opacity:1}}
     .spotanalysis{padding:14px;display:flex;flex-direction:column;gap:12px;text-align:left}
     .spotanalysis[hidden]{display:none!important}
-    .spotanalysistitle{padding:10px 12px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);color:var(--c-accent-text);letter-spacing:var(--ls-label);font-size:var(--fs)!important}
+    .spotanalysistitle{padding:10px 12px;border-radius:var(--r-card);background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);color:#fff;letter-spacing:var(--ls-label);font-size:var(--fs)!important}
     .spotanalysissection{display:flex;flex-direction:column;gap:5px;padding:11px 12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl)}
-    .spotanalysissection b,.spotindicator b{font-weight:400;color:var(--c-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotanalysissection b,.spotindicator b{font-weight:400;color:#fff;font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
     .spotanalysissection p,.spotsource,.spotindicator span,.spotindicator small,.spotfinalsummary li{color:var(--c-muted);font-size:var(--fs)!important;letter-spacing:var(--ls-desc);line-height:1.45}
-    .spotindicatorheading{padding:11px 12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);color:var(--c-accent-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotindicatorheading{padding:11px 12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);color:#fff;font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
     .spotindicatorlist{display:flex;flex-direction:column;gap:8px}
     .spotindicator{position:relative;padding:12px 12px 12px 52px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);display:flex;flex-direction:column;gap:4px;min-height:78px}
     .spotindicatorindex{position:absolute;left:12px;top:12px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--on-bg);border:var(--on-border);box-shadow:var(--on-glow);color:var(--c-accent-text);font-size:var(--fs)!important}
-    .spotindicator .indicatorvalue{color:var(--c-text)}
+    .spotindicator .indicatorvalue{color:var(--c-muted)}
     .spotindicator .indicatorcalc,.spotindicator .indicatorimpact{color:var(--c-muted)}
     .spotfinal{padding:12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl);display:flex;flex-direction:column;gap:8px}
-    .spotfinaltitle{color:var(--c-accent-text);font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
+    .spotfinaltitle{color:#fff;font-size:var(--fs)!important;letter-spacing:var(--ls-label)}
     .spotfinalsummary{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
     .spotfinalsummary li::marker{color:var(--c-accent-text)}
     .spotsource{padding:10px 12px;border-radius:var(--r-card);background:var(--glass-bg);border:var(--glass-border);box-shadow:var(--glass-hl)}
@@ -1810,26 +1876,39 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div><div class="spotanalysissection"><p>'+spotEscape(analysis?.line2||'—')+'</p></div>';
       return;
     }
-    const sections=(analysis.summary||[]).map(s=>'<div class="spotanalysissection"><b>'+spotEscape(s.title)+'</b><p>'+spotEscape(s.text)+'</p></div>').join('');
+    const cleanUnavailable=value=>{
+      const raw=String(value??'').trim();
+      if(!raw)return '---';
+      if(/não disponível|nao disponivel|não se aplica|nao se aplica|not available|not applicable|no disponible|no se aplica|item não disponível|item not available|ítem no disponible/i.test(raw))return '---';
+      return raw;
+    };
+    const sections=(analysis.summary||[]).map(section=>{
+      const text=cleanUnavailable(section.text);
+      return '<div class="spotanalysissection"><b>'+spotEscape(section.title)+'</b><p>'+spotEscape(text)+'</p></div>';
+    }).join('');
     const ordered=[...(analysis.indicators||[])].sort((a,b)=>Number(a.index)-Number(b.index));
     const indicators=ordered.map(x=>{
+      const unavailable=!!x.unavailable||cleanUnavailable(x.value)==='---';
+      const value=unavailable?'---':cleanUnavailable(x.value);
       const calc=x.calculation||x.note||'—';
       const impact=x.interpretation||x.note||'—';
       return '<div class="spotindicator">'+
         '<span class="spotindicatorindex">'+spotEscape(String(x.index))+'</span>'+
         '<b>'+spotEscape(x.name)+'</b>'+
-        '<span class="indicatorvalue">'+spotEscape('RESULTADO: '+(x.value??'—'))+'</span>'+
-        (x.unavailable?'':('<small class="indicatorcalc">'+spotEscape('CÁLCULO / LEITURA: '+calc)+'</small>'+
+        '<span class="indicatorvalue">'+spotEscape('RESULTADO: '+value)+'</span>'+
+        (unavailable?'':('<small class="indicatorcalc">'+spotEscape('CÁLCULO / LEITURA: '+calc)+'</small>'+
         '<small class="indicatorimpact">'+spotEscape('IMPACTO NA DECISÃO: '+impact)+'</small>'))+
       '</div>';
     }).join('');
-    const finalSummary=ordered.map(x=>'<li><b>'+spotEscape(x.name)+'</b> — '+spotEscape(x.value??'—')+'</li>').join('');
+    const finalSummary=ordered.map(x=>{
+      const value=(!!x.unavailable||cleanUnavailable(x.value)==='---')?'---':cleanUnavailable(x.value);
+      return '<li><b>'+spotEscape(x.name)+'</b> — '+spotEscape(value)+'</li>';
+    }).join('');
     box.hidden=false;
     box.innerHTML='<div class="spotanalysistitle">'+spotEscape(tx.analysis)+'</div>'+sections+
       '<div class="spotindicatorheading">'+spotEscape(tx.indicators)+'</div>'+
       '<div class="spotindicatorlist">'+indicators+'</div>'+
-      '<div class="spotfinal"><div class="spotfinaltitle">'+spotEscape(tx.indicators+' · 1–35')+'</div><ol class="spotfinalsummary">'+finalSummary+'</ol></div>'+
-      '<div class="spotsource">'+spotEscape(analysis.sourceNote||'')+'</div>';
+      '<div class="spotfinal"><div class="spotfinaltitle">'+spotEscape(tx.indicators+' · 1–35')+'</div><ol class="spotfinalsummary">'+finalSummary+'</ol></div>';
   }
   function renderSpotSupport(){
     if(!spotSupport)return;
@@ -2049,6 +2128,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return 790;
   }
 
+  function playSpotResultSound(status,delay){
+    const kind=status==='correct'?'positive':status==='incorrect'?'negative':status==='adjustable'?'adjustable':null;
+    if(!kind)return;
+    window.setTimeout(()=>window.StackUpPokerAudio?.play?.(kind),Math.max(0,Number(delay)||0));
+  }
+
   function syncSpotTableStateDom(){
     const state=SOLVER_TABLE_STATE;
     if(!state)return;
@@ -2056,26 +2141,23 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const seat=[...tb.querySelectorAll('.seat[data-pos]')].find(el=>el.dataset.pos===p.position);
       if(!seat)return;
       const visualFold=SPOT_VISUAL_FOLDS.has(String(p.position||'').toUpperCase());
-      seat.classList.toggle('spot-state-folded',!!p.folded||visualFold);
-      if(visualFold){
-        const cards=seat.querySelector('.backs,.herohand');
-        if(cards)cards.style.display='none';
+      const folded=!!p.folded||visualFold;
+      seat.classList.toggle('spot-state-folded',folded);
+      const cards=seat.querySelector('.backs,.herohand');
+      if(cards){
+        cards.style.display=folded?'none':'';
+        cards.style.opacity=folded?'0':'';
+        cards.style.visibility=folded?'hidden':'';
       }
       seat.classList.toggle('spot-state-allin',!!p.allIn);
       const stk=seat.querySelector('.stk');
       if(stk)stk.textContent=fmtStack(Number(p.stack)||0);
-      let commit=seat.querySelector('.spotcommit');
-      if(Number(p.committed)>0){
-        if(!commit){
-          commit=document.createElement('div');
-          commit.className='spotcommit';
-          seat.appendChild(commit);
-        }
-        commit.textContent=fmtStack(Number(p.committed)||0);
-      }else if(commit)commit.remove();
+      const commit=seat.querySelector('.spotcommit');
+      if(commit)commit.remove();
     });
     const potLine=tb.querySelector('.centerbox .potline');
     if(potLine)potLine.textContent=TR[L()].pot+': '+fmtStack(Number(state.pot)||0);
+    paintSpotActorAction();
   }
 
   spotActions.addEventListener('click',e=>{
@@ -2083,6 +2165,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(!b||spotActionBusy)return;
 
     const uiAction=b.dataset.spotAction;
+    const heroPosForAction=String(resolveHeroPosition(POSN[resolveSpotCount()]||POSN[10])||'').toUpperCase();
+    const heroActionLabel=(b.querySelector('b')?.textContent||b.childNodes?.[0]?.textContent||b.textContent||uiAction).trim();
+    if(heroPosForAction)setSpotVisualAction(heroPosForAction,heroActionLabel,uiAction);
     b.classList.add('on');
     setTimeout(()=>b.classList.remove('on'),180);
     setSpotActionsBusy(true);
@@ -2113,6 +2198,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       language:L()
     })||{status:'unknown',title:spotText().analysis,line2:'—',summary:[],indicators:[]};
     if(analysis&&!SPOT_ANALYSIS_CACHE.has(analysisKey))SPOT_ANALYSIS_CACHE.set(analysisKey,analysis);
+    playSpotResultSound(analysis?.status,Math.max(280,animationMs));
 
     const entry=currentSpotEntry();
     if(entry){
@@ -2127,9 +2213,24 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
     try{
       const sid=ensureStatsSession();
-      window.StackUpTrainingPerformance?.record?.({
+      const answeredAt=entry?.answer?.answeredAt||new Date().toISOString();
+      const xpFilters=cloneSpotValue(buildSolverSpotFilters());
+      const xpScenario=cloneSpotValue({
+        gameType:SOLVER_SPOT?.scenario?.gameType||null,
+        street:SOLVER_SPOT?.scenario?.street||view?.street||null,
+        tableSize:Number(SOLVER_SPOT?.scenario?.trainingTableSize??SOLVER_SPOT?.scenario?.tableSize)||null,
+        heroPosition:SOLVER_SPOT?.scenario?.heroPosition||view?.heroPosition||null,
+        villainPosition:SOLVER_SPOT?.scenario?.villainPosition||null,
+        effectiveStack:Number(SOLVER_SPOT?.scenario?.effectiveStack)||null,
+        pot:Number(SOLVER_SPOT?.scenario?.pot)||null,
+        ante:SOLVER_SPOT?.scenario?.ante??null,
+        icm:SOLVER_SPOT?.scenario?.icm??null,
+        bounty:SOLVER_SPOT?.scenario?.bounty??null,
+        difficulty:SOLVER_SPOT?.scenario?.difficulty||null
+      });
+      const xpInput={
         sessionId:sid,
-        answeredAt:entry?.answer?.answeredAt||new Date().toISOString(),
+        answeredAt,
         spotId:view?.id||SOLVER_SPOT?.id||'',
         training:trainingStatsLabel(),
         sections:trainingStatsSections(),
@@ -2137,27 +2238,46 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
         heroPosition:view?.heroPosition||SOLVER_SPOT?.scenario?.heroPosition||'',
         hand:view?.handKey||view?.heroCards?.join(' ')||'',
         status:analysis?.status||'unknown',
+        filters:xpFilters,
+        scenario:xpScenario,
+        prescriptionId:ACTIVE_STACKUP_PRESCRIPTION?.id||null
+      };
+      const xpEval=window.StackUpXPPerformance?.evaluate?.(xpInput)||{difficulty:'REC',weight:10,xpEarned:0};
+      window.StackUpTrainingPerformance?.record?.({
+        ...xpInput,
         chosenAction:analysis?.chosenAction||uiAction,
         indicatedAction:analysis?.indicatedAction||result?.best?.action||'',
         chosenFrequency:Number(analysis?.chosenFrequency??result?.frequency)||0,
         bestFrequency:Number(analysis?.bestFrequency??result?.best?.frequency)||0,
-        filters:cloneSpotValue(buildSolverSpotFilters()),
-        scenario:cloneSpotValue({
-          gameType:SOLVER_SPOT?.scenario?.gameType||null,
-          street:SOLVER_SPOT?.scenario?.street||view?.street||null,
-          tableSize:Number(SOLVER_SPOT?.scenario?.trainingTableSize??SOLVER_SPOT?.scenario?.tableSize)||null,
-          heroPosition:SOLVER_SPOT?.scenario?.heroPosition||view?.heroPosition||null,
-          villainPosition:SOLVER_SPOT?.scenario?.villainPosition||null,
-          effectiveStack:Number(SOLVER_SPOT?.scenario?.effectiveStack)||null,
-          pot:Number(SOLVER_SPOT?.scenario?.pot)||null,
-          ante:SOLVER_SPOT?.scenario?.ante??null,
-          icm:SOLVER_SPOT?.scenario?.icm??null,
-          bounty:SOLVER_SPOT?.scenario?.bounty??null
-        }),
+        difficulty:xpEval.difficulty,
+        xpWeight:xpEval.weight,
+        xpEarned:xpEval.xpEarned,
         trainingFamily:SOLVER_SPOT?.trainingFamily||null,
         trainingSignature:SOLVER_SPOT?.trainingSignature||null,
+        sourceApp:ACTIVE_STACKUP_PRESCRIPTION?.source||null,
         solver:view?.solver||SOLVER_SPOT?.solver||''
       });
+      const xpAward=window.StackUpXPPerformance?.record?.(xpInput);
+      if(xpAward?.awarded&&xpAward.xpEarned>0){
+        window.setTimeout(()=>showSpotToast('+'+xpAward.xpEarned+' XP · '+xpAward.difficulty),380);
+      }
+      if(ACTIVE_STACKUP_PRESCRIPTION&&grinderBridge){
+        grinderBridge.send('training_progress','heroes',{
+          prescriptionId:ACTIVE_STACKUP_PRESCRIPTION.id,
+          title:ACTIVE_STACKUP_PRESCRIPTION.title,
+          spotId:view?.id||SOLVER_SPOT?.id||'',
+          status:analysis?.status||'unknown',
+          chosenAction:analysis?.chosenAction||uiAction,
+          indicatedAction:analysis?.indicatedAction||result?.best?.action||'',
+          chosenFrequency:Number(analysis?.chosenFrequency??result?.frequency)||0,
+          bestFrequency:Number(analysis?.bestFrequency??result?.best?.frequency)||0,
+          difficulty:xpEval.difficulty,
+          xpEarned:xpEval.xpEarned,
+          answeredAt
+        },{correlationId:ACTIVE_STACKUP_PRESCRIPTION.envelopeId});
+      }
+      personalUI?.onRecord?.();
+      performanceUI?.render?.();
     }catch(_){}
     renderSpotSupport();
 
@@ -2241,8 +2361,12 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
           :DEMO_STK[k%DEMO_STK.length]);
       const settled=!!currentSpotEntry()?.answer;
       const stateClass=statePlayer?((statePlayer.folded&&settled)?' spot-state-folded':'')+(statePlayer.allIn?' spot-state-allin':''):'';
-      const commit=statePlayer&&Number(statePlayer.committed)>=0.05?`<div class="spotcommit">${fmtStack(Number(statePlayer.committed))}</div>`:'';
-      html+=`<div class="seat${hero?' hero':''}${stateClass}" data-pos="${p}" style="left:${x}px;top:${y}px">${hand}<div class="playerbox"><div class="av" data-pos="${p}">${p}</div><div class="stk">${fmtStack(stack)}</div></div>${commit}</div>`;
+      const lastAction=spotLastActionForPosition(p);
+      const actionText=spotVisualActionLabel(lastAction);
+      const actionCard=hero
+        ?`<div class="spotactiontext heroaction">${spotEscape(actionText)}</div>`
+        :`<div class="spotactiontext">${spotEscape(actionText)}</div>`;
+      html+=`<div class="seat${hero?' hero':''}${stateClass}" data-pos="${p}" style="left:${x}px;top:${y}px">${hero?actionCard:''}${hand}<div class="playerbox"><div class="av" data-pos="${p}">${p}</div><div class="stk">${fmtStack(stack)}</div>${hero?'':actionCard}</div></div>`;
 
 
     }
@@ -2426,6 +2550,42 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       setSelection(s.id,values.length?values:['all'],'all');
     });
   }
+  function applyIncomingPrescription(idOrEnvelope){
+    const env=typeof idOrEnvelope==='object'&&idOrEnvelope?idOrEnvelope:
+      grinderIncomingPrescriptions().find(x=>x.id===String(idOrEnvelope));
+    if(!env||env.type!=='training_prescription')return false;
+    const payload=env.payload||{};
+    const filters=payload.grinderFilters||payload.filters||{};
+    applySavedFilters(filters);
+    normalizeFilterSelections({source:'heroes'});
+    ACTIVE_STACKUP_PRESCRIPTION={
+      id:String(payload.prescriptionId||env.id),
+      envelopeId:env.id,
+      source:env.source||'heroes',
+      title:String(payload.title||payload.name||'HEROES'),
+      reason:String(payload.reason||''),
+      priority:String(payload.priority||''),
+      profileVersion:payload.profileVersion||null,
+      receivedAt:new Date().toISOString()
+    };
+    grinderBridge?.acknowledge?.(env,'accepted',{prescriptionId:ACTIVE_STACKUP_PRESCRIPTION.id});
+    grinderBridge?.consume?.(env.id);
+    resetSpotTimeline();
+    SOLVER_SPOT=null;
+    SOLVER_TABLE_STATE=null;
+    SOLVER_FILTER_KEY='';
+    SPOT_TRAINING_STARTED=false;
+    SPOT_STAGE_INTRO=true;
+    SPOT_STATS_SESSION_ID=null;
+    sub.home.length=0;
+    renderTrain();
+    renderAdvance();
+    show('spots',true);
+    requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
+    showSpotToast((L()==='en'?'HEROES TRAINING LOADED':L()==='es'?'ENTRENO HEROES CARGADO':'TREINO HEROES CARREGADO'));
+    return true;
+  }
+
   function resumeSavedTraining(item){
     const snap=item?.snapshot||{},spot=snap.currentSpot;
     if(!spot)return false;
@@ -2715,35 +2875,30 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const bySection=statsGroup(records,r=>(Array.isArray(r.sections)&&r.sections.length?r.sections:[r.street||'GERAL']));
     const sessionNames=new Map(statsAllSessions().map(s=>[s.id,s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt)]));
     const bySession=statsGroup(records,r=>sessionNames.get(r.sessionId)||formatHistoryDate(r.answeredAt));
+    const deep=window.StackUpPerformanceAnalysis?.analyze?.(records,L())||{strengths:[],weaknesses:[],opportunities:[],threats:[],recommendations:[],accessMessage:''};
     if(!overall.total){
       return {
-        records,
-        overall,
-        byTraining:[],
-        bySection:[],
-        bySession:[],
+        records,overall,byTraining:[],bySection:[],bySession:[],deep,
         swot:{strengths:'—',weaknesses:'—',opportunities:'—',threats:'—'},
         plan:['—']
       };
     }
-    const strong=bySection.filter(x=>x.counts.total>=5&&x.grade.score>=75).slice(0,3);
-    const weak=[...bySection].filter(x=>x.counts.total>=3&&x.grade.score<65).sort((a,b)=>a.grade.score-b.grade.score).slice(0,3);
-    const adjustable=[...bySection].filter(x=>x.counts.total>=3&&x.counts.adjustable/x.counts.total>=.25).slice(0,3);
-    const risky=[...bySection].filter(x=>x.counts.total>=3&&x.counts.incorrect/x.counts.total>=.35).sort((a,b)=>b.counts.incorrect/b.counts.total-a.counts.incorrect/a.counts.total).slice(0,3);
-    const fmt=g=>g.length?g.map(x=>x.name+' ('+x.grade.score.toFixed(0)+'%)').join(' · '):'—';
+    const deepSummary=items=>items?.length
+      ?items.slice(0,4).map(x=>x.name+' · '+x.evidence).join(' | ')
+      :'—';
     const swot={
-      strengths:fmt(strong),
-      weaknesses:fmt(weak),
-      opportunities:adjustable.length?adjustable.map(x=>x.name+' — revisar mixes e frequências').join(' · '):(overall.total<30?'Aumentar a amostra para identificar padrões com maior confiança.':'Consolidar os assuntos intermediários com sessões focadas.'),
-      threats:risky.length?risky.map(x=>x.name+' — erros recorrentes').join(' · '):(overall.total<15?'Amostra ainda pequena pode distorcer conclusões.':'Evitar dispersar volume entre muitos filtros sem consolidar os pontos fracos.')
+      strengths:deepSummary(deep.strengths),
+      weaknesses:deepSummary(deep.weaknesses),
+      opportunities:deepSummary(deep.opportunities),
+      threats:deepSummary(deep.threats)
     };
     const plan=[];
-    if(overall.total<30)plan.push('Complete pelo menos 30 spots no mesmo recorte antes de concluir que um padrão está consolidado.');
-    weak.forEach(x=>plan.push('Priorize '+x.name+': faça uma sessão focada de 50 spots, revise cada decisão incorreta e compare ação escolhida, ação indicada e frequência do solver.'));
-    if(overall.adjustable>overall.correct*.35)plan.push('Há muitas decisões ajustáveis: revise os mixes do solver e treine a diferença entre ação possível e ação dominante.');
-    if(!weak.length&&overall.total>=30)plan.push('Mantenha o volume e aumente gradualmente a complexidade dos filtros, preservando a revisão das decisões ajustáveis.');
-    plan.push(statsTrend(records));
-    return {records,overall,byTraining,bySection,bySession,swot,plan};
+    [...(deep.weaknesses||[]).slice(0,4),...(deep.threats||[]).slice(0,3)].forEach(x=>{
+      if(x?.action&&!plan.includes(x.action))plan.push(x.action);
+    });
+    if(!plan.length&&overall.total<30)plan.push(L()==='en'?'Increase the sample in the same filters before drawing a stable conclusion.':L()==='es'?'Aumenta la muestra con los mismos filtros antes de sacar una conclusión estable.':'Aumente a amostra nos mesmos filtros antes de concluir que o padrão está consolidado.');
+    if(!plan.length)plan.push(L()==='en'?'Maintain volume and reinforce the intermediate areas identified in the detailed SWOT.':L()==='es'?'Mantén el volumen y refuerza las áreas intermedias identificadas en la SWOT detallada.':'Mantenha o volume e reforce as áreas intermediárias identificadas na SWOT detalhada.');
+    return {records,overall,byTraining,bySection,bySession,swot,plan,deep};
   }
   function statsEsc(v){return spotEscape(String(v??''));}
   function statsOptions(values,current,allLabel){
@@ -2766,21 +2921,45 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }).join('')+'</div></div>';
   }
   function statsDetailedHtml(model){
-    const tx=statsText(),c=model.overall,grade=statsGrade(model.records);
-    const strongest=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>b.grade.score-a.grade.score)[0];
-    const weakest=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>a.grade.score-b.grade.score)[0];
+    const tx=statsText(),c=model.overall,grade=statsGrade(model.records),deep=model.deep||{};
     const lines=[];
     if(!c.total){
       lines.push(tx.empty);
       lines.push(L()==='en'?'Complete training spots and STATS will build the report automatically.':L()==='es'?'Completa spots de entrenamiento y STATS construirá el informe automáticamente.':'Complete spots de treino e o STATS construirá o relatório automaticamente.');
     }else{
-      lines.push((L()==='en'?'Current technical level: ':L()==='es'?'Nivel técnico actual: ':'Nível técnico atual: ')+grade.grade+' · '+c.technical.toFixed(1).replace('.',',')+'%.');
-      lines.push((L()==='en'?'Sample: ':L()==='es'?'Muestra: ':'Amostra: ')+c.total+' spots · '+c.correct+' '+tx.correct.toLowerCase()+' · '+c.adjustable+' '+tx.adjustable.toLowerCase()+' · '+c.incorrect+' '+tx.incorrect.toLowerCase()+'.');
-      if(strongest)lines.push((L()==='en'?'Best consolidated subject: ':L()==='es'?'Tema mejor consolidado: ':'Assunto mais consolidado: ')+strongest.name+' · '+strongest.grade.grade+' · '+strongest.grade.score.toFixed(0)+'%.');
-      if(weakest&&(!strongest||weakest.name!==strongest.name))lines.push((L()==='en'?'Priority for improvement: ':L()==='es'?'Prioridad de mejora: ':'Prioridade de evolução: ')+weakest.name+' · '+weakest.grade.grade+' · '+weakest.grade.score.toFixed(0)+'%.');
+      const incorrectRate=c.total?c.incorrect/c.total*100:0,adjustableRate=c.total?c.adjustable/c.total*100:0;
+      lines.push((L()==='en'?'Current technical level: ':L()==='es'?'Nivel técnico actual: ':'Nível técnico atual: ')+grade.grade+' · '+statsPct(c.technical)+'.');
+      lines.push((L()==='en'?'Sample composition: ':L()==='es'?'Composición de la muestra: ':'Composição da amostra: ')+c.total+' spots · '+c.correct+' '+tx.correct.toLowerCase()+' · '+c.adjustable+' '+tx.adjustable.toLowerCase()+' ('+statsPct(adjustableRate)+') · '+c.incorrect+' '+tx.incorrect.toLowerCase()+' ('+statsPct(incorrectRate)+').');
+      if(deep.weaknesses?.[0])lines.push((L()==='en'?'Main weakness: ':L()==='es'?'Principal debilidad: ':'Principal fraqueza: ')+deep.weaknesses[0].name+' · '+deep.weaknesses[0].evidence+'.');
+      if(deep.threats?.[0])lines.push((L()==='en'?'Main threat: ':L()==='es'?'Principal amenaza: ':'Principal ameaça: ')+deep.threats[0].name+' · '+deep.threats[0].evidence+'.');
       lines.push(statsTrend(model.records));
     }
     return '<div class="statscard"><div class="statshead">'+tx.detail+'</div><div class="statsdetail">'+lines.map(x=>'<p>'+statsEsc(x)+'</p>').join('')+'</div></div>';
+  }
+  function statsDeepItemHtml(item,index){
+    return '<div class="statscallout" style="margin-top:7px"><b>#'+(index+1)+' · '+statsEsc(item.name)+' · '+statsPct(item.metrics?.technical)+'</b>'+
+      '<p><b>'+(L()==='en'?'EVIDENCE: ':L()==='es'?'EVIDENCIA: ':'EVIDÊNCIA: ')+'</b>'+statsEsc(item.evidence)+'</p>'+
+      '<p>'+statsEsc(item.comment)+'</p>'+
+      '<p><b>'+(L()==='en'?'RISK: ':L()==='es'?'RIESGO: ':'RISCO: ')+'</b>'+statsEsc(item.risk)+'</p>'+
+      '<p><b>'+(L()==='en'?'RECOMMENDED ACTION: ':L()==='es'?'ACCIÓN RECOMENDADA: ':'AÇÃO RECOMENDADA: ')+'</b>'+statsEsc(item.action)+'</p></div>';
+  }
+  function statsDeepAnalysisHtml(model){
+    const d=model.deep||{},blocks=[];
+    const defs=[
+      [L()==='en'?'DETAILED WEAKNESSES':L()==='es'?'DEBILIDADES DETALLADAS':'FRAQUEZAS DETALHADAS',d.weaknesses],
+      [L()==='en'?'DETAILED THREATS':L()==='es'?'AMENAZAS DETALLADAS':'AMEAÇAS DETALHADAS',d.threats],
+      [L()==='en'?'OPPORTUNITIES':L()==='es'?'OPORTUNIDADES':'OPORTUNIDADES',d.opportunities],
+      [L()==='en'?'CONSOLIDATED STRENGTHS':L()==='es'?'FORTALEZAS CONSOLIDADAS':'FORÇAS CONSOLIDADAS',d.strengths]
+    ];
+    defs.forEach(([title,items])=>{
+      const body=items?.length?items.slice(0,8).map(statsDeepItemHtml).join(''):'<div class="statscallout">—</div>';
+      blocks.push('<div class="statscard premium"><div class="statshead premium"><span>'+statsEsc(title)+'</span><small>'+(items?.length||0)+'</small></div>'+body+'</div>');
+    });
+    return blocks.join('');
+  }
+  function statsPerformanceCta(model){
+    const msg=model.deep?.accessMessage||(L()==='en'?'Open PERFORMANCE for the item-by-item SWOT and prescribed training.':L()==='es'?'Accede a PERFORMANCE para ver la SWOT punto por punto y los entrenos indicados.':'Acesse PERFORMANCE para ver a SWOT desmembrada item por item e os treinos indicados.');
+    return '<div class="statscard premium"><div class="statshead premium"><span>PERFORMANCE</span><small>SWOT + TREINOS</small></div><div class="statscallout">'+statsEsc(msg)+'</div><button class="statsbtn primary" style="width:100%;margin-top:8px" data-stats-performance>'+(L()==='en'?'OPEN PERFORMANCE':L()==='es'?'ABRIR PERFORMANCE':'ABRIR PERFORMANCE')+'</button></div>';
   }
 
 
@@ -3049,17 +3228,31 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const game='<div class="statsview" data-stats-panel="game"'+(statsView==='game'?'':' hidden')+'>'+gameHtml+'</div>';
     const advance='<div class="statsview" data-stats-panel="advance"'+(statsView==='advance'?'':' hidden')+'>'+statsAdvanceHtml(records)+'</div>';
     const sessions='<div class="statsview" data-stats-panel="sessions"'+(statsView==='sessions'?'':' hidden')+'>'+sessionsHtml+statsTrendHtml(model)+statsBarCard(L()==='en'?'VOLUME BY TRAINING':L()==='es'?'VOLUMEN POR ENTRENO':'VOLUME POR TREINO','',model.byTraining,x=>x)+'</div>';
-    const report='<div class="statsview" data-stats-panel="report"'+(statsView==='report'?'':' hidden')+'>'+sw+statsDetailedHtml(model)+plan+contact+'</div>';
+    const report='<div class="statsview" data-stats-panel="report"'+(statsView==='report'?'':' hidden')+'>'+sw+statsDetailedHtml(model)+statsDeepAnalysisHtml(model)+plan+contact+statsPerformanceCta(model)+'</div>';
 
     const savedBanner=statsReportOverride?'<div class="statsreportbanner">'+(L()==='en'?'SAVED REPORT: ':L()==='es'?'INFORME GUARDADO: ':'RELATÓRIO SALVO: ')+statsEsc(statsReportOverride.item?.name||'')+'</div>':'';
     statsPanel.innerHTML=savedBanner+hero+nav+overview+evolution+game+advance+sessions+report;
   }
   function statsReportText(model){
-    const tx=statsText(),c=model.overall;
+    const tx=statsText(),c=model.overall,d=model.deep||{};
     const lines=['STACKUP HOLD\'EM GRINDER — '+tx.report,'',tx.spots+': '+c.total,tx.correct+': '+c.correct,tx.adjustable+': '+c.adjustable,tx.incorrect+': '+c.incorrect,tx.accuracy+': '+c.accuracy.toFixed(1)+'%','','GRADUAÇÃO POR ASSUNTO'];
     model.bySection.forEach(x=>lines.push(x.name+': '+x.grade.grade+' · '+x.counts.total+' spots · '+x.counts.accuracy.toFixed(1)+'% '+tx.accuracy.toLowerCase()));
-    lines.push('',tx.swot,tx.strengths+': '+model.swot.strengths,tx.weaknesses+': '+model.swot.weaknesses,tx.opportunities+': '+model.swot.opportunities,tx.threats+': '+model.swot.threats,'',tx.improve);
+    const add=(title,items)=>{
+      lines.push('',title);
+      (items||[]).forEach((x,i)=>{
+        lines.push((i+1)+'. '+x.name+' · '+x.evidence);
+        lines.push('   '+x.comment);
+        lines.push('   '+(L()==='en'?'RISK: ':L()==='es'?'RIESGO: ':'RISCO: ')+x.risk);
+        lines.push('   '+(L()==='en'?'ACTION: ':L()==='es'?'ACCIÓN: ':'AÇÃO: ')+x.action);
+      });
+    };
+    add(tx.weaknesses,d.weaknesses);
+    add(tx.threats,d.threats);
+    add(tx.opportunities,d.opportunities);
+    add(tx.strengths,d.strengths);
+    lines.push('',tx.improve);
     model.plan.forEach((x,i)=>lines.push((i+1)+'. '+x));
+    if(d.accessMessage)lines.push('',d.accessMessage);
     return lines.join('\n');
   }
   function statsReportHtml(model){
@@ -3147,6 +3340,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   statsPanel.addEventListener('click',e=>{
     const view=e.target.closest('[data-stats-view]');
     if(view){statsView=view.dataset.statsView||'overview';renderStats();return;}
+    const perf=e.target.closest('[data-stats-performance]');
+    if(perf){
+      sub.home.length=0;sub.home.push('plans');show('home',false,0);
+      return;
+    }
     const b=e.target.closest('[data-stats-export]');
     if(b)statsExport(b.dataset.statsExport);
   });
@@ -3350,14 +3548,176 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
   }
 
+  function startPersonalTrainingItem(item){
+    if(!item)return false;
+    applySavedFilters(item.filters||{});
+    normalizeFilterSelections({source:'personal'});
+    ACTIVE_STACKUP_PRESCRIPTION={
+      id:String(item?.meta?.prescriptionId||item.externalKey||item.id),
+      personalId:item.id,
+      envelopeId:item.sourceMessageId||null,
+      source:item.origin||'grinder',
+      title:item.title||'PERSONAL',
+      reason:item.reason||'',
+      priority:item.priority||'normal',
+      targetSpots:Math.max(1,Number(item.targetSpots)||50),
+      receivedAt:new Date().toISOString()
+    };
+    if(item.origin==='heroes'&&item.sourceMessageId&&grinderBridge){
+      const env=grinderIncomingPrescriptions().find(x=>x.id===item.sourceMessageId);
+      if(env){
+        grinderBridge.acknowledge?.(env,'accepted',{prescriptionId:ACTIVE_STACKUP_PRESCRIPTION.id});
+        grinderBridge.consume?.(env.id);
+      }
+    }
+    resetSpotTimeline();
+    SOLVER_SPOT=null;
+    SOLVER_TABLE_STATE=null;
+    SOLVER_FILTER_KEY='';
+    SPOT_TRAINING_STARTED=false;
+    SPOT_STAGE_INTRO=true;
+    SPOT_STATS_SESSION_ID=null;
+    sub.home.length=0;
+    renderTrain();
+    renderAdvance();
+    show('spots',true);
+    requestAnimationFrame(()=>{renderTable();renderSpotSupport();});
+    return true;
+  }
+
+  personalUI=window.StackUpPersonalUI?.mount?.({
+    root:R,
+    page:$('#page'),
+    lang:L,
+    escape:spotEscape,
+    clone:cloneSpotValue,
+    library:window.StackUpPersonalTraining,
+    coach:window.StackUpWhatsAppCoach,
+    bridge:grinderBridge,
+    heroInbox:grinderIncomingPrescriptions,
+    records:statsAllRecords,
+    counts:statsCounts,
+    group:statsGroup,
+    scenario:statsScenarioValue,
+    startTraining:startPersonalTrainingItem,
+    toast:showSpotToast
+  })||null;
+
+  function syncPersonalAreas(){
+    const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null;
+    const personalOn=hs==='account',profileOn=hs==='perfil';
+    personalUI?.showPersonal?.(personalOn);
+    personalUI?.showProfile?.(profileOn);
+    if(personalOn||profileOn){
+      const slot=$('#page .slot');if(slot)slot.hidden=true;
+      hg.hidden=true;tw.hidden=true;adv.hidden=true;historyPanel.hidden=true;reportsPanel.hidden=true;
+      statsPanel.hidden=true;statsPanel.style.display='none';tb.hidden=true;spotActions.hidden=true;spotSupport.hidden=true;
+      const content=$('.content');if(content)content.scrollTop=0;
+    }
+  }
+
+  performanceUI=window.StackUpPerformanceUI?.mount?.({
+    root:R,
+    page:$('#page'),
+    xp:window.StackUpXPPerformance,
+    analysis:(records,lang)=>window.StackUpPerformanceAnalysis?.analyze?.(records,lang),
+    library:window.StackUpPersonalTraining,
+    startTraining:startPersonalTrainingItem,
+    toast:showSpotToast,
+    lang:L,
+    escape:spotEscape,
+    records:statsAllRecords
+  })||null;
+
+  function syncPerformance(){
+    const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null;
+    const on=hs==='plans';
+    performanceUI?.show?.(on);
+    if(on){
+      const slot=$('#page .slot');if(slot)slot.hidden=true;
+      hg.hidden=true;tw.hidden=true;adv.hidden=true;historyPanel.hidden=true;reportsPanel.hidden=true;
+      personalUI?.showPersonal?.(false);personalUI?.showProfile?.(false);
+      statsPanel.hidden=true;statsPanel.style.display='none';tb.hidden=true;spotActions.hidden=true;spotSupport.hidden=true;
+      const content=$('.content');if(content)content.scrollTop=0;
+    }
+  }
+
+  // ===== NAVEGAÇÃO INTERNA: VOLTAR | HOME no topo e no fim =====
+  const internalNavStyle=document.createElement('style');
+  internalNavStyle.textContent='.internalnav{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:7px}.internalnav[hidden]{display:none!important}.internalnav.top{margin:0 0 10px}.internalnav.bottom{margin:12px 0 2px}.internalnav button{min-height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.17);background:linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.025));color:var(--c-text);font-family:var(--f-ui);font-size:12px!important;letter-spacing:.7px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}.internalnav button:active,.internalnav button.on{background:var(--on-bg);border:var(--on-border);color:var(--c-accent-text);box-shadow:var(--on-glow)}.internalnav svg{width:17px;height:17px;flex:none}';
+  R.appendChild(internalNavStyle);
+
+  function internalNavMarkup(position){
+    return '<div class="internalnav '+position+'" data-internal-nav="'+position+'" hidden>'+
+      '<button type="button" data-internal-action="back">'+
+        '<svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M561-240 320-481l241-241 43 43-198 198 198 198-43 43Z"/></svg>'+
+        '<span data-internal-label="back"></span>'+
+      '</button>'+
+      '<button type="button" data-internal-action="home">'+
+        '<svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M220-180h150v-250h220v250h150v-390L480-765 220-570v390Zm-60 60v-480l320-240 320 240v480H530v-250H430v250H160Z"/></svg>'+
+        '<span>HOME</span>'+
+      '</button>'+
+    '</div>';
+  }
+
+  const internalNavTopWrap=document.createElement('div');
+  internalNavTopWrap.innerHTML=internalNavMarkup('top');
+  const internalNavTopBar=internalNavTopWrap.firstElementChild;
+  const ptitleEl=$('#ptitle');
+  if(ptitleEl)ptitleEl.insertAdjacentElement('afterend',internalNavTopBar);
+
+  const internalNavBottomWrap=document.createElement('div');
+  internalNavBottomWrap.innerHTML=internalNavMarkup('bottom');
+  const internalNavBottomBar=internalNavBottomWrap.firstElementChild;
+  $('#page').appendChild(internalNavBottomBar);
+
+  function isInternalPage(){
+    return !!(sub[cur]&&sub[cur].length);
+  }
+  function updateInternalNavLabels(){
+    const label=L()==='en'?'BACK':L()==='es'?'VOLVER':'VOLTAR';
+    qa('[data-internal-label="back"]').forEach(el=>el.textContent=label);
+  }
+  function syncInternalNav(){
+    const on=isInternalPage();
+    updateInternalNavLabels();
+    [internalNavTopBar,internalNavBottomBar].forEach(el=>{if(el)el.hidden=!on;});
+  }
+  function goInternalBack(){
+    if(sub[cur]?.length){
+      sub[cur].pop();
+      show(cur,false,0);
+      const content=$('.content');if(content)content.scrollTop=0;
+    }
+  }
+  function goInternalHome(){
+    Object.keys(sub).forEach(k=>sub[k]=[]);
+    historySelectedId=null;
+    historyPendingAction=null;
+    statsReportOverride=null;
+    reportsPendingDelete.clear();
+    const content=$('.content');if(content)content.scrollTop=0;
+    show('home',false,0);
+    renderHome();
+    requestAnimationFrame(()=>tr());
+  }
+  $('#page').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-internal-action]');
+    if(!btn)return;
+    btn.classList.add('on');
+    window.setTimeout(()=>btn.classList.remove('on'),160);
+    if(btn.dataset.internalAction==='back')goInternalBack();
+    if(btn.dataset.internalAction==='home')goInternalHome();
+  });
+
   function renderHome(){ hg.innerHTML=HORD.map(k=>`<button class="tower" data-k="${k}">${HICONS[k]}<b>${k==='ia'?T2[L()][k].replace(' ','\n'):k==='api'?T2[L()][k]:brk(T2[L()]['card_'+k]||T2[L()][k])}</b></button>`).join(''); }
   hg.addEventListener('click',e=>{ const c=e.target.closest('.tower'); if(!c)return; const k=c.dataset.k;
     c.classList.add('on'); setTimeout(()=>{ if(HSUB.includes(k)){ sub.home.push(k); show('home',false);} else show(k,true); },250); });
-  function tr(){ $$('[data-i]').forEach(el=>el.textContent=T2[L()][el.dataset.i]);
+  function tr(){ qa('[data-i]').forEach(el=>el.textContent=T2[L()][el.dataset.i]);
     const hs=cur==='home'&&sub.home.length?sub.home[sub.home.length-1]:null, key=hs||cur;
     const title=T2[L()]['ti_'+key];
     $('#ptitle').textContent=title; $('#sectiontitle').textContent=title;
-    $('#pslotT').textContent=T2[L()]['soon']; $('#pslotS').textContent=T2[L()]['ds_'+key]; syncTrain(); syncSpots(); syncAdvance(); syncHistory(); syncStats(); syncReports();
+    $('#pslotT').textContent=T2[L()]['soon']; $('#pslotS').textContent=T2[L()]['ds_'+key]; syncTrain(); syncSpots(); syncAdvance(); syncHistory(); syncStats(); syncReports(); syncPersonalAreas(); syncPerformance(); syncInternalNav();
     const hm=cur==='home'&&!hs; hg.hidden=!hm; if(hm){ $('#page .slot').hidden=true; renderHome(); } }
   function show(t,push,dir){
     const prev=cur; cur=t;
@@ -3365,7 +3725,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       $('.content').classList.remove('spotsmode');
       $('#page').classList.remove('spotsmode');
     }
-    $$('.tab').forEach(x=>{const on=x.dataset.t===t;x.classList.toggle('on',on);on?x.setAttribute('aria-current','page'):x.removeAttribute('aria-current')});
+    qa('.tab').forEach(x=>{const on=x.dataset.t===t;x.classList.toggle('on',on);on?x.setAttribute('aria-current','page'):x.removeAttribute('aria-current')});
     const pg=$('#page'); const a=dir!==undefined?dir:(TORDER.indexOf(t)-TORDER.indexOf(prev));
     pg.style.animation='none';pg.offsetHeight;pg.style.animation=a>0?'slideInR .26s cubic-bezier(.2,.7,.2,1)':a<0?'slideInL .26s cubic-bezier(.2,.7,.2,1)':'';
     if(a) $('.content').scrollTop=0;
@@ -3383,7 +3743,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const sectiontitle=$('#sectiontitle');
       if(ptitle)ptitle.textContent=T2[L()].ti_home;
       if(sectiontitle)sectiontitle.textContent=T2[L()].ti_home;
-      $$('.tab').forEach(x=>{
+      qa('.tab').forEach(x=>{
         const on=x.dataset.t==='home';
         x.classList.toggle('on',on);
         if(on)x.setAttribute('aria-current','page');else x.removeAttribute('aria-current');
@@ -3395,7 +3755,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   function openApp(){
     hist=[];
     Object.keys(sub).forEach(k=>sub[k]=[]);
-    $$('.hbtn').forEach(x=>x.classList.remove('on'));
+    qa('.hbtn').forEach(x=>x.classList.remove('on'));
 
     // Primeiro abre o container. Depois pinta HOME no mesmo evento do toque.
     // Nenhum solver, histórico ou sincronização pode atrasar a primeira pintura.
@@ -3415,6 +3775,15 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       if(pg){pg.style.transition='';pg.style.opacity='';}
     },80);
   }
+  if(grinderBridge){
+    grinderBridge.onMessage(env=>{
+      if(env?.type==='training_prescription'&&env?.source==='heroes'){
+        personalUI?.onBridge?.(env);
+        showSpotToast(L()==='en'?'NEW HEROES TRAINING AVAILABLE':L()==='es'?'NUEVO ENTRENO HEROES DISPONIBLE':'NOVO TREINO HEROES DISPONÍVEL');
+      }
+    });
+    try{grinderBridge.send('capabilities','heroes',{product:'grinder',version:'1.0',accepts:['training_prescription','player_profile'],returns:['training_progress','training_completed'],sameOrigin:true});}catch(_){}
+  }
   host.grinderEnter=openApp;
   function backToLogin(){
     host.hidden=true;
@@ -3423,8 +3792,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     document.querySelectorAll('.actions [data-a]').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false')});
   }
   // Biometria: entrada imediata é controlada pelo biometricEntryOverride.
-  $$('.hbtn').forEach(b=>b.onclick=()=>{ if(b.disabled)return;
-    $$('.hbtn').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+  qa('.hbtn').forEach(b=>b.onclick=()=>{ if(b.disabled)return;
+    qa('.hbtn').forEach(x=>x.classList.remove('on')); b.classList.add('on');
     setTimeout(()=>{ b.classList.remove('on');
       if(b.dataset.h==='back'){ if(sub[cur].length){ sub[cur].pop(); show(cur,false); } else if(cur!=='home'){ show('home',false); } else { backToLogin(); } }
       else {
@@ -3441,7 +3810,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       }
     },250);
   });
-  $$('.tab').forEach(t=>t.onclick=()=>{
+  qa('.tab').forEach(t=>t.onclick=()=>{
     const target=t.dataset.t;
     if(target==='menu'){
       statsReportOverride=null;
