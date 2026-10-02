@@ -102,6 +102,24 @@ jobs:
           node scripts/plan-solved-spot-growth.mjs
           node scripts/route-solve-queue.mjs
 
+      - name: Enforce targeted strict publication floors
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const coverage=JSON.parse(fs.readFileSync('data/solver/coverage.json','utf8'));
+          const required=[
+            ['aggr_special','pot_4bet'],
+            ['math_special','implied_odds'],
+            ['math_special','reverse_implied_odds']
+          ];
+          for(const [section,id] of required){
+            const card=(coverage.cards||[]).find(x=>x.section===section&&x.id===id);
+            const n=Number(card?.validatedSolvedSpots||0);
+            if(n<1500)throw new Error(section+'/'+id+' below strict 1500 floor: '+n);
+            console.log({filter:section+'/'+id,validatedSolvedSpots:n});
+          }
+          NODE
+
       - name: Commit solver bank
         if: github.ref == 'refs/heads/main'
         run: |
