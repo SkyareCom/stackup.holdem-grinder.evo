@@ -254,6 +254,9 @@ async function solveRaw({id,street,board,oopRange,ipRange,potBb,stackBb,betSizes
     "--max-raises",String(maxRaises),"--allin-threshold","0.67","--allin-pot-ratio","3",
     "--skip-cum-strategy"
   ];
+  // Action-conditioned exact ranges are generally suit-asymmetric. Board-only
+  // suit isomorphism is not safe once combo weights differ by suit.
+  if(String(street).toUpperCase()!=="FLOP")args.push("--no-iso");
   try{
     await execFileAsync(BIN,args,{maxBuffer:48*1024*1024});
     return JSON.parse(await readFile(rawPath,"utf8"));
