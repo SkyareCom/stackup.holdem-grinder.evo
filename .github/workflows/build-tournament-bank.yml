@@ -61,11 +61,16 @@ jobs:
           spots=p.get("spots",[])
           assert spots, "tournament bank empty"
           gate=float(p["maxNashConv"])
+          by_tag={}
           for s in spots:
               nc=float(s["convergence"]["nashConv"])
               assert math.isfinite(nc) and nc <= gate, (s["id"],nc,gate)
-              assert len(s.get("strategy",[])) == 169, s["id"]
-          print({"spots":len(spots),"rejected":len(p.get("rejected",[])),"gate":gate})
+              solved=len(s.get("strategy",[]))
+              assert solved == 169, s["id"]
+              for tag in s.get("scenario",{}).get("tags",[]):
+                  by_tag[tag]=by_tag.get(tag,0)+solved
+          assert by_tag.get("covered_stack",0) >= 2000, ("covered_stack",by_tag.get("covered_stack",0))
+          print({"spots":len(spots),"rejected":len(p.get("rejected",[])),"gate":gate,"covered_stack":by_tag.get("covered_stack",0)})
           PY
 
       - name: Audit all 162 scenario cards
