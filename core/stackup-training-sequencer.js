@@ -848,6 +848,7 @@
       ...((bank?.textureSizing?.spots)||[]),
       ...((bank?.preflop9max?.spots)||[]),
       ...((bank?.preflopMultistack?.spots)||[]),
+      ...((bank?.preflopHu?.spots)||[]),
       ...((bank?.lineBank?.spots)||[])
     ];
     const candidates=[];
