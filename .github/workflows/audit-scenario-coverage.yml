@@ -7,6 +7,8 @@ on:
       - ".github/workflows/audit-scenario-coverage.yml"
       - "scripts/audit-scenario-coverage.mjs"
       - "scripts/plan-solved-spot-growth.mjs"
+      - "scripts/route-solve-queue.mjs"
+      - "data/solver/engine-registry.json"
       - "core/stackup-scenario-catalog.js"
       - "core/stackup-solved-spot-contract.js"
       - "core/stackup-solved-spot-classifier.js"
@@ -42,6 +44,7 @@ jobs:
         run: |
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
       - name: Validate coverage contract
         run: |
@@ -75,8 +78,9 @@ jobs:
           git reset --hard origin/main
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
+          node scripts/route-solve-queue.mjs
 
-          git add data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json
+          git add data/solver/coverage.json data/solver/growth-plan.json data/solver/generation-queue.json data/solver/solve-route-plan.json
           if git diff --cached --quiet; then
             echo "Coverage unchanged."
             exit 0
