@@ -1691,6 +1691,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
     solverSpotLoading=true;
     if(typeof setSpotActionsBusy==='function'&&!tb.hidden)setSpotActionsBusy(true);
+    if(!tb.hidden)scheduleSpotTableRender(true);
     if(!spotSupport.hidden)renderSpotSupport();
     try{
       const spot=await client.next(filters);
