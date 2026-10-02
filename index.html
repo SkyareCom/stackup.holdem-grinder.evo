@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="spot-analysis-clean-v1">
+<meta name="grinder-build" content="no-outer-frames-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -3641,6 +3641,53 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       const content=$('.content');if(content)content.scrollTop=0;
     }
   }
+
+  // ===== REGRA VISUAL GLOBAL: SEM MOLDURAS EXTERNAS =====
+  const noOuterFramesStyle=document.createElement('style');
+  noOuterFramesStyle.textContent=`
+    /* O fundo da tela é o único contêiner visual. Agrupadores não viram cards. */
+    .screen,.page,.slot,
+    .homegrid,.trainwrap,.advancewrap,
+    .statspanel,.statsview,
+    .historypanel,.historylist,
+    .reportspanel,.reportslist,
+    .personalpanel,.personallist,.coachprofile,.coachtemplates,
+    .performancepanel,.perfsectionlist,.perfrecent,.perfswotlist,.perftraininglist,
+    .spotsupport,.spotanalysis,.spotindicatorlist,
+    .statslist,.statsbarlist,.statstrend,.statsplan,.statsdetail{
+      border:0!important;
+      outline:0!important;
+      box-shadow:none!important;
+      background:transparent!important;
+      -webkit-backdrop-filter:none!important;
+      backdrop-filter:none!important;
+    }
+
+    /* Placeholder/contêiner genérico nunca deve parecer uma caixa externa. */
+    .slot{
+      border-radius:0!important;
+      padding-left:0!important;
+      padding-right:0!important;
+    }
+
+    /* No desktop também não existe moldura simulando aparelho em volta do app. */
+    .screen{
+      border-radius:0!important;
+      box-shadow:none!important;
+    }
+
+    /*
+      Mantêm borda somente unidades funcionais:
+      cards de conteúdo, filtros, botões, inputs, navegação, resultados e ações.
+      Não sobrescrever .tower, .chip, .thead, .statscard, .statskpi,
+      .historyitem, .historydetail, .reportitem, .reportdetail,
+      .personalcard, .personalhero, .coachcard, .perfcard, .perfduel,
+      .perfrank, .perfswotblock, .perfswotitem, .perftraining,
+      .spotfeedback, .spotanalysissection, .spotindicator, .spotfinal,
+      .spotcontrol, .spotaction, .spotsetupcard.
+    */
+  `;
+  R.appendChild(noOuterFramesStyle);
 
   // ===== NAVEGAÇÃO INTERNA: VOLTAR | HOME no topo e no fim =====
   const internalNavStyle=document.createElement('style');
