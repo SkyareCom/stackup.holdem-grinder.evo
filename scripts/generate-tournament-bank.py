@@ -555,7 +555,35 @@ ARCHETYPES.extend([
   arch("pko-bb-cover-c",["pko_math"],[64,50,38,29,11,30],[.38,.24,.15,.10,.08,.05],"LATE","1000+",
        sb_tags=["pko_math","bounty_shove","covered_stack"],
        bb_tags=["pko_math","bounty_call","covering_stack"],
-       tournament_type="PKO",hero_bounty=.085,villain_bounty=.045)
+       tournament_type="PKO",hero_bounty=.085,villain_bounty=.045),
+
+  # Additional independent covered-stack PKO contexts. Each context is solved
+  # from its own stack distribution, payout state and bounty configuration.
+  arch("pko-sb-cover-d",["pko_math"],[72,56,43,33,31,9],[.40,.25,.15,.09,.07,.04],"BUBBLE","250",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covered_stack"],
+       tournament_type="PKO",hero_bounty=.075,villain_bounty=.11),
+  arch("pko-sb-cover-e",["pko_math"],[76,60,46,35,29,13],[.36,.23,.16,.11,.08,.06],"LATE","350",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covered_stack"],
+       tournament_type="PKO",hero_bounty=.055,villain_bounty=.095),
+  arch("pko-sb-cover-f",["pko_math"],[84,63,49,37,26,8],[.42,.24,.14,.09,.065,.045],"FINAL_TABLE","500",
+       sb_tags=["pko_math","bounty_shove","covering_stack"],
+       bb_tags=["pko_math","bounty_call","covered_stack"],
+       tournament_type="PKO",hero_bounty=.09,villain_bounty=.13),
+
+  arch("pko-bb-cover-d",["pko_math"],[70,54,41,31,9,32],[.40,.25,.15,.09,.07,.04],"BUBBLE","250",
+       sb_tags=["pko_math","bounty_shove","covered_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.105,villain_bounty=.05),
+  arch("pko-bb-cover-e",["pko_math"],[78,59,44,34,12,36],[.36,.23,.16,.11,.08,.06],"LATE","350",
+       sb_tags=["pko_math","bounty_shove","covered_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.12,villain_bounty=.06),
+  arch("pko-bb-cover-f",["pko_math"],[88,66,50,38,7,30],[.42,.24,.14,.09,.065,.045],"FINAL_TABLE","500",
+       sb_tags=["pko_math","bounty_shove","covered_stack"],
+       bb_tags=["pko_math","bounty_call","covering_stack"],
+       tournament_type="PKO",hero_bounty=.14,villain_bounty=.075)
 ])
 
 RESHOVE_ARCHETYPES=[
