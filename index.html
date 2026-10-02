@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="runtime-fluidity-v2">
+<meta name="grinder-build" content="internal-bg-fluid-nav-v2">
 <title>Grinder Login</title>
 <link rel="preload" href="assets/bebrush.otf" as="font" type="font/otf" crossorigin>
 <link rel="preload" href="assets/road-rage.woff2" as="font" type="font/woff2" crossorigin>
@@ -3856,7 +3856,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   const noOuterFramesStyle=document.createElement('style');
   noOuterFramesStyle.textContent=`
     /* O fundo da tela é o único contêiner visual. Agrupadores não viram cards. */
-    .screen,.page,.slot,
+    .page,.slot,
     .homegrid,.trainwrap,.advancewrap,
     .statspanel,.statsview,
     .historypanel,.historylist,
@@ -3884,6 +3884,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     .screen{
       border-radius:0!important;
       box-shadow:none!important;
+      background:linear-gradient(180deg,#07182f 0%,#000000 40%,#010713 70%,#010713 100%)!important;
+    }
+    .page,.content{
+      background:transparent!important;
     }
 
     /*
@@ -3996,10 +4000,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     if(a&&pg?.animate&&!window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches){
       try{
         pg.getAnimations?.().forEach(anim=>{if(anim.id==='stackup-nav')anim.cancel();});
-        pg.style.willChange='transform,opacity';
+        pg.style.willChange='transform';
         const anim=pg.animate(
-          [{transform:'translate3d('+(a>0?'5px':'-5px')+',0,0)',opacity:.94},{transform:'translate3d(0,0,0)',opacity:1}],
-          {duration:85,easing:'cubic-bezier(.2,.75,.2,1)'}
+          [{transform:'translate3d('+(a>0?'3px':'-3px')+',0,0)'},{transform:'translate3d(0,0,0)'}],
+          {duration:72,easing:'cubic-bezier(.2,.75,.2,1)'}
         );
         anim.finished.finally(()=>{pg.style.willChange='';}).catch(()=>{pg.style.willChange='';});
         anim.id='stackup-nav';
