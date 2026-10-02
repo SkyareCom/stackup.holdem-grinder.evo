@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="spot-analysis-visible-v1">
+<meta name="grinder-build" content="stats-performance-deep-v1">
 <title>Grinder Login</title>
 <style>html,body{margin:0;height:100%;background:#000}</style>
 
@@ -801,6 +801,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 <script src="core/stackup-personal-training.js"></script>
 <script src="core/stackup-whatsapp-coach.js"></script>
 <script src="core/stackup-xp-performance.js"></script>
+<script src="core/stackup-performance-analysis.js"></script>
 <script src="core/stackup-performance-ui.js"></script>
 <script src="core/stackup-personal-ui.js"></script>
 <script src="core/stackup-app-bridge.js"></script>
@@ -2876,35 +2877,30 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const bySection=statsGroup(records,r=>(Array.isArray(r.sections)&&r.sections.length?r.sections:[r.street||'GERAL']));
     const sessionNames=new Map(statsAllSessions().map(s=>[s.id,s.name||s.training||formatHistoryDate(s.startedAt||s.updatedAt)]));
     const bySession=statsGroup(records,r=>sessionNames.get(r.sessionId)||formatHistoryDate(r.answeredAt));
+    const deep=window.StackUpPerformanceAnalysis?.analyze?.(records,L())||{strengths:[],weaknesses:[],opportunities:[],threats:[],recommendations:[],accessMessage:''};
     if(!overall.total){
       return {
-        records,
-        overall,
-        byTraining:[],
-        bySection:[],
-        bySession:[],
+        records,overall,byTraining:[],bySection:[],bySession:[],deep,
         swot:{strengths:'—',weaknesses:'—',opportunities:'—',threats:'—'},
         plan:['—']
       };
     }
-    const strong=bySection.filter(x=>x.counts.total>=5&&x.grade.score>=75).slice(0,3);
-    const weak=[...bySection].filter(x=>x.counts.total>=3&&x.grade.score<65).sort((a,b)=>a.grade.score-b.grade.score).slice(0,3);
-    const adjustable=[...bySection].filter(x=>x.counts.total>=3&&x.counts.adjustable/x.counts.total>=.25).slice(0,3);
-    const risky=[...bySection].filter(x=>x.counts.total>=3&&x.counts.incorrect/x.counts.total>=.35).sort((a,b)=>b.counts.incorrect/b.counts.total-a.counts.incorrect/a.counts.total).slice(0,3);
-    const fmt=g=>g.length?g.map(x=>x.name+' ('+x.grade.score.toFixed(0)+'%)').join(' · '):'—';
+    const deepSummary=items=>items?.length
+      ?items.slice(0,4).map(x=>x.name+' · '+x.evidence).join(' | ')
+      :'—';
     const swot={
-      strengths:fmt(strong),
-      weaknesses:fmt(weak),
-      opportunities:adjustable.length?adjustable.map(x=>x.name+' — revisar mixes e frequências').join(' · '):(overall.total<30?'Aumentar a amostra para identificar padrões com maior confiança.':'Consolidar os assuntos intermediários com sessões focadas.'),
-      threats:risky.length?risky.map(x=>x.name+' — erros recorrentes').join(' · '):(overall.total<15?'Amostra ainda pequena pode distorcer conclusões.':'Evitar dispersar volume entre muitos filtros sem consolidar os pontos fracos.')
+      strengths:deepSummary(deep.strengths),
+      weaknesses:deepSummary(deep.weaknesses),
+      opportunities:deepSummary(deep.opportunities),
+      threats:deepSummary(deep.threats)
     };
     const plan=[];
-    if(overall.total<30)plan.push('Complete pelo menos 30 spots no mesmo recorte antes de concluir que um padrão está consolidado.');
-    weak.forEach(x=>plan.push('Priorize '+x.name+': faça uma sessão focada de 50 spots, revise cada decisão incorreta e compare ação escolhida, ação indicada e frequência do solver.'));
-    if(overall.adjustable>overall.correct*.35)plan.push('Há muitas decisões ajustáveis: revise os mixes do solver e treine a diferença entre ação possível e ação dominante.');
-    if(!weak.length&&overall.total>=30)plan.push('Mantenha o volume e aumente gradualmente a complexidade dos filtros, preservando a revisão das decisões ajustáveis.');
-    plan.push(statsTrend(records));
-    return {records,overall,byTraining,bySection,bySession,swot,plan};
+    [...(deep.weaknesses||[]).slice(0,4),...(deep.threats||[]).slice(0,3)].forEach(x=>{
+      if(x?.action&&!plan.includes(x.action))plan.push(x.action);
+    });
+    if(!plan.length&&overall.total<30)plan.push(L()==='en'?'Increase the sample in the same filters before drawing a stable conclusion.':L()==='es'?'Aumenta la muestra con los mismos filtros antes de sacar una conclusión estable.':'Aumente a amostra nos mesmos filtros antes de concluir que o padrão está consolidado.');
+    if(!plan.length)plan.push(L()==='en'?'Maintain volume and reinforce the intermediate areas identified in the detailed SWOT.':L()==='es'?'Mantén el volumen y refuerza las áreas intermedias identificadas en la SWOT detallada.':'Mantenha o volume e reforce as áreas intermediárias identificadas na SWOT detalhada.');
+    return {records,overall,byTraining,bySection,bySession,swot,plan,deep};
   }
   function statsEsc(v){return spotEscape(String(v??''));}
   function statsOptions(values,current,allLabel){
@@ -2927,21 +2923,45 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }).join('')+'</div></div>';
   }
   function statsDetailedHtml(model){
-    const tx=statsText(),c=model.overall,grade=statsGrade(model.records);
-    const strongest=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>b.grade.score-a.grade.score)[0];
-    const weakest=[...model.bySection].filter(x=>x.counts.total>=3).sort((a,b)=>a.grade.score-b.grade.score)[0];
+    const tx=statsText(),c=model.overall,grade=statsGrade(model.records),deep=model.deep||{};
     const lines=[];
     if(!c.total){
       lines.push(tx.empty);
       lines.push(L()==='en'?'Complete training spots and STATS will build the report automatically.':L()==='es'?'Completa spots de entrenamiento y STATS construirá el informe automáticamente.':'Complete spots de treino e o STATS construirá o relatório automaticamente.');
     }else{
-      lines.push((L()==='en'?'Current technical level: ':L()==='es'?'Nivel técnico actual: ':'Nível técnico atual: ')+grade.grade+' · '+c.technical.toFixed(1).replace('.',',')+'%.');
-      lines.push((L()==='en'?'Sample: ':L()==='es'?'Muestra: ':'Amostra: ')+c.total+' spots · '+c.correct+' '+tx.correct.toLowerCase()+' · '+c.adjustable+' '+tx.adjustable.toLowerCase()+' · '+c.incorrect+' '+tx.incorrect.toLowerCase()+'.');
-      if(strongest)lines.push((L()==='en'?'Best consolidated subject: ':L()==='es'?'Tema mejor consolidado: ':'Assunto mais consolidado: ')+strongest.name+' · '+strongest.grade.grade+' · '+strongest.grade.score.toFixed(0)+'%.');
-      if(weakest&&(!strongest||weakest.name!==strongest.name))lines.push((L()==='en'?'Priority for improvement: ':L()==='es'?'Prioridad de mejora: ':'Prioridade de evolução: ')+weakest.name+' · '+weakest.grade.grade+' · '+weakest.grade.score.toFixed(0)+'%.');
+      const incorrectRate=c.total?c.incorrect/c.total*100:0,adjustableRate=c.total?c.adjustable/c.total*100:0;
+      lines.push((L()==='en'?'Current technical level: ':L()==='es'?'Nivel técnico actual: ':'Nível técnico atual: ')+grade.grade+' · '+statsPct(c.technical)+'.');
+      lines.push((L()==='en'?'Sample composition: ':L()==='es'?'Composición de la muestra: ':'Composição da amostra: ')+c.total+' spots · '+c.correct+' '+tx.correct.toLowerCase()+' · '+c.adjustable+' '+tx.adjustable.toLowerCase()+' ('+statsPct(adjustableRate)+') · '+c.incorrect+' '+tx.incorrect.toLowerCase()+' ('+statsPct(incorrectRate)+').');
+      if(deep.weaknesses?.[0])lines.push((L()==='en'?'Main weakness: ':L()==='es'?'Principal debilidad: ':'Principal fraqueza: ')+deep.weaknesses[0].name+' · '+deep.weaknesses[0].evidence+'.');
+      if(deep.threats?.[0])lines.push((L()==='en'?'Main threat: ':L()==='es'?'Principal amenaza: ':'Principal ameaça: ')+deep.threats[0].name+' · '+deep.threats[0].evidence+'.');
       lines.push(statsTrend(model.records));
     }
     return '<div class="statscard"><div class="statshead">'+tx.detail+'</div><div class="statsdetail">'+lines.map(x=>'<p>'+statsEsc(x)+'</p>').join('')+'</div></div>';
+  }
+  function statsDeepItemHtml(item,index){
+    return '<div class="statscallout" style="margin-top:7px"><b>#'+(index+1)+' · '+statsEsc(item.name)+' · '+statsPct(item.metrics?.technical)+'</b>'+
+      '<p><b>'+(L()==='en'?'EVIDENCE: ':L()==='es'?'EVIDENCIA: ':'EVIDÊNCIA: ')+'</b>'+statsEsc(item.evidence)+'</p>'+
+      '<p>'+statsEsc(item.comment)+'</p>'+
+      '<p><b>'+(L()==='en'?'RISK: ':L()==='es'?'RIESGO: ':'RISCO: ')+'</b>'+statsEsc(item.risk)+'</p>'+
+      '<p><b>'+(L()==='en'?'RECOMMENDED ACTION: ':L()==='es'?'ACCIÓN RECOMENDADA: ':'AÇÃO RECOMENDADA: ')+'</b>'+statsEsc(item.action)+'</p></div>';
+  }
+  function statsDeepAnalysisHtml(model){
+    const d=model.deep||{},blocks=[];
+    const defs=[
+      [L()==='en'?'DETAILED WEAKNESSES':L()==='es'?'DEBILIDADES DETALLADAS':'FRAQUEZAS DETALHADAS',d.weaknesses],
+      [L()==='en'?'DETAILED THREATS':L()==='es'?'AMENAZAS DETALLADAS':'AMEAÇAS DETALHADAS',d.threats],
+      [L()==='en'?'OPPORTUNITIES':L()==='es'?'OPORTUNIDADES':'OPORTUNIDADES',d.opportunities],
+      [L()==='en'?'CONSOLIDATED STRENGTHS':L()==='es'?'FORTALEZAS CONSOLIDADAS':'FORÇAS CONSOLIDADAS',d.strengths]
+    ];
+    defs.forEach(([title,items])=>{
+      const body=items?.length?items.slice(0,8).map(statsDeepItemHtml).join(''):'<div class="statscallout">—</div>';
+      blocks.push('<div class="statscard premium"><div class="statshead premium"><span>'+statsEsc(title)+'</span><small>'+(items?.length||0)+'</small></div>'+body+'</div>');
+    });
+    return blocks.join('');
+  }
+  function statsPerformanceCta(model){
+    const msg=model.deep?.accessMessage||(L()==='en'?'Open PERFORMANCE for the item-by-item SWOT and prescribed training.':L()==='es'?'Accede a PERFORMANCE para ver la SWOT punto por punto y los entrenos indicados.':'Acesse PERFORMANCE para ver a SWOT desmembrada item por item e os treinos indicados.');
+    return '<div class="statscard premium"><div class="statshead premium"><span>PERFORMANCE</span><small>SWOT + TREINOS</small></div><div class="statscallout">'+statsEsc(msg)+'</div><button class="statsbtn primary" style="width:100%;margin-top:8px" data-stats-performance>'+(L()==='en'?'OPEN PERFORMANCE':L()==='es'?'ABRIR PERFORMANCE':'ABRIR PERFORMANCE')+'</button></div>';
   }
 
 
@@ -3210,17 +3230,31 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const game='<div class="statsview" data-stats-panel="game"'+(statsView==='game'?'':' hidden')+'>'+gameHtml+'</div>';
     const advance='<div class="statsview" data-stats-panel="advance"'+(statsView==='advance'?'':' hidden')+'>'+statsAdvanceHtml(records)+'</div>';
     const sessions='<div class="statsview" data-stats-panel="sessions"'+(statsView==='sessions'?'':' hidden')+'>'+sessionsHtml+statsTrendHtml(model)+statsBarCard(L()==='en'?'VOLUME BY TRAINING':L()==='es'?'VOLUMEN POR ENTRENO':'VOLUME POR TREINO','',model.byTraining,x=>x)+'</div>';
-    const report='<div class="statsview" data-stats-panel="report"'+(statsView==='report'?'':' hidden')+'>'+sw+statsDetailedHtml(model)+plan+contact+'</div>';
+    const report='<div class="statsview" data-stats-panel="report"'+(statsView==='report'?'':' hidden')+'>'+sw+statsDetailedHtml(model)+statsDeepAnalysisHtml(model)+plan+contact+statsPerformanceCta(model)+'</div>';
 
     const savedBanner=statsReportOverride?'<div class="statsreportbanner">'+(L()==='en'?'SAVED REPORT: ':L()==='es'?'INFORME GUARDADO: ':'RELATÓRIO SALVO: ')+statsEsc(statsReportOverride.item?.name||'')+'</div>':'';
     statsPanel.innerHTML=savedBanner+hero+nav+overview+evolution+game+advance+sessions+report;
   }
   function statsReportText(model){
-    const tx=statsText(),c=model.overall;
+    const tx=statsText(),c=model.overall,d=model.deep||{};
     const lines=['STACKUP HOLD\'EM GRINDER — '+tx.report,'',tx.spots+': '+c.total,tx.correct+': '+c.correct,tx.adjustable+': '+c.adjustable,tx.incorrect+': '+c.incorrect,tx.accuracy+': '+c.accuracy.toFixed(1)+'%','','GRADUAÇÃO POR ASSUNTO'];
     model.bySection.forEach(x=>lines.push(x.name+': '+x.grade.grade+' · '+x.counts.total+' spots · '+x.counts.accuracy.toFixed(1)+'% '+tx.accuracy.toLowerCase()));
-    lines.push('',tx.swot,tx.strengths+': '+model.swot.strengths,tx.weaknesses+': '+model.swot.weaknesses,tx.opportunities+': '+model.swot.opportunities,tx.threats+': '+model.swot.threats,'',tx.improve);
+    const add=(title,items)=>{
+      lines.push('',title);
+      (items||[]).forEach((x,i)=>{
+        lines.push((i+1)+'. '+x.name+' · '+x.evidence);
+        lines.push('   '+x.comment);
+        lines.push('   '+(L()==='en'?'RISK: ':L()==='es'?'RIESGO: ':'RISCO: ')+x.risk);
+        lines.push('   '+(L()==='en'?'ACTION: ':L()==='es'?'ACCIÓN: ':'AÇÃO: ')+x.action);
+      });
+    };
+    add(tx.weaknesses,d.weaknesses);
+    add(tx.threats,d.threats);
+    add(tx.opportunities,d.opportunities);
+    add(tx.strengths,d.strengths);
+    lines.push('',tx.improve);
     model.plan.forEach((x,i)=>lines.push((i+1)+'. '+x));
+    if(d.accessMessage)lines.push('',d.accessMessage);
     return lines.join('\n');
   }
   function statsReportHtml(model){
@@ -3308,6 +3342,11 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   statsPanel.addEventListener('click',e=>{
     const view=e.target.closest('[data-stats-view]');
     if(view){statsView=view.dataset.statsView||'overview';renderStats();return;}
+    const perf=e.target.closest('[data-stats-performance]');
+    if(perf){
+      sub.home.length=0;sub.home.push('plans');show('home',false,0);
+      return;
+    }
     const b=e.target.closest('[data-stats-export]');
     if(b)statsExport(b.dataset.statsExport);
   });
@@ -3583,6 +3622,10 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     root:R,
     page:$('#page'),
     xp:window.StackUpXPPerformance,
+    analysis:(records,lang)=>window.StackUpPerformanceAnalysis?.analyze?.(records,lang),
+    library:window.StackUpPersonalTraining,
+    startTraining:startPersonalTrainingItem,
+    toast:showSpotToast,
     lang:L,
     escape:spotEscape,
     records:statsAllRecords
