@@ -34,6 +34,8 @@ const ALL_CASES=[
   {id:"monotone-d",tag:"board_monotone",board:"Jc6c2c",bet:"33"},
   {id:"monotone-e",tag:"board_monotone",board:"Ts7s4s",bet:"33"},
   {id:"monotone-f",tag:"board_monotone",board:"AhJh5h",bet:"33"},
+  {id:"monotone-g",tag:"board_monotone",board:"9h5h2h",bet:"33"},
+  {id:"monotone-h",tag:"board_monotone",board:"8d6d3d",bet:"33"},
   {id:"low-a",tag:"board_low",board:"8s5d2c",bet:"33"},
   {id:"low-b",tag:"board_low",board:"7h4c3d",bet:"33"},
   {id:"low-c",tag:"board_low",board:"9c6h2d",bet:"33"},
