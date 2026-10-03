@@ -62,7 +62,7 @@ jobs:
               valid++;
             }
           }
-          if(valid<1500)throw new Error('postflop_multiway below 1500: '+valid);
+          if(valid<2000)throw new Error('postflop_multiway below 2000 solved decisions: '+valid);
           console.log({validatedSolvedDecisions:valid,rootScenarios:d.spots?.length||0});
           NODE
 
