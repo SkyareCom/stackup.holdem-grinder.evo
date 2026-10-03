@@ -2,6 +2,11 @@ name: Build Texture Sizing Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-texture-sizing-bank.yml"
+      - "scripts/generate-texture-sizing-bank.mjs"
+      - "scripts/audit-scenario-coverage.mjs"
   push:
     branches:
       - main
@@ -13,7 +18,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: texture-sizing-bank
+  group: texture-sizing-bank-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -89,7 +94,7 @@ jobs:
               valid++;
             }
           }
-          if(valid<1500)throw new Error(process.env.TARGET_TAG+' shard below 1500: '+valid);
+          if(valid<2000)throw new Error(process.env.TARGET_TAG+' shard below 2000 raw solved decisions: '+valid);
           console.log({tag:process.env.TARGET_TAG,spots:d.spots?.length||0,valid,failures:d.failures?.length||0});
           NODE
 
@@ -170,7 +175,7 @@ jobs:
             for(const tag of s.scenario?.tags||[])solvedByTag[tag]=(solvedByTag[tag]||0)+valid;
           }
           for(const tag of required){
-            if((solvedByTag[tag]||0)<1500)throw new Error(tag+' below strict 1500 floor: '+String(solvedByTag[tag]||0));
+            if((solvedByTag[tag]||0)<2000)throw new Error(tag+' below raw 2000 solved decisions: '+String(solvedByTag[tag]||0));
           }
           console.log({spots:d.spots.length,failures:d.failures?.length||0,solvedByTag});
           NODE
@@ -180,6 +185,22 @@ jobs:
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
           node scripts/route-solve-queue.mjs
+
+      - name: Gate canonical texture coverage at 2000
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const coverage=JSON.parse(fs.readFileSync('data/solver/coverage.json','utf8'));
+          const required=['board_paired','board_monotone','board_low','bet_25','bet_50','bet_66','bet_75','pot_bet','overbet_125','overbet_150'];
+          const byId=new Map((coverage.cards||[])
+            .filter(x=>x.section==='texture_special')
+            .map(x=>[x.id,Number(x.validatedSolvedSpots||0)]));
+          const deficits=required
+            .filter(id=>(byId.get(id)||0)<2000)
+            .map(id=>({id,solved:byId.get(id)||0,deficit:2000-(byId.get(id)||0)}));
+          if(deficits.length)throw new Error('canonical texture deficits '+JSON.stringify(deficits));
+          console.log(Object.fromEntries(required.map(id=>[id,byId.get(id)||0])));
+          NODE
 
       - name: Commit bank and coverage safely
         if: github.ref == 'refs/heads/main'
