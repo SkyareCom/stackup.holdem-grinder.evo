@@ -544,6 +544,16 @@ ARCHETYPES.extend([
   arch("10max-d",["big_stack_pressure"],[92,70,55,43,34,27,21,16,11,48],[.28,.19,.14,.105,.08,.065,.05,.04,.03,.02],"BUBBLE","500"),
   arch("10max-e",["short_stack_survival"],[70,58,48,40,33,27,22,17,12,9],[.28,.19,.14,.105,.08,.065,.05,.04,.03,.02],"BUBBLE","1000+"),
 
+  # Immediate 2,000 target: one additional independently solved context per
+  # family currently at 1,690. Distinct stacks/payouts/field/phase; no projection.
+  arch("icm-5-8-f",["icm_5_8","short_stack_survival"],[58,44,33,25,18,14,8,50],[.32,.21,.14,.105,.08,.06,.045,.025],"LATE","350"),
+  arch("icm-9-12-f",["icm_9_12","icm_bubble"],[60,46,35,27,20,15,11,52],[.315,.21,.14,.105,.08,.065,.045,.04],"BUBBLE","350"),
+  arch("icm-13-18-e",["icm_13_18","mid_stack_pressure"],[68,52,40,31,24,18,16,60],[.32,.21,.14,.105,.08,.06,.045,.04],"LATE","500"),
+  arch("icm-19-25-d",["icm_19_25","icm_pay_jump"],[82,62,47,36,29,25,22,72],[.35,.22,.14,.095,.07,.055,.04,.03],"LATE","350"),
+  arch("ft-f",["icm_final_table","icm_pay_jump"],[88,67,51,39,30,23,17,12,8],[.31,.20,.14,.10,.075,.06,.05,.04,.025],"FINAL_TABLE","350"),
+  arch("3h-f",["icm_3handed","icm_pay_jump"],[70,20,10],[.52,.30,.18],"FINAL_TABLE","1000+"),
+  arch("10max-f",["mid_stack_pressure"],[86,69,56,45,37,30,24,19,13,10],[.285,.19,.14,.105,.08,.065,.05,.04,.028,.017],"LATE","350"),
+
   arch("pko-even-c",["pko_math"],[62,48,36,28,20,20],[.38,.24,.15,.10,.08,.05],"LATE","250",
        sb_tags=["pko_math","bounty_shove","covering_stack"],
        bb_tags=["pko_math","bounty_call","covering_stack"],
@@ -646,6 +656,24 @@ RESHOVE_ARCHETYPES.extend([
     "openerPosition":"HJ","heroPosition":"CO","openSizeBb":2.2,
     "stacks":[58,39,25,32,27,21],"payouts":[.38,.24,.15,.10,.08,.05],
     "phase":"LATE","fieldSize":"250","tournamentType":"SNG"
+  },
+  {
+    "id":"reshove-late-11","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"CO","heroPosition":"BTN","openSizeBb":2.0,
+    "stacks":[45,36,29,11,24,20],"payouts":[.38,.24,.15,.10,.08,.05],
+    "phase":"LATE","fieldSize":"100","tournamentType":"TURBO"
+  },
+  {
+    "id":"reshove-bubble-17","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"UTG","heroPosition":"HJ","openSizeBb":2.1,
+    "stacks":[39,17,30,26,21,18],"payouts":[.40,.25,.16,.10,.09,0],
+    "phase":"BUBBLE","fieldSize":"350","tournamentType":"FREEZEOUT"
+  },
+  {
+    "id":"reshove-late-23","positions":["UTG","HJ","CO","BTN","SB","BB"],
+    "openerPosition":"CO","heroPosition":"BTN","openSizeBb":2.3,
+    "stacks":[62,47,35,23,29,24],"payouts":[.38,.24,.15,.10,.08,.05],
+    "phase":"LATE","fieldSize":"500","tournamentType":"HIGH_ROLLER"
   }
 ])
 
