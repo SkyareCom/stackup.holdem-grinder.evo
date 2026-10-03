@@ -1,6 +1,12 @@
 name: Migrate Validated Solved Banks
 on:
   workflow_dispatch:
+  push:
+    branches: [solved-spot-external-storage]
+    paths:
+      - 'scripts/package-solved-core-banks.mjs'
+      - 'scripts/upload-solved-core-banks.mjs'
+      - '.github/workflows/migrate-solved-core.yml'
 permissions:
   contents: read
 jobs:
