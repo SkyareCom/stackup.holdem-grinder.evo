@@ -2,6 +2,11 @@ name: Build Multiway Tournament Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-multiway-tournament-bank.yml"
+      - "scripts/generate-multiway-tournament-bank.py"
+      - "data/solver/pushfold-hu-v1.json"
   push:
     branches:
       - main
@@ -14,7 +19,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: multiway-tournament-bank
+  group: multiway-tournament-bank-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
