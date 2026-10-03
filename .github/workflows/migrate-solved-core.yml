@@ -1,0 +1,27 @@
+name: Migrate Validated Solved Banks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    env:
+      SOLVED_SPOT_SUPABASE_URL: ${{ secrets.SOLVED_SPOT_SUPABASE_URL }}
+      SOLVED_SPOT_SUPABASE_SERVICE_KEY: ${{ secrets.SOLVED_SPOT_SUPABASE_SERVICE_KEY }}
+      SOLVED_SPOT_BUCKET: solved-spots
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Require server-only credentials
+        run: |
+          test -n "$SOLVED_SPOT_SUPABASE_URL"
+          test -n "$SOLVED_SPOT_SUPABASE_SERVICE_KEY"
+      - name: Strict audit
+        run: node scripts/audit-solved-core-migration.mjs
+      - name: Package validated banks
+        run: node scripts/package-solved-core-banks.mjs
+      - name: Upload and verify parity
+        run: node scripts/upload-solved-core-banks.mjs
