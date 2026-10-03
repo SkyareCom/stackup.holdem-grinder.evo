@@ -21,11 +21,11 @@ permissions:
   contents: write
 
 concurrency:
-  group: strict-solved-line-bank-refs/heads/main
+  group: strict-solved-line-bank-refs/pull/27/merge
   cancel-in-progress: true
 
 jobs:
   cancel_stale:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Release stale main line-bank concurrency group"
+      - run: echo "Release stale PR27 line-bank concurrency group"
