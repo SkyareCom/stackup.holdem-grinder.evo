@@ -2,6 +2,12 @@ name: Build Native 9max Preflop Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-preflop-9max.yml"
+      - "scripts/patch-dcfr-9max.py"
+      - "scripts/patch-dcfr-stack.py"
+      - "scripts/stackup-preflop-export.rs"
   push:
     branches:
       - main
@@ -15,7 +21,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: preflop-9max
+  group: preflop-9max-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
