@@ -150,10 +150,10 @@ def main():
     if max_expl>=0.05:raise SystemExit("equilibrium source failed exploitability gate")
 
     spots=[];rejected=[];counts={"multi_shove":0,"bounty_iso":0,"multiway_bounty":0}
-    stacks=[5,6,7,8,9,10,11,12,13,14,15,16]
+    stacks=[3,4,5,6,7,8,9,10,11,12,13,14]
     for family in counts:
         for stack in stacks:
-            chart_stack=str(min(stack,15))
+            chart_stack=str(stack)
             jam=np.array([float(pf["charts"]["sb_jam"][chart_stack].get(h,0.0)) for h in tb.HANDS])
             call=np.array([float(pf["charts"]["bb_call_vs_jam"][chart_stack].get(h,0.0)) for h in tb.HANDS])
             # Weight range selection by physical combo count as well as policy reach.
