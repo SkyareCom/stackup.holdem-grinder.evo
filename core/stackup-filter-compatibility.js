@@ -415,14 +415,7 @@
     if(option==='all'||option==='random')return null;
 
     const mode=concrete(state,'mode')[0];
-    const profile=concrete(state,'fskill')[0]||null;
     if(ADV_SECTIONS.includes(group)&&mode==='cash')return 'Disponível apenas em torneios';
-    if(profile){
-      if(group==='fsize'&&option!=='500')return 'Perfil resolvido atualmente no FIELD 500';
-      if(group==='seats'&&option!=='s6')return 'Perfil resolvido atualmente em 6MAX';
-      if(group==='ttype'&&option!=='regular')return 'Perfil resolvido atualmente em torneio REGULAR';
-      if(group==='street'&&option!=='pre')return 'Perfil resolvido atualmente no PRÉ-FLOP';
-    }
     if(group==='extras'&&concrete(state,'ttype')[0]==='freeze')return 'Freezeout não aceita rebuy/add-on';
 
     if(group==='pos'){
