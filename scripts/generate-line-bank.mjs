@@ -547,18 +547,9 @@ for(const runout of RUNOUTS){
             const potAfterCall=pot0+2*b1;
             const raiseAmount=solverBetBb(potAfterCall,raise.pct);
             const to=b1+raiseAmount;
-            addSpot(spots,materialize({
-              id:"betfold-"+runout.id,raw:riverRaw,node:response,tags:["bet_fold","sequential_lines"],
-              base,
-              oopRange:conditionRange(oopRiver,riverRoot,{label:small}),
-              ipRange:conditionRange(ipRiver,afterSmall,{label:raise.label}),
-              potBb:pot0+b1+to,stackBb:stack0,currentBet:to,
-              history:[
-                ...histRiver,
-                actionEvent(base.scenario.heroPosition,small,b1,"RIVER"),
-                actionEvent(base.scenario.villainPosition,raise.label,to,"RIVER")
-              ]
-            }));
+            // maxRaises=1 does not permit the hero's response raise/fold tree.
+            // Keep this branch only as a solver-navigation probe; do not persist
+            // it as BET/FOLD. LINE D owns the legal maxRaises=2 decision.
           }
         }
       }
@@ -811,17 +802,8 @@ for(const runout of RUNOUTS){
         const potAfterCall=pot0+2*b1;
         const raiseAmount=solverBetBb(potAfterCall,raise.pct);
         const to=b1+raiseAmount;
-        addSpot(spots,materialize({
-          id:"river-tactical-betfold-"+runout.id,raw:riverRaw,node:response,tags:["bet_fold"],
-          base,
-          oopRange:conditionRange(oopRiver,riverRoot,{label:small}),
-          ipRange:conditionRange(ipRiver,afterSmall,{label:raise.label}),
-          potBb:pot0+b1+to,stackBb:stack0,currentBet:to,
-          history:[
-            actionEvent(base.scenario.heroPosition,small,b1,"RIVER"),
-            actionEvent(base.scenario.villainPosition,raise.label,to,"RIVER")
-          ]
-        }));
+        // This maxRaises=1 tactical tree cannot represent a legal BET/FOLD
+        // response. LINE D below solves that decision with maxRaises=2.
       }
     }
   }catch(error){
