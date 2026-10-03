@@ -59,6 +59,9 @@ BOARDS=[
  ["Ks","Qd","9s","4c","3h"],
  ["Ad","Jc","8s","6h","5d"],
  ["Kh","Td","9c","7s","2d"],
+ ["As","Kd","Qc","8h","3s"],
+ ["Jh","8d","5s","4c","2h"],
+ ["Tc","9d","7s","3h","2c"],
 ]
 
 def seed_for(*parts):
@@ -203,8 +206,8 @@ def main():
         })
         total_solved+=len(strategy)
 
-    if total_solved<1500:
-        raise SystemExit(f"postflop_multiway below strict floor: {total_solved}")
+    if total_solved<2000:
+        raise SystemExit(f"postflop_multiway below 2000 solved decisions: {total_solved}")
     payload={
       "schemaVersion":1,"generatedAt":__import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
       "solver":"STACKUP_MULTIWAY_RIVER_BR","modelVersion":"v1","samplesPerHand":SAMPLES,
