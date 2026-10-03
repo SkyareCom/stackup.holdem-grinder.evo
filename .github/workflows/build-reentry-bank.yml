@@ -62,7 +62,7 @@ jobs:
             if(!v.ok)throw new Error(s.id+'/'+h.hand+': '+v.errors.join(','));
             for(const e of s.scenario?.extras||[])if(e in counts)counts[e]++;
           }
-          for(const k of Object.keys(counts))if(counts[k]<1500)throw new Error(k+' below strict floor '+counts[k]);
+          for(const k of Object.keys(counts))if(counts[k]<2000)throw new Error(k+' below 2000 solved decisions '+counts[k]);
           console.log(counts);
           NODE
 
