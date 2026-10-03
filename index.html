@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<meta name="grinder-build" content="spots-mtt-routing-v12">
+<meta name="grinder-build" content="spots-load-before-table-v13">
 <title>Grinder Login</title>
 <link rel="preload" href="assets/bebrush.otf" as="font" type="font/otf" crossorigin>
 <link rel="preload" href="assets/road-rage.woff2" as="font" type="font/woff2" crossorigin>
@@ -787,20 +787,20 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
 #app2{position:fixed;inset:0;z-index:100;background:#1a1a1a;display:flex;justify-content:center}
 #app2[hidden]{display:none!important}
 </style>
-<script src="core/stackup-spots-engine.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-tournament-math.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-scenario-catalog.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-filter-compatibility.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-ai-scenario-planner.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-solved-spot-contract.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-solved-spot-classifier.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-training-sequencer.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-spots-client.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-table-state.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-poker-audio.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-spot-coach.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-training-history.js?v=spots-mtt-routing-v12"></script>
-<script src="core/stackup-training-performance.js?v=spots-mtt-routing-v12"></script>
+<script src="core/stackup-spots-engine.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-tournament-math.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-scenario-catalog.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-filter-compatibility.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-ai-scenario-planner.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-solved-spot-contract.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-solved-spot-classifier.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-training-sequencer.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-spots-client.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-table-state.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-poker-audio.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-spot-coach.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-training-history.js?v=spots-load-before-table-v13"></script>
+<script src="core/stackup-training-performance.js?v=spots-load-before-table-v13"></script>
 <script src="core/stackup-report-library.js"></script>
 <script src="core/stackup-personal-training.js"></script>
 <script src="core/stackup-whatsapp-coach.js"></script>
@@ -1083,6 +1083,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   let SPOT_DECISION_SEQUENCE_RUNNING=false;
   let SPOT_STAGE_INTRO=false;
   let SPOT_TRAINING_STARTED=false;
+  let SPOT_STARTING=false;
   let SPOT_STATS_SESSION_ID=null;
   let SPOT_LOAD_ERROR='';
   let SPOT_ACTIVE_ACTION=null;
@@ -1558,6 +1559,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const tx=SPOT_SETUP_TEXT[L()]||SPOT_SETUP_TEXT.pt;
     const rows=spotSetupRows();
     const retry=L()==='en'?'TRY AGAIN':L()==='es'?'INTENTAR DE NUEVO':'TENTAR NOVAMENTE';
+    const loading=L()==='en'?'LOADING TRAINING':L()==='es'?'CARGANDO ENTRENO':'CARREGANDO TREINO';
     const error=SPOT_LOAD_ERROR
       ?'<div class="spotsetuperror">'+spotEscape(SPOT_LOAD_ERROR)+'</div>'
       :'';
@@ -1566,7 +1568,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
       '<div class="spotsetuprows">'+rows.map(row=>
         '<div class="spotsetuprow"><b>'+spotEscape(row.label)+'</b><span>'+spotEscape(row.value)+'</span></div>'
       ).join('')+'</div></div>'+error+
-      '<button class="spotsetupstart" type="button" data-spot-start="1">'+spotEscape(SPOT_LOAD_ERROR?retry:tx.start)+'</button></div>';
+      '<button class="spotsetupstart" type="button" data-spot-start="1"'+(SPOT_STARTING?' disabled':'')+'>'+spotEscape(SPOT_STARTING?loading:(SPOT_LOAD_ERROR?retry:tx.start))+'</button></div>';
   }
   function trainingStatsSections(){
     const names=[];
@@ -1606,8 +1608,55 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
   }
 
   async function startSpotTraining(){
-    if(SPOT_TRAINING_STARTED)return;
+    if(SPOT_TRAINING_STARTED||SPOT_STARTING)return;
+
+    // Never enter the felt before a validated solved spot is actually ready.
+    // This removes the dead state: TRAINING_STARTED=true + SOLVER_SPOT=null.
     SPOT_LOAD_ERROR='';
+    SPOT_STARTING=true;
+    SPOT_STAGE_INTRO=true;
+    SPOT_TRAINING_STARTED=false;
+    spotActions.hidden=true;
+    spotSupport.hidden=true;
+    setSpotActionsBusy(true);
+    scheduleSpotTableRender(true);
+
+    let spot=SOLVER_SPOT;
+    try{
+      // A stale/concurrent request should finish behind the setup card instead
+      // of making the caller receive null and exposing an empty table.
+      let guard=0;
+      while(solverSpotLoading&&!spot&&guard<150){
+        await spotSleep(40);
+        spot=SOLVER_SPOT;
+        guard++;
+      }
+      if(!spot)spot=await loadSolverSpot(false);
+    }catch(error){
+      const detail=String(error?.message||error||'load_failed');
+      SPOT_LOAD_ERROR=spotLoadFailureMessage();
+      if(!SPOT_LOAD_ERROR.includes(detail))SPOT_LOAD_ERROR+=' · '+detail;
+      spot=null;
+    }
+
+    if(cur!=='spots'||sub.spots.length){
+      SPOT_STARTING=false;
+      return;
+    }
+
+    if(!spot){
+      SPOT_STARTING=false;
+      SPOT_TRAINING_STARTED=false;
+      SPOT_STAGE_INTRO=true;
+      spotActions.hidden=true;
+      spotSupport.hidden=true;
+      sizeSpotStage();
+      scheduleSpotTableRender(true);
+      return;
+    }
+
+    // Only now is the training session considered started.
+    SPOT_STARTING=false;
     SPOT_TRAINING_STARTED=true;
     SPOT_STAGE_INTRO=false;
     ensureStatsSession();
@@ -1615,29 +1664,15 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     spotActions.hidden=false;
     spotSupport.hidden=false;
     spotActions.style.visibility='';
-    setSpotActionsBusy(true);
     renderSpotActions();
+    setSpotActionsBusy(true);
     renderTable();
     renderSpotSupport();
 
-    // The spot normally loads behind the summary card. If the user starts
-    // immediately, wait for that request instead of launching a duplicate one.
-    let guard=0;
-    while(solverSpotLoading&&!SOLVER_SPOT&&guard<100){
-      await spotSleep(40);
-      guard++;
-    }
-    const spot=SOLVER_SPOT||await loadSolverSpot(false);
-    if(cur!=='spots'||sub.spots.length||!SPOT_TRAINING_STARTED)return;
-    renderSpotActions();
-    renderTable();
-    renderSpotSupport();
-    if(spot&&!currentSpotEntry()?.answer&&!SPOT_DECISION_SEQUENCE_RUNNING){
+    if(!currentSpotEntry()?.answer&&!SPOT_DECISION_SEQUENCE_RUNNING){
       playSpotDecisionSequence(spot);
-    }else if(spot){
-      setSpotActionsBusy(!!currentSpotEntry()?.answer);
     }else{
-      setSpotActionsBusy(true);
+      setSpotActionsBusy(!!currentSpotEntry()?.answer);
     }
   }
 
@@ -1705,6 +1740,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     SOLVER_SPOT=null;
     SOLVER_TABLE_STATE=null;
     SPOT_TRAINING_STARTED=false;
+    SPOT_STARTING=false;
     SPOT_STAGE_INTRO=true;
     SPOT_STATS_SESSION_ID=null;
     spotActions.hidden=true;
@@ -2677,6 +2713,7 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }else{
       SPOT_STAGE_INTRO=false;
       SPOT_TRAINING_STARTED=false;
+      SPOT_STARTING=false;
       SPOT_STATS_SESSION_ID=null;
       SPOT_LOAD_ERROR='';
       spotActions.hidden=true;
