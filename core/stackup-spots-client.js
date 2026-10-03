@@ -159,6 +159,33 @@
     if(STATIC_PARTS[key]&&allowStaticPart(key)&&!plan.includes(key))plan.push(key);
   }
 
+  function opponentProfileContextCompatible(filters){
+    const f=filters||{};
+    if(!f.opponentProfile)return true;
+    if(f.fieldSize&&String(f.fieldSize)!=='500')return false;
+    if(f.tournamentType&&String(f.tournamentType).toUpperCase()!=='REGULAR')return false;
+
+    const phases=(Array.isArray(f.phases)&&f.phases.length?f.phases:[f.phase]).filter(Boolean)
+      .map(x=>String(x).toUpperCase().replace('FINAL_TABLE','FT'));
+    if(phases.length&&!phases.includes('MIDDLE'))return false;
+
+    if(f.tableSize&&Number(f.tableSize)!==6)return false;
+
+    const streets=(Array.isArray(f.streets)&&f.streets.length?f.streets:[f.street]).filter(Boolean)
+      .map(normalizedStreet).filter(Boolean);
+    if(streets.length&&!streets.includes('PRE-FLOP'))return false;
+
+    const positions=(Array.isArray(f.heroPositions)&&f.heroPositions.length?f.heroPositions:[f.heroPosition])
+      .filter(Boolean).map(x=>String(x).toUpperCase());
+    if(positions.length&&!positions.some(x=>x==='SB'||x==='BB'))return false;
+
+    const stacks=(Array.isArray(f.effectiveStacks)&&f.effectiveStacks.length?f.effectiveStacks:[f.effectiveStack])
+      .filter(v=>v!==undefined&&v!==null&&v!=='').map(Number).filter(Number.isFinite);
+    if(stacks.length&&!stacks.some(n=>Number.isInteger(n)&&n>=2&&n<=15))return false;
+
+    return true;
+  }
+
   function staticLoadPlan(filters){
     const f=filters||{};
     const street=normalizedStreet(f.street);
@@ -166,6 +193,32 @@
     const game=String(f.gameType||'').toUpperCase();
     const tournamentish=game==='TOURNAMENT'||!!f.tournamentType||!!f.phase||!!f.fieldSize||!!f.opponentProfile;
     const plan=[];
+
+    // Route explicit solved contexts directly to the bank most likely to own
+    // them. This prevents Android from parsing a chain of unrelated multi-MB
+    // banks before finding the first compatible decision.
+    if(f.opponentProfile)addPlan(plan,'opponentProfile');
+
+    if(f.fieldSize){
+      addPlan(plan,'reentry');
+      addPlan(plan,'tournament');
+      if(String(f.fieldSize)==='500'){
+        if(street&&street!=='PRE-FLOP')addPlan(plan,'multiwayPostflop');
+        else addPlan(plan,'multiwayTournament');
+      }
+    }
+
+    if(f.tournamentType||f.phase){
+      addPlan(plan,'reentry');
+      addPlan(plan,'tournament');
+      addPlan(plan,'multiwayTournament');
+    }
+
+    if(tableSize===2){
+      addPlan(plan,'pushfold');
+      addPlan(plan,'preflopHu');
+    }
+    if(tableSize===9||tableSize===10)addPlan(plan,'preflop9max');
 
     // Start with the smallest bank that is most likely to satisfy the active
     // filter. Only add heavier banks when strict coverage is still below floor.
@@ -333,6 +386,10 @@
 
   async function nextStatic(filters){
     const sequencer=global.StackUpTrainingSequencer;
+
+    if(!opponentProfileContextCompatible(filters)){
+      throw new Error('opponent_profile_context_not_solved');
+    }
 
     if(isMobileRuntime()&&sequencer?.pickRuntime){
       await ensureStaticManifest();
