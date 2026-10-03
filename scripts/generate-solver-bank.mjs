@@ -12,6 +12,7 @@ const OUT=join(ROOT,"data","solver");
 const PREFLOP_ITERATIONS=Math.max(100_000,Number(process.env.STACKUP_PREFLOP_ITERATIONS||10_000_000));
 const POSTFLOP_ITERATIONS=Math.max(50,Number(process.env.STACKUP_POSTFLOP_ITERATIONS||120));
 const RANGE_MIN_WEIGHT=Math.max(0,Math.min(0.25,Number(process.env.STACKUP_RANGE_MIN_WEIGHT||0.08)));
+const DCFR_UPSTREAM_COMMIT="4ade6a9e15a841c41867afde1258b9d110cd6fb1";
 const POSITION_ORDER=["SB","BB","UTG","HJ","CO","BTN"];
 const TABLE_POSITIONS=["BTN","SB","BB","UTG","UTG+1","UTG+2","MP","LJ","HJ","CO"];
 const BOARDS={
@@ -280,7 +281,14 @@ const preflop=charts.map(chart=>{
       villainRange:"solver-blueprint",
       actionHistory:[],
       positions:["UTG","HJ","CO","BTN","SB","BB"],
-      playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,100]))
+      playerStacks:Object.fromEntries(TABLE_POSITIONS.map(p=>[p,100])),
+      provenance:{
+        strategySource:"DCFR_PREFLOP_BLUEPRINT",
+        upstream:"exinori/DCFR-SOLVER",
+        upstreamCommit:DCFR_UPSTREAM_COMMIT,
+        iterations:PREFLOP_ITERATIONS,
+        solveContextId:baseId
+      }
     },
     strategy
   };
@@ -432,7 +440,17 @@ for(const matchup of selected){
             potType:context.potType,
             tags:[...new Set([...context.tags,...semantic])],
             solverNode:node.node,
-            solverPlayer:node.player
+            solverPlayer:node.player,
+            provenance:{
+              strategySource:"DCFR_SOLVER",
+              upstream:"exinori/DCFR-SOLVER",
+              upstreamCommit:DCFR_UPSTREAM_COMMIT,
+              iterations:POSTFLOP_ITERATIONS,
+              solveProfile,
+              sourceMatchup:matchup.matchup,
+              solverNode:node.node,
+              solverPlayer:node.player
+            }
           },
           strategy:node.strategy
         });
@@ -448,6 +466,7 @@ const manifest={
   solver:{
     id:"DCFR_SOLVER",
     upstream:"exinori/DCFR-SOLVER",
+    upstreamCommit:DCFR_UPSTREAM_COMMIT,
     license:"MIT"
   },
   shard:{index:SHARD_INDEX,count:SHARD_COUNT,boardsPerStreet:BOARDS_PER_STREET},

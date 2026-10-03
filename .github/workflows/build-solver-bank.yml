@@ -2,6 +2,11 @@ name: Build Solver Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-solver-bank.yml"
+      - "scripts/generate-solver-bank.mjs"
+      - "scripts/merge-solver-shards.mjs"
   push:
     branches:
       - main
@@ -14,8 +19,8 @@ permissions:
   contents: write
 
 concurrency:
-  group: solver-bank
-  cancel-in-progress: false
+  group: solver-bank-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -35,11 +40,12 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Checkout DCFR-SOLVER
+      - name: Checkout pinned DCFR-SOLVER
         run: |
           mkdir -p .stackup
           rm -rf .stackup/DCFR-SOLVER
-          git clone --depth 1 https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git clone https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
@@ -95,6 +101,34 @@ jobs:
           STACKUP_SHARD_COUNT: "12"
           STACKUP_SHARD_INPUT: ${{ github.workspace }}/.stackup/solver-shards
         run: node scripts/merge-solver-shards.mjs
+
+      - name: Validate strict solver provenance and decisions
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          const contract=fake.StackUpSolvedSpotContract;
+          const pin='4ade6a9e15a841c41867afde1258b9d110cd6fb1';
+          let validated=0;
+          for(const file of ['data/solver/preflop.json','data/solver/postflop.json']){
+            const spots=JSON.parse(fs.readFileSync(file,'utf8'));
+            if(!Array.isArray(spots)||!spots.length)throw new Error(file+' empty');
+            for(const spot of spots){
+              if(!String(spot.solveId||'').trim())throw new Error(spot.id+': solveId missing');
+              const p=spot.scenario?.provenance||spot.provenance;
+              if(!p||!String(p.strategySource||'').trim())throw new Error(spot.id+': provenance missing');
+              if(String(p.upstreamCommit||'')!==pin)throw new Error(spot.id+': provenance pin drift');
+              for(const entry of spot.strategy||[]){
+                const v=contract.validateSolvedDecision(spot,entry);
+                if(!v.ok)throw new Error(spot.id+'/'+entry.hand+': '+v.errors.join(','));
+                validated++;
+              }
+            }
+          }
+          if(validated<15000)throw new Error('production solver bank unexpectedly small: '+validated);
+          console.log({validatedSolvedDecisions:validated,upstreamCommit:pin});
+          NODE
 
       - name: Audit scenario coverage
         run: |
