@@ -175,9 +175,44 @@
   function clearTournamentAdvance(state){
     ADV_SECTIONS.forEach(id=>resetAdvance(state,id));
     setOne(state,'ttype','random');
+    setOne(state,'fskill','all');
     state.extras=[];
     setOne(state,'phase','all');
     setOne(state,'stack','all');
+  }
+
+  function opponentProfileActive(state){
+    return concrete(state,'fskill').length>0;
+  }
+  function clearOpponentProfile(state){
+    setOne(state,'fskill','all');
+  }
+  function normalizeOpponentProfileContext(state){
+    // Current solved opponent-profile bank is explicit, not projected:
+    // TOURNAMENT · FIELD 500 · REGULAR · MIDDLE · 6-max · PRE-FLOP.
+    setOne(state,'mode','mtt');
+    setOne(state,'fsize','500');
+    setOne(state,'ttype','regular');
+    setOne(state,'phase','middle');
+    setOne(state,'seats','s6');
+    setOne(state,'street','pre');
+    state.extras=[];
+
+    const pos=concrete(state,'pos');
+    if(pos.length)setMany(state,'pos',intersection(pos,['SB','BB']),'all');
+
+    const stack=concrete(state,'stack');
+    if(stack.length){
+      const supported=stack.filter(v=>{
+        const n=Number(String(v).replace(/bb$/i,''));
+        return Number.isInteger(n)&&n>=2&&n<=15;
+      });
+      setMany(state,'stack',supported,'all');
+    }
+
+    // A later explicit ADVANCE choice may replace the profile context, but a
+    // profile selection itself must never inherit an unrelated special filter.
+    ADV_SECTIONS.forEach(id=>resetAdvance(state,id));
   }
 
   function pruneAdvanceByStreet(state,streetValues){
@@ -254,6 +289,29 @@
       group==='phase'&&option!=='all' ||
       group==='stack'&&option!=='all';
     if(tournamentTrigger)setOne(state,'mode','mtt');
+
+    // PERFIL DO FIELD is solver-backed only in its native solved context.
+    // Latest explicit choice wins: selecting the profile constrains the other
+    // dimensions; selecting an incompatible dimension later clears the profile.
+    if(group==='fskill'&&option!=='all'&&option!=='random'){
+      normalizeOpponentProfileContext(state);
+    }else if(opponentProfileActive(state)){
+      const concreteOption=option!=='all'&&option!=='random';
+      const incompatible=
+        (group==='mode'&&option!=='mtt') ||
+        (group==='fsize'&&option!=='500') ||
+        (group==='ttype'&&option!=='regular') ||
+        (group==='phase'&&option!=='middle') ||
+        (group==='seats'&&option!=='s6') ||
+        (group==='street'&&option!=='pre') ||
+        (group==='pos'&&concreteOption&&!['SB','BB'].includes(option)) ||
+        (group==='stack'&&concreteOption&&(()=>{
+          const n=Number(String(option).replace(/bb$/i,''));
+          return !Number.isInteger(n)||n<2||n>15;
+        })()) ||
+        (isAdvance&&concreteOption);
+      if(incompatible)clearOpponentProfile(state);
+    }
 
     // Freezeout is exclusive with rebuy/add-on.
     if(concrete(state,'ttype')[0]==='freeze')state.extras=[];
@@ -357,7 +415,14 @@
     if(option==='all'||option==='random')return null;
 
     const mode=concrete(state,'mode')[0];
+    const profile=concrete(state,'fskill')[0]||null;
     if(ADV_SECTIONS.includes(group)&&mode==='cash')return 'Disponível apenas em torneios';
+    if(profile){
+      if(group==='fsize'&&option!=='500')return 'Perfil resolvido atualmente no FIELD 500';
+      if(group==='seats'&&option!=='s6')return 'Perfil resolvido atualmente em 6MAX';
+      if(group==='ttype'&&option!=='regular')return 'Perfil resolvido atualmente em torneio REGULAR';
+      if(group==='street'&&option!=='pre')return 'Perfil resolvido atualmente no PRÉ-FLOP';
+    }
     if(group==='extras'&&concrete(state,'ttype')[0]==='freeze')return 'Freezeout não aceita rebuy/add-on';
 
     if(group==='pos'){
