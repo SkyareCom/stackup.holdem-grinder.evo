@@ -58,7 +58,7 @@ jobs:
             const se=Number(s.convergence?.maxStandardErrorBb);
             if(!Number.isFinite(se)||se>1.5)throw new Error('multiway standard error too high '+s.id+': '+se);
           }
-          for(const [k,n] of Object.entries(counts))if(n<1500)throw new Error(k+' below 1500: '+n);
+          for(const [k,n] of Object.entries(counts))if(n<2000)throw new Error(k+' below 2000 solved decisions: '+n);
           console.log(counts);
           NODE
 
