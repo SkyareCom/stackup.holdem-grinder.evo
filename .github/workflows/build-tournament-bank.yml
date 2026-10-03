@@ -62,15 +62,25 @@ jobs:
           assert spots, "tournament bank empty"
           gate=float(p["maxNashConv"])
           by_tag={}
+          by_table={}
           for s in spots:
               nc=float(s["convergence"]["nashConv"])
               assert math.isfinite(nc) and nc <= gate, (s["id"],nc,gate)
               solved=len(s.get("strategy",[]))
               assert solved == 169, s["id"]
-              for tag in s.get("scenario",{}).get("tags",[]):
+              scenario=s.get("scenario",{})
+              for tag in scenario.get("tags",[]):
                   by_tag[tag]=by_tag.get(tag,0)+solved
+              table=int(scenario.get("trainingTableSize",scenario.get("tableSize",0)) or 0)
+              by_table[table]=by_table.get(table,0)+solved
+          targets=["reshove","icm_5_8","icm_9_12","icm_13_18","icm_19_25","icm_final_table","icm_3handed"]
+          for tag in targets:
+              assert by_tag.get(tag,0) >= 2000, (tag,by_tag.get(tag,0))
+          assert by_table.get(10,0) >= 2000, ("s10",by_table.get(10,0))
           assert by_tag.get("covered_stack",0) >= 2000, ("covered_stack",by_tag.get("covered_stack",0))
-          print({"spots":len(spots),"rejected":len(p.get("rejected",[])),"gate":gate,"covered_stack":by_tag.get("covered_stack",0)})
+          print({"spots":len(spots),"rejected":len(p.get("rejected",[])),"gate":gate,
+                 "targets":{tag:by_tag.get(tag,0) for tag in targets},
+                 "s10":by_table.get(10,0),"covered_stack":by_tag.get("covered_stack",0)})
           PY
 
       - name: Audit all 162 scenario cards
