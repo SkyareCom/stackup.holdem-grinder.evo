@@ -2170,37 +2170,17 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const street=String(view?.street||SOLVER_SPOT?.scenario?.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
 
     const candidates=[];
-    const add=(value,solverBacked=false,frequency=0)=>{
+    const add=value=>{
       let v=spotRoundRaiseBb(value);
       if(!Number.isFinite(v))return;
       v=Math.min(maxTarget,v);
-      if(v<min-.001)return;
-      const found=candidates.find(x=>Math.abs(x.target-v)<.01);
-      if(found){
-        found.solverBacked=found.solverBacked||solverBacked;
-        found.frequency=Math.max(found.frequency||0,Number(frequency)||0);
-        return;
-      }
-      candidates.push({target:v,solverBacked:!!solverBacked,frequency:Number(frequency)||0});
+      if(v<=min+.001)return;
+      if(candidates.some(x=>Math.abs(x-v)<.01))return;
+      candidates.push(v);
     };
 
-    // The three RAISE buttons are real numeric suggestions. Solver-backed
-    // branches are inserted first so the dominant/correct sizing can never
-    // be omitted from the choices shown to the player.
-    try{
-      const engine=window.StackUpSpotsEngine;
-      const strategy=engine?.strategyForHand?.(SOLVER_SPOT,view?.handKey);
-      for(const action of (strategy?.actions||[])){
-        if(engine?.normalizeActionKind?.(action)!=='raise')continue;
-        const resolved=table?.resolveActionTarget?.(state,heroPos,action);
-        if(Number.isFinite(Number(resolved)))add(Number(resolved),true,action.frequency);
-      }
-    }catch(_){}
-
-    // Always include the legal minimum as a useful baseline suggestion.
-    add(min,false,0);
-
-    // Fill any remaining slots with contextual teaching sizes.
+    // Teaching sizes: two distinct raises above the legal minimum.
+    // Keep this arithmetic-only so rendering cannot block the UI.
     if(street==='PRE-FLOP'){
       const reference=Math.max(1,currentBet);
       add(Math.max(min+.5,reference*2.5));
@@ -2220,36 +2200,32 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     }
 
     let step=.5;
-    while(candidates.length<3&&min+step<=maxTarget+.001&&step<=10){
+    while(candidates.length<2&&min+step<maxTarget-.001&&step<=10){
       add(min+step);
       step+=.5;
     }
-
-    const solverRaises=candidates.filter(x=>x.solverBacked).sort((a,b)=>(b.frequency||0)-(a.frequency||0));
-    const correct=solverRaises[0]||null;
-    let choices=candidates.slice(0,3);
-    if(correct&&!choices.some(x=>Math.abs(x.target-correct.target)<.01)){
-      choices[2]=correct;
-    }
-    choices=choices.sort((a,b)=>a.target-b.target);
-    return {choices,correctTarget:correct?.target??null};
+    return {
+      minTarget:min,
+      extras:candidates.slice(0,2).map(target=>({target,solverBacked:false}))
+    };
   }
 
   function renderSpotActions(){
     const a=SPOT_ACTION_LABELS[L()]||SPOT_ACTION_LABELS.pt;
     const raise=spotRaiseOptions();
-    const primaryKeys=['check','call','fold'];
-    const primary=a.slice(0,3).map((label,i)=>{
+    const primaryKeys=['check','call','fold','raise'];
+    const primary=a.slice(0,4).map((label,i)=>{
       const key=primaryKeys[i];
-      return '<button class="spotaction" data-spot-action="'+key+'">'+label+'</button>';
+      const target=key==='raise'&&Number.isFinite(raise.minTarget)?' data-spot-target="'+raise.minTarget+'"':'';
+      return '<button class="spotaction" data-spot-action="'+key+'"'+target+'>'+label+'</button>';
     }).join('');
-    const raiseButton=(key,item)=>{
+    const extra=(key,item)=>{
       if(!item)return '<button class="spotaction solver-size" data-spot-action="'+key+'" disabled><span>RAISE —</span></button>';
-      return '<button class="spotaction solver-size" data-spot-action="'+key+'" data-spot-target="'+item.target+'" data-spot-didactic="'+(item.solverBacked?'0':'1')+'"><span>'+spotEscape(spotRaiseLabel(item.target))+'</span></button>';
+      return '<button class="spotaction solver-size" data-spot-action="'+key+'" data-spot-target="'+item.target+'" data-spot-didactic="1"><span>'+spotEscape(spotRaiseLabel(item.target))+'</span></button>';
     };
     spotActions.innerHTML=
-      '<div class="spotactionrow primary">'+primary+raiseButton('raise',raise.choices[0])+'</div>'+
-      '<div class="spotactionrow raise">'+raiseButton('raise1',raise.choices[1])+raiseButton('raise2',raise.choices[2])+'<button class="spotaction" data-spot-action="allin">'+a[6]+'</button></div>';
+      '<div class="spotactionrow primary">'+primary+'</div>'+
+      '<div class="spotactionrow raise">'+extra('raise1',raise.extras[0])+extra('raise2',raise.extras[1])+'<button class="spotaction" data-spot-action="allin">'+a[6]+'</button></div>';
   }
   let spotActionBusy=false;
 
