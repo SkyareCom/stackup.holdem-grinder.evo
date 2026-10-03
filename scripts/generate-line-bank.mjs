@@ -408,7 +408,7 @@ function materialize({
 }
 function addSpot(spots,spot){if(spot)spots.push(spot);}
 
-const spots=[],failures=[];
+const spots=[],failures=[],unavailable=[];
 
 for(const runout of RUNOUTS){
   // -----------------------------------------------------------------------
@@ -555,7 +555,12 @@ for(const runout of RUNOUTS){
       }
     }
   }catch(error){
-    failures.push({runout:runout.id,line:"CHECKBACK_PROBE",error:errorDetail(error)});
+    const detail=errorDetail(error);
+    if(/^lineA_checkcheck_ranges_too_small_/.test(detail)){
+      unavailable.push({runout:runout.id,line:"CHECKBACK_PROBE",reason:detail});
+    }else{
+      failures.push({runout:runout.id,line:"CHECKBACK_PROBE",error:detail});
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -659,7 +664,12 @@ for(const runout of RUNOUTS){
       }
     }
   }catch(error){
-    failures.push({runout:runout.id,line:"CHECKBACK_PROBE_TARGETED",error:errorDetail(error)});
+    const detail=errorDetail(error);
+    if(/^target_checkcheck_ranges_too_small_/.test(detail)){
+      unavailable.push({runout:runout.id,line:"CHECKBACK_PROBE_TARGETED",reason:detail});
+    }else{
+      failures.push({runout:runout.id,line:"CHECKBACK_PROBE_TARGETED",error:detail});
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -940,7 +950,12 @@ for(const runout of RUNOUTS){
       ]
     }));
   }catch(error){
-    failures.push({runout:runout.id,line:"DELAYED_CBET_OOP",error:errorDetail(error)});
+    const detail=errorDetail(error);
+    if(/^delayed_checkcheck_ranges_too_small_/.test(detail)||detail==="delayed_turn_root_has_no_bet"){
+      unavailable.push({runout:runout.id,line:"DELAYED_CBET_OOP",reason:detail});
+    }else{
+      failures.push({runout:runout.id,line:"DELAYED_CBET_OOP",error:detail});
+    }
   }
 }
 
@@ -951,14 +966,15 @@ const payload={
   upstream:{repository:"exinori/DCFR-SOLVER",commit:"4ade6a9e15a841c41867afde1258b9d110cd6fb1",license:"MIT"},
   iterations:ITER,
   baseMatchups:[baseCallerOop.matchup,baseAggressorOop.matchup],
-  spots,failures
+  spots,failures,unavailable
 };
 await writeFile(OUT,JSON.stringify(payload),"utf8");
 console.log(JSON.stringify({
   selectedRunoutId:selectedRunoutId||null,
-  spots:spots.length,failures:failures.length,
+  spots:spots.length,failures:failures.length,unavailable:unavailable.length,
   tags:[...new Set(spots.flatMap(s=>s.scenario?.tags||[]))].sort(),
-  failureDetails:failures
+  failureDetails:failures,
+  unavailableDetails:unavailable
 },null,2));
 // Do not fail an individual runout on an arbitrary local volume floor.
 // The aggregate workflow is the authority: every decision is contract-validated
