@@ -231,12 +231,72 @@ function bbToChips(bb){
 }
 function chipsToBb(chips){return Number(chips)/2;}
 function normalizeBb(bb){return chipsToBb(bbToChips(bb));}
-function solverBetBb(potBb,pct){
-  const potChips=bbToChips(potBb);
+function solverBetChips(potChips,pct){
+  const pot=Math.round(Number(potChips));
   const p=Number(pct);
   if(!Number.isFinite(p)||p<=0)throw new Error("invalid_bet_pct_"+String(pct));
-  const amountChips=Math.max(1,Math.floor((potChips*p+50)/100));
-  return chipsToBb(amountChips);
+  if(!Number.isFinite(pot)||pot<=0)throw new Error("invalid_pot_chips_"+String(potChips));
+  return Math.max(1,Math.floor((pot*p+50)/100));
+}
+function solverBetBb(potBb,pct){
+  return chipsToBb(solverBetChips(bbToChips(potBb),pct));
+}
+function simulateNodeState(raw,node){
+  const basePot=Math.round(Number(raw?.config?.pot));
+  const cfgStacks=raw?.config?.stacks;
+  if(!Number.isFinite(basePot)||basePot<=0||!Array.isArray(cfgStacks)||cfgStacks.length<2){
+    throw new Error("solver_export_state_missing");
+  }
+  const stacks=[Math.round(Number(cfgStacks[0])),Math.round(Number(cfgStacks[1]))];
+  if(stacks.some(x=>!Number.isFinite(x)||x<0))throw new Error("solver_export_stack_invalid");
+  const bets=[0,0];
+  let actor=0;
+  for(const label of nodePath(node?.node)){
+    const p=actor,opp=1-p;
+    const kind=actionKind(label);
+    if(kind==="check"||kind==="fold"){
+      actor=opp;
+      continue;
+    }
+    if(kind==="call"){
+      const toCall=Math.max(0,bets[opp]-bets[p]);
+      const paid=Math.min(toCall,stacks[p]);
+      stacks[p]-=paid;bets[p]+=paid;actor=opp;
+      continue;
+    }
+    if(kind==="jam"){
+      const paid=stacks[p];
+      stacks[p]=0;bets[p]+=paid;actor=opp;
+      continue;
+    }
+    if(kind==="raise"){
+      const pct=sizingPct(label);
+      if(!Number.isFinite(pct))throw new Error("solver_node_sizing_missing_"+String(label));
+      const currentPot=basePot+bets[0]+bets[1];
+      const oppBet=bets[opp],myBet=bets[p];
+      const toCall=Math.max(0,oppBet-myBet);
+      let amount;
+      if(toCall>0){
+        const potAfterCall=currentPot+toCall;
+        const raiseAmount=solverBetChips(potAfterCall,pct);
+        const totalBet=oppBet+raiseAmount;
+        amount=Math.max(0,totalBet-myBet);
+      }else{
+        amount=solverBetChips(currentPot,pct);
+      }
+      const paid=Math.min(amount,stacks[p]);
+      stacks[p]-=paid;bets[p]+=paid;actor=opp;
+      continue;
+    }
+    throw new Error("solver_node_action_unknown_"+String(label));
+  }
+  const expected=String(node?.player||"OOP").toUpperCase()==="IP"?1:0;
+  if(actor!==expected)throw new Error("solver_node_actor_mismatch_"+String(node?.node));
+  return {
+    stacks,bets,toAct:actor,
+    potChips:basePot+bets[0]+bets[1],
+    currentBetChips:Math.max(bets[0],bets[1])
+  };
 }
 function errorDetail(error){
   return [
@@ -295,6 +355,23 @@ function materialize({
   const cleanOop=withoutBoard(oopRange,boardRaw);
   const cleanIp=withoutBoard(ipRange,boardRaw);
   const ranges=playerRanges(nodePlayer,cleanOop,cleanIp);
+
+  // Reconstruct the exact state of the exported solver node from the solver's
+  // own integer-chip root config + action path. The caller-provided pot/stack
+  // values are intentionally not trusted for the persisted scenario because
+  // a response node may already contain committed chips.
+  const state=simulateNodeState(raw,node);
+  const oopStack=chipsToBb(state.stacks[0]);
+  const ipStack=chipsToBb(state.stacks[1]);
+  const heroStack=nodePlayer==="IP"?ipStack:oopStack;
+  const villainStack=nodePlayer==="IP"?oopStack:ipStack;
+  const effectiveStack=Math.max(0,Math.min(heroStack,villainStack));
+  const solvedPot=chipsToBb(state.potChips);
+  const solvedCurrentBet=chipsToBb(state.currentBetChips);
+  const playerStacks=Object.fromEntries(POSITIONS.map(p=>[p,effectiveStack]));
+  playerStacks[base.scenario.heroPosition]=oopStack;
+  playerStacks[base.scenario.villainPosition]=ipStack;
+
   return {
     id:"dcfr-line-"+id+"-"+hash(base.matchup+"|"+id+"|"+node.node),
     solver:"DCFR_SOLVER",
@@ -307,15 +384,16 @@ function materialize({
       street:String(raw.config?.street||extra.street||"").toUpperCase(),
       tableSize:6,
       heroPosition,villainPosition,
-      heroStack:stackBb,effectiveStack:stackBb,
-      pot:+potBb.toFixed(4),currentBet:+Number(currentBet||0).toFixed(4),
+      heroStack:+heroStack.toFixed(4),effectiveStack:+effectiveStack.toFixed(4),
+      pot:+solvedPot.toFixed(4),currentBet:+solvedCurrentBet.toFixed(4),
       board:boardCards(boardRaw),
       heroRange:rangeText(ranges.hero),villainRange:rangeText(ranges.villain),
       actionHistory:history,
       positions:POSITIONS,
-      playerStacks:Object.fromEntries(POSITIONS.map(p=>[p,stackBb])),
+      playerStacks,
       tags:[...new Set(tags)],
       solverNode:node.node,
+      solverPlayer:nodePlayer,
       provenance:{
         strategySource:"DCFR_SOLVER",
         upstream:"exinori/DCFR-SOLVER",
