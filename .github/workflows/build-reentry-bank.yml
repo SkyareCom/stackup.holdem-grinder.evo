@@ -2,6 +2,11 @@ name: Build Re-entry Utility Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-reentry-bank.yml"
+      - "scripts/generate-reentry-bank.py"
+      - "scripts/generate-tournament-bank.py"
   push:
     branches:
       - main
@@ -14,7 +19,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: reentry-utility-bank
+  group: reentry-utility-bank-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
