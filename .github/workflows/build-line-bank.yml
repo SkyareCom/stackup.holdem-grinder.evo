@@ -1,4 +1,5 @@
 name: Build Strict Solved Line Bank
+# ci-cancel-pulse
 
 on:
   workflow_dispatch:
