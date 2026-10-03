@@ -40,11 +40,13 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Checkout DCFR-SOLVER
+      - name: Checkout pinned DCFR-SOLVER
         run: |
           mkdir -p .stackup
           rm -rf .stackup/DCFR-SOLVER
-          git clone --depth 1 https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git clone https://github.com/exinori/DCFR-SOLVER.git .stackup/DCFR-SOLVER
+          git -C .stackup/DCFR-SOLVER checkout 4ade6a9e15a841c41867afde1258b9d110cd6fb1
+          test "$(git -C .stackup/DCFR-SOLVER rev-parse HEAD)" = "4ade6a9e15a841c41867afde1258b9d110cd6fb1"
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
