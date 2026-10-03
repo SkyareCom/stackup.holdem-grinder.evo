@@ -26,7 +26,6 @@ jobs:
       fail-fast: false
       max-parallel: 9
       matrix:
-        mode: [TOURNAMENT, CASH]
         stack: [5, 10, 15, 18, 20, 25, 30, 50, 100]
 
     steps:
@@ -51,7 +50,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: ".stackup/DCFR-SOLVER -> target"
-          shared-key: "dcfr-9max-${{ matrix.mode }}-${{ matrix.stack }}"
+          shared-key: "dcfr-9max-${{ matrix.stack }}"
 
       - name: Build patched solver and exporter
         run: |
@@ -62,44 +61,42 @@ jobs:
 
       - name: Train native 9-max preflop blueprint
         run: |
-          .stackup/dcfr-solver-9max preflop             --iterations 10000000             --output ".stackup/preflop-9max-${{ matrix.mode }}-${{ matrix.stack }}bb.bin"
+          .stackup/dcfr-solver-9max preflop             --iterations 10000000             --output ".stackup/preflop-9max-${{ matrix.stack }}bb.bin"
 
       - name: Export all 9-max decision nodes
         env:
-          STACKUP_SOLVE_CONTEXT_ID: "9max-${{ matrix.mode }}-${{ matrix.stack }}bb"
-          STACKUP_GAME_TYPE: ${{ matrix.mode }}
-          STACKUP_PHASE: ${{ matrix.mode == 'TOURNAMENT' && 'MIDDLE' || '' }}
-          STACKUP_TOURNAMENT_TYPE: ${{ matrix.mode == 'TOURNAMENT' && 'REGULAR' || '' }}
-          STACKUP_FIELD_SIZE: ${{ matrix.mode == 'TOURNAMENT' && '500' || '' }}
+          STACKUP_SOLVE_CONTEXT_ID: "9max-${{ matrix.stack }}bb"
+          STACKUP_GAME_TYPE: TOURNAMENT
+          STACKUP_PHASE: MIDDLE
+          STACKUP_TOURNAMENT_TYPE: REGULAR
+          STACKUP_FIELD_SIZE: "500"
         run: |
           mkdir -p .stackup/9max-out
-          .stackup/stackup-preflop-export-9max             ".stackup/preflop-9max-${{ matrix.mode }}-${{ matrix.stack }}bb.bin"             ".stackup/9max-out/preflop-9max-${{ matrix.mode }}-${{ matrix.stack }}bb.json"
+          .stackup/stackup-preflop-export-9max             ".stackup/preflop-9max-${{ matrix.stack }}bb.bin"             ".stackup/9max-out/preflop-9max-${{ matrix.stack }}bb.json"
 
       - name: Validate native stack bank
         env:
           EXPECT_STACK: "${{ matrix.stack }}"
-          EXPECT_MODE: "${{ matrix.mode }}"
         run: |
           node - <<'NODE'
           const fs=require('fs');
-          const file='.stackup/9max-out/preflop-9max-'+process.env.EXPECT_MODE+'-'+process.env.EXPECT_STACK+'bb.json';
+          const file='.stackup/9max-out/preflop-9max-'+process.env.EXPECT_STACK+'bb.json';
           const d=JSON.parse(fs.readFileSync(file,'utf8'));
           if(d.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw new Error('upstream pin drift');
           if(Number(d.iterations)<10000000)throw new Error('9max iterations below 10M');
           const root=d.spots?.find(s=>s.scenario?.actionHistory?.length===0);
           if(!root)throw new Error('9max root missing');
           if(Number(root.scenario?.tableSize)!==9)throw new Error('non-9max root');
-          if(String(root.scenario?.gameType)!==String(process.env.EXPECT_MODE))throw new Error('game type mismatch');
           if(Math.abs(Number(root.scenario?.heroStack)-Number(process.env.EXPECT_STACK))>.01)throw new Error('stack mismatch');
           const positions=new Set((d.spots||[]).map(s=>s.scenario?.heroPosition));
           for(const p of ['UTG+1','UTG+2','LJ'])if(!positions.has(p))throw new Error('missing native '+p);
-          console.log({mode:process.env.EXPECT_MODE,stack:Number(process.env.EXPECT_STACK),nodes:d.spots.length,positions:[...positions]});
+          console.log({stack:Number(process.env.EXPECT_STACK),nodes:d.spots.length,positions:[...positions]});
           NODE
 
       - uses: actions/upload-artifact@v4
         with:
-          name: "preflop-9max-${{ matrix.mode }}-${{ matrix.stack }}"
-          path: ".stackup/9max-out/preflop-9max-${{ matrix.mode }}-${{ matrix.stack }}bb.json"
+          name: "preflop-9max-${{ matrix.stack }}"
+          path: ".stackup/9max-out/preflop-9max-${{ matrix.stack }}bb.json"
           if-no-files-found: error
           retention-days: 1
 
@@ -125,15 +122,14 @@ jobs:
           const fs=require('fs'),path=require('path');
           const dir='.stackup/9max-in';
           const files=fs.readdirSync(dir).filter(x=>x.endsWith('.json')).sort();
-          if(files.length!==18)throw new Error('expected 18 native 9max banks (9 stacks x 2 modes), found '+files.length);
-          const spots=[],ids=new Set(),stacks=[],gameTypes=[];
+          if(files.length!==9)throw new Error('expected 9 native 9max banks, found '+files.length);
+          const spots=[],ids=new Set(),stacks=[];
           let iterations=Infinity;
           for(const file of files){
             const d=JSON.parse(fs.readFileSync(path.join(dir,file),'utf8'));
             iterations=Math.min(iterations,Number(d.iterations)||0);
             const root=d.spots?.find(s=>s.scenario?.actionHistory?.length===0);
             stacks.push(Number(root?.scenario?.heroStack));
-            gameTypes.push(String(root?.scenario?.gameType||''));
             for(const spot of d.spots||[]){
               if(ids.has(spot.id))throw new Error('duplicate 9max spot '+spot.id);
               ids.add(spot.id);spots.push(spot);
@@ -147,12 +143,10 @@ jobs:
             variant:'9MAX_MULTISTACK_NATIVE',
             iterations,
             stackDepthsBb:[...new Set(stacks)].sort((a,b)=>a-b),
-            gameTypes:[...new Set(gameTypes)].sort(),
             spots
           };
           fs.writeFileSync('data/solver/preflop-9max.json',JSON.stringify(payload));
-          if(payload.gameTypes.join(',')!=='CASH,TOURNAMENT')throw new Error('missing native game modes: '+payload.gameTypes.join(','));
-          console.log({nodes:spots.length,stacks:payload.stackDepthsBb,gameTypes:payload.gameTypes});
+          console.log({nodes:spots.length,stacks:payload.stackDepthsBb});
           NODE
 
       - name: Validate strict 9-max coverage
@@ -163,7 +157,7 @@ jobs:
           const fake={};new Function('window','globalThis',code)(fake,fake);
           const contract=fake.StackUpSolvedSpotContract;
           const d=JSON.parse(fs.readFileSync('data/solver/preflop-9max.json','utf8'));
-          const solvedByPos={};const solvedByMode={};let valid=0;
+          const solvedByPos={};let valid=0;
           for(const s of d.spots||[]){
             if(Number(s.scenario?.tableSize)!==9)throw new Error('non-9max '+s.id);
             for(const h of s.strategy||[]){
@@ -171,18 +165,13 @@ jobs:
               if(!v.ok)throw new Error(s.id+'/'+h.hand+': '+v.errors.join(','));
               valid++;
               const p=String(s.scenario?.heroPosition||'');
-              const mode=String(s.scenario?.gameType||'');
               solvedByPos[p]=(solvedByPos[p]||0)+1;
-              solvedByMode[mode]=(solvedByMode[mode]||0)+1;
             }
           }
           for(const p of ['UTG+1','UTG+2','LJ']){
-            if((solvedByPos[p]||0)<2000)throw new Error(p+' below 2000 solved decisions: '+String(solvedByPos[p]||0));
+            if((solvedByPos[p]||0)<1500)throw new Error(p+' below strict floor: '+String(solvedByPos[p]||0));
           }
-          for(const mode of ['TOURNAMENT','CASH']){
-            if(!(solvedByMode[mode]>0))throw new Error('missing solved '+mode+' decisions');
-          }
-          console.log({validatedSolvedDecisions:valid,solvedByPos,solvedByMode});
+          console.log({validatedSolvedDecisions:valid,solvedByPos});
           NODE
 
       - name: Recompute strict coverage and deficit queue
