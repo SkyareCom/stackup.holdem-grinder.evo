@@ -21,11 +21,12 @@ permissions:
   contents: write
 
 concurrency:
-  group: strict-solved-line-bank-${{ github.ref }}
+  group: strict-solved-line-bank
   cancel-in-progress: true
 
 jobs:
   solve:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     timeout-minutes: 75
     strategy:
