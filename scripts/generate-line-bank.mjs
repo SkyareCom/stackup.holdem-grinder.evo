@@ -434,29 +434,16 @@ for(const runout of RUNOUTS){
       id:"donk-"+runout.id,raw:flopRaw,node:root,tags:["donk_bet"],
       base,oopRange:oop0,ipRange:ip0,potBb:pot0,stackBb:stack0,history:[]
     }));
-    addSpot(spots,materialize({
-      id:"checkback-"+runout.id,raw:flopRaw,node:afterCheck,tags:["check_back_flop","miss_cbet"],
-      base,oopRange:conditionRange(oop0,root,{kind:"check"}),ipRange:ip0,
-      potBb:pot0,stackBb:stack0,
-      history:[checkEvent(base.scenario.heroPosition,"FLOP")]
-    }));
+    // Do not persist this intermediate check-back decision here. LINE A2
+    // materializes the same observed state with the strict legal-raise tree;
+    // keeping both would count a solver-tree variation as a second spot.
 
     const flopIpBet=chooseBet(ip0,afterCheck);
     if(!flopIpBet)throw new Error("lineA_ip_bet_missing");
     const afterCheckBet=findNode(flopRaw,[{kind:"check"},{kind:"raise",pct:flopIpBet.pct}]);
     const flopBetAmt=solverBetBb(pot0,flopIpBet.pct);
-    addSpot(spots,materialize({
-      id:"checkraise-flop-"+runout.id,raw:flopRaw,node:afterCheckBet,tags:[],
-      base,
-      oopRange:conditionRange(oop0,root,{kind:"check"}),
-      ipRange:conditionRange(ip0,afterCheck,{label:flopIpBet.label}),
-      potBb:pot0+flopBetAmt,stackBb:stack0,
-      currentBet:flopBetAmt,
-      history:[
-        checkEvent(base.scenario.heroPosition,"FLOP"),
-        actionEvent(base.scenario.villainPosition,flopIpBet.label,flopBetAmt,"FLOP")
-      ]
-    }));
+    // The old maxRaises=1 response node is retained only for range
+    // propagation. It is not a legal check-raise training decision.
 
     // Check-check propagation to turn. Remove the newly exposed turn card
     // from both exact posterior ranges before solving the next street.
@@ -475,10 +462,8 @@ for(const runout of RUNOUTS){
       checkEvent(base.scenario.heroPosition,"FLOP"),
       checkEvent(base.scenario.villainPosition,"FLOP")
     ];
-    addSpot(spots,materialize({
-      id:"probe-"+runout.id,raw:turnRaw,node:turnRoot,tags:["probe_bet","vs_missed_cbet","sequential_lines"],
-      base,oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,history:priorCheckCheck
-    }));
+    // Do not persist this duplicate probe root. LINE A2 owns the canonical
+    // probe/vs-missed decision for this observed check-check state.
     addSpot(spots,materialize({
       id:"delayed-"+runout.id,raw:turnRaw,node:turnAfterCheck,tags:["delayed_cbet","sequential_lines"],
       base,oopRange:conditionRange(oopTurn,turnRoot,{kind:"check"}),ipRange:ipTurn,
