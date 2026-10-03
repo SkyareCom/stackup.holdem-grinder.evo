@@ -146,8 +146,10 @@ function transformSuitValue(value,perm){
 }
 function decisionScenarioIdentity(scenario,perm){
   const s=scenario||{};
-  // Tags, provenance and targetSizingPct are filter/presentation metadata,
-  // not a new poker decision. Everything below changes the actual context.
+  // Tags and provenance are classification/presentation metadata.
+  // targetSizingPct is retained because it changes the solver action space:
+  // a 25% sizing solve and a 50% sizing solve are distinct decisions, even
+  // though suit relabeling of either one is not.
   return stableValue({
     gameType:s.gameType??null,
     street:normStreet(s.street),
@@ -174,7 +176,8 @@ function decisionScenarioIdentity(scenario,perm){
     extras:transformSuitValue(s.extras||[],perm),
     icm:transformSuitValue(s.icm??null,perm),
     bounty:transformSuitValue(s.bounty??null,perm),
-    multiwayModel:transformSuitValue(s.multiwayModel??null,perm)
+    multiwayModel:transformSuitValue(s.multiwayModel??null,perm),
+    targetSizingPct:s.targetSizingPct??null
   });
 }
 function canonicalDecisionKey(spot,hand){
