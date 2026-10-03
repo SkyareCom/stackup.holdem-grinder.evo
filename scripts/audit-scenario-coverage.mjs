@@ -33,14 +33,21 @@ const preflopHu=JSON.parse(await readFile(join(SOLVER_DIR,"preflop-hu.json"),"ut
 const textureSizing=JSON.parse(await readFile(join(SOLVER_DIR,"texture-sizing.json"),"utf8"));
 const lineBank=JSON.parse(await readFile(join(SOLVER_DIR,"line-bank.json"),"utf8"));
 
-const SUIT_PERMS=[
-  {s:"s",h:"h",d:"d",c:"c"},
-  {s:"h",h:"s",d:"c",c:"d"},
-  {s:"d",h:"c",d:"s",c:"h"},
-  {s:"c",h:"d",d:"h",c:"s"},
-  {s:"h",h:"d",d:"c",c:"s"},
-  {s:"d",h:"c",d:"h",c:"s"}
-];
+function permutations(values){
+  if(values.length<=1)return [values];
+  const out=[];
+  for(let i=0;i<values.length;i++){
+    const head=values[i];
+    const rest=values.slice(0,i).concat(values.slice(i+1));
+    for(const tail of permutations(rest))out.push([head,...tail]);
+  }
+  return out;
+}
+const SUITS=["c","d","h","s"];
+const SUIT_PERMS=permutations(SUITS).map(order=>
+  Object.fromEntries(SUITS.map((s,i)=>[s,order[i]]))
+);
+if(SUIT_PERMS.length!==24)throw new Error("expected 24 suit permutations");
 
 function isExactHand(hand){
   return /^(?:10|[2-9TJQKA])[cdhs](?:10|[2-9TJQKA])[cdhs]$/i.test(String(hand||""));
@@ -113,14 +120,74 @@ function transformHand(hand,perm){
   if(!m)return text;
   return transformCard(m[1]+m[2],perm)+transformCard(m[3]+m[4],perm);
 }
-function handVariants(spot,hand){
-  if(!isExactHand(hand))return 1;
-  const set=new Set();
-  for(const perm of SUIT_PERMS){
-    const board=(spot?.scenario?.board||[]).map(c=>transformCard(c,perm)).join("");
-    set.add(board+"|"+transformHand(hand,perm));
+function transformCardsInText(value,perm){
+  return String(value??"").replace(/(10|[2-9TJQKA])([cdhs])/gi,(m,r,suit)=>
+    String(r).toUpperCase().replace("10","T")+(perm[String(suit).toLowerCase()]||String(suit).toLowerCase())
+  );
+}
+function stableValue(value){
+  if(Array.isArray(value))return value.map(stableValue);
+  if(value&&typeof value==="object"){
+    const out={};
+    for(const key of Object.keys(value).sort())out[key]=stableValue(value[key]);
+    return out;
   }
-  return set.size;
+  return value;
+}
+function transformSuitValue(value,perm){
+  if(Array.isArray(value))return value.map(v=>transformSuitValue(v,perm));
+  if(value&&typeof value==="object"){
+    const out={};
+    for(const key of Object.keys(value).sort())out[key]=transformSuitValue(value[key],perm);
+    return out;
+  }
+  if(typeof value==="string")return transformCardsInText(value,perm);
+  return value;
+}
+function decisionScenarioIdentity(scenario,perm){
+  const s=scenario||{};
+  // Tags, provenance and targetSizingPct are filter/presentation metadata,
+  // not a new poker decision. Everything below changes the actual context.
+  return stableValue({
+    gameType:s.gameType??null,
+    street:normStreet(s.street),
+    tableSize:s.trainingTableSize??s.tableSize??null,
+    heroPosition:s.heroPosition??null,
+    villainPosition:s.villainPosition??null,
+    heroStack:Number(s.heroStack??s.effectiveStack),
+    effectiveStack:Number(s.effectiveStack),
+    pot:Number(s.pot),
+    currentBet:Number(s.currentBet||0),
+    board:(s.board||[]).map(card=>transformCard(card,perm)),
+    heroRange:s.heroRange==null?null:transformCardsInText(s.heroRange,perm),
+    villainRange:s.villainRange==null?null:transformCardsInText(s.villainRange,perm),
+    actionHistory:transformSuitValue(s.actionHistory||[],perm),
+    legalActions:transformSuitValue(s.legalActions||[],perm),
+    sizings:transformSuitValue(s.sizings||[],perm),
+    positions:s.positions||[],
+    playerStacks:s.playerStacks||null,
+    ante:s.ante??null,
+    phase:s.phase??null,
+    tournamentType:s.tournamentType??null,
+    fieldSize:s.fieldSize??null,
+    opponentProfile:s.opponentProfile??null,
+    extras:transformSuitValue(s.extras||[],perm),
+    icm:transformSuitValue(s.icm??null,perm),
+    bounty:transformSuitValue(s.bounty??null,perm),
+    multiwayModel:transformSuitValue(s.multiwayModel??null,perm)
+  });
+}
+function canonicalDecisionKey(spot,hand){
+  if(!isExactHand(hand))return null;
+  let best=null;
+  for(const perm of SUIT_PERMS){
+    const key=JSON.stringify(stableValue({
+      scenario:decisionScenarioIdentity(spot?.scenario||{},perm),
+      hand:transformHand(hand,perm)
+    }));
+    if(best===null||key<best)best=key;
+  }
+  return "suitcanon:"+best;
 }
 function exactCardsFromHand(hand){
   const text=String(hand||"").replace(/10/g,"T");
@@ -199,7 +266,14 @@ function candidateCount(spots,item=null){
       if(!entry?.hand||!Array.isArray(entry.actions)||!entry.actions.length)continue;
       if(!candidateMatchesItem(item,spot,entry.hand))continue;
       const verdict=solvedContract.validateSolvedDecision(spot,entry);
-      if(verdict.ok)unique.add(verdict.id);
+      if(!verdict.ok)continue;
+      // Postflop exact-hand decisions are deduplicated by the actual poker
+      // context, canonicalized across all 24 suit permutations. Different
+      // solveIds / target cards do not manufacture extra coverage.
+      const key=(isExactHand(entry.hand)&&solvedPolicy?.rules?.countSuitPermutation===false)
+        ? canonicalDecisionKey(spot,entry.hand)
+        : verdict.id;
+      unique.add(key);
     }
   }
   return unique.size;
