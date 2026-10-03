@@ -1,0 +1,26 @@
+name: Audit Solved Core Migration
+on:
+  pull_request:
+    paths:
+      - 'scripts/audit-solved-core-migration.mjs'
+      - 'core/stackup-solved-spot-contract.js'
+      - 'data/solver/**'
+      - '.github/workflows/audit-solved-core-migration.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Strict migration audit
+        run: node scripts/audit-solved-core-migration.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: solved-core-migration-audit
+          path: data/solver/solved-core-migration-audit.json
+          retention-days: 14
