@@ -150,7 +150,7 @@ def main():
     if max_expl>=0.05:raise SystemExit("equilibrium source failed exploitability gate")
 
     spots=[];rejected=[];counts={"multi_shove":0,"bounty_iso":0,"multiway_bounty":0}
-    stacks=[5,6,7,8,9,10,11,12,13,14]
+    stacks=[5,6,7,8,9,10,11,12,13,14,15,16]
     for family in counts:
         for stack in stacks:
             chart_stack=str(min(stack,15))
@@ -214,7 +214,7 @@ def main():
             counts[family]+=169
 
     for family,n in counts.items():
-        if n<1500:raise SystemExit(f"{family} below strict floor: {n}")
+        if n<2000:raise SystemExit(f"{family} below 2000 solved decisions: {n}")
     payload={
       "schemaVersion":1,"generatedAt":__import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
       "solver":"STACKUP_MULTIWAY_BR","modelVersion":"v1","samplesPerHand":SAMPLES,
