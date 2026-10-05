@@ -16,9 +16,14 @@ await mkdir(WORK,{recursive:true});
 await mkdir(dirname(OUT),{recursive:true});
 
 const baseBank=JSON.parse(await readFile(join(ROOT,"data","solver","postflop.json"),"utf8"));
-const baseCallerOop=baseBank.find(s=>s?.matchup==="UTG vs BB"&&s?.scenario?.street==="FLOP");
+const callerOopBases=baseBank.filter(s=>
+  ["UTG vs BB","UTG vs SB"].includes(s?.matchup)&&
+  s?.scenario?.street==="FLOP"&&
+  ["BB","SB"].includes(s?.scenario?.heroPosition)&&
+  s?.scenario?.villainPosition==="UTG"
+);
 const baseAggressorOop=baseBank.find(s=>s?.matchup==="UTG vs HJ"&&s?.scenario?.street==="FLOP");
-if(!baseCallerOop||!baseAggressorOop)throw new Error("required_line_base_matchups_missing");
+if(callerOopBases.length!==2||!baseAggressorOop)throw new Error("required_line_base_matchups_missing");
 
 const ALL_RUNOUTS=[
   {id:"a",flop:"As7d2c",turn:"Jh",river:"4s"},
@@ -314,8 +319,9 @@ for(const runout of RUNOUTS){
   // LINE A: UTG opener IP vs BB caller OOP.
   // Flop check-back -> Turn probe / delayed c-bet -> River checked-through.
   // -----------------------------------------------------------------------
+  for(const base of callerOopBases){
   try{
-    const base=baseCallerOop;
+    const baseKey=String(base.scenario.heroPosition).toLowerCase()+"-vs-"+String(base.scenario.villainPosition).toLowerCase();
     const oop0=parseRange(base.scenario.heroRange);
     const ip0=parseRange(base.scenario.villainRange);
     const pot0=Number(base.scenario.pot);
@@ -478,7 +484,7 @@ for(const runout of RUNOUTS){
       }
     }
   }catch(error){
-    failures.push({runout:runout.id,line:"CHECKBACK_PROBE",error:String(error?.message||error).slice(0,1400)});
+    failures.push({runout:runout.id,base:base.matchup,line:"CHECKBACK_PROBE",error:String(error?.message||error).slice(0,1400)});
   }
 
   // -----------------------------------------------------------------------
