@@ -577,7 +577,7 @@ const payload={
   solver:"DCFR_SOLVER",
   upstream:{repository:"exinori/DCFR-SOLVER",commit:"4ade6a9e15a841c41867afde1258b9d110cd6fb1",license:"MIT"},
   iterations:ITER,
-  baseMatchups:[baseCallerOop.matchup,baseAggressorOop.matchup],
+  baseMatchups:[...callerOopBases.map(base=>base.matchup),baseAggressorOop.matchup],
   spots,failures
 };
 await writeFile(OUT,JSON.stringify(payload),"utf8");
