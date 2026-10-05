@@ -329,7 +329,7 @@ for(const runout of RUNOUTS){
     const pot0=Number(base.scenario.pot);
     const stack0=Number(base.scenario.effectiveStack);
     const flopRaw=await solveRaw({
-      id:"caller-oop-flop-"+runout.id,street:"FLOP",board:runout.flop,
+      id:"caller-oop-flop-"+baseKey+"-"+runout.id,street:"FLOP",board:runout.flop,
       oopRange:oop0,ipRange:ip0,potBb:pot0,stackBb:stack0,
       betSizes:"33,75",raiseSizes:"75",maxRaises:1
     });
@@ -338,11 +338,11 @@ for(const runout of RUNOUTS){
     if(!root||!afterCheck)throw new Error("lineA_flop_nodes_missing");
 
     addSpot(spots,materialize({
-      id:"donk-"+runout.id,raw:flopRaw,node:root,tags:["donk_bet"],
+      id:"donk-"+baseKey+"-"+runout.id,raw:flopRaw,node:root,tags:["donk_bet"],
       base,oopRange:oop0,ipRange:ip0,potBb:pot0,stackBb:stack0,history:[]
     }));
     addSpot(spots,materialize({
-      id:"checkback-"+runout.id,raw:flopRaw,node:afterCheck,tags:["check_back_flop","miss_cbet"],
+      id:"checkback-"+baseKey+"-"+runout.id,raw:flopRaw,node:afterCheck,tags:["check_back_flop","miss_cbet"],
       base,oopRange:conditionRange(oop0,root,{kind:"check"}),ipRange:ip0,
       potBb:pot0,stackBb:stack0,
       history:[checkEvent(base.scenario.heroPosition,"FLOP")]
@@ -353,7 +353,7 @@ for(const runout of RUNOUTS){
     const afterCheckBet=findNode(flopRaw,[{kind:"check"},{kind:"raise",pct:flopIpBet.pct}]);
     const flopBetAmt=pot0*(flopIpBet.pct/100);
     addSpot(spots,materialize({
-      id:"checkraise-flop-"+runout.id,raw:flopRaw,node:afterCheckBet,tags:["check_raise"],
+      id:"checkraise-flop-"+baseKey+"-"+runout.id,raw:flopRaw,node:afterCheckBet,tags:["check_raise"],
       base,
       oopRange:conditionRange(oop0,root,{kind:"check"}),
       ipRange:conditionRange(ip0,afterCheck,{label:flopIpBet.label}),
@@ -372,7 +372,7 @@ for(const runout of RUNOUTS){
     const ipTurn=withoutBoard(conditionRange(ip0,afterCheck,{kind:"check"}),turnBoard);
     if(oopTurn.size<4||ipTurn.size<4)throw new Error("lineA_checkcheck_ranges_too_small_"+oopTurn.size+"_"+ipTurn.size);
     const turnRaw=await solveRaw({
-      id:"caller-oop-turn-"+runout.id,street:"TURN",board:turnBoard,
+      id:"caller-oop-turn-"+baseKey+"-"+runout.id,street:"TURN",board:turnBoard,
       oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,
       betSizes:"33,75",raiseSizes:"75",maxRaises:1
     });
@@ -383,11 +383,11 @@ for(const runout of RUNOUTS){
       checkEvent(base.scenario.villainPosition,"FLOP")
     ];
     addSpot(spots,materialize({
-      id:"probe-"+runout.id,raw:turnRaw,node:turnRoot,tags:["probe_bet","vs_missed_cbet","sequential_lines"],
+      id:"probe-"+baseKey+"-"+runout.id,raw:turnRaw,node:turnRoot,tags:["probe_bet","vs_missed_cbet","sequential_lines"],
       base,oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,history:priorCheckCheck
     }));
     addSpot(spots,materialize({
-      id:"delayed-"+runout.id,raw:turnRaw,node:turnAfterCheck,tags:["delayed_cbet","sequential_lines"],
+      id:"delayed-"+baseKey+"-"+runout.id,raw:turnRaw,node:turnAfterCheck,tags:["delayed_cbet","sequential_lines"],
       base,oopRange:conditionRange(oopTurn,turnRoot,{kind:"check"}),ipRange:ipTurn,
       potBb:pot0,stackBb:stack0,
       history:[...priorCheckCheck,checkEvent(base.scenario.heroPosition,"TURN")]
@@ -398,7 +398,7 @@ for(const runout of RUNOUTS){
       const turnAfterCheckBet=findNode(turnRaw,[{kind:"check"},{kind:"raise",pct:turnIpBet.pct}]);
       const betAmt=pot0*(turnIpBet.pct/100);
       addSpot(spots,materialize({
-        id:"turn-checkraise-"+runout.id,raw:turnRaw,node:turnAfterCheckBet,
+        id:"turn-checkraise-"+baseKey+"-"+runout.id,raw:turnRaw,node:turnAfterCheckBet,
         tags:["turn_check_raise","sequential_lines"],
         base,
         oopRange:conditionRange(oopTurn,turnRoot,{kind:"check"}),
@@ -418,7 +418,7 @@ for(const runout of RUNOUTS){
       const ipRiver=withoutBoard(conditionRange(ipTurn,turnAfterCheck,{kind:"check"}),riverBoard);
       if(oopRiver.size>=4&&ipRiver.size>=4){
         const riverRaw=await solveRaw({
-          id:"caller-oop-river-"+runout.id,street:"RIVER",board:riverBoard,
+          id:"caller-oop-river-"+baseKey+"-"+runout.id,street:"RIVER",board:riverBoard,
           oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,
           betSizes:"25,75,125,150",raiseSizes:"75",maxRaises:1
         });
@@ -430,7 +430,7 @@ for(const runout of RUNOUTS){
           checkEvent(base.scenario.villainPosition,"TURN")
         ];
         addSpot(spots,materialize({
-          id:"blockbet-"+runout.id,raw:riverRaw,node:riverRoot,
+          id:"blockbet-"+baseKey+"-"+runout.id,raw:riverRaw,node:riverRoot,
           tags:["block_bet_20_25","sequential_lines"],
           base,oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,history:histRiver
         }));
@@ -445,7 +445,7 @@ for(const runout of RUNOUTS){
           const tags=["river_bluff_catch","river_check_raise","sequential_lines"];
           if(chosen.pct>=120)tags.push("vs_overbet");
           addSpot(spots,materialize({
-            id:"river-response-"+runout.id,raw:riverRaw,node:response,tags,
+            id:"river-response-"+baseKey+"-"+runout.id,raw:riverRaw,node:response,tags,
             base,
             oopRange:conditionRange(oopRiver,riverRoot,{kind:"check"}),
             ipRange:conditionRange(ipRiver,riverAfterCheck,{label:chosen.label}),
@@ -470,7 +470,7 @@ for(const runout of RUNOUTS){
             const raiseAmount=potAfterCall*(raise.pct/100);
             const to=b1+raiseAmount;
             addSpot(spots,materialize({
-              id:"betfold-"+runout.id,raw:riverRaw,node:response,tags:["bet_fold","sequential_lines"],
+              id:"betfold-"+baseKey+"-"+runout.id,raw:riverRaw,node:response,tags:["bet_fold","sequential_lines"],
               base,
               oopRange:conditionRange(oopRiver,riverRoot,{label:small}),
               ipRange:conditionRange(ipRiver,afterSmall,{label:raise.label}),
