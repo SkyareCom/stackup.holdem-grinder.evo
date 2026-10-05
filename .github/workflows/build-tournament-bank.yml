@@ -2,6 +2,12 @@ name: Build Tournament Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-tournament-bank.yml"
+      - "scripts/generate-tournament-bank.py"
+      - "core/stackup-tournament-math.js"
+      - "core/stackup-scenario-catalog.js"
   push:
     branches:
       - main
@@ -70,7 +76,12 @@ jobs:
               for tag in s.get("scenario",{}).get("tags",[]):
                   by_tag[tag]=by_tag.get(tag,0)+solved
           assert by_tag.get("covered_stack",0) >= 2000, ("covered_stack",by_tag.get("covered_stack",0))
-          print({"spots":len(spots),"rejected":len(p.get("rejected",[])),"gate":gate,"covered_stack":by_tag.get("covered_stack",0)})
+          required=["reshove","icm_5_8","icm_9_12","icm_13_18","icm_19_25","icm_final_table","icm_3handed"]
+          deficits={tag:by_tag.get(tag,0) for tag in required if by_tag.get(tag,0)<2000}
+          s10=sum(len(s.get("strategy",[])) for s in spots if int(s.get("scenario",{}).get("tableSize",0))==10)
+          if s10<2000: deficits["s10"]=s10
+          assert not deficits, ("strict_2000_deficits",deficits)
+          print({"spots":len(spots),"rejected":len(p.get("rejected",[])),"gate":gate,"covered_stack":by_tag.get("covered_stack",0),"s10":s10,"targets":{tag:by_tag.get(tag,0) for tag in required}})
           PY
 
       - name: Audit all 162 scenario cards

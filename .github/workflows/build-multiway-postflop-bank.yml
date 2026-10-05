@@ -2,6 +2,11 @@ name: Build Multiway Postflop Bank
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/build-multiway-postflop-bank.yml"
+      - "scripts/generate-multiway-postflop-bank.py"
+      - "data/solver/postflop.json"
   push:
     branches:
       - main
@@ -57,7 +62,7 @@ jobs:
               valid++;
             }
           }
-          if(valid<1500)throw new Error('postflop_multiway below 1500: '+valid);
+          if(valid<2000)throw new Error('postflop_multiway below strict 2000 floor: '+valid);
           console.log({validatedSolvedDecisions:valid,rootScenarios:d.spots?.length||0});
           NODE
 
