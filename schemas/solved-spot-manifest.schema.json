@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "STACKUP Solved Spot Manifest",
+  "type": "object",
+  "required": ["schemaVersion","engine","family","solverVersion","sha256","decisionCount","objectPath","compression","validated"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "engine": {"type":"string","minLength":1},
+    "family": {"type":"string","minLength":1},
+    "solverVersion": {"type":"string","minLength":1},
+    "sha256": {"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "decisionCount": {"type":"integer","minimum":1},
+    "objectPath": {"type":"string","minLength":1},
+    "compression": {"const":"gzip"},
+    "validated": {"const":true},
+    "sourceCommit": {"type":"string"},
+    "createdAt": {"type":"string"}
+  },
+  "additionalProperties": true
+}
