@@ -1,0 +1,27 @@
+name: Audit Filter Combinations
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Audit individual coverage
+        run: node scripts/audit-scenario-coverage.mjs
+      - name: Audit filter combinations
+        run: node scripts/audit-filter-combinations.mjs
+      - name: Upload combination audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: filter-combinations-audit
+          path: data/solver/filter-combinations.json
+          if-no-files-found: error
