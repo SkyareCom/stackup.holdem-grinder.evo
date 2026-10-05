@@ -16,7 +16,7 @@ const POSITION_ORDER=["SB","BB","UTG","HJ","CO","BTN"];
 const TABLE_POSITIONS=["BTN","SB","BB","UTG","UTG+1","UTG+2","MP","LJ","HJ","CO"];
 const BOARDS={
   FLOP:["As7d2c","Qh8h3c","Kd9s4h","Tc8c5d"],
-  TURN:["As7d2cJh","Qh8h3c5d","9c6d2sKh","Kd9s4h2c"],
+  TURN:["As7d2cJh","Qh8h3c5d","9c6d2sKh","Kd9s4h2c","Jh8s4d2c"],
   RIVER:["As7d2cJh4s","Qh8h3c5dTs","Kd9s4h2c7d","Tc8c5dQs3h"]
 };
 const SHARD_COUNT=Math.max(1,Number(process.env.STACKUP_SHARD_COUNT||1));
