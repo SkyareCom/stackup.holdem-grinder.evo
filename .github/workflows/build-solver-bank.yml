@@ -61,7 +61,7 @@ jobs:
           STACKUP_MAX_MATCHUPS: "30"
           STACKUP_SHARD_COUNT: "12"
           STACKUP_SHARD_INDEX: ${{ matrix.shard }}
-          STACKUP_BOARDS_PER_STREET: "4"
+          STACKUP_BOARDS_PER_STREET: "5"
           STACKUP_SHARD_OUT: ${{ github.workspace }}/.stackup/solver-shard
         run: node scripts/generate-solver-bank.mjs
 
