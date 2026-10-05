@@ -17,3 +17,21 @@ for(const m of manifests){
  if(!wr.ok) throw new Error('manifest_failed:'+m.bankName+':'+wr.status+':'+await wr.text());
  console.log('verified',m.bankName,m.decisionCount,m.sha256);
 }
+
+const catalog=JSON.parse(await readFile('.solved-core/catalog.json','utf8'));
+const manifestRows=await fetch(base+'/rest/v1/solved_spot_manifests?select=id,sha256',{headers:{authorization:'Bearer '+key,apikey:key}});
+if(!manifestRows.ok)throw new Error('manifest_lookup_failed:'+manifestRows.status+':'+await manifestRows.text());
+const manifestBySha=new Map((await manifestRows.json()).map(x=>[x.sha256,x.id]));
+const batchSize=500;
+for(let i=0;i<catalog.length;i+=batchSize){
+ const batch=catalog.slice(i,i+batchSize).map(x=>{
+   const manifest_id=manifestBySha.get(x.manifest_sha256);
+   if(!manifest_id)throw new Error('manifest_id_missing:'+x.bank_name+':'+x.manifest_sha256);
+   const {bank_name,manifest_sha256,...row}=x;
+   return {...row,manifest_id};
+ });
+ const wr=await fetch(base+'/rest/v1/solved_spot_catalog?on_conflict=solve_id',{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json',prefer:'resolution=ignore-duplicates'},body:JSON.stringify(batch)});
+ if(!wr.ok)throw new Error('catalog_failed:'+i+':'+wr.status+':'+await wr.text());
+ console.log('catalog_batch',i,batch.length);
+}
+console.log('catalog_complete',catalog.length);
