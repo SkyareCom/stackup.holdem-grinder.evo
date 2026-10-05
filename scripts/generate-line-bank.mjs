@@ -510,7 +510,7 @@ for(const runout of RUNOUTS){
     const flopBet=chooseBet(oop0,root);
     if(!flopBet)throw new Error("lineB_flop_bet_missing");
     const afterBet=findNode(flopRaw,[{label:flopBet.label}]);
-    const betAmt=pot0*(flopBet.pct/100);
+    const betAmt=solverBetBb(pot0,flopBet.pct);
     addSpot(spots,materialize({
       id:"float-"+runout.id,raw:flopRaw,node:afterBet,tags:["float_flop"],
       base,
@@ -543,7 +543,7 @@ for(const runout of RUNOUTS){
     const turnBet=chooseBet(oopTurn,turnRoot);
     if(!turnBet)throw new Error("lineB_turn_bet_missing");
     const turnAfterBet=findNode(turnRaw,[{label:turnBet.label}]);
-    const turnBetAmt=potTurn*(turnBet.pct/100);
+    const turnBetAmt=solverBetBb(potTurn,turnBet.pct);
     const riverBoard=appendCard(turnBoard,runout.river);
     const oopRiver=withoutBoard(conditionRange(oopTurn,turnRoot,{label:turnBet.label}),riverBoard);
     const ipRiver=withoutBoard(conditionRange(ipTurn,turnAfterBet,{kind:"call"}),riverBoard);
