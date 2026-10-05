@@ -123,6 +123,36 @@ jobs:
           console.log({strict:true,publishFloor:policy.publishFloor,currentGoal:policy.currentGoal,longTerm:policy.growth.longTermTargetPerFilter});
           NODE
 
+      - name: Validate strategic decision identity
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const code=fs.readFileSync('core/stackup-solved-spot-contract.js','utf8');
+          const fake={};new Function('window','globalThis',code)(fake,fake);
+          const contract=fake.StackUpSolvedSpotContract;
+          if(typeof contract.strategicDecisionId!=='function')throw new Error('strategicDecisionId unavailable');
+          const entry={hand:'AA',actions:[{kind:'raise',action:'RAISE',frequency:100}]};
+          const scenario={
+            gameType:'CASH',street:'PRE-FLOP',tableSize:6,
+            positions:['UTG','HJ','CO','BTN','SB','BB'],
+            heroPosition:'UTG',villainPosition:'BB',
+            effectiveStack:50,heroStack:50,
+            playerStacks:{UTG:50,HJ:50,CO:50,BTN:50,SB:49.5,BB:49},
+            pot:1.5,currentBet:1,board:[],actionHistory:[]
+          };
+          const a={solver:'DCFR_SOLVER',solveId:'run-cash',scenario,strategy:[entry]};
+          const b={solver:'DCFR_SOLVER',solveId:'run-mtt',scenario:{...scenario,gameType:'TOURNAMENT',phase:'EARLY',fieldSize:'500',tournamentType:'REGULAR'},strategy:[entry]};
+          const provenanceA=contract.solvedDecisionId(a,entry);
+          const provenanceB=contract.solvedDecisionId(b,entry);
+          const strategicA=contract.strategicDecisionId(a,entry);
+          const strategicB=contract.strategicDecisionId(b,entry);
+          if(provenanceA===provenanceB)throw new Error('provenance ids should remain distinct');
+          if(strategicA!==strategicB)throw new Error('cash/mtt label duplicate was not deduplicated');
+          const icm={...b,solveId:'run-icm',scenario:{...b.scenario,payouts:[0.5,0.3,0.2,0,0,0]}};
+          if(contract.strategicDecisionId(icm,entry)===strategicB)throw new Error('ICM payout state must remain strategically distinct');
+          console.log({strategicIdentity:true,provenanceDistinct:true,contextLabelsDeduplicated:true,icmDistinct:true});
+          NODE
+
       - name: Run strict coverage audit
         run: |
           node scripts/audit-scenario-coverage.mjs
