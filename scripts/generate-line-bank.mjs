@@ -486,6 +486,7 @@ for(const runout of RUNOUTS){
   }catch(error){
     failures.push({runout:runout.id,base:base.matchup,line:"CHECKBACK_PROBE",error:String(error?.message||error).slice(0,1400)});
   }
+  }
 
   // -----------------------------------------------------------------------
   // LINE B: UTG opener OOP vs HJ caller IP.
