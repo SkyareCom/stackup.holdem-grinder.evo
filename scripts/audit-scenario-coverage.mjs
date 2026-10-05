@@ -1,5 +1,6 @@
 import {readFile,writeFile} from "node:fs/promises";
 import {resolve,join} from "node:path";
+import {fileURLToPath} from "node:url";
 
 const ROOT=resolve(process.cwd());
 const SOLVER_DIR=join(ROOT,"data","solver");
@@ -178,7 +179,7 @@ function spotFacesAggression(spot){
   const kind=String(last.kind||last.action||"").toLowerCase();
   return actor!==hero&&/raise|bet|jam|all\s*-?\s*in/.test(kind);
 }
-function candidateMatchesItem(item,spot,hand){
+export function candidateMatchesItem(item,spot,hand){
   if(item?.section==="math_special"&&["implied_odds","reverse_implied_odds"].includes(item.id)){
     const street=normStreet(spot?.scenario?.street);
     if(!["FLOP","TURN"].includes(street))return false;
@@ -192,7 +193,7 @@ function candidateMatchesItem(item,spot,hand){
   }
   return true;
 }
-function candidateCount(spots,item=null){
+export function candidateCount(spots,item=null){
   const unique=new Set();
   for(const spot of spots){
     for(const entry of spot?.strategy||[]){
@@ -308,7 +309,7 @@ function tags(spot){
   }
   return set;
 }
-function matchAdjust(item,spot){
+export function matchAdjust(item,spot){
   const s=spot?.scenario||{};
   switch(item.section){
     case "mode": return item.id==="mtt"?String(s.gameType||"").toUpperCase()==="TOURNAMENT":item.id==="cash"?String(s.gameType||"").toUpperCase()==="CASH":false;
@@ -334,7 +335,7 @@ function matchAdjust(item,spot){
     default:return false;
   }
 }
-function matchAdvance(item,spot){
+export function matchAdvance(item,spot){
   const street=normStreet(spot?.scenario?.street);
   if(["pre_special","blind_special","short_special","icm_special","pko_special"].includes(item.section)&&street!=="PRE-FLOP")return false;
   if(item.section==="aggr_special"){
@@ -351,11 +352,30 @@ function matchAdvance(item,spot){
   return tags(spot).has(item.id);
 }
 
-function baseSpotsFor(item){
+export function baseSpotsFor(item){
   const direct=all.filter(spot=>item.section.endsWith("_special")?matchAdvance(item,spot):matchAdjust(item,spot));
   return direct;
 }
 
+export function countCombination(items){
+  const unique=new Set();
+  for(const spot of all){
+    const spotMatches=items.every(item =>
+      item.section.endsWith("_special") ? matchAdvance(item,spot) : matchAdjust(item,spot)
+    );
+    if(!spotMatches)continue;
+    for(const entry of spot?.strategy||[]){
+      if(!entry?.hand||!Array.isArray(entry.actions)||!entry.actions.length)continue;
+      if(!items.every(item=>candidateMatchesItem(item,spot,entry.hand)))continue;
+      const verdict=solvedContract.validateSolvedDecision(spot,entry);
+      if(verdict.ok)unique.add(verdict.id);
+    }
+  }
+  return unique.size;
+}
+export {all,catalog,solvedContract,solvedPolicy};
+
+async function main(){
 const cards=[];
 for(const item of catalog.ALL){
   const spots=baseSpotsFor(item);
@@ -405,3 +425,7 @@ console.log(JSON.stringify({
   incomplete:summary.incomplete,
   atCurrentGoal:summary.atCurrentGoal
 },null,2));
+
+}
+const invokedDirectly=process.argv[1]&&fileURLToPath(import.meta.url)===resolve(process.argv[1]);
+if(invokedDirectly)await main();
