@@ -16,14 +16,16 @@ await mkdir(WORK,{recursive:true});
 await mkdir(dirname(OUT),{recursive:true});
 
 const baseBank=JSON.parse(await readFile(join(ROOT,"data","solver","postflop.json"),"utf8"));
-const callerOopBases=baseBank.filter(s=>
-  ["UTG vs BB","UTG vs SB"].includes(s?.matchup)&&
-  s?.scenario?.street==="FLOP"&&
-  ["BB","SB"].includes(s?.scenario?.heroPosition)&&
-  s?.scenario?.villainPosition==="UTG"
+const callerOopBases=["UTG vs BB","UTG vs SB"].map(matchup=>
+  baseBank.find(s=>
+    s?.matchup===matchup&&
+    s?.scenario?.street==="FLOP"&&
+    ["BB","SB"].includes(s?.scenario?.heroPosition)&&
+    s?.scenario?.villainPosition==="UTG"
+  )
 );
 const baseAggressorOop=baseBank.find(s=>s?.matchup==="UTG vs HJ"&&s?.scenario?.street==="FLOP");
-if(callerOopBases.length!==2||!baseAggressorOop)throw new Error("required_line_base_matchups_missing");
+if(callerOopBases.some(base=>!base)||!baseAggressorOop)throw new Error("required_line_base_matchups_missing");
 
 const ALL_RUNOUTS=[
   {id:"a",flop:"As7d2c",turn:"Jh",river:"4s"},
