@@ -66,6 +66,12 @@ const CSS=`
 .spotactiontext,.heroturnnotice{border-radius:2px!important;border-color:var(--cine-line)!important;background:rgba(3,4,5,.88)!important}
 .spotsetupcard{border-radius:4px!important;background:linear-gradient(145deg,rgba(14,17,20,.94),rgba(4,5,6,.98))!important;border:1px solid var(--cine-line)!important;box-shadow:0 20px 60px rgba(0,0,0,.6),var(--cine-glow)!important}
 .spotsetupstart{border-radius:3px!important;background:linear-gradient(180deg,#d7b46a,#9c7135)!important;color:#080808!important;border:1px solid #f0d595!important}
+
+/* DIRECT APP PHOTOGRAPHIC COMPOSITION — production UI, not concept */
+.screen[data-cine-photo]{background-color:#020303!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+.screen[data-cine-photo]:after{background:linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.42) 42%,rgba(0,0,0,.18) 68%,rgba(0,0,0,.72)),linear-gradient(0deg,rgba(0,0,0,.82),transparent 44%,rgba(0,0,0,.22))!important}
+.screen[data-cine-photo] .content{background:transparent!important}
+.screen[data-cine-photo] .homegrid .tower:first-child{background:linear-gradient(90deg,rgba(5,6,6,.90),rgba(5,6,6,.32))!important;backdrop-filter:blur(5px)!important}
 /* V3 SCENE ARCHITECTURE — replaces app-card composition with film-frame composition */
 .screen{background:#020303!important}
 .header{padding:calc(env(safe-area-inset-top) + 8px) 15px 5px!important;gap:5px!important;background:linear-gradient(180deg,rgba(0,0,0,.84),rgba(0,0,0,.18) 72%,transparent)!important}
@@ -233,7 +239,7 @@ function install(){
  const root=host&&host.shadowRoot;
  if(!root)return false;
  if(root.getElementById('cinematicPremiumStyle'))return true;
- const style=document.createElement('style');style.id='cinematicPremiumStyle';style.textContent=CSS;root.appendChild(style);
+ const style=document.createElement('style');style.id='cinematicPremiumStyle';style.textContent=CSS;root.appendChild(style);wirePhotographicScenes(root);
  return true;
 }
 let n=0;const timer=setInterval(()=>{if(install()||++n>120)clearInterval(timer)},50);
