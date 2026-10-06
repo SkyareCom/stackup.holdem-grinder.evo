@@ -66,6 +66,45 @@ const CSS=`
 .spotactiontext,.heroturnnotice{border-radius:2px!important;border-color:var(--cine-line)!important;background:rgba(3,4,5,.88)!important}
 .spotsetupcard{border-radius:4px!important;background:linear-gradient(145deg,rgba(14,17,20,.94),rgba(4,5,6,.98))!important;border:1px solid var(--cine-line)!important;box-shadow:0 20px 60px rgba(0,0,0,.6),var(--cine-glow)!important}
 .spotsetupstart{border-radius:3px!important;background:linear-gradient(180deg,#d7b46a,#9c7135)!important;color:#080808!important;border:1px solid #f0d595!important}
+/* V2 FILMIC ENGINE — original in-app rendering, no image assets */
+.screen{perspective:1000px!important;overflow:hidden!important}
+.screen:before{opacity:.62!important;background:
+ linear-gradient(115deg,transparent 0 34%,rgba(255,224,159,.035) 42%,transparent 51%),
+ repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 54px),
+ repeating-linear-gradient(0deg,rgba(255,255,255,.012) 0 1px,transparent 1px 54px)!important;
+ mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,.15) 72%,transparent)!important}
+.screen:after{background:
+ radial-gradient(ellipse at 50% 15%,transparent 0 18%,rgba(0,0,0,.18) 45%,rgba(0,0,0,.78) 100%),
+ linear-gradient(90deg,rgba(0,0,0,.52),transparent 18% 82%,rgba(0,0,0,.52))!important}
+.header:before{content:"";position:absolute;left:-25%;top:-35px;width:150%;height:130px;pointer-events:none;
+ background:radial-gradient(ellipse at 50% 0,rgba(224,190,112,.16),transparent 55%);filter:blur(8px);opacity:.85}
+.header:after{content:"";position:absolute;left:9%;right:9%;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,var(--cine-gold),transparent);opacity:.58;box-shadow:0 0 14px rgba(214,174,99,.28)}
+.content:before{content:"";position:fixed;z-index:-1;left:50%;top:20%;width:74vw;max-width:310px;height:58vh;transform:translateX(-50%) rotate(-8deg);pointer-events:none;
+ background:linear-gradient(100deg,transparent 8%,rgba(225,194,125,.045) 44%,rgba(225,194,125,.012) 62%,transparent 78%);filter:blur(12px);opacity:.9}
+.content:after{content:"";position:fixed;z-index:-1;left:50%;bottom:11%;width:78%;height:24%;transform:translateX(-50%);pointer-events:none;
+ background:radial-gradient(ellipse,rgba(214,174,99,.065),transparent 68%);filter:blur(20px)}
+.slot,.tsec,.statscard,.statshero,.spotanalysis,.spotfinal,.spotsetupcard,.homegrid .tower{backdrop-filter:blur(14px) saturate(112%)!important;-webkit-backdrop-filter:blur(14px) saturate(112%)!important}
+.slot,.statscard,.statshero,.spotanalysis,.spotfinal,.spotsetupcard{box-shadow:inset 0 1px rgba(255,255,255,.055),inset 0 -18px 40px rgba(0,0,0,.18),0 18px 48px rgba(0,0,0,.32)!important}
+.homegrid .tower{transform-style:preserve-3d!important}
+.homegrid .tower:nth-child(even){background:linear-gradient(155deg,rgba(20,24,27,.82),rgba(4,5,6,.96))!important}
+.homegrid .tower:nth-child(odd){background:linear-gradient(205deg,rgba(26,22,16,.70),rgba(4,5,6,.97) 66%)!important}
+.homegrid .tower:first-child{min-height:158px!important;background:
+ radial-gradient(circle at 79% 24%,rgba(238,203,126,.20),transparent 19%),
+ linear-gradient(120deg,rgba(31,27,19,.96),rgba(5,7,9,.97) 62%)!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.07),inset -40px -30px 90px rgba(0,0,0,.42),0 20px 52px rgba(0,0,0,.40),0 0 26px rgba(214,174,99,.10)!important}
+.homegrid .tower:first-child:after{width:86px!important;height:86px!important;right:-18px!important;top:-16px!important;border:1px solid rgba(214,174,99,.16)!important;border-radius:50%!important;background:
+ radial-gradient(circle,transparent 47%,rgba(214,174,99,.08) 48% 49%,transparent 50%),
+ conic-gradient(from 25deg,transparent 0 10%,rgba(214,174,99,.20) 10% 11%,transparent 11% 29%,rgba(214,174,99,.14) 29% 30%,transparent 30% 100%)!important;
+ box-shadow:0 0 34px rgba(214,174,99,.06)!important}
+.ptable,.poker-table,.tablefelt{position:relative!important;background:
+ radial-gradient(ellipse at 50% 40%,rgba(38,55,49,.70),rgba(10,20,18,.94) 55%,rgba(2,4,4,.99) 76%)!important;
+ border:1px solid rgba(223,188,111,.52)!important;box-shadow:inset 0 0 22px rgba(224,190,112,.12),inset 0 0 80px rgba(0,0,0,.86),0 22px 60px rgba(0,0,0,.60),0 0 22px rgba(214,174,99,.10)!important}
+.ptable:after,.poker-table:after,.tablefelt:after{content:"";position:absolute;inset:4%;border:1px solid rgba(214,174,99,.11);border-radius:inherit;pointer-events:none;box-shadow:inset 0 0 20px rgba(214,174,99,.035)}
+.seat.hero .av,.seat.hero.spot-turn .av{animation:cineHeroPulse 2.2s ease-in-out infinite}
+.spotfeedback.answered,.spotfinal{animation:cineDebrief .42s cubic-bezier(.16,.8,.2,1) both!important}
+@keyframes cineHeroPulse{0%,100%{box-shadow:0 0 0 1px rgba(214,174,99,.35),0 0 14px rgba(214,174,99,.14)}50%{box-shadow:0 0 0 1px rgba(239,207,137,.62),0 0 30px rgba(214,174,99,.30)}}
+@keyframes cineDebrief{from{opacity:0;transform:scale(.985) translateY(7px);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+@media(prefers-reduced-motion:reduce){.seat.hero .av,.seat.hero.spot-turn .av{animation:none!important}.spotfeedback.answered,.spotfinal{animation:none!important}}
 /* HOME: cinematic command deck */
 .homegrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-content:start!important;position:relative;padding-top:32px!important}
 .homegrid:before{content:"TACTICAL TRAINING // COMMAND DECK";position:absolute;left:1px;top:5px;color:var(--cine-gold);font:8px Arial,sans-serif;letter-spacing:1.8px}
