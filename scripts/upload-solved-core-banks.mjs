@@ -44,7 +44,7 @@ for(let i=0;i<catalog.length;i+=batchSize){
    const manifest_id=manifestBySha.get(x.manifest_sha256);
    if(!manifest_id)throw new Error('manifest_id_missing:'+x.bank_name+':'+x.manifest_sha256);
    const {bank_name,manifest_sha256,...row}=x;
-   return {...row,manifest_id};
+   return {...row,manifest_id,audit_status:'APPROVED',published:true,provenance:{...(row.provenance||{}),audit_ref:auditRef,approval_sha256:approvalSha256,audited_at:approval.audited_at,source_commit:sourceCommit}};
  });
  const wr=await fetch(base+'/rest/v1/solved_spot_catalog?on_conflict=solve_id',{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json',prefer:'resolution=ignore-duplicates'},body:JSON.stringify(batch)});
  if(!wr.ok)throw new Error('catalog_failed:'+i+':'+wr.status+':'+await wr.text());
