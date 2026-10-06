@@ -11,7 +11,8 @@ const sha256=v=>createHash('sha256').update(typeof v==='string'?v:JSON.stringify
 const normGame=v=>String(v||'').trim().toUpperCase();
 const normStreet=v=>C.normStreet(v);
 const rows=[];
-const seen=new Set();
+const seenIds=new Set();
+const seenDecisions=new Map();
 
 for(const m of manifests){
   const payload=JSON.parse(await readFile('data/solver/'+m.bankName,'utf8'));
@@ -20,21 +21,23 @@ for(const m of manifests){
     for(const entry of Array.isArray(spot?.strategy)?spot.strategy:[]){
       const v=C.validateSolvedDecision(spot,entry);
       if(!v.ok)throw new Error('invalid_decision:'+m.bankName+':'+(spot?.solveId||spot?.id||'unknown')+':'+v.errors.join(','));
-      if(seen.has(v.id))throw new Error('duplicate_decision:'+v.id);
-      seen.add(v.id);
+      if(seenIds.has(v.id))throw new Error('duplicate_solve_id:'+v.id);
+      seenIds.add(v.id);
       const scenario=spot.scenario||{};
       const scenarioHash=sha256(JSON.stringify(C.stable({
         contractVersion:C.VERSION,
         scenarioFingerprint:v.scenarioFingerprint
       })));
+      // Canonical uniqueness is the concrete scenario + hand, never an arbitrary solve id.
+      const handKey=String(entry.hand||'').trim();
       const decisionHash=sha256(JSON.stringify(C.stable({
         contractVersion:C.VERSION,
-        solveId:v.id,
         scenarioHash,
-        hand:String(entry.hand||'').trim(),
-        solver:String(spot.solver||'').trim(),
-        solverRef:String(spot.solveId||spot.id||'').trim()
+        hand:handKey
       })));
+      const prior=seenDecisions.get(decisionHash);
+      if(prior)throw new Error('duplicate_scenario_hand:'+decisionHash+':'+prior+':'+v.id);
+      seenDecisions.set(decisionHash,v.id);
       rows.push({
         solve_id:v.id,
         bank_name:m.bankName,
@@ -45,7 +48,7 @@ for(const m of manifests){
         street:normStreet(scenario.street),
         hero_position:scenario.heroPosition??null,
         effective_stack:Number.isFinite(Number(scenario.effectiveStack))?Number(scenario.effectiveStack):null,
-        hand_key:String(entry.hand||'').trim(),
+        hand_key:handKey,
         solver_ref:String(spot.solveId||spot.id||'').trim(),
         object_path:m.objectPath,
         scenario_hash:scenarioHash,
@@ -58,4 +61,4 @@ for(const m of manifests){
   }
 }
 await writeFile('.solved-core/catalog.json',JSON.stringify(rows)+'\n');
-console.log(JSON.stringify({catalogRows:rows.length,uniqueSolveIds:seen.size,banks:manifests.length},null,2));
+console.log(JSON.stringify({catalogRows:rows.length,uniqueSolveIds:seenIds.size,uniqueScenarioHands:seenDecisions.size,banks:manifests.length},null,2));
