@@ -336,7 +336,7 @@ function materialize({
 }
 function addSpot(spots,spot){if(spot)spots.push(spot);}
 
-const spots=[],failures=[];
+const spots=[],failures=[],unavailable=[];
 
 for(const runout of RUNOUTS){
   // -----------------------------------------------------------------------
