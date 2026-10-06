@@ -491,6 +491,102 @@ for(const runout of RUNOUTS){
   }
 
   // -----------------------------------------------------------------------
+  // LINE C/D RESTORED: solver-native river tactics with legal raise trees.
+  for(const base of callerOopBases){
+    try{
+      const baseKey=String(base.scenario.heroPosition).toLowerCase()+"-vs-"+String(base.scenario.villainPosition).toLowerCase();
+      const riverBoard=appendCard(appendCard(runout.flop,runout.turn),runout.river);
+      const oopRiver=withoutBoard(parseRange(base.scenario.heroRange),riverBoard);
+      const ipRiver=withoutBoard(parseRange(base.scenario.villainRange),riverBoard);
+      if(oopRiver.size<4||ipRiver.size<4)throw new Error("river_tactical_ranges_too_small_"+oopRiver.size+"_"+ipRiver.size);
+      const pot0=normalizeBb(Number(base.scenario.pot));
+      const stack0=normalizeBb(Number(base.scenario.effectiveStack));
+      const riverRaw=await solveRaw({
+        id:"river-tactical-"+baseKey+"-"+runout.id,street:"RIVER",board:riverBoard,
+        oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,
+        betSizes:"25,75,125,150",raiseSizes:"75",maxRaises:1
+      });
+      const riverRoot=findNode(riverRaw,[]);
+      const riverAfterCheck=findNode(riverRaw,[{kind:"check"}]);
+      addSpot(spots,materialize({
+        id:"river-tactical-blockbet-"+baseKey+"-"+runout.id,raw:riverRaw,node:riverRoot,
+        tags:["block_bet_20_25"],base,oopRange:oopRiver,ipRange:ipRiver,
+        potBb:pot0,stackBb:stack0,history:[]
+      }));
+      const over=(riverAfterCheck?.combos||[]).flatMap(x=>x.actions||[])
+        .map(a=>String(a.action)).find(x=>actionKind(x)==="raise"&&Number(sizingPct(x))>=120);
+      const fallbackBet=chooseBet(ipRiver,riverAfterCheck,{minPct:50,maxPct:160});
+      const chosen=over?{label:over,pct:sizingPct(over)}:fallbackBet;
+      if(chosen){
+        const response=findNode(riverRaw,[{kind:"check"},{label:chosen.label}]);
+        const betAmt=solverBetBb(pot0,chosen.pct);
+        const tags=["river_bluff_catch"];
+        if(chosen.pct>=120)tags.push("vs_overbet");
+        addSpot(spots,materialize({
+          id:"river-tactical-response-"+baseKey+"-"+runout.id,raw:riverRaw,node:response,tags,base,
+          oopRange:conditionRange(oopRiver,riverRoot,{kind:"check"}),
+          ipRange:conditionRange(ipRiver,riverAfterCheck,{label:chosen.label}),
+          potBb:pot0+betAmt,stackBb:stack0,currentBet:betAmt,
+          history:[checkEvent(base.scenario.heroPosition,"RIVER"),actionEvent(base.scenario.villainPosition,chosen.label,betAmt,"RIVER")]
+        }));
+      }
+
+      const checkRaiseRaw=await solveRaw({
+        id:"river-checkraise-"+baseKey+"-"+runout.id,street:"RIVER",board:riverBoard,
+        oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,
+        betSizes:"125",raiseSizes:"75",maxRaises:2
+      });
+      const crRoot=findNode(checkRaiseRaw,[]);
+      const crAfterCheck=findNode(checkRaiseRaw,[{kind:"check"}]);
+      const crBet=chooseBet(ipRiver,crAfterCheck,{minPct:120,maxPct:130});
+      if(crBet){
+        const crResponse=findNode(checkRaiseRaw,[{kind:"check"},{label:crBet.label}]);
+        const hasLegalRaise=(crResponse?.combos||[]).some(combo=>(combo.actions||[]).some(a=>actionKind(a.action)==="raise"&&Number(a.weight??a.frequency??0)>0));
+        if(hasLegalRaise){
+          const betAmt=solverBetBb(pot0,crBet.pct);
+          addSpot(spots,materialize({
+            id:"river-checkraise-legal-"+baseKey+"-"+runout.id,raw:checkRaiseRaw,node:crResponse,tags:["river_check_raise"],
+            base,oopRange:conditionRange(oopRiver,crRoot,{kind:"check"}),
+            ipRange:conditionRange(ipRiver,crAfterCheck,{label:crBet.label}),
+            potBb:pot0+betAmt,stackBb:stack0,currentBet:betAmt,
+            history:[checkEvent(base.scenario.heroPosition,"RIVER"),actionEvent(base.scenario.villainPosition,crBet.label,betAmt,"RIVER")]
+          }));
+        }
+      }
+
+      const betFoldRaw=await solveRaw({
+        id:"river-betfold-"+baseKey+"-"+runout.id,street:"RIVER",board:riverBoard,
+        oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,
+        betSizes:"25",raiseSizes:"75",maxRaises:2
+      });
+      const bfRoot=findNode(betFoldRaw,[]);
+      const smallLabel=(bfRoot?.combos||[]).flatMap(x=>x.actions||[])
+        .map(a=>String(a.action)).find(x=>actionKind(x)==="raise"&&Math.abs(Number(sizingPct(x))-25)<=3);
+      if(smallLabel){
+        const bfAfterSmall=findNode(betFoldRaw,[{label:smallLabel}]);
+        const raise=chooseBet(ipRiver,bfAfterSmall,{minPct:70,maxPct:80});
+        if(raise){
+          const bfResponse=findNode(betFoldRaw,[{label:smallLabel},{label:raise.label}]);
+          const hasFold=(bfResponse?.combos||[]).some(combo=>(combo.actions||[]).some(a=>actionKind(a.action)==="fold"&&Number(a.weight??a.frequency??0)>0));
+          if(hasFold){
+            const b1=solverBetBb(pot0,25);
+            const raiseAmount=solverBetBb(pot0+2*b1,raise.pct);
+            const to=b1+raiseAmount;
+            addSpot(spots,materialize({
+              id:"river-betfold-legal-"+baseKey+"-"+runout.id,raw:betFoldRaw,node:bfResponse,tags:["bet_fold"],base,
+              oopRange:conditionRange(oopRiver,bfRoot,{label:smallLabel}),
+              ipRange:conditionRange(ipRiver,bfAfterSmall,{label:raise.label}),
+              potBb:pot0+b1+to,stackBb:stack0,currentBet:to,
+              history:[actionEvent(base.scenario.heroPosition,smallLabel,b1,"RIVER"),actionEvent(base.scenario.villainPosition,raise.label,to,"RIVER")]
+            }));
+          }
+        }
+      }
+    }catch(error){
+      failures.push({runout:runout.id,line:"RIVER_TACTICS",error:errorDetail(error)});
+    }
+  }
+
   // LINE B: UTG opener OOP vs HJ caller IP.
   // Flop c-bet -> call -> Turn double barrel -> call -> River triple barrel.
   // -----------------------------------------------------------------------
