@@ -2,8 +2,8 @@
    Visual-only layer. Does not alter solver/filter/training logic. */
 (function(){
 'use strict';
-const PHOTO={home:'assets/cinematic/grinder-home-cinematic.webp',spots:'assets/cinematic/grinder-training-cinematic.webp',analysis:'assets/cinematic/grinder-analysis-cinematic.webp',stats:'assets/cinematic/grinder-stats-cinematic.webp'};
-function wirePhotographicScenes(root){const screen=root.querySelector('.screen');if(!screen)return;const apply=()=>{const active=root.querySelector('.tab.on')?.dataset?.t||'home';const key=active==='menu'?'stats':active;const src=PHOTO[key];if(src){screen.dataset.cinePhoto=key;screen.style.backgroundImage='url("'+src+'")'}else{delete screen.dataset.cinePhoto;screen.style.backgroundImage=''}};root.addEventListener('click',e=>{if(e.target.closest('.tab,.hbtn'))setTimeout(apply,0)},true);apply()}
+const PHOTO={home:'assets/cinematic/grinder-home-cinematic.webp',profile:'assets/cinematic/grinder-advance-cinematic.webp',train:'assets/cinematic/grinder-settings-cinematic.webp',spots:'assets/cinematic/grinder-training-cinematic.webp',analysis:'assets/cinematic/grinder-analysis-cinematic.webp',menu:'assets/cinematic/grinder-stats-cinematic.webp'};
+function wirePhotographicScenes(root){const screen=root.querySelector('.screen');if(!screen)return;const apply=()=>{const active=root.querySelector('.tab.on')?.dataset?.t||'home';const key=active;const src=PHOTO[key];if(src){screen.dataset.cinePhoto=key;screen.style.backgroundImage='url("'+src+'")'}else{delete screen.dataset.cinePhoto;screen.style.backgroundImage=''}};root.addEventListener('click',e=>{if(e.target.closest('.tab,.hbtn'))setTimeout(apply,0)},true);apply()}
 
 const CSS=`
 :host{
