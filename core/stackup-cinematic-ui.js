@@ -87,6 +87,18 @@ const CSS=`
 .screen[data-cine-photo="home"] .homegrid .tower:active,.screen[data-cine-photo="home"] .homegrid .tower.on{transform:translateY(1px)!important;border-color:#e2bd75!important;background:rgba(28,23,16,.88)!important;color:#fff!important}
 @media(max-width:390px){.screen[data-cine-photo="home"] .homegrid{gap:7px!important;padding-top:31vh!important}.screen[data-cine-photo="home"] .homegrid .tower{min-height:84px!important;padding:11px 8px!important}}
 
+
+/* SPOTS / TRAINING — photographic felt, functional controls preserved */
+.screen[data-cine-photo="spots"] .content.spotsmode{background:transparent!important}
+.screen[data-cine-photo="spots"] .pokerwrap,.screen[data-cine-photo="spots"] .tablewrap{background:transparent!important}
+.screen[data-cine-photo="spots"] .felt{background:radial-gradient(ellipse at 50% 43%,rgba(18,69,53,.76),rgba(5,28,23,.90) 58%,rgba(2,9,8,.96) 100%)!important;border:2px solid rgba(183,142,75,.72)!important;box-shadow:0 28px 55px rgba(0,0,0,.58),inset 0 0 50px rgba(0,0,0,.58),0 0 0 5px rgba(20,15,10,.78)!important}
+.screen[data-cine-photo="spots"] .av{box-shadow:0 8px 18px rgba(0,0,0,.6),0 0 0 1px rgba(214,174,99,.52)!important}
+.screen[data-cine-photo="spots"] .stk,.screen[data-cine-photo="spots"] .seatbet,.screen[data-cine-photo="spots"] .potline{background:rgba(3,5,5,.76)!important;border-color:rgba(214,174,99,.42)!important;backdrop-filter:blur(7px)!important}
+.screen[data-cine-photo="spots"] .spotactions{gap:7px!important;padding:5px!important;border:1px solid rgba(214,174,99,.24)!important;background:rgba(3,4,4,.68)!important;backdrop-filter:blur(12px)!important;border-radius:12px!important}
+.screen[data-cine-photo="spots"] .spotaction{height:40px!important;border:1px solid rgba(214,174,99,.5)!important;background:linear-gradient(180deg,rgba(22,22,20,.9),rgba(5,6,6,.92))!important;color:#f5eee1!important;font-weight:700!important;border-radius:9px!important;box-shadow:0 8px 18px rgba(0,0,0,.28)!important}
+.screen[data-cine-photo="spots"] .spotaction:hover,.screen[data-cine-photo="spots"] .spotaction:focus-visible{border-color:#e3bd72!important;background:linear-gradient(180deg,rgba(51,40,23,.95),rgba(12,10,7,.96))!important}
+.screen[data-cine-photo="spots"] .spotaction:disabled{opacity:1!important;pointer-events:auto!important;filter:none!important}
+
 /* V3 SCENE ARCHITECTURE — replaces app-card composition with film-frame composition */
 .screen{background:#020303!important}
 .header{padding:calc(env(safe-area-inset-top) + 8px) 15px 5px!important;gap:5px!important;background:linear-gradient(180deg,rgba(0,0,0,.84),rgba(0,0,0,.18) 72%,transparent)!important}
