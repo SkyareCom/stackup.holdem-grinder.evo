@@ -231,6 +231,13 @@ function boardCards(raw){
   })||[];
 }
 function appendCard(board,card){return String(board)+String(card);}
+function errorDetail(error){
+  return [
+    String(error?.message||error||""),
+    error?.stderr?String(error.stderr):"",
+    error?.stdout?String(error.stdout):""
+  ].filter(Boolean).join(" | ").slice(0,4000);
+}
 function actionEvent(position,label,to,street){
   return {position,action:String(label).toUpperCase(),kind:actionKind(label),to:+Number(to||0).toFixed(4),street};
 }
