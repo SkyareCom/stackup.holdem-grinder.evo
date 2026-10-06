@@ -72,9 +72,69 @@
     return scenario;
   }
 
+  function validatePokerState(scenario){
+    validateScenario(scenario);
+    const errors=[];
+    const street=String(scenario.street||'').toUpperCase().replace('PREFLOP','PRE-FLOP');
+    const expectedBoard={'PRE-FLOP':0,FLOP:3,TURN:4,RIVER:5}[street];
+    const board=Array.isArray(scenario.board)?scenario.board:[];
+    const heroCards=Array.isArray(scenario.heroCards)?scenario.heroCards:[];
+    const allCards=[...board,...heroCards].map(normalizeCard);
+    const tableSize=Number(scenario.tableSize);
+    const positions=Array.isArray(scenario.positions)?scenario.positions.map(String):[];
+    const hero=String(scenario.heroPosition||'');
+    const villain=scenario.villainPosition==null?'':String(scenario.villainPosition);
+
+    if(Number(scenario.effectiveStack)<=0)errors.push('effectiveStack must be > 0');
+    if(Number(scenario.pot)<0)errors.push('pot must be >= 0');
+    if(Number.isFinite(tableSize)&&(tableSize<2||tableSize>10))errors.push('tableSize must be between 2 and 10');
+    if(Number.isFinite(expectedBoard)&&board.length!==expectedBoard)errors.push('board card count does not match street');
+    if(allCards.some(c=>!c))errors.push('invalid card');
+    const validCards=allCards.filter(Boolean);
+    if(new Set(validCards).size!==validCards.length)errors.push('duplicate card');
+    if(positions.length){
+      if(Number.isFinite(tableSize)&&positions.length!==tableSize)errors.push('positions count does not match tableSize');
+      if(!positions.includes(hero))errors.push('heroPosition is not seated');
+      if(villain&&!positions.includes(villain))errors.push('villainPosition is not seated');
+      if(new Set(positions).size!==positions.length)errors.push('duplicate table position');
+    }
+    if(villain&&hero===villain)errors.push('hero and villain cannot share a position');
+
+    const game=String(scenario.gameType||'').toLowerCase();
+    const cash=game.includes('cash');
+    if(cash&&(scenario.icm||scenario.bounty||scenario.pko))errors.push('cash scenario cannot contain ICM/PKO/bounty context');
+
+    const stacks=scenario.playerStacks||scenario.stacks;
+    if(stacks&&typeof stacks==='object'){
+      const values=Array.isArray(stacks)?stacks:Object.values(stacks);
+      if(values.some(v=>!Number.isFinite(Number(v))||Number(v)<0))errors.push('player stacks must be finite and non-negative');
+    }
+    const sidePots=Array.isArray(scenario.sidePots)?scenario.sidePots:[];
+    if(sidePots.some(v=>!Number.isFinite(Number(v))||Number(v)<=0))errors.push('side pots must be positive');
+    if(sidePots.length&&sidePots.reduce((a,v)=>a+Number(v),0)>Number(scenario.pot)+1e-9)errors.push('side pots cannot exceed total pot');
+
+    // Structural action invariants. Detailed min-raise/re-opening legality belongs
+    // to the solver tree because short all-ins can cumulatively re-open action.
+    const folded=new Set(),allIn=new Set();
+    let facingBet=false;
+    for(const raw of scenario.actionHistory){
+      const actor=String(raw?.position||raw?.player||raw?.actor||'');
+      const kind=normalizeActionKind(raw);
+      if(actor&&(folded.has(actor)||allIn.has(actor)))errors.push('folded/all-in player cannot act again');
+      if(kind==='check'&&facingBet)errors.push('check cannot face an outstanding bet');
+      if(kind==='call'&&!facingBet)errors.push('call requires an outstanding bet');
+      if(kind==='fold'&&actor)folded.add(actor);
+      if(kind==='raise'||kind==='jam')facingBet=true;
+      if(kind==='jam'&&actor)allIn.add(actor);
+    }
+
+    if(errors.length)throw new Error('invalid poker state: '+[...new Set(errors)].join('; '));
+    return scenario;
+  }
+
   function validateSolverSpot(spot){
     if(!spot||typeof spot!=='object')throw new TypeError('solver spot required');
-    validateScenario(spot.scenario);
+    validatePokerState(spot.scenario);
     if(!Array.isArray(spot.strategy)||!spot.strategy.length)throw new Error('solver strategy required');
     for(const hand of spot.strategy){
       if(!hand||!hand.hand||!Array.isArray(hand.actions)||!hand.actions.length)throw new Error('invalid hand strategy');
@@ -308,6 +368,7 @@
     SOLVER_CAPABILITIES,
     canonicalScenarioSignature,
     validateScenario,
+    validatePokerState,
     validateSolverSpot,
     normalizeActionKind,
     handClassFromCards,
