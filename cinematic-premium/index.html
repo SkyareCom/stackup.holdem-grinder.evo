@@ -95,7 +95,7 @@ function renderAdvance(){
  const off=!isTournament();
  root.innerHTML=ADV_FILTER_DEFS.map(g=>{
    const buttons=g.opts.map(([o,label])=>{const selected=filterState[g.id].has(o);const disabled=off||(!selected&&filterDisabled(g.id,o));return '<button class="chip'+(selected?' on':'')+'" data-filter-group="'+g.id+'" data-filter-option="'+o+'"'+(disabled?' disabled':'')+'>'+label+'</button>'}).join('');
-   return '<div class="filtergroup'+(off?' filter-disabled':'')+'"><label>'+g.label+(off?' · SOMENTE TORNEIOS':'')+'</label><div class="chips" style="--cols:'+(g.opts.length===6?3:Math.min(g.opts.length,5))+'">'+buttons+'</div></div>';
+   return '<div class="filtergroup'+(off?' filter-disabled':'')+'"><label>'+g.label+(off?' · SOMENTE TORNEIOS':'')+'</label><div class="chips" style="--cols:'+(g.opts.length%4===0?4:(g.opts.length%3===0?3:Math.min(g.opts.length,5)))+'">'+buttons+'</div></div>';
  }).join('');
  const note=document.getElementById('advanceModeNotice');if(note)note.textContent=off?'ADVANCE indisponível em CASH. Altere MODO em AJUSTES.':'Cenários ADVANCE usam os mesmos filtros-base de AJUSTES.';
 }
