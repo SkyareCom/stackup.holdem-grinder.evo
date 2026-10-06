@@ -2,6 +2,9 @@
    Visual-only layer. Does not alter solver/filter/training logic. */
 (function(){
 'use strict';
+const PHOTO={home:'assets/cinematic/grinder-home-cinematic.webp',spots:'assets/cinematic/grinder-training-cinematic.webp',analysis:'assets/cinematic/grinder-analysis-cinematic.webp',stats:'assets/cinematic/grinder-stats-cinematic.webp'};
+function wirePhotographicScenes(root){const screen=root.querySelector('.screen');if(!screen)return;const apply=()=>{const active=root.querySelector('.tab.on')?.dataset?.t||'home';const key=active==='menu'?'stats':active;const src=PHOTO[key];if(src){screen.dataset.cinePhoto=key;screen.style.backgroundImage='url("'+src+'")'}else{delete screen.dataset.cinePhoto;screen.style.backgroundImage=''}};root.addEventListener('click',e=>{if(e.target.closest('.tab,.hbtn'))setTimeout(apply,0)},true);apply()}
+
 const CSS=`
 :host{
  --cine-bg:#030507;--cine-panel:rgba(9,12,15,.78);--cine-panel2:rgba(15,18,21,.72);
