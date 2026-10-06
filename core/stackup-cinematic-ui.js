@@ -87,6 +87,21 @@ const CSS=`
 .content::-webkit-scrollbar{display:none}
 .tower,.chip,.statscard,.statshero,.spotanalysis,.spotfinal{min-width:0!important;max-width:100%!important}
 .tower b,.tower small,.statscard *,.spotindicator *{overflow-wrap:anywhere}
+/* audit pass: hard overflow containment */
+.spotsetupcard{width:min(100%,410px)!important;max-width:100%!important;min-width:0!important}
+.spotsetuprows,.spotsetuprow{width:100%!important;max-width:100%!important;min-width:0!important}
+.spotsetuprow{white-space:normal!important;gap:8px!important}
+.spotsetuprow b{flex:0 1 42%!important;min-width:0!important;white-space:normal!important;overflow-wrap:anywhere!important}
+.spotsetuprow span{flex:1 1 58%!important;min-width:0!important;white-space:normal!important;overflow-wrap:anywhere!important;text-align:right!important}
+.spotsetuptitle,.spotintro.loading{white-space:normal!important;text-align:center!important}
+.spotactionrow{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(72px,1fr))!important;gap:6px!important;width:100%!important;min-width:0!important}
+.spotaction{min-width:0!important;width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}
+.spotactiontext{max-width:100%!important;min-width:0!important;white-space:normal!important}
+.statsgrid,.statsadvancegrid,.statsevolutiongrid,.statsdual{min-width:0!important;max-width:100%!important}
+.statscard,.statsadvancecard,.statsmini,.statstopic,.statsevorow{min-width:0!important}
+.statsbarrow b,.statsadvancecard b,.statstopic b,.statstopic span,.statsevorow b{min-width:0!important;max-width:100%!important;text-overflow:ellipsis!important;overflow:hidden!important}
+.advancewrap,.trainwrap,.homegrid{width:100%!important;max-width:100%!important;min-width:0!important}
+.advancewrap .advscenarios,.towers,.chips{min-width:0!important;max-width:100%!important}
 @media(max-width:360px){
  .content{padding-left:11px!important;padding-right:11px!important}
  .header{padding-left:14px!important;padding-right:14px!important}
