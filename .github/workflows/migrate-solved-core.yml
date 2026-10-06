@@ -29,5 +29,9 @@ jobs:
         run: node scripts/audit-solved-core-migration.mjs
       - name: Package validated banks
         run: node scripts/package-solved-core-banks.mjs
+      - name: Build deterministic decision catalog
+        run: node scripts/build-solved-core-catalog.mjs
+      - name: Require independent audit approval artifact
+        run: test -s .solved-core/approval.json
       - name: Upload and verify parity
         run: node scripts/upload-solved-core-banks.mjs
