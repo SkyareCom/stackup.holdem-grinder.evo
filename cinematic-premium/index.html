@@ -27,24 +27,34 @@
 const pages=[...document.querySelectorAll('.page')],nav=[...document.querySelectorAll('.nav button')];
 function go(k){pages.forEach(p=>p.classList.toggle('on',p.dataset.page===k));nav.forEach(b=>b.classList.toggle('on',b.dataset.go===k));scrollTo(0,0)}
 const seatLayer=document.getElementById('dynamicSeats');
-const arc=[[5,69],[7,40],[25,15],[50,5],[75,15],[93,40],[95,69]];
-function seat(name,x,y,hero=false){return '<div class="seat'+(hero?' hero':'')+'" style="left:'+x+'%;top:'+y+'%"><div class="avatar"></div><b>'+name+'</b><em>—</em></div>'}
+const HERO=[50,91],BASE_L=[25,91],BASE_R=[75,91];
+function seat(name,p,hero=false){return '<div class="seat'+(hero?' hero':'')+'" style="left:'+p[0]+'%;top:'+p[1]+'%"><div class="avatar"></div><b>'+name+'</b><em>—</em></div>'}
+function ovalPoint(t){
+  // t=0 left lower tip, t=1 right lower tip; follows the upper oval rail.
+  const theta=Math.PI-(Math.PI*t);
+  return [50+45*Math.cos(theta),69-64*Math.sin(theta)];
+}
+function distributedArc(count){
+  if(count<=0)return[];
+  if(count===1)return[[50,5]];
+  return Array.from({length:count},(_,i)=>ovalPoint(i/(count-1)));
+}
 function renderTable(n){
- let out='';
- if(n===2){out+=seat('JOGADOR 1',50,5);out+=seat('HERÓI',50,91,true)}
- else if(n===6){
-   const six=[[7,48],[27,16],[50,5],[73,16],[93,48]];
-   six.forEach((p,i)=>out+=seat('JOGADOR '+(i+1),p[0],p[1]));
-   out+=seat('HERÓI',50,91,true);
- } else {
-   const base=n>=8?[[25,91],[75,91]]:[];
-   const remaining=n-1-base.length;
-   const picks=remaining===7?arc:remaining===6?[arc[0],arc[1],arc[2],arc[4],arc[5],arc[6]]:remaining===5?[arc[0],arc[2],arc[3],arc[4],arc[6]]:arc.slice(0,remaining);
-   let i=1;picks.forEach(p=>out+=seat('JOGADOR '+i++,p[0],p[1]));
-   base.forEach(p=>out+=seat('JOGADOR '+i++,p[0],p[1]));
-   out+=seat('HERÓI',50,91,true);
- }
- seatLayer.innerHTML=out;
+  const valid=[2,6,8,9,10]; if(!valid.includes(n))n=6;
+  let positions=[];
+  if(n===2){
+    positions=[{p:[50,5],hero:false},{p:HERO,hero:true}];
+  }else if(n===6){
+    positions=distributedArc(5).map(p=>({p,hero:false}));
+    positions.push({p:HERO,hero:true});
+  }else{
+    // 8/9/10: three fixed lower-base seats; every other player is evenly spaced on the oval rail.
+    positions=distributedArc(n-3).map(p=>({p,hero:false}));
+    positions.push({p:BASE_L,hero:false},{p:BASE_R,hero:false},{p:HERO,hero:true});
+  }
+  let villain=1;
+  seatLayer.innerHTML=positions.map(s=>seat(s.hero?'HERÓI':'JOGADOR '+villain++,s.p,s.hero)).join('');
+  seatLayer.dataset.players=String(n);
 }
 renderTable(6);
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g){go(g.dataset.go);return}const c=e.target.closest('.chip');if(c){c.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));c.classList.add('on');if(c.dataset.players)renderTable(Number(c.dataset.players))}})
