@@ -75,6 +75,18 @@ const CSS=`
 .screen[data-cine-photo]:after{background:linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.42) 42%,rgba(0,0,0,.18) 68%,rgba(0,0,0,.72)),linear-gradient(0deg,rgba(0,0,0,.82),transparent 44%,rgba(0,0,0,.22))!important}
 .screen[data-cine-photo] .content{background:transparent!important}
 .screen[data-cine-photo] .homegrid .tower:first-child{background:linear-gradient(90deg,rgba(5,6,6,.90),rgba(5,6,6,.32))!important;backdrop-filter:blur(5px)!important}
+
+/* HOME — direct cinematic production composition */
+.screen[data-cine-photo="home"] .content{padding-top:10px!important}
+.screen[data-cine-photo="home"] .ptitle{background:rgba(5,6,6,.62)!important;border-color:rgba(214,174,99,.55)!important;color:#f5ead5!important;backdrop-filter:blur(8px);transform:none!important}
+.screen[data-cine-photo="home"] .homegrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin-top:auto!important;padding-top:min(34vh,280px)!important}
+.screen[data-cine-photo="home"] .homegrid .tower{min-height:96px!important;border-radius:13px!important;border:1px solid rgba(214,174,99,.48)!important;background:linear-gradient(145deg,rgba(8,9,9,.82),rgba(18,17,14,.62))!important;backdrop-filter:blur(9px)!important;box-shadow:0 16px 36px rgba(0,0,0,.34)!important;padding:14px 10px!important;align-items:flex-start!important;text-align:left!important}
+.screen[data-cine-photo="home"] .homegrid .tower svg{width:24px!important;height:24px!important;color:#d6ae63!important}
+.screen[data-cine-photo="home"] .homegrid .tower b{font-weight:700!important;color:#f6efe2!important;font-size:12px!important;letter-spacing:.9px!important}
+.screen[data-cine-photo="home"] .homegrid .tower small{color:#b9ad99!important}
+.screen[data-cine-photo="home"] .homegrid .tower:active,.screen[data-cine-photo="home"] .homegrid .tower.on{transform:translateY(1px)!important;border-color:#e2bd75!important;background:rgba(28,23,16,.88)!important;color:#fff!important}
+@media(max-width:390px){.screen[data-cine-photo="home"] .homegrid{gap:7px!important;padding-top:31vh!important}.screen[data-cine-photo="home"] .homegrid .tower{min-height:84px!important;padding:11px 8px!important}}
+
 /* V3 SCENE ARCHITECTURE — replaces app-card composition with film-frame composition */
 .screen{background:#020303!important}
 .header{padding:calc(env(safe-area-inset-top) + 8px) 15px 5px!important;gap:5px!important;background:linear-gradient(180deg,rgba(0,0,0,.84),rgba(0,0,0,.18) 72%,transparent)!important}
