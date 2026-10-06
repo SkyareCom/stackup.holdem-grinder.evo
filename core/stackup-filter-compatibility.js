@@ -573,6 +573,19 @@
     return null;
   }
 
+
+  function validate(input){
+    const state=stateClone(input);
+    const errors=[];
+    for(const [group,values] of Object.entries(state)){
+      for(const option of concrete(state,group)){
+        const reason=disabled(state,group,option);
+        if(reason)errors.push(Object.freeze({group,option,reason}));
+      }
+    }
+    return Object.freeze({ok:errors.length===0,errors:Object.freeze(errors)});
+  }
+
   function policy(){
     return {
       groupSemantics:{
@@ -591,7 +604,7 @@
   }
 
   global.StackUpFilterCompatibility=Object.freeze({
-    normalize,disabled,policy,
+    normalize,disabled,validate,policy,
     ADV_SECTIONS:Object.freeze([...ADV_SECTIONS])
   });
 })(window);
