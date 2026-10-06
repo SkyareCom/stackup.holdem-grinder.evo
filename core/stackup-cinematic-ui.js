@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 const PHOTO={home:'assets/cinematic/grinder-home-cinematic.webp',profile:'assets/cinematic/grinder-advance-cinematic.webp',train:'assets/cinematic/grinder-settings-cinematic.webp',spots:'assets/cinematic/grinder-training-cinematic.webp',analysis:'assets/cinematic/grinder-analysis-cinematic.webp',menu:'assets/cinematic/grinder-stats-cinematic.webp'};
-function wirePhotographicScenes(root){const screen=root.querySelector('.screen');if(!screen)return;const apply=()=>{const active=root.querySelector('.tab.on')?.dataset?.t||'home';const key=active;const src=PHOTO[key];if(src){screen.dataset.cinePhoto=key;screen.style.backgroundImage='url("'+src+'")'}else{delete screen.dataset.cinePhoto;screen.style.backgroundImage=''}};root.addEventListener('click',e=>{if(e.target.closest('.tab,.hbtn'))setTimeout(apply,0)},true);apply()}
+function wirePhotographicScenes(root){const screen=root.querySelector('.screen');if(!screen||screen.dataset.cineWired)return;screen.dataset.cineWired='1';let last='';const apply=()=>{const active=root.querySelector('.tab.on')?.dataset?.t||'home';const key=active;if(key===last)return;last=key;const src=PHOTO[key];if(src){screen.dataset.cinePhoto=key;screen.style.setProperty('--cine-photo','url("'+src+'")')}else{delete screen.dataset.cinePhoto;screen.style.removeProperty('--cine-photo')}};root.addEventListener('click',e=>{if(e.target.closest('.tab,.hbtn'))requestAnimationFrame(apply)},true);new MutationObserver(apply).observe(root,{subtree:true,attributes:true,attributeFilter:['class','aria-current']});apply()}
 
 const CSS=`
 :host{
@@ -71,7 +71,7 @@ const CSS=`
 .spotsetupstart{border-radius:3px!important;background:linear-gradient(180deg,#d7b46a,#9c7135)!important;color:#080808!important;border:1px solid #f0d595!important}
 
 /* DIRECT APP PHOTOGRAPHIC COMPOSITION — production UI, not concept */
-.screen[data-cine-photo]{background-color:#020303!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+.screen[data-cine-photo]{background-color:#020303!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;background-image:var(--cine-photo)!important}
 .screen[data-cine-photo]:after{background:linear-gradient(90deg,rgba(0,0,0,.88),rgba(0,0,0,.42) 42%,rgba(0,0,0,.18) 68%,rgba(0,0,0,.72)),linear-gradient(0deg,rgba(0,0,0,.82),transparent 44%,rgba(0,0,0,.22))!important}
 .screen[data-cine-photo] .content{background:transparent!important}
 .screen[data-cine-photo] .homegrid .tower:first-child{background:linear-gradient(90deg,rgba(5,6,6,.90),rgba(5,6,6,.32))!important;backdrop-filter:blur(5px)!important}
