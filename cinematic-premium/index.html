@@ -80,7 +80,7 @@ function renderSettings(){
  root.innerHTML=FILTER_DEFS.map(g=>{
    const off=g.tour&&!isTournament();
    const buttons=g.opts.map(([o,label])=>'<button class="chip'+(filterState[g.id].has(o)?' on':'')+'" data-filter-group="'+g.id+'" data-filter-option="'+o+'"'+((off||filterDisabled(g.id,o))?' disabled':'')+'>'+label+'</button>').join('');
-   return '<div class="filtergroup'+(off?' filter-disabled':'')+'"><label>'+g.label+(off?' · SOMENTE TORNEIOS':'')+'</label><div class="chips" style="--cols:'+Math.min(g.opts.length,5)+'">'+buttons+'</div></div>';
+   return '<div class="filtergroup'+(off?' filter-disabled':'')+'"><label>'+g.label+(off?' · SOMENTE TORNEIOS':'')+'</label><div class="chips" style="--cols:'+(g.opts.length===6?3:Math.min(g.opts.length,5))+'">'+buttons+'</div></div>';
  }).join('');
 }
 function chooseFilter(gid,opt){
