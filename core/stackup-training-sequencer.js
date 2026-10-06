@@ -691,7 +691,19 @@
     });
   }
 
+  function structurallyValid(spot){
+    try{
+      const engine=global.StackUpSpotsEngine;
+      if(!engine?.validatePokerState)return true;
+      engine.validatePokerState(spot?.scenario||{});
+      return true;
+    }catch(_){
+      return false;
+    }
+  }
+
   function compatible(spot,filters){
+    if(!structurallyValid(spot))return false;
     const s=spot?.scenario||{};
     const street=normStreet(s.street);
     const heroPosition=normPosition(s.heroPosition);
@@ -1001,6 +1013,7 @@
 
   global.StackUpTrainingSequencer=Object.freeze({
     normalizedFilters,
+    structurallyValid,
     filterKey,
     exactSignature,
     familySignature,
