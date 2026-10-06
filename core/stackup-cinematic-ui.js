@@ -66,6 +66,37 @@ const CSS=`
 .spotactiontext,.heroturnnotice{border-radius:2px!important;border-color:var(--cine-line)!important;background:rgba(3,4,5,.88)!important}
 .spotsetupcard{border-radius:4px!important;background:linear-gradient(145deg,rgba(14,17,20,.94),rgba(4,5,6,.98))!important;border:1px solid var(--cine-line)!important;box-shadow:0 20px 60px rgba(0,0,0,.6),var(--cine-glow)!important}
 .spotsetupstart{border-radius:3px!important;background:linear-gradient(180deg,#d7b46a,#9c7135)!important;color:#080808!important;border:1px solid #f0d595!important}
+/* HOME: cinematic command deck */
+.homegrid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-content:start!important;position:relative;padding-top:32px!important}
+.homegrid:before{content:"TACTICAL TRAINING // COMMAND DECK";position:absolute;left:1px;top:5px;color:var(--cine-gold);font:8px Arial,sans-serif;letter-spacing:1.8px}
+.homegrid:after{content:"SOLVER CORE ONLINE";position:absolute;right:1px;top:5px;color:var(--cine-muted);font:7px Arial,sans-serif;letter-spacing:1.2px}
+.homegrid .tower{aspect-ratio:auto!important;min-height:104px!important;align-items:flex-start!important;text-align:left!important;justify-content:flex-end!important;padding:12px!important;position:relative;overflow:hidden}
+.homegrid .tower:before{content:"";position:absolute;left:0;top:0;width:22px;height:22px;border-left:2px solid var(--cine-gold);border-top:2px solid var(--cine-gold);opacity:.8}
+.homegrid .tower:after{content:"";position:absolute;right:9px;top:10px;width:22px;height:1px;background:var(--cine-line);box-shadow:0 5px 0 rgba(214,174,99,.12)}
+.homegrid .tower svg{position:absolute;left:11px;top:12px;width:26px!important;height:26px!important;color:var(--cine-gold)!important;opacity:.9}
+.homegrid .tower b{font-family:Arial,sans-serif!important;font-weight:700!important;font-size:11px!important;letter-spacing:1.2px!important;line-height:1.2!important}
+.homegrid .tower:first-child{grid-column:1/-1!important;min-height:132px!important;background:radial-gradient(circle at 78% 28%,rgba(214,174,99,.14),transparent 34%),linear-gradient(145deg,rgba(24,23,19,.94),rgba(5,7,9,.98))!important;border-color:rgba(214,174,99,.55)!important}
+.homegrid .tower:first-child b{font-size:15px!important;max-width:65%;line-height:1.1!important}
+.homegrid .tower:first-child svg{width:34px!important;height:34px!important}
+/* remove old concrete visual without touching DOM/assets */
+.concrete{opacity:0!important}
+.ptitle{align-self:flex-start!important;transform:none!important;margin:0 0 4px!important;padding:7px 10px!important;border-radius:2px!important;background:rgba(4,5,6,.74)!important;border:1px solid var(--cine-line)!important;color:var(--cine-gold)!important;font-family:Arial,sans-serif!important;font-size:9px!important;letter-spacing:2px!important}
+/* mobile finishing and overflow guards */
+.screen{max-width:430px!important}
+.content{overscroll-behavior:contain;scrollbar-width:none}
+.content::-webkit-scrollbar{display:none}
+.tower,.chip,.statscard,.statshero,.spotanalysis,.spotfinal{min-width:0!important;max-width:100%!important}
+.tower b,.tower small,.statscard *,.spotindicator *{overflow-wrap:anywhere}
+@media(max-width:360px){
+ .content{padding-left:11px!important;padding-right:11px!important}
+ .header{padding-left:14px!important;padding-right:14px!important}
+ .homegrid{gap:6px!important}
+ .homegrid .tower{min-height:96px!important;padding:10px!important}
+ .brandtxt .title{font-size:21px!important}
+}
+@media(min-width:431px){
+ .screen{border-radius:18px!important;box-shadow:0 28px 90px rgba(0,0,0,.72),0 0 0 1px rgba(214,174,99,.20)!important}
+}
 /* Analysis: tactical debrief */
 .spotfeedback,.spotanalysis,.spotfinal{border-radius:4px!important;background:linear-gradient(145deg,rgba(13,16,19,.94),rgba(4,5,6,.98))!important;border:1px solid var(--cine-line)!important;box-shadow:inset 0 1px rgba(255,255,255,.025),0 12px 30px rgba(0,0,0,.26)!important}
 .spotanalysistitle,.spotfinaltitle{color:var(--cine-gold)!important;letter-spacing:1.8px!important;text-transform:uppercase}
