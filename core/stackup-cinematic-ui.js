@@ -99,6 +99,18 @@ const CSS=`
 .screen[data-cine-photo="spots"] .spotaction:hover,.screen[data-cine-photo="spots"] .spotaction:focus-visible{border-color:#e3bd72!important;background:linear-gradient(180deg,rgba(51,40,23,.95),rgba(12,10,7,.96))!important}
 .screen[data-cine-photo="spots"] .spotaction:disabled{opacity:1!important;pointer-events:auto!important;filter:none!important}
 
+
+/* ANALYSIS — cinematic solver reading layer */
+.screen[data-cine-photo="analysis"] .spotanalysis,.screen[data-cine-photo="spots"] .spotanalysis{display:grid;gap:10px!important}
+.screen[data-cine-photo="analysis"] .spotanalysissection,.screen[data-cine-photo="spots"] .spotanalysissection,.screen[data-cine-photo="analysis"] .spotindicator,.screen[data-cine-photo="spots"] .spotindicator,.screen[data-cine-photo="analysis"] .spotfinal,.screen[data-cine-photo="spots"] .spotfinal,.screen[data-cine-photo="analysis"] .spotsource,.screen[data-cine-photo="spots"] .spotsource{background:linear-gradient(145deg,rgba(5,7,7,.9),rgba(17,16,13,.76))!important;border:1px solid rgba(214,174,99,.34)!important;box-shadow:0 14px 32px rgba(0,0,0,.28)!important;backdrop-filter:blur(10px)!important;border-radius:10px!important}
+.screen[data-cine-photo="analysis"] .spotanalysissection,.screen[data-cine-photo="spots"] .spotanalysissection{padding:12px!important}
+.screen[data-cine-photo="analysis"] .spotanalysissection b,.screen[data-cine-photo="spots"] .spotanalysissection b,.screen[data-cine-photo="analysis"] .spotindicator b,.screen[data-cine-photo="spots"] .spotindicator b{color:#f4ead8!important;font-weight:700!important}
+.screen[data-cine-photo="analysis"] .spotindicator,.screen[data-cine-photo="spots"] .spotindicator{padding:11px!important}
+.screen[data-cine-photo="analysis"] .spotindicatorindex,.screen[data-cine-photo="spots"] .spotindicatorindex{color:#d6ae63!important}
+.screen[data-cine-photo="analysis"] .indicatorvalue,.screen[data-cine-photo="spots"] .indicatorvalue{color:#e7dfd2!important}
+.screen[data-cine-photo="analysis"] .indicatorcalc,.screen[data-cine-photo="analysis"] .indicatorimpact,.screen[data-cine-photo="spots"] .indicatorcalc,.screen[data-cine-photo="spots"] .indicatorimpact{color:#a9a195!important}
+.screen[data-cine-photo="analysis"] .spotfeedback,.screen[data-cine-photo="spots"] .spotfeedback{background:rgba(3,5,5,.78)!important;border-color:rgba(214,174,99,.38)!important;backdrop-filter:blur(10px)!important}
+
 /* V3 SCENE ARCHITECTURE — replaces app-card composition with film-frame composition */
 .screen{background:#020303!important}
 .header{padding:calc(env(safe-area-inset-top) + 8px) 15px 5px!important;gap:5px!important;background:linear-gradient(180deg,rgba(0,0,0,.84),rgba(0,0,0,.18) 72%,transparent)!important}
