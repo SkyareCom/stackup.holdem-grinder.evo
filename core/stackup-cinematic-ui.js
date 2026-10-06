@@ -111,6 +111,18 @@ const CSS=`
 .screen[data-cine-photo="analysis"] .indicatorcalc,.screen[data-cine-photo="analysis"] .indicatorimpact,.screen[data-cine-photo="spots"] .indicatorcalc,.screen[data-cine-photo="spots"] .indicatorimpact{color:#a9a195!important}
 .screen[data-cine-photo="analysis"] .spotfeedback,.screen[data-cine-photo="spots"] .spotfeedback{background:rgba(3,5,5,.78)!important;border-color:rgba(214,174,99,.38)!important;backdrop-filter:blur(10px)!important}
 
+
+/* AJUSTES + ADVANCE — compact cinematic filter console */
+.screen[data-cine-photo="train"] .trainwrap,.screen[data-cine-photo="profile"] .advancewrap{background:rgba(3,5,5,.44)!important;backdrop-filter:blur(5px)!important;border-radius:12px!important}
+.screen[data-cine-photo="train"] .tsec,.screen[data-cine-photo="profile"] .advblock{background:linear-gradient(145deg,rgba(5,7,7,.88),rgba(15,14,12,.72))!important;border:1px solid rgba(214,174,99,.30)!important;border-radius:10px!important;box-shadow:0 12px 30px rgba(0,0,0,.24)!important}
+.screen[data-cine-photo="train"] .thead,.screen[data-cine-photo="profile"] .stitle{color:#f3eadb!important;font-weight:700!important;letter-spacing:.8px!important}
+.screen[data-cine-photo="train"] .chip,.screen[data-cine-photo="profile"] .tower{background:rgba(4,6,6,.78)!important;border:1px solid rgba(214,174,99,.34)!important;color:#ddd4c5!important;border-radius:8px!important;box-shadow:none!important}
+.screen[data-cine-photo="train"] .chip.on,.screen[data-cine-photo="profile"] .tower.on{background:linear-gradient(180deg,rgba(75,58,31,.92),rgba(31,24,14,.94))!important;border-color:#d6ae63!important;color:#fff5df!important}
+.screen[data-cine-photo="train"] .chip:disabled,.screen[data-cine-photo="profile"] .tower:disabled{opacity:.28!important;filter:saturate(.35)!important;cursor:not-allowed!important}
+.screen[data-cine-photo="profile"] .advscenarios{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important}
+.screen[data-cine-photo="profile"] .advscenarios .tower{min-height:76px!important;padding:10px 5px!important}
+.screen[data-cine-photo="train"] .tstart{background:linear-gradient(180deg,#caa55f,#89672f)!important;border:1px solid #e0bd79!important;color:#080807!important;font-weight:800!important;border-radius:9px!important}
+
 /* V3 SCENE ARCHITECTURE — replaces app-card composition with film-frame composition */
 .screen{background:#020303!important}
 .header{padding:calc(env(safe-area-inset-top) + 8px) 15px 5px!important;gap:5px!important;background:linear-gradient(180deg,rgba(0,0,0,.84),rgba(0,0,0,.18) 72%,transparent)!important}
