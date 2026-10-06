@@ -1020,8 +1020,9 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const c=e.target.closest('.chip,.tower');
     if(c){const g=SECS.flatMap(s=>s.groups).find(x=>x.id===c.dataset.g),S=sel[g.id],o=c.dataset.o;
       if(g.toggle){ S.has(o)?S.delete(o):S.add(o); } else if(g.multi){ if(o==='all'){S.clear();S.add('all');} else { S.delete('all'); if(S.has(o)){S.delete(o); if(!S.size)S.add('all');} else S.add(o); } } else {S.clear();S.add(o);}
-      normalizeFilterSelections({group:g.id,option:o,source:'ajustes'});
-      renderTrain();orgAll();return;}
+      // Interactive selections are never normalized into a different scenario.
+      // Incompatible candidates are disabled prospectively before this handler.
+      renderTrain();if(cur==='profile')renderAdvance();orgAll();return;}
     const st=e.target.closest('#tstart');
     if(st){st.classList.add('on');setTimeout(()=>st.classList.remove('on'),600);
       toast2.textContent=TR[L()].t_start.replace('{n}',[...sel.hands][0]);toast2.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>toast2.classList.remove('show'),1800);}
@@ -1467,7 +1468,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     return v.length===1?v[0]:null;
   }
   function buildSolverSpotFilters(){
-    normalizeFilterSelections({source:'solver'});
+    // Preserve the user's exact explicit filter state. Never rewrite filters
+    // immediately before requesting a solved spot.
     const mode=selectedOne('mode');
     const tournament=mode==='mtt';
     const seats=selectedOne('seats');
@@ -2742,7 +2744,8 @@ html[lang="en"] .tag{font-size:min(19px,calc((100cqi - 48px) / 21))!important}
     const g=ADV_SECS.flatMap(s=>s.groups).find(x=>x.id===b.dataset.ag),S=sel[g.id],o=b.dataset.ao;
     if(o==='all'){S.clear();S.add('all');}
     else{S.delete('all');if(S.has(o)){S.delete(o);if(!S.size)S.add('all');}else S.add(o);}
-    normalizeFilterSelections({group:g.id,option:o,source:'advance'});
+    // ADVANCE follows the same prospective rule: disabled combinations cannot
+    // be clicked and valid clicks never rewrite another selected dimension.
     renderAdvance();
     if(cur==='train')renderTrain();
   });
