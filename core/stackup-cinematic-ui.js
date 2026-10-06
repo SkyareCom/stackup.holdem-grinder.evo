@@ -123,6 +123,17 @@ const CSS=`
 .screen[data-cine-photo="profile"] .advscenarios .tower{min-height:76px!important;padding:10px 5px!important}
 .screen[data-cine-photo="train"] .tstart{background:linear-gradient(180deg,#caa55f,#89672f)!important;border:1px solid #e0bd79!important;color:#080807!important;font-weight:800!important;border-radius:9px!important}
 
+
+/* STATS — photographic performance dashboard */
+.screen[data-cine-photo="menu"] .statspanel{display:grid;gap:10px!important}
+.screen[data-cine-photo="menu"] .statscard,.screen[data-cine-photo="menu"] .statshero,.screen[data-cine-photo="menu"] .statscallout,.screen[data-cine-photo="menu"] .statsmetric,.screen[data-cine-photo="menu"] .statssection,.screen[data-cine-photo="menu"] .swotcard{background:linear-gradient(145deg,rgba(4,6,6,.90),rgba(17,16,13,.74))!important;border:1px solid rgba(214,174,99,.30)!important;border-radius:10px!important;box-shadow:0 14px 34px rgba(0,0,0,.30)!important;backdrop-filter:blur(11px)!important}
+.screen[data-cine-photo="menu"] .statshero{border-color:rgba(214,174,99,.48)!important}
+.screen[data-cine-photo="menu"] .statsmetric b,.screen[data-cine-photo="menu"] .statshero b,.screen[data-cine-photo="menu"] .statscard b{color:#f5ecdc!important;font-weight:700!important}
+.screen[data-cine-photo="menu"] .statsmetric strong{color:#d9b36c!important}
+.screen[data-cine-photo="menu"] svg text{fill:#bdb4a5!important}
+.screen[data-cine-photo="menu"] .statsfilters button,.screen[data-cine-photo="menu"] .statsnav button{border:1px solid rgba(214,174,99,.34)!important;background:rgba(4,6,6,.82)!important;color:#dcd3c4!important;border-radius:8px!important}
+.screen[data-cine-photo="menu"] .statsfilters button.on,.screen[data-cine-photo="menu"] .statsnav button.on{border-color:#d6ae63!important;background:rgba(69,53,29,.90)!important;color:#fff3dc!important}
+
 /* V3 SCENE ARCHITECTURE — replaces app-card composition with film-frame composition */
 .screen{background:#020303!important}
 .header{padding:calc(env(safe-area-inset-top) + 8px) 15px 5px!important;gap:5px!important;background:linear-gradient(180deg,rgba(0,0,0,.84),rgba(0,0,0,.18) 72%,transparent)!important}
