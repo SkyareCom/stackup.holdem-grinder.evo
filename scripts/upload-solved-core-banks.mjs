@@ -50,4 +50,24 @@ for(let i=0;i<catalog.length;i+=batchSize){
  if(!wr.ok)throw new Error('catalog_failed:'+i+':'+wr.status+':'+await wr.text());
  console.log('catalog_batch',i,batch.length);
 }
-console.log('catalog_complete',catalog.length);
+
+// Verify exact post-ingestion parity. ignore-duplicates must never hide stale content.
+const expectedById=new Map(catalog.map(x=>[x.solve_id,x.decision_hash]));
+let verified=0;
+const verifySize=100;
+for(let i=0;i<catalog.length;i+=verifySize){
+  const ids=catalog.slice(i,i+verifySize).map(x=>x.solve_id);
+  const filter='in.('+ids.map(id=>JSON.stringify(id)).join(',')+')';
+  const vr=await fetch(base+'/rest/v1/solved_spot_catalog?select=solve_id,decision_hash&solve_id='+encodeURIComponent(filter),{headers:{authorization:'Bearer '+key,apikey:key}});
+  if(!vr.ok)throw new Error('catalog_verify_failed:'+i+':'+vr.status+':'+await vr.text());
+  const rows=await vr.json();
+  if(rows.length!==ids.length)throw new Error('catalog_verify_count_mismatch:'+i+':expected='+ids.length+':got='+rows.length);
+  for(const row of rows){
+    const expected=expectedById.get(row.solve_id);
+    if(!expected)throw new Error('catalog_verify_unexpected_solve_id:'+row.solve_id);
+    if(row.decision_hash!==expected)throw new Error('catalog_verify_hash_mismatch:'+row.solve_id);
+    verified++;
+  }
+}
+if(verified!==catalog.length)throw new Error('catalog_verify_total_mismatch:expected='+catalog.length+':got='+verified);
+console.log('catalog_complete',catalog.length,'verified',verified);

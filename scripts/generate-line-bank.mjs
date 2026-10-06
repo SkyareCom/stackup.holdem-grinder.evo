@@ -16,9 +16,16 @@ await mkdir(WORK,{recursive:true});
 await mkdir(dirname(OUT),{recursive:true});
 
 const baseBank=JSON.parse(await readFile(join(ROOT,"data","solver","postflop.json"),"utf8"));
-const baseCallerOop=baseBank.find(s=>s?.matchup==="UTG vs BB"&&s?.scenario?.street==="FLOP");
+const callerOopBases=["UTG vs BB","UTG vs SB"].map(matchup=>
+  baseBank.find(s=>
+    s?.matchup===matchup&&
+    s?.scenario?.street==="FLOP"&&
+    ["BB","SB"].includes(s?.scenario?.heroPosition)&&
+    s?.scenario?.villainPosition==="UTG"
+  )
+);
 const baseAggressorOop=baseBank.find(s=>s?.matchup==="UTG vs HJ"&&s?.scenario?.street==="FLOP");
-if(!baseCallerOop||!baseAggressorOop)throw new Error("required_line_base_matchups_missing");
+if(callerOopBases.some(base=>!base)||!baseAggressorOop)throw new Error("required_line_base_matchups_missing");
 
 const ALL_RUNOUTS=[
   {id:"a",flop:"As7d2c",turn:"Jh",river:"4s"},
@@ -224,6 +231,28 @@ function boardCards(raw){
   })||[];
 }
 function appendCard(board,card){return String(board)+String(card);}
+function bbToChips(bb){
+  const n=Number(bb);
+  if(!Number.isFinite(n))throw new Error("invalid_bb_"+String(bb));
+  return Math.max(1,Math.round(n*2));
+}
+function chipsToBb(chips){return Number(chips)/2;}
+function normalizeBb(bb){return chipsToBb(bbToChips(bb));}
+function solverBetChips(potChips,pct){
+  const pot=Math.round(Number(potChips));
+  const p=Number(pct);
+  if(!Number.isFinite(p)||p<=0)throw new Error("invalid_bet_pct_"+String(pct));
+  if(!Number.isFinite(pot)||pot<=0)throw new Error("invalid_pot_chips_"+String(potChips));
+  return Math.max(1,Math.floor((pot*p+50)/100));
+}
+function solverBetBb(potBb,pct){return chipsToBb(solverBetChips(bbToChips(potBb),pct));}
+function errorDetail(error){
+  return [
+    String(error?.message||error||""),
+    error?.stderr?String(error.stderr):"",
+    error?.stdout?String(error.stdout):""
+  ].filter(Boolean).join(" | ").slice(0,4000);
+}
 function actionEvent(position,label,to,street){
   return {position,action:String(label).toUpperCase(),kind:actionKind(label),to:+Number(to||0).toFixed(4),street};
 }
@@ -307,21 +336,22 @@ function materialize({
 }
 function addSpot(spots,spot){if(spot)spots.push(spot);}
 
-const spots=[],failures=[];
+const spots=[],failures=[],unavailable=[];
 
 for(const runout of RUNOUTS){
   // -----------------------------------------------------------------------
   // LINE A: UTG opener IP vs BB caller OOP.
   // Flop check-back -> Turn probe / delayed c-bet -> River checked-through.
   // -----------------------------------------------------------------------
+  for(const base of callerOopBases){
   try{
-    const base=baseCallerOop;
+    const baseKey=String(base.scenario.heroPosition).toLowerCase()+"-vs-"+String(base.scenario.villainPosition).toLowerCase();
     const oop0=parseRange(base.scenario.heroRange);
     const ip0=parseRange(base.scenario.villainRange);
     const pot0=Number(base.scenario.pot);
     const stack0=Number(base.scenario.effectiveStack);
     const flopRaw=await solveRaw({
-      id:"caller-oop-flop-"+runout.id,street:"FLOP",board:runout.flop,
+      id:"caller-oop-flop-"+baseKey+"-"+runout.id,street:"FLOP",board:runout.flop,
       oopRange:oop0,ipRange:ip0,potBb:pot0,stackBb:stack0,
       betSizes:"33,75",raiseSizes:"75",maxRaises:1
     });
@@ -330,11 +360,11 @@ for(const runout of RUNOUTS){
     if(!root||!afterCheck)throw new Error("lineA_flop_nodes_missing");
 
     addSpot(spots,materialize({
-      id:"donk-"+runout.id,raw:flopRaw,node:root,tags:["donk_bet"],
+      id:"donk-"+baseKey+"-"+runout.id,raw:flopRaw,node:root,tags:["donk_bet"],
       base,oopRange:oop0,ipRange:ip0,potBb:pot0,stackBb:stack0,history:[]
     }));
     addSpot(spots,materialize({
-      id:"checkback-"+runout.id,raw:flopRaw,node:afterCheck,tags:["check_back_flop","miss_cbet"],
+      id:"checkback-"+baseKey+"-"+runout.id,raw:flopRaw,node:afterCheck,tags:["check_back_flop","miss_cbet"],
       base,oopRange:conditionRange(oop0,root,{kind:"check"}),ipRange:ip0,
       potBb:pot0,stackBb:stack0,
       history:[checkEvent(base.scenario.heroPosition,"FLOP")]
@@ -345,7 +375,7 @@ for(const runout of RUNOUTS){
     const afterCheckBet=findNode(flopRaw,[{kind:"check"},{kind:"raise",pct:flopIpBet.pct}]);
     const flopBetAmt=pot0*(flopIpBet.pct/100);
     addSpot(spots,materialize({
-      id:"checkraise-flop-"+runout.id,raw:flopRaw,node:afterCheckBet,tags:["check_raise"],
+      id:"checkraise-flop-"+baseKey+"-"+runout.id,raw:flopRaw,node:afterCheckBet,tags:["check_raise"],
       base,
       oopRange:conditionRange(oop0,root,{kind:"check"}),
       ipRange:conditionRange(ip0,afterCheck,{label:flopIpBet.label}),
@@ -364,7 +394,7 @@ for(const runout of RUNOUTS){
     const ipTurn=withoutBoard(conditionRange(ip0,afterCheck,{kind:"check"}),turnBoard);
     if(oopTurn.size<4||ipTurn.size<4)throw new Error("lineA_checkcheck_ranges_too_small_"+oopTurn.size+"_"+ipTurn.size);
     const turnRaw=await solveRaw({
-      id:"caller-oop-turn-"+runout.id,street:"TURN",board:turnBoard,
+      id:"caller-oop-turn-"+baseKey+"-"+runout.id,street:"TURN",board:turnBoard,
       oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,
       betSizes:"33,75",raiseSizes:"75",maxRaises:1
     });
@@ -375,11 +405,11 @@ for(const runout of RUNOUTS){
       checkEvent(base.scenario.villainPosition,"FLOP")
     ];
     addSpot(spots,materialize({
-      id:"probe-"+runout.id,raw:turnRaw,node:turnRoot,tags:["probe_bet","vs_missed_cbet","sequential_lines"],
+      id:"probe-"+baseKey+"-"+runout.id,raw:turnRaw,node:turnRoot,tags:["probe_bet","vs_missed_cbet","sequential_lines"],
       base,oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,history:priorCheckCheck
     }));
     addSpot(spots,materialize({
-      id:"delayed-"+runout.id,raw:turnRaw,node:turnAfterCheck,tags:["delayed_cbet","sequential_lines"],
+      id:"delayed-"+baseKey+"-"+runout.id,raw:turnRaw,node:turnAfterCheck,tags:["delayed_cbet","sequential_lines"],
       base,oopRange:conditionRange(oopTurn,turnRoot,{kind:"check"}),ipRange:ipTurn,
       potBb:pot0,stackBb:stack0,
       history:[...priorCheckCheck,checkEvent(base.scenario.heroPosition,"TURN")]
@@ -390,7 +420,7 @@ for(const runout of RUNOUTS){
       const turnAfterCheckBet=findNode(turnRaw,[{kind:"check"},{kind:"raise",pct:turnIpBet.pct}]);
       const betAmt=pot0*(turnIpBet.pct/100);
       addSpot(spots,materialize({
-        id:"turn-checkraise-"+runout.id,raw:turnRaw,node:turnAfterCheckBet,
+        id:"turn-checkraise-"+baseKey+"-"+runout.id,raw:turnRaw,node:turnAfterCheckBet,
         tags:["turn_check_raise","sequential_lines"],
         base,
         oopRange:conditionRange(oopTurn,turnRoot,{kind:"check"}),
@@ -410,7 +440,7 @@ for(const runout of RUNOUTS){
       const ipRiver=withoutBoard(conditionRange(ipTurn,turnAfterCheck,{kind:"check"}),riverBoard);
       if(oopRiver.size>=4&&ipRiver.size>=4){
         const riverRaw=await solveRaw({
-          id:"caller-oop-river-"+runout.id,street:"RIVER",board:riverBoard,
+          id:"caller-oop-river-"+baseKey+"-"+runout.id,street:"RIVER",board:riverBoard,
           oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,
           betSizes:"25,75,125,150",raiseSizes:"75",maxRaises:1
         });
@@ -422,7 +452,7 @@ for(const runout of RUNOUTS){
           checkEvent(base.scenario.villainPosition,"TURN")
         ];
         addSpot(spots,materialize({
-          id:"blockbet-"+runout.id,raw:riverRaw,node:riverRoot,
+          id:"blockbet-"+baseKey+"-"+runout.id,raw:riverRaw,node:riverRoot,
           tags:["block_bet_20_25","sequential_lines"],
           base,oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,history:histRiver
         }));
@@ -437,7 +467,7 @@ for(const runout of RUNOUTS){
           const tags=["river_bluff_catch","river_check_raise","sequential_lines"];
           if(chosen.pct>=120)tags.push("vs_overbet");
           addSpot(spots,materialize({
-            id:"river-response-"+runout.id,raw:riverRaw,node:response,tags,
+            id:"river-response-"+baseKey+"-"+runout.id,raw:riverRaw,node:response,tags,
             base,
             oopRange:conditionRange(oopRiver,riverRoot,{kind:"check"}),
             ipRange:conditionRange(ipRiver,riverAfterCheck,{label:chosen.label}),
@@ -462,7 +492,7 @@ for(const runout of RUNOUTS){
             const raiseAmount=potAfterCall*(raise.pct/100);
             const to=b1+raiseAmount;
             addSpot(spots,materialize({
-              id:"betfold-"+runout.id,raw:riverRaw,node:response,tags:["bet_fold","sequential_lines"],
+              id:"betfold-"+baseKey+"-"+runout.id,raw:riverRaw,node:response,tags:["bet_fold","sequential_lines"],
               base,
               oopRange:conditionRange(oopRiver,riverRoot,{label:small}),
               ipRange:conditionRange(ipRiver,afterSmall,{label:raise.label}),
@@ -478,7 +508,213 @@ for(const runout of RUNOUTS){
       }
     }
   }catch(error){
-    failures.push({runout:runout.id,line:"CHECKBACK_PROBE",error:String(error?.message||error).slice(0,1400)});
+    failures.push({runout:runout.id,base:base.matchup,line:"CHECKBACK_PROBE",error:String(error?.message||error).slice(0,1400)});
+  }
+  }
+
+  // -----------------------------------------------------------------------
+  // LINE C/D RESTORED: solver-native river tactics with legal raise trees.
+  for(const base of callerOopBases){
+    try{
+      const baseKey=String(base.scenario.heroPosition).toLowerCase()+"-vs-"+String(base.scenario.villainPosition).toLowerCase();
+      const riverBoard=appendCard(appendCard(runout.flop,runout.turn),runout.river);
+      const oopRiver=withoutBoard(parseRange(base.scenario.heroRange),riverBoard);
+      const ipRiver=withoutBoard(parseRange(base.scenario.villainRange),riverBoard);
+      if(oopRiver.size<4||ipRiver.size<4)throw new Error("river_tactical_ranges_too_small_"+oopRiver.size+"_"+ipRiver.size);
+      const pot0=normalizeBb(Number(base.scenario.pot));
+      const stack0=normalizeBb(Number(base.scenario.effectiveStack));
+      const riverRaw=await solveRaw({
+        id:"river-tactical-"+baseKey+"-"+runout.id,street:"RIVER",board:riverBoard,
+        oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,
+        betSizes:"25,75,125,150",raiseSizes:"75",maxRaises:1
+      });
+      const riverRoot=findNode(riverRaw,[]);
+      const riverAfterCheck=findNode(riverRaw,[{kind:"check"}]);
+      addSpot(spots,materialize({
+        id:"river-tactical-blockbet-"+baseKey+"-"+runout.id,raw:riverRaw,node:riverRoot,
+        tags:["block_bet_20_25"],base,oopRange:oopRiver,ipRange:ipRiver,
+        potBb:pot0,stackBb:stack0,history:[]
+      }));
+      const over=(riverAfterCheck?.combos||[]).flatMap(x=>x.actions||[])
+        .map(a=>String(a.action)).find(x=>actionKind(x)==="raise"&&Number(sizingPct(x))>=120);
+      const fallbackBet=chooseBet(ipRiver,riverAfterCheck,{minPct:50,maxPct:160});
+      const chosen=over?{label:over,pct:sizingPct(over)}:fallbackBet;
+      if(chosen){
+        const response=findNode(riverRaw,[{kind:"check"},{label:chosen.label}]);
+        const betAmt=solverBetBb(pot0,chosen.pct);
+        const tags=["river_bluff_catch"];
+        if(chosen.pct>=120)tags.push("vs_overbet");
+        addSpot(spots,materialize({
+          id:"river-tactical-response-"+baseKey+"-"+runout.id,raw:riverRaw,node:response,tags,base,
+          oopRange:conditionRange(oopRiver,riverRoot,{kind:"check"}),
+          ipRange:conditionRange(ipRiver,riverAfterCheck,{label:chosen.label}),
+          potBb:pot0+betAmt,stackBb:stack0,currentBet:betAmt,
+          history:[checkEvent(base.scenario.heroPosition,"RIVER"),actionEvent(base.scenario.villainPosition,chosen.label,betAmt,"RIVER")]
+        }));
+      }
+
+      const checkRaiseRaw=await solveRaw({
+        id:"river-checkraise-"+baseKey+"-"+runout.id,street:"RIVER",board:riverBoard,
+        oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,
+        betSizes:"125",raiseSizes:"75",maxRaises:2
+      });
+      const crRoot=findNode(checkRaiseRaw,[]);
+      const crAfterCheck=findNode(checkRaiseRaw,[{kind:"check"}]);
+      const crBet=chooseBet(ipRiver,crAfterCheck,{minPct:120,maxPct:130});
+      if(crBet){
+        const crResponse=findNode(checkRaiseRaw,[{kind:"check"},{label:crBet.label}]);
+        const hasLegalRaise=(crResponse?.combos||[]).some(combo=>(combo.actions||[]).some(a=>actionKind(a.action)==="raise"&&Number(a.weight??a.frequency??0)>0));
+        if(hasLegalRaise){
+          const betAmt=solverBetBb(pot0,crBet.pct);
+          addSpot(spots,materialize({
+            id:"river-checkraise-legal-"+baseKey+"-"+runout.id,raw:checkRaiseRaw,node:crResponse,tags:["river_check_raise"],
+            base,oopRange:conditionRange(oopRiver,crRoot,{kind:"check"}),
+            ipRange:conditionRange(ipRiver,crAfterCheck,{label:crBet.label}),
+            potBb:pot0+betAmt,stackBb:stack0,currentBet:betAmt,
+            history:[checkEvent(base.scenario.heroPosition,"RIVER"),actionEvent(base.scenario.villainPosition,crBet.label,betAmt,"RIVER")]
+          }));
+        }
+      }
+
+      const betFoldRaw=await solveRaw({
+        id:"river-betfold-"+baseKey+"-"+runout.id,street:"RIVER",board:riverBoard,
+        oopRange:oopRiver,ipRange:ipRiver,potBb:pot0,stackBb:stack0,
+        betSizes:"25",raiseSizes:"75",maxRaises:2
+      });
+      const bfRoot=findNode(betFoldRaw,[]);
+      const smallLabel=(bfRoot?.combos||[]).flatMap(x=>x.actions||[])
+        .map(a=>String(a.action)).find(x=>actionKind(x)==="raise"&&Math.abs(Number(sizingPct(x))-25)<=3);
+      if(smallLabel){
+        const bfAfterSmall=findNode(betFoldRaw,[{label:smallLabel}]);
+        const raise=chooseBet(ipRiver,bfAfterSmall,{minPct:70,maxPct:80});
+        if(raise){
+          const bfResponse=findNode(betFoldRaw,[{label:smallLabel},{label:raise.label}]);
+          const hasFold=(bfResponse?.combos||[]).some(combo=>(combo.actions||[]).some(a=>actionKind(a.action)==="fold"&&Number(a.weight??a.frequency??0)>0));
+          if(hasFold){
+            const b1=solverBetBb(pot0,25);
+            const raiseAmount=solverBetBb(pot0+2*b1,raise.pct);
+            const to=b1+raiseAmount;
+            addSpot(spots,materialize({
+              id:"river-betfold-legal-"+baseKey+"-"+runout.id,raw:betFoldRaw,node:bfResponse,tags:["bet_fold"],base,
+              oopRange:conditionRange(oopRiver,bfRoot,{label:smallLabel}),
+              ipRange:conditionRange(ipRiver,bfAfterSmall,{label:raise.label}),
+              potBb:pot0+b1+to,stackBb:stack0,currentBet:to,
+              history:[actionEvent(base.scenario.heroPosition,smallLabel,b1,"RIVER"),actionEvent(base.scenario.villainPosition,raise.label,to,"RIVER")]
+            }));
+          }
+        }
+      }
+    }catch(error){
+      failures.push({runout:runout.id,line:"RIVER_TACTICS",error:errorDetail(error)});
+    }
+  }
+
+  // LINE A2: compact check-back / probe / legal check-raise tree.
+  // One 75% sizing keeps the tree stable while maxRaises=2 preserves the
+  // actual check-raise option at the response nodes.
+  // -----------------------------------------------------------------------
+  try{
+    const base=callerOopBases[0];
+    const oop0=parseRange(base.scenario.heroRange);
+    const ip0=parseRange(base.scenario.villainRange);
+    const pot0=normalizeBb(Number(base.scenario.pot));
+    const stack0=normalizeBb(Number(base.scenario.effectiveStack));
+    const flopRaw=await solveRaw({
+      id:"checkback-target-flop-"+runout.id,street:"FLOP",board:runout.flop,
+      oopRange:oop0,ipRange:ip0,potBb:pot0,stackBb:stack0,
+      betSizes:"75",raiseSizes:"75",maxRaises:2
+    });
+    const root=findNode(flopRaw,[]);
+    const afterCheck=findNode(flopRaw,[{kind:"check"}]);
+    if(!root||!afterCheck)throw new Error("target_checkback_flop_nodes_missing");
+
+    addSpot(spots,materialize({
+      id:"checkback-target-"+runout.id,raw:flopRaw,node:afterCheck,
+      tags:["check_back_flop","miss_cbet"],
+      base,
+      oopRange:conditionRange(oop0,root,{kind:"check"}),ipRange:ip0,
+      potBb:pot0,stackBb:stack0,
+      history:[checkEvent(base.scenario.heroPosition,"FLOP")]
+    }));
+
+    const ipBet=chooseBet(ip0,afterCheck,{minPct:70,maxPct:80});
+    if(ipBet){
+      const response=findNode(flopRaw,[{kind:"check"},{label:ipBet.label}]);
+      if(response){
+        const hasLegalRaise=(response.combos||[]).some(combo=>
+          (combo.actions||[]).some(a=>actionKind(a.action)==="raise"&&Number(a.weight??a.frequency??0)>0)
+        );
+        if(hasLegalRaise){
+          const betAmt=solverBetBb(pot0,ipBet.pct);
+          addSpot(spots,materialize({
+            id:"checkraise-legal-flop-"+runout.id,raw:flopRaw,node:response,
+            tags:["check_raise"],
+            base,
+            oopRange:conditionRange(oop0,root,{kind:"check"}),
+            ipRange:conditionRange(ip0,afterCheck,{label:ipBet.label}),
+            potBb:pot0+betAmt,stackBb:stack0,currentBet:betAmt,
+            history:[
+              checkEvent(base.scenario.heroPosition,"FLOP"),
+              actionEvent(base.scenario.villainPosition,ipBet.label,betAmt,"FLOP")
+            ]
+          }));
+        }
+      }
+    }
+
+    const turnBoard=appendCard(runout.flop,runout.turn);
+    const oopTurn=withoutBoard(conditionRange(oop0,root,{kind:"check"}),turnBoard);
+    const ipTurn=withoutBoard(conditionRange(ip0,afterCheck,{kind:"check"}),turnBoard);
+    if(oopTurn.size<4||ipTurn.size<4)throw new Error("target_checkcheck_ranges_too_small_"+oopTurn.size+"_"+ipTurn.size);
+    const turnRaw=await solveRaw({
+      id:"probe-target-turn-"+runout.id,street:"TURN",board:turnBoard,
+      oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,
+      betSizes:"75",raiseSizes:"75",maxRaises:2
+    });
+    const turnRoot=findNode(turnRaw,[]);
+    const hist=[
+      checkEvent(base.scenario.heroPosition,"FLOP"),
+      checkEvent(base.scenario.villainPosition,"FLOP")
+    ];
+    addSpot(spots,materialize({
+      id:"probe-target-"+runout.id,raw:turnRaw,node:turnRoot,
+      tags:["probe_bet","vs_missed_cbet","sequential_lines"],
+      base,oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,history:hist
+    }));
+
+    const turnAfterCheck=findNode(turnRaw,[{kind:"check"}]);
+    const turnIpBet=chooseBet(ipTurn,turnAfterCheck,{minPct:70,maxPct:80});
+    if(turnIpBet){
+      const response=findNode(turnRaw,[{kind:"check"},{label:turnIpBet.label}]);
+      if(response){
+        const hasLegalRaise=(response.combos||[]).some(combo=>
+          (combo.actions||[]).some(a=>actionKind(a.action)==="raise"&&Number(a.weight??a.frequency??0)>0)
+        );
+        if(hasLegalRaise){
+          const betAmt=solverBetBb(pot0,turnIpBet.pct);
+          addSpot(spots,materialize({
+            id:"turn-checkraise-legal-"+runout.id,raw:turnRaw,node:response,
+            tags:["turn_check_raise","sequential_lines"],
+            base,
+            oopRange:conditionRange(oopTurn,turnRoot,{kind:"check"}),
+            ipRange:conditionRange(ipTurn,turnAfterCheck,{label:turnIpBet.label}),
+            potBb:pot0+betAmt,stackBb:stack0,currentBet:betAmt,
+            history:[
+              ...hist,
+              checkEvent(base.scenario.heroPosition,"TURN"),
+              actionEvent(base.scenario.villainPosition,turnIpBet.label,betAmt,"TURN")
+            ]
+          }));
+        }
+      }
+    }
+  }catch(error){
+    const detail=errorDetail(error);
+    if(/^target_checkcheck_ranges_too_small_/.test(detail)){
+      unavailable.push({runout:runout.id,line:"CHECKBACK_PROBE_TARGETED",reason:detail});
+    }else{
+      failures.push({runout:runout.id,line:"CHECKBACK_PROBE_TARGETED",error:detail});
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -501,7 +737,7 @@ for(const runout of RUNOUTS){
     const flopBet=chooseBet(oop0,root);
     if(!flopBet)throw new Error("lineB_flop_bet_missing");
     const afterBet=findNode(flopRaw,[{label:flopBet.label}]);
-    const betAmt=pot0*(flopBet.pct/100);
+    const betAmt=solverBetBb(pot0,flopBet.pct);
     addSpot(spots,materialize({
       id:"float-"+runout.id,raw:flopRaw,node:afterBet,tags:["float_flop"],
       base,
@@ -534,7 +770,7 @@ for(const runout of RUNOUTS){
     const turnBet=chooseBet(oopTurn,turnRoot);
     if(!turnBet)throw new Error("lineB_turn_bet_missing");
     const turnAfterBet=findNode(turnRaw,[{label:turnBet.label}]);
-    const turnBetAmt=potTurn*(turnBet.pct/100);
+    const turnBetAmt=solverBetBb(potTurn,turnBet.pct);
     const riverBoard=appendCard(turnBoard,runout.river);
     const oopRiver=withoutBoard(conditionRange(oopTurn,turnRoot,{label:turnBet.label}),riverBoard);
     const ipRiver=withoutBoard(conditionRange(ipTurn,turnAfterBet,{kind:"call"}),riverBoard);
@@ -568,7 +804,7 @@ const payload={
   solver:"DCFR_SOLVER",
   upstream:{repository:"exinori/DCFR-SOLVER",commit:"4ade6a9e15a841c41867afde1258b9d110cd6fb1",license:"MIT"},
   iterations:ITER,
-  baseMatchups:[baseCallerOop.matchup,baseAggressorOop.matchup],
+  baseMatchups:[...callerOopBases.map(base=>base.matchup),baseAggressorOop.matchup],
   spots,failures
 };
 await writeFile(OUT,JSON.stringify(payload),"utf8");
@@ -582,5 +818,55 @@ console.log(JSON.stringify({
 // The aggregate workflow is the authority: every decision is contract-validated
 // and every required family must reach the strict solved floor there.
 if(!spots.length&&failures.length){
-  console.warn("runout produced no solved roots; aggregate strict-floor validation will decide publishability");
+  console.warn("runout produced no solved roots; aggregate strict-floor validation will decide publishability");  // LINE E: delayed c-bet with the preflop aggressor OOP.
+  // UTG checks flop, HJ checks back, then UTG reaches a genuine turn root
+  // decision. This does not depend on the much rarer IP-aggressor check-back
+  // branch used by LINE A.
+  // -----------------------------------------------------------------------
+  try{
+    const base=baseAggressorOop;
+    const oop0=parseRange(base.scenario.heroRange);
+    const ip0=parseRange(base.scenario.villainRange);
+    const pot0=normalizeBb(Number(base.scenario.pot));
+    const stack0=normalizeBb(Number(base.scenario.effectiveStack));
+    const flopRaw=await solveRaw({
+      id:"delayed-oop-flop-"+runout.id,street:"FLOP",board:runout.flop,
+      oopRange:oop0,ipRange:ip0,potBb:pot0,stackBb:stack0,
+      betSizes:"33",raiseSizes:"75",maxRaises:1
+    });
+    const flopRoot=findNode(flopRaw,[]);
+    const flopAfterCheck=findNode(flopRaw,[{kind:"check"}]);
+    if(!flopRoot||!flopAfterCheck)throw new Error("delayed_flop_check_nodes_missing");
+    const turnBoard=appendCard(runout.flop,runout.turn);
+    const oopTurn=withoutBoard(conditionRange(oop0,flopRoot,{kind:"check"}),turnBoard);
+    const ipTurn=withoutBoard(conditionRange(ip0,flopAfterCheck,{kind:"check"}),turnBoard);
+    if(oopTurn.size<4||ipTurn.size<4)throw new Error("delayed_checkcheck_ranges_too_small_"+oopTurn.size+"_"+ipTurn.size);
+    const turnRaw=await solveRaw({
+      id:"delayed-oop-turn-"+runout.id,street:"TURN",board:turnBoard,
+      oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,
+      betSizes:"33,75",raiseSizes:"75",maxRaises:1
+    });
+    const turnRoot=findNode(turnRaw,[]);
+    if(!turnRoot)throw new Error("delayed_turn_root_missing");
+    const hasBet=(turnRoot.combos||[]).some(combo=>
+      (combo.actions||[]).some(a=>actionKind(a.action)==="raise"&&Number(a.weight??a.frequency??0)>0)
+    );
+    if(!hasBet)throw new Error("delayed_turn_root_has_no_bet");
+    addSpot(spots,materialize({
+      id:"delayed-oop-"+runout.id,raw:turnRaw,node:turnRoot,
+      tags:["delayed_cbet"],
+      base,oopRange:oopTurn,ipRange:ipTurn,potBb:pot0,stackBb:stack0,
+      history:[
+        checkEvent(base.scenario.heroPosition,"FLOP"),
+        checkEvent(base.scenario.villainPosition,"FLOP")
+      ]
+    }));
+  }catch(error){
+    const detail=errorDetail(error);
+    if(/^delayed_checkcheck_ranges_too_small_/.test(detail)||detail==="delayed_turn_root_has_no_bet"){
+      unavailable.push({runout:runout.id,line:"DELAYED_CBET_OOP",reason:detail});
+    }else{
+      failures.push({runout:runout.id,line:"DELAYED_CBET_OOP",error:detail});
+    }
+  }
 }
