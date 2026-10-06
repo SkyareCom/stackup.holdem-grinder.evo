@@ -409,8 +409,7 @@
     };
   }
 
-  function disabled(input,group,option){
-    const state=stateClone(input);
+  function directReason(state,group,option){
     group=String(group||'');option=String(option||'');
     if(option==='all'||option==='random')return null;
 
@@ -444,6 +443,91 @@
       const phase=concrete(state,'phase');
       const pd=optionPhaseDomain(group,option);
       if(phase.length&&pd&&!intersection(phase,pd).length)return 'Incompatível com a fase selecionada';
+    }
+    return null;
+  }
+
+  function candidateState(input,group,option){
+    const state=stateClone(input);
+    const current=state[group]||[];
+    const semantics=policy().groupSemantics[group]||'exclusive';
+    if(semantics==='cumulative-or'||semantics==='cumulative-and'){
+      const next=concrete(state,group);
+      if(option==='all'||option==='random')state[group]=[option];
+      else if(!next.includes(option))state[group]=uniq([...next,option]);
+    }else{
+      state[group]=[option];
+    }
+    return state;
+  }
+
+  function disabled(input,group,option){
+    const state=stateClone(input);
+    group=String(group||'');option=String(option||'');
+    if(option==='all'||option==='random')return null;
+
+    const immediate=directReason(state,group,option);
+    if(immediate)return immediate;
+
+    // Prospective guard: evaluate the exact state that would exist after the click.
+    // We do not call normalize() here because normalization may silently rewrite a
+    // different dimension ("last choice wins"). A candidate is enabled only when
+    // it can coexist with the current explicit selections as-is.
+    const candidate=candidateState(state,group,option);
+
+    const mode=concrete(candidate,'mode')[0];
+    if(mode==='cash'){
+      if(group!=='mode'&&(
+        (group==='ttype'&&option!=='random')||group==='extras'||group==='fsize'||
+        group==='fskill'||group==='phase'||group==='stack'||ADV_SECTIONS.includes(group)
+      ))return 'Incompatível com CASH';
+      if(hasConcrete(candidate,'icm_special'))return 'ICM não existe em CASH';
+      if(hasConcrete(candidate,'pko_special'))return 'PKO não existe em CASH';
+    }
+
+    const seat=concrete(candidate,'seats')[0];
+    const positions=concrete(candidate,'pos');
+    if(seat&&SEAT_POSITIONS[seat]&&positions.some(p=>!SEAT_POSITIONS[seat].includes(p))){
+      return 'A seleção contém posição inexistente nesta mesa';
+    }
+
+    // Every active ADVANCE family must share at least one legal street.
+    let streets=[...ALL_STREETS];
+    for(const section of activeAdvance(candidate)){
+      streets=intersection(streets,sectionStreetDomain(section,concrete(candidate,section)));
+      if(!streets.length)return 'Sem street possível com os filtros ativos';
+    }
+    const explicitStreet=concrete(candidate,'street');
+    if(explicitStreet.length&&!intersection(streets,explicitStreet).length){
+      return 'Sem street possível com a seleção atual';
+    }
+
+    // Position-locked cards and table size must retain at least one common seat.
+    let posDomain=selectedPositionDomain(candidate);
+    if(!posDomain.length)return 'Sem posição possível com os filtros ativos';
+    if(positions.length&&!intersection(posDomain,positions).length){
+      return 'Sem posição possível com a seleção atual';
+    }
+
+    // Tournament-type contracts are strict: do not rewrite the user's type.
+    const ttype=concrete(candidate,'ttype')[0];
+    if(hasConcrete(candidate,'pko_special')&&ttype&&ttype!=='pko'){
+      return 'Treino PKO requer torneio PKO';
+    }
+    if(ttype==='freeze'&&concrete(candidate,'extras').length){
+      return 'Freezeout não aceita rebuy/add-on';
+    }
+
+    // Explicit stack/phase choices must intersect every constrained active card.
+    const stacks=concrete(candidate,'stack').map(v=>Number(String(v).replace(/bb$/i,''))).filter(Number.isFinite);
+    const phases=concrete(candidate,'phase');
+    for(const section of activeAdvance(candidate)){
+      for(const id of concrete(candidate,section)){
+        const sd=optionStackDomain(section,id);
+        if(stacks.length&&sd&&!intersection(stacks,sd).length)return 'Sem stack possível com os filtros ativos';
+        const pd=optionPhaseDomain(section,id);
+        if(phases.length&&pd&&!intersection(phases,pd).length)return 'Sem fase possível com os filtros ativos';
+      }
     }
     return null;
   }
