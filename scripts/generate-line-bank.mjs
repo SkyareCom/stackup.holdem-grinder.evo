@@ -231,6 +231,21 @@ function boardCards(raw){
   })||[];
 }
 function appendCard(board,card){return String(board)+String(card);}
+function bbToChips(bb){
+  const n=Number(bb);
+  if(!Number.isFinite(n))throw new Error("invalid_bb_"+String(bb));
+  return Math.max(1,Math.round(n*2));
+}
+function chipsToBb(chips){return Number(chips)/2;}
+function normalizeBb(bb){return chipsToBb(bbToChips(bb));}
+function solverBetChips(potChips,pct){
+  const pot=Math.round(Number(potChips));
+  const p=Number(pct);
+  if(!Number.isFinite(p)||p<=0)throw new Error("invalid_bet_pct_"+String(pct));
+  if(!Number.isFinite(pot)||pot<=0)throw new Error("invalid_pot_chips_"+String(potChips));
+  return Math.max(1,Math.floor((pot*p+50)/100));
+}
+function solverBetBb(potBb,pct){return chipsToBb(solverBetChips(bbToChips(potBb),pct));}
 function errorDetail(error){
   return [
     String(error?.message||error||""),
