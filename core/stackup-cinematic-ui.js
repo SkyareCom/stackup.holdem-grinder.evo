@@ -66,6 +66,41 @@ const CSS=`
 .spotactiontext,.heroturnnotice{border-radius:2px!important;border-color:var(--cine-line)!important;background:rgba(3,4,5,.88)!important}
 .spotsetupcard{border-radius:4px!important;background:linear-gradient(145deg,rgba(14,17,20,.94),rgba(4,5,6,.98))!important;border:1px solid var(--cine-line)!important;box-shadow:0 20px 60px rgba(0,0,0,.6),var(--cine-glow)!important}
 .spotsetupstart{border-radius:3px!important;background:linear-gradient(180deg,#d7b46a,#9c7135)!important;color:#080808!important;border:1px solid #f0d595!important}
+/* Analysis: tactical debrief */
+.spotfeedback,.spotanalysis,.spotfinal{border-radius:4px!important;background:linear-gradient(145deg,rgba(13,16,19,.94),rgba(4,5,6,.98))!important;border:1px solid var(--cine-line)!important;box-shadow:inset 0 1px rgba(255,255,255,.025),0 12px 30px rgba(0,0,0,.26)!important}
+.spotanalysistitle,.spotfinaltitle{color:var(--cine-gold)!important;letter-spacing:1.8px!important;text-transform:uppercase}
+.spotanalysissection{border-top:1px solid rgba(214,174,99,.18)!important}
+.spotindicator{background:rgba(255,255,255,.025)!important;border-left:1px solid rgba(214,174,99,.35)!important}
+.spotindicatorindex{color:var(--cine-gold)!important}
+.spotindicatorheading{color:var(--cine-text)!important}
+.spotindicatorlist{color:var(--cine-muted)!important}
+.spotfinalsummary{color:var(--cine-text)!important}
+.spotaction,.spotcontrol,.spotsavebutton{border-radius:3px!important;border:1px solid rgba(214,174,99,.30)!important;background:linear-gradient(180deg,rgba(20,23,26,.92),rgba(6,8,10,.98))!important;color:var(--cine-text)!important;box-shadow:inset 0 1px rgba(255,255,255,.03)!important;transition:transform .16s ease,border-color .16s ease,background .16s ease!important}
+.spotaction:not(:disabled):active,.spotcontrol:not(:disabled):active,.spotsavebutton:not(:disabled):active{transform:scale(.97)}
+.spotaction.solver-size{border-color:rgba(214,174,99,.52)!important;color:#f1d48f!important}
+.spotaction.danger,.dataaction.danger{border-color:rgba(220,108,103,.48)!important;color:#ef9a95!important}
+.spotactionrow.primary{position:relative}
+.spotactionrow.primary:before{content:"DECISION MATRIX";position:absolute;left:2px;top:-12px;color:var(--cine-muted);font:7px Arial,sans-serif;letter-spacing:1.6px}
+/* STATS: intelligence dashboard */
+.statsview,.statsgrid,.statsadvancegrid,.statsevolutiongrid{gap:8px!important}
+.statscard,.statshero,.statsadvancecard,.statsreportbanner,.statscallout,.statsmini,.statsplan,.statsdetail,.statspiebox{border-radius:4px!important;background:linear-gradient(145deg,rgba(14,17,20,.90),rgba(5,7,9,.96))!important;border:1px solid rgba(214,174,99,.24)!important;box-shadow:inset 0 1px rgba(255,255,255,.025),0 10px 24px rgba(0,0,0,.18)!important}
+.statscard.premium,.statshero.premium{border-color:rgba(214,174,99,.50)!important;box-shadow:inset 0 1px rgba(255,255,255,.035),0 0 24px rgba(214,174,99,.07)!important}
+.statshead,.statshero-title{color:var(--cine-gold)!important;letter-spacing:1.5px!important}
+.statshero-sub,.statssectionnote,.statslegend,.statslist{color:var(--cine-muted)!important}
+.statskpi,.statsevolutionkpi,.statsgrade,.statspievalue{color:var(--cine-text)!important;text-shadow:0 0 12px rgba(214,174,99,.10)}
+.statsbar,.statstrackbar,.statsmeter,.statshero-meter{background:rgba(255,255,255,.06)!important;border-radius:1px!important;overflow:hidden}
+.statsbar>*,.statstrackbar>*,.statsmeter>*,.statshero-meterline{background:linear-gradient(90deg,#7c5b2d,#e1bd70)!important;box-shadow:0 0 10px rgba(214,174,99,.22)!important}
+.statsdelta{color:var(--cine-green)!important}.statsdelta.flat{color:var(--cine-muted)!important}
+.statsbtn{border-radius:3px!important;border:1px solid var(--cine-line)!important;background:rgba(255,255,255,.035)!important;color:var(--cine-text)!important}
+.statsbtn.primary{background:linear-gradient(180deg,#d7b46a,#9c7135)!important;color:#080808!important;border-color:#f0d595!important}
+.statsnav{border-radius:3px!important;background:rgba(2,3,4,.78)!important;border:1px solid rgba(214,174,99,.20)!important}
+/* cinematic continuity */
+.page{animation:cinePageIn .28s cubic-bezier(.2,.8,.2,1)!important}
+.tower.on,.chip.on,.tab.on,.spotaction:active,.statsbtn:active{animation:cineConfirm .20s ease-out}
+.seat.spot-acting .av{box-shadow:0 0 0 1px rgba(214,174,99,.55),0 0 20px rgba(214,174,99,.28)!important}
+.centerbox{filter:drop-shadow(0 0 14px rgba(214,174,99,.08))}
+@keyframes cinePageIn{from{opacity:.25;transform:translateY(8px);filter:blur(2px)}to{opacity:1;transform:none;filter:none}}
+@keyframes cineConfirm{0%{filter:brightness(1)}45%{filter:brightness(1.35)}100%{filter:brightness(1)}}
 @keyframes cineBoot{from{opacity:0;transform:translateY(7px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
 .content>*{animation:cineBoot .38s cubic-bezier(.2,.8,.2,1) both}
 @media(prefers-reduced-motion:reduce){.content>*{animation:none!important}}
