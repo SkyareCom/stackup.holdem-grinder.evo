@@ -108,9 +108,15 @@
     if(PRE_ADV.has(section))return ['pre'];
     if(section==='aggr_special')return option==='pot_4bet'?[...POST_STREETS]:['pre'];
     if(section==='river_special')return ['river'];
-    if(POST_ADV.has(section))return OPTION_STREETS[option]||POST_STREETS;
-    if(section==='math_special')return OPTION_STREETS[option]||ALL_STREETS;
-    return ALL_STREETS;
+    if(OPTION_STREETS[option])return OPTION_STREETS[option];
+    const c=contractFor(section,option);
+    if(c?.street){
+      const s=String(c.street).toLowerCase().replace('pre-flop','pre').replace('preflop','pre');
+      if(ALL_STREETS.includes(s))return [s];
+    }
+    if(POST_ADV.has(section))return [...POST_STREETS];
+    if(section==='math_special')return [...ALL_STREETS];
+    return [...ALL_STREETS];
   }
 
   function selectedStreetDomain(state,ignoreSection){
@@ -169,6 +175,25 @@
     const c=contractFor(section,option);
     if(c?.icmKind==='bubble')return ['bubble'];
     if(c?.icmKind==='final_table'||c?.icmKind==='three_handed')return ['ft'];
+    if(c?.icmKind==='pay_jump')return ['late','ft'];
+    return null;
+  }
+
+  function optionSeatDomain(section,option){
+    const c=contractFor(section,option);
+    if(Number(c?.tableSize)===2)return ['s2'];
+    if(c?.icmKind==='three_handed')return ['s6','s8','s9','s10'];
+    return null;
+  }
+
+  function tournamentContextReason(state,group,option){
+    const mode=concrete(state,'mode')[0];
+    const ttype=concrete(state,'ttype')[0];
+    const tournamentOnly=group==='ttype'||group==='extras'||group==='fsize'||group==='fskill'||
+      group==='phase'||group==='stack'||ADV_SECTIONS.includes(group);
+    if(mode==='cash'&&tournamentOnly)return 'Disponível apenas em torneios';
+    if(group==='pko_special'&&ttype&&ttype!=='pko'&&ttype!=='random')return 'Treino PKO requer torneio PKO';
+    if(group==='icm_special'&&ttype==='freeze'&&option==='all')return null;
     return null;
   }
 
@@ -414,7 +439,8 @@
     if(option==='all'||option==='random')return null;
 
     const mode=concrete(state,'mode')[0];
-    if(ADV_SECTIONS.includes(group)&&mode==='cash')return 'Disponível apenas em torneios';
+    const tournamentReason=tournamentContextReason(state,group,option);
+    if(tournamentReason)return tournamentReason;
     if(group==='extras'&&concrete(state,'ttype')[0]==='freeze')return 'Freezeout não aceita rebuy/add-on';
 
     if(group==='pos'){
@@ -434,6 +460,8 @@
       if(pos.length&&!intersection(pos,pDomain).length)return 'Incompatível com a posição selecionada';
 
       const seat=concrete(state,'seats')[0];
+      const seatDomain=optionSeatDomain(group,option);
+      if(seat&&seatDomain&&!seatDomain.includes(seat))return 'Incompatível com o número de jogadores';
       if(option==='heads_up_2max'&&seat&&seat!=='s2')return 'Requer Heads-Up / 2 jogadores';
 
       const stack=concrete(state,'stack').map(v=>Number(String(v).replace(/bb$/i,''))).filter(Number.isFinite);
@@ -507,6 +535,19 @@
     if(!posDomain.length)return 'Sem posição possível com os filtros ativos';
     if(positions.length&&!intersection(posDomain,positions).length){
       return 'Sem posição possível com a seleção atual';
+    }
+
+    // Table-size contracts are strict too. A 2-max contract cannot survive on a
+    // larger table, and 3-handed ICM requires a tournament table capable of
+    // reaching three players (not a native heads-up table).
+    const candidateSeat=concrete(candidate,'seats')[0];
+    for(const section of activeAdvance(candidate)){
+      for(const id of concrete(candidate,section)){
+        const seatDomain=optionSeatDomain(section,id);
+        if(candidateSeat&&seatDomain&&!seatDomain.includes(candidateSeat)){
+          return 'Sem número de jogadores possível com os filtros ativos';
+        }
+      }
     }
 
     // Tournament-type contracts are strict: do not rewrite the user's type.
