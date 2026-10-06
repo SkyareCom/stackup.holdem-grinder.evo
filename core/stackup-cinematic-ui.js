@@ -66,6 +66,44 @@ const CSS=`
 .spotactiontext,.heroturnnotice{border-radius:2px!important;border-color:var(--cine-line)!important;background:rgba(3,4,5,.88)!important}
 .spotsetupcard{border-radius:4px!important;background:linear-gradient(145deg,rgba(14,17,20,.94),rgba(4,5,6,.98))!important;border:1px solid var(--cine-line)!important;box-shadow:0 20px 60px rgba(0,0,0,.6),var(--cine-glow)!important}
 .spotsetupstart{border-radius:3px!important;background:linear-gradient(180deg,#d7b46a,#9c7135)!important;color:#080808!important;border:1px solid #f0d595!important}
+/* V3 SCENE ARCHITECTURE — replaces app-card composition with film-frame composition */
+.screen{background:#020303!important}
+.header{padding:calc(env(safe-area-inset-top) + 8px) 15px 5px!important;gap:5px!important;background:linear-gradient(180deg,rgba(0,0,0,.84),rgba(0,0,0,.18) 72%,transparent)!important}
+.brandrow{min-height:54px!important;border:0!important;padding:0 0 7px!important}
+.brandrow img{width:34px!important;height:34px!important}
+.brandtxt .brand{font-size:7px!important;letter-spacing:4px!important}
+.brandtxt .title{font-size:21px!important;letter-spacing:4.5px!important;font-weight:600!important}
+.brandrow:after{content:"GRINDER // TRAINING INTELLIGENCE";bottom:3px!important;font-size:6px!important;letter-spacing:1.7px!important;background:transparent!important}
+.navbtns{position:absolute!important;right:14px!important;top:calc(env(safe-area-inset-top) + 13px)!important;display:flex!important;gap:5px!important;width:auto!important}
+.hbtn{width:34px!important;height:34px!important;padding:0!important;border-radius:50%!important;border:1px solid rgba(214,174,99,.26)!important;background:rgba(2,3,4,.48)!important;font-size:0!important;backdrop-filter:blur(14px)!important}
+.hbtn svg{width:14px!important;height:14px!important}
+.divider{display:none!important}
+.content{padding:5px 12px 12px!important;gap:7px!important}
+.ptitle{border:0!important;border-left:1px solid var(--cine-gold)!important;background:transparent!important;padding:5px 9px!important;margin:0!important;font-size:7px!important;letter-spacing:2.6px!important;color:#a99d86!important}
+.homegrid{grid-template-columns:1fr!important;gap:6px!important;padding-top:38px!important}
+.homegrid:before{font-size:7px!important;letter-spacing:2.4px!important;top:7px!important}
+.homegrid:after{top:20px!important;left:1px!important;right:auto!important;font-size:6px!important;letter-spacing:1.7px!important}
+.homegrid .tower{min-height:62px!important;height:62px!important;display:grid!important;grid-template-columns:36px 1fr 26px!important;align-items:center!important;justify-content:stretch!important;padding:7px 10px!important;border:0!important;border-bottom:1px solid rgba(214,174,99,.20)!important;background:linear-gradient(90deg,rgba(12,15,17,.78),rgba(4,5,6,.42))!important;box-shadow:none!important;backdrop-filter:blur(8px)!important;text-align:left!important}
+.homegrid .tower:before{width:1px!important;height:62%!important;top:19%!important;left:0!important;border:0!important;background:var(--cine-gold)!important;opacity:.35!important}
+.homegrid .tower:after{content:"›"!important;position:static!important;width:auto!important;height:auto!important;border:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;color:rgba(214,174,99,.6)!important;font:26px/1 Arial!important;text-align:right!important}
+.homegrid .tower svg{position:static!important;width:22px!important;height:22px!important}
+.homegrid .tower b{font-size:10px!important;letter-spacing:1.7px!important;max-width:none!important}
+.homegrid .tower:first-child{grid-column:auto!important;min-height:154px!important;height:154px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-end!important;padding:17px!important;border:1px solid rgba(214,174,99,.38)!important;background:
+ linear-gradient(0deg,rgba(0,0,0,.94),rgba(0,0,0,.08) 70%),
+ radial-gradient(ellipse at 70% 28%,rgba(221,183,100,.18),transparent 28%),
+ linear-gradient(120deg,#151713,#050708 64%)!important;box-shadow:0 24px 60px rgba(0,0,0,.48)!important}
+.homegrid .tower:first-child:before{width:46%!important;height:1px!important;left:17px!important;top:auto!important;bottom:49px!important;background:linear-gradient(90deg,var(--cine-gold),transparent)!important}
+.homegrid .tower:first-child:after{content:"ENTER TRAINING  01"!important;position:absolute!important;right:14px!important;top:12px!important;width:auto!important;height:auto!important;border:0!important;border-radius:0!important;background:none!important;color:#9d8a63!important;font:6px Arial!important;letter-spacing:1.5px!important}
+.homegrid .tower:first-child svg{position:absolute!important;left:17px!important;top:17px!important;width:31px!important;height:31px!important}
+.homegrid .tower:first-child b{font-size:16px!important;letter-spacing:2px!important;line-height:1!important}
+.tabbar{margin:0 8px 6px!important;padding:3px!important;border:1px solid rgba(214,174,99,.18)!important;border-radius:3px!important;background:rgba(2,3,4,.80)!important;box-shadow:0 12px 40px rgba(0,0,0,.5)!important}
+.tab{height:48px!important;border:0!important;border-radius:1px!important;gap:3px!important;font-size:7px!important;letter-spacing:1px!important}
+.tab svg{width:16px!important;height:16px!important}
+.tab.on{background:linear-gradient(180deg,rgba(214,174,99,.16),rgba(214,174,99,.025))!important;color:#e4c781!important}
+.tab.on:before{top:-4px!important;left:12%!important;right:12%!important}
+.tsec{border-left:1px solid rgba(214,174,99,.18)!important;padding-left:7px!important}
+.thead{min-height:50px!important;border:0!important;border-bottom:1px solid rgba(214,174,99,.22)!important;border-radius:0!important;background:linear-gradient(90deg,rgba(15,17,18,.82),rgba(4,5,6,.36))!important}
+.tsec.open .thead{border:0!important;border-bottom:1px solid rgba(214,174,99,.52)!important;background:linear-gradient(90deg,rgba(42,33,18,.62),rgba(5,6,7,.45))!important}
 /* V2 FILMIC ENGINE — original in-app rendering, no image assets */
 .screen{perspective:1000px!important;overflow:hidden!important}
 .screen:before{opacity:.62!important;background:
