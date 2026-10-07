@@ -207,6 +207,8 @@ window.StackUpCinematicMigration={
    showSpot(spot);
  }
  $('startRealTraining')?.addEventListener('click',start);
+ $('editRealTraining')?.addEventListener('click',()=>go('settings'));
+ $('cancelRealTraining')?.addEventListener('click',()=>go('home'));
  window.StackUpCinematicMigration.solverFilters=solverFilters;
  window.StackUpCinematicMigration.startTraining=start;
 })();
