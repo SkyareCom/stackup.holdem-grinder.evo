@@ -1,3 +1,4 @@
+import {createHash} from "node:crypto";
 import {readFile,writeFile} from "node:fs/promises";
 import {resolve,join} from "node:path";
 
@@ -199,7 +200,12 @@ function candidateCount(spots,item=null){
       if(!entry?.hand||!Array.isArray(entry.actions)||!entry.actions.length)continue;
       if(!candidateMatchesItem(item,spot,entry.hand))continue;
       const verdict=solvedContract.validateSolvedDecision(spot,entry);
-      if(verdict.ok)unique.add(verdict.id);
+      if(verdict.ok){
+        // Same canonical scenario + hand identity as build-solved-core-catalog.mjs.
+        const scenarioHash=createHash("sha256").update(JSON.stringify(solvedContract.stable({contractVersion:solvedContract.VERSION,scenarioFingerprint:verdict.scenarioFingerprint}))).digest("hex");
+        const decisionHash=createHash("sha256").update(JSON.stringify(solvedContract.stable({contractVersion:solvedContract.VERSION,scenarioHash,hand:String(entry.hand||"").trim()}))).digest("hex");
+        unique.add(decisionHash);
+      }
     }
   }
   return unique.size;
