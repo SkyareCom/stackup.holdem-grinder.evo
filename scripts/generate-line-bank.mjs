@@ -613,8 +613,8 @@ for(const runout of RUNOUTS){
   // One 75% sizing keeps the tree stable while maxRaises=2 preserves the
   // actual check-raise option at the response nodes.
   // -----------------------------------------------------------------------
-  try{
-    const base=callerOopBases[0];
+  for(const [baseIndex,base] of callerOopBases.entries())try{
+    const targetKey="base"+baseIndex;
     const oop0=parseRange(base.scenario.heroRange);
     const ip0=parseRange(base.scenario.villainRange);
     const pot0=normalizeBb(Number(base.scenario.pot));
