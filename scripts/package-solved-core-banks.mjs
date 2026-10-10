@@ -23,7 +23,9 @@ for(const bank of BANKS){
  const rawSolvers=[...new Set(spots.map(x=>x?.solver).filter(Boolean))].sort();
  const mapped=bankEngineOverride.has(bank)?[bankEngineOverride.get(bank)]:rawSolvers.map(x=>legacySolverMap.get(x)??x);
  if(mapped.some(x=>!allowedEngines.has(x))) throw new Error('unregistered_solver:'+bank+':'+mapped.join(','));
+ if(!mapped.length)throw new Error('bank_without_solver_identity:'+bank);
  const solver=mapped.join('+');
+ if(!spots.length||audit.uniqueSolvedSpots<1)throw new Error('empty_bank:'+bank);
  const objectPath='banks/'+solver+'/'+bank.replace(/\.json$/,'')+'/'+sha+'.json.gz';
  const out='.solved-core/'+bank+'.gz'; await writeFile(out,gz);
  manifests.push({schemaVersion:1,bankName:bank,engine:solver,family:'bank',solverVersion:String(payload.version??payload.modelVersion??payload.schemaVersion??'v1'),sha256:sha,decisionCount:audit.uniqueSolvedSpots,objectPath,compression:'gzip',validated:true,contractVersion:C.VERSION});
