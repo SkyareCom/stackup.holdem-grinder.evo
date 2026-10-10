@@ -6,16 +6,19 @@ import vm from 'node:vm';
 const sha=x=>createHash('sha256').update(x).digest('hex');
 const raw=await readFile('data/solver/coverage.json');
 const coverage=JSON.parse(raw.toString());
+if(!Array.isArray(coverage.cards))throw Error('coverage_cards_must_be_array');
 const catalogCode=await readFile('core/stackup-scenario-catalog.js','utf8');
 const sandbox={window:{}};vm.createContext(sandbox);vm.runInContext(catalogCode,sandbox);
 const catalog=sandbox.window.StackUpScenarioCatalog;
 if(!catalog)throw Error('scenario_catalog_missing');
 const byKey=new Map();
-for(const card of coverage.cards||[]){
+for(const card of coverage.cards){
+ if(!card||typeof card!=='object'||typeof card.section!=='string'||typeof card.id!=='string'||!card.section||!card.id)throw Error('malformed_coverage_filter');
  const key=card.section+':'+card.id;
  if(byKey.has(key))throw Error('duplicate_coverage_filter:'+key);
  byKey.set(key,card);
 }
+if(!Array.isArray(catalog.ALL))throw Error('invalid_scenario_catalog');
 const catalogKeys=new Set(catalog.ALL.map(x=>x.section+':'+x.id));
 if(catalogKeys.size!==catalog.ALL.length)throw Error('duplicate_catalog_filter');
 const unknownCoverageKeys=[...byKey.keys()].filter(key=>!catalogKeys.has(key));
