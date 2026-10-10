@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/build-line-bank.yml"
       - "scripts/generate-line-bank.mjs"
+      - "scripts/verify-dcfr-line-aggregate.mjs"
       - "core/stackup-solved-spot-contract.js"
       - "data/solver/solved-spot-policy.json"
   push:
@@ -175,6 +176,7 @@ jobs:
             data/solver/line-bank.json
             line-bank.sha256
             line-bank-provenance.json
+            line-family-audit.json
           retention-days: 90
           if-no-files-found: error
 
@@ -217,7 +219,9 @@ jobs:
             'vs_overbet'
           ];
           const byTagCanonical=Object.fromEntries([...tagUnique].map(([tag,keys])=>[tag,keys.size]));
-          console.log({rootNodes:bank.spots.length,validatedSolvedDecisions:valid,canonicalUniqueDecisions:canonicalSeen.size,canonicalDuplicates,byTag,byTagCanonical,failures:bank.failures?.length||0});
+          const audit={schemaVersion:1,certification:'NOT_CERTIFIED',rootNodes:bank.spots.length,validatedSolvedDecisions:valid,canonicalUniqueDecisions:canonicalSeen.size,canonicalDuplicates,byTag,byTagCanonical,failures:bank.failures?.length||0,requiredMinimum:1500,deficits:required.map(tag=>({tag,solved:byTagCanonical[tag]||0,deficit:Math.max(0,1500-(byTagCanonical[tag]||0))})).filter(x=>x.deficit>0)};
+          fs.writeFileSync('line-family-audit.json',JSON.stringify(audit,null,2)+'\\n');
+          console.log(audit);
           if(valid<6000)throw new Error('line bank has fewer than 6000 validated solved decisions: '+valid);
           const deficits=required.filter(tag=>(byTagCanonical[tag]||0)<1500).map(tag=>({tag,solved:byTagCanonical[tag]||0,deficit:1500-(byTagCanonical[tag]||0)}));
           if(canonicalDuplicates)throw new Error('duplicate canonical scenario+hand decisions: '+canonicalDuplicates);
@@ -232,6 +236,7 @@ jobs:
           path: |
             line-bank-provenance.json
             line-bank.sha256
+            line-family-audit.json
             data/solver/line-bank.json
           retention-days: 90
           if-no-files-found: warn
