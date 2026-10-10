@@ -1,18 +1,13 @@
 name: Migrate Validated Solved Banks
 on:
   workflow_dispatch:
-  push:
-    branches: [solved-spot-external-storage]
-    paths:
-      - 'scripts/package-solved-core-banks.mjs'
-      - 'scripts/upload-solved-core-banks.mjs'
-      - 'scripts/approve-solved-core-automatically.mjs'
-      - '.github/workflows/migrate-solved-core.yml'
 permissions:
   contents: read
 jobs:
   migrate:
+    if: github.repository == 'SkyareCom/stackup.holdem-grinder.evo' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: solved-spots-production
     env:
       SOLVED_SPOT_SUPABASE_URL: ${{ secrets.SOLVED_SPOT_SUPABASE_URL }}
       SOLVED_SPOT_SUPABASE_SERVICE_KEY: ${{ secrets.SOLVED_SPOT_SUPABASE_SERVICE_KEY }}
