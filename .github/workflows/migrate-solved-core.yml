@@ -1,17 +1,13 @@
 name: Migrate Validated Solved Banks
 on:
   workflow_dispatch:
-  push:
-    branches: [solved-spot-external-storage]
-    paths:
-      - 'scripts/package-solved-core-banks.mjs'
-      - 'scripts/upload-solved-core-banks.mjs'
-      - '.github/workflows/migrate-solved-core.yml'
 permissions:
   contents: read
 jobs:
   migrate:
+    if: github.repository == 'SkyareCom/stackup.holdem-grinder.evo' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment: solved-spots-production
     env:
       SOLVED_SPOT_SUPABASE_URL: ${{ secrets.SOLVED_SPOT_SUPABASE_URL }}
       SOLVED_SPOT_SUPABASE_SERVICE_KEY: ${{ secrets.SOLVED_SPOT_SUPABASE_SERVICE_KEY }}
@@ -31,7 +27,16 @@ jobs:
         run: node scripts/package-solved-core-banks.mjs
       - name: Build deterministic decision catalog
         run: node scripts/build-solved-core-catalog.mjs
-      - name: Require independent audit approval artifact
-        run: test -s .solved-core/approval.json
+      - name: Automated strict contract audit (not solver certification)
+        run: node scripts/approve-solved-core-automatically.mjs
+      - name: Require independent solver replay certificate
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const a=JSON.parse(fs.readFileSync('.solved-core/approval.json','utf8'));
+          if(a.audit_mode!=='INDEPENDENT_SOLVER_REPLAY'||a.solver_replay?.status!=='PASSED'||!a.solver_replay?.report_sha256||!a.solver_replay?.verifier_commit){
+            throw new Error('Production blocked: independent solver replay certificate is missing');
+          }
+          NODE
       - name: Upload and verify parity
         run: node scripts/upload-solved-core-banks.mjs

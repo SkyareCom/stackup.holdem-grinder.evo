@@ -1,0 +1,54 @@
+name: Verify Automated Solved Bank Approval
+on:
+  push:
+    branches:
+      - feat/automated-solved-bank-approval-v1
+    paths:
+      - 'scripts/audit-solved-card-integrity.mjs'
+      - 'scripts/approve-solved-core-automatically.mjs'
+      - 'scripts/upload-solved-core-banks.mjs'
+      - 'scripts/package-solved-core-banks.mjs'
+      - 'scripts/build-solved-core-catalog.mjs'
+      - 'scripts/audit-solved-core-migration.mjs'
+      - '.github/workflows/verify-automated-solved-bank-approval.yml'
+  pull_request:
+    paths:
+      - 'scripts/approve-solved-core-automatically.mjs'
+      - 'scripts/upload-solved-core-banks.mjs'
+      - 'scripts/package-solved-core-banks.mjs'
+      - 'scripts/build-solved-core-catalog.mjs'
+      - 'scripts/audit-solved-core-migration.mjs'
+      - '.github/workflows/verify-automated-solved-bank-approval.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify approval and uploader JavaScript syntax
+        run: |
+          node --check scripts/audit-solved-card-integrity.mjs
+          node --check scripts/approve-solved-core-automatically.mjs
+          node --check scripts/upload-solved-core-banks.mjs
+          node --check scripts/package-solved-core-banks.mjs
+          node --check scripts/build-solved-core-catalog.mjs
+          node --check scripts/audit-solved-core-migration.mjs
+      - name: Audit source banks independently (including empty banks)
+        run: node scripts/audit-solved-card-integrity.mjs --source-banks
+      - name: Upload integrity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: solved-card-integrity-${{ github.run_id }}
+          path: .solved-core/card-integrity-audit.json
+          if-no-files-found: warn
+      - name: Verify upload fails closed without server credentials
+        run: |
+          if env -u SOLVED_SPOT_SUPABASE_URL -u SOLVED_SPOT_SUPABASE_SERVICE_KEY node scripts/upload-solved-core-banks.mjs; then
+            echo "FAIL: uploader accepted missing credentials" >&2
+            exit 1
+          fi

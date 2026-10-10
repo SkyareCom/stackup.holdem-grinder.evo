@@ -1,0 +1,59 @@
+#!/usr/bin/env node
+// Independent card/deck consistency audit. This is NOT a solver-optimality certificate.
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {gunzipSync} from 'node:zlib';
+const hash=b=>createHash('sha256').update(b).digest('hex');
+const card=c=>{const v=String(c||'').toUpperCase().replace(/10/g,'T');return /^[2-9TJQKA][CDHS]$/.test(v)?v:null};
+const cardsFromHand=h=>{
+ const s=String(h||'').toUpperCase().replace(/10/g,'T');
+ const m=s.match(/^([2-9TJQKA][CDHS])([2-9TJQKA][CDHS])$/);
+ return m?[m[1],m[2]]:null;
+};
+const standalone=process.argv.includes('--source-banks');
+const sourceBanks=['preflop.json','postflop.json','tournament.json','reentry.json','opponent-profile.json','multiway-tournament.json','multiway-postflop.json','preflop-decisions.json','preflop-9max.json','preflop-multistack.json','preflop-hu.json','texture-sizing.json','line-bank.json'];
+const manifests=standalone?sourceBanks.map(bankName=>({bankName})):JSON.parse(await readFile('.solved-core/manifests.json','utf8'));
+let failureCount=0;
+const bankEvidence=[];
+const failures=[],stats={banks:0,spots:0,decisions:0,exactHandDecisions:0,classHandDecisions:0};
+const reject=(bank,id,reason)=>{failureCount++;if(failures.length<100)failures.push({bank,id,reason});};
+for(const m of manifests){
+ stats.banks++;
+ const raw=standalone?await readFile('data/solver/'+m.bankName):await readFile('.solved-core/'+m.bankName+'.gz');
+ if(!standalone&&hash(raw)!==m.sha256)throw Error('bank_sha_mismatch:'+m.bankName);
+ const payload=JSON.parse(standalone?raw:gunzipSync(raw));
+ const spots=Array.isArray(payload)?payload:payload.spots||[];
+ bankEvidence.push({bank:m.bankName,sha256:hash(raw),spots:spots.length,empty:spots.length===0});
+ for(const spot of spots){
+  stats.spots++;
+  const id=String(spot.solveId||spot.id||'');
+  const scenario=spot.scenario||{};
+  const board=Array.isArray(scenario.board)?scenario.board.map(card):[];
+  const expected={'PRE-FLOP':0,FLOP:3,TURN:4,RIVER:5}[String(scenario.street||'').toUpperCase()];
+  if(expected===undefined||board.length!==expected||board.some(x=>!x)||new Set(board).size!==board.length)reject(m.bankName,id,'invalid_board');
+  for(const e of spot.strategy||[]){
+   stats.decisions++;
+   const hand=cardsFromHand(e.hand);
+   if(hand){
+    stats.exactHandDecisions++;
+    if(hand[0]===hand[1])reject(m.bankName,id,'duplicate_hole_card');
+    if(hand.some(c=>board.includes(c)))reject(m.bankName,id,'hole_board_collision');
+   }else{
+    stats.classHandDecisions++;
+    const h=String(e.hand||'').toUpperCase().replace(/10/g,'T');
+    if(!/^([2-9TJQKA])([2-9TJQKA])([SO])?$/.test(h))reject(m.bankName,id,'invalid_hand_class');
+    if(expected!==0)reject(m.bankName,id,'nonexact_postflop_hand');
+   }
+   const actions=e.actions||[];
+   if(!Array.isArray(actions)||!actions.length)reject(m.bankName,id,'actions_missing');
+   const sum=actions.reduce((n,a)=>n+Number(a.frequency),0);
+   if(!Number.isFinite(sum)||Math.abs(sum-100)>1.25)reject(m.bankName,id,'frequency_sum_invalid');
+  }
+ }
+}
+const emptyBanks=bankEvidence.filter(x=>x.empty).map(x=>x.bank);
+const report={schemaVersion:1,emptyBanks,packagingReady:emptyBanks.length===0&&failureCount===0,sourceMode:standalone?'SOURCE_BANKS':'PACKAGED_BANKS',auditMode:'INDEPENDENT_DECK_AND_STRATEGY_INTEGRITY',mathematicalSolverReplay:false,passed:failureCount===0,failureCount,stats,bankEvidence,failures};
+await mkdir('.solved-core',{recursive:true});
+await writeFile('.solved-core/card-integrity-audit.json',JSON.stringify(report,null,2)+'\n');
+console.log(JSON.stringify(report));
+if(!report.passed)process.exitCode=2;

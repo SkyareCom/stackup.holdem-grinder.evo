@@ -9,6 +9,11 @@ const approval=JSON.parse(approvalBytes.toString('utf8'));
 const sourceCommit=String(process.env.GITHUB_SHA||'').trim();
 if(!/^[0-9a-f]{40}$/i.test(sourceCommit)) throw new Error('verified_source_commit_required');
 if(approval?.status!=='APPROVED') throw new Error('audit_approval_required');
+// Contract checks prove structural integrity, not independent mathematical replay.
+// Production publication is blocked until a separate solver replay certifies the package.
+if(approval?.audit_mode!=='INDEPENDENT_SOLVER_REPLAY') throw new Error('independent_solver_replay_required');
+if(approval?.solver_replay?.status!=='PASSED'||!approval?.solver_replay?.report_sha256||!approval?.solver_replay?.verifier_commit) throw new Error('independent_solver_replay_evidence_required');
+if(approval?.source_commit!==sourceCommit) throw new Error('approval_source_commit_mismatch');
 const auditRef=String(approval?.audit_ref||'').trim();
 if(!auditRef) throw new Error('audit_reference_required');
 if(!approval?.audited_at) throw new Error('audit_timestamp_required');
@@ -18,8 +23,23 @@ if(approved.size!==manifests.length) throw new Error('approval_manifest_count_mi
 for(const m of manifests){
  if(approved.get(m.bankName)!==m.sha256) throw new Error('approval_hash_mismatch:'+m.bankName);
 }
+// Complete approval preflight before the first remote write.
+const catalogBytes=await readFile('.solved-core/catalog.json');
+const catalog=JSON.parse(catalogBytes.toString('utf8'));
+const catalogSha=createHash('sha256').update(catalogBytes).digest('hex');
+if(String(approval?.catalog_sha256||'')!==catalogSha) throw new Error('approval_catalog_hash_mismatch');
+if(!Array.isArray(catalog)||catalog.length!==approval.decision_count)throw new Error('approval_catalog_count_mismatch');
+const approvedManifests=new Map(manifests.map(m=>[m.bankName,m]));
+const uniqueIds=new Set();
+for(const row of catalog){
+ const m=approvedManifests.get(row.bank_name);
+ if(!m||row.manifest_sha256!==m.sha256||row.object_path!==m.objectPath||!row.solve_id||uniqueIds.has(row.solve_id))throw new Error('approval_catalog_row_mismatch');
+ uniqueIds.add(row.solve_id);
+}
 for(const m of manifests){
  const body=await readFile('.solved-core/'+m.bankName+'.gz');
+ const localSha=createHash('sha256').update(body).digest('hex');
+ if(localSha!==m.sha256)throw new Error('local_bank_sha_mismatch:'+m.bankName);
  const u=base+'/storage/v1/object/'+bucket+'/'+m.objectPath;
  const res=await fetch(u,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/gzip','x-upsert':'false'},body});
  if(!res.ok && res.status!==409) throw new Error('upload_failed:'+m.bankName+':'+res.status+':'+await res.text());
@@ -32,12 +52,16 @@ for(const m of manifests){
  console.log('verified',m.bankName,m.decisionCount,m.sha256);
 }
 
-const catalog=JSON.parse(await readFile('.solved-core/catalog.json','utf8'));
-const catalogSha=createHash('sha256').update(await readFile('.solved-core/catalog.json')).digest('hex');
-if(String(approval?.catalog_sha256||'')!==catalogSha) throw new Error('approval_catalog_hash_mismatch');
-const manifestRows=await fetch(base+'/rest/v1/solved_spot_manifests?select=id,sha256',{headers:{authorization:'Bearer '+key,apikey:key}});
-if(!manifestRows.ok)throw new Error('manifest_lookup_failed:'+manifestRows.status+':'+await manifestRows.text());
-const manifestBySha=new Map((await manifestRows.json()).map(x=>[x.sha256,x.id]));
+const manifestBySha=new Map();
+for(const m of manifests){
+ const manifestUrl=base+'/rest/v1/solved_spot_manifests?select=id,sha256&sha256=eq.'+encodeURIComponent(m.sha256);
+ const manifestRows=await fetch(manifestUrl,{headers:{authorization:'Bearer '+key,apikey:key}});
+ if(!manifestRows.ok)throw new Error('manifest_lookup_failed:'+m.bankName+':'+manifestRows.status+':'+await manifestRows.text());
+ const rows=await manifestRows.json();
+ if(!Array.isArray(rows)||rows.length!==1||!rows[0].id||rows[0].sha256!==m.sha256)throw new Error('manifest_lookup_ambiguous:'+m.bankName);
+ manifestBySha.set(m.sha256,rows[0].id);
+}
+for(const m of manifests)if(!manifestBySha.has(m.sha256))throw new Error('remote_manifest_missing:'+m.bankName);
 const batchSize=500;
 for(let i=0;i<catalog.length;i+=batchSize){
  const batch=catalog.slice(i,i+batchSize).map(x=>{
@@ -50,4 +74,11 @@ for(let i=0;i<catalog.length;i+=batchSize){
  if(!wr.ok)throw new Error('catalog_failed:'+i+':'+wr.status+':'+await wr.text());
  console.log('catalog_batch',i,batch.length);
 }
-console.log('catalog_complete',catalog.length);
+const countUrl=base+'/rest/v1/solved_spot_catalog?select=solve_id&published=eq.true&provenance->>approval_sha256=eq.'+encodeURIComponent(approvalSha256);
+const verify=await fetch(countUrl,{headers:{authorization:'Bearer '+key,apikey:key,prefer:'count=exact'},method:'HEAD'});
+if(!verify.ok)throw new Error('catalog_parity_lookup_failed:'+verify.status);
+const range=verify.headers.get('content-range')||'';
+if(!/^(?:\d+-\d+|\*)\/\d+$/.test(range))throw new Error('catalog_parity_content_range_invalid:'+range);
+const remoteCount=Number(range.split('/').pop());
+if(!Number.isSafeInteger(remoteCount)||remoteCount!==catalog.length)throw new Error('catalog_parity_mismatch:'+remoteCount+':'+catalog.length);
+console.log('catalog_complete_verified',catalog.length);
