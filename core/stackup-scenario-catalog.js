@@ -131,6 +131,49 @@
       ['breakeven_bluff','BREAK-EVEN BLUFF','breakeven_bluff'],['breakeven_call','BREAK-EVEN CALL','breakeven_call'],
       ['combos','COMBOS','combos'],['blockers','BLOCKERS','blockers'],['equity_realization','EQUITY REALIZATION','equity_realization']
     ].map(([id,label,focus])=>A('math_special',id,label,SOURCE.MATH,'math_focus',{focus}))
+    // Additional real poker decision families. Catalogued only: no synthetic solver certification.
+    ...[
+      ['straddle_pot','STRADDLE POT','straddle_pot'],
+      ['ante_cash','CASH GAME COM ANTE','ante_cash'],
+      ['bomb_pot','BOMB POT','bomb_pot'],
+      ['dead_blind','DEAD BLIND','dead_blind'],
+      ['mississippi_straddle','MISSISSIPPI STRADDLE','mississippi_straddle']
+    ].map(([id,label,kind])=>A('game_special',id,label,SOURCE.UNSUPPORTED,'requires_specific_game_tree',{kind})),
+    ...[
+      ['heads_up_postflop','HEADS-UP PÓS-FLOP','heads_up_postflop'],
+      ['three_way_pot','POTE 3-WAY','three_way'],
+      ['four_way_plus','POTE 4-WAY+','four_way_plus'],
+      ['side_pot','SIDE POT','side_pot'],
+      ['dry_side_pot','DRY SIDE POT','dry_side_pot'],
+      ['multi_all_in','MULTIWAY ALL-IN','multi_all_in'],
+      ['effective_stack_asymmetry','STACKS ASSIMÉTRICOS','effective_stack_asymmetry']
+    ].map(([id,label,kind])=>A('pot_special',id,label,SOURCE.UNSUPPORTED,'requires_multi_player_solver',{kind})),
+    ...[
+      ['overlimp','OVERLIMP','overlimp'],
+      ['isolation_raise','ISOLATION RAISE','isolation_raise'],
+      ['open_4bet','OPEN 4-BET','open_4bet'],
+      ['five_bet','5-BET','five_bet'],
+      ['five_bet_shove','5-BET SHOVE','five_bet_shove'],
+      ['backraise','BACKRAISE','backraise'],
+      ['cold_3bet','COLD 3-BET','cold_3bet']
+    ].map(([id,label,kind])=>A('pre_extended',id,label,SOURCE.UNSUPPORTED,'requires_preflop_tree',{kind})),
+    ...[
+      ['flop_cbet','FLOP C-BET','flop_cbet'],
+      ['flop_check_call','FLOP CHECK-CALL','flop_check_call'],
+      ['turn_lead','TURN LEAD','turn_lead'],
+      ['turn_overbet','TURN OVERBET','turn_overbet'],
+      ['river_overbet','RIVER OVERBET','river_overbet'],
+      ['river_triple_barrel_defense','DEFESA VS TRIPLE BARREL','river_triple_barrel_defense'],
+      ['river_check_call','RIVER CHECK-CALL','river_check_call'],
+      ['river_check_fold','RIVER CHECK-FOLD','river_check_fold']
+    ].map(([id,label,kind])=>A('line_extended',id,label,SOURCE.UNSUPPORTED,'requires_action_history_solver',{kind})),
+    ...[
+      ['run_it_twice','RUN IT TWICE','run_it_twice'],
+      ['satellite_bubble','SATELLITE BUBBLE','satellite_bubble'],
+      ['final_table_deal','FINAL TABLE DEAL','final_table_deal'],
+      ['mystery_bounty','MYSTERY BOUNTY','mystery_bounty'],
+      ['progressive_bounty','PROGRESSIVE BOUNTY','progressive_bounty']
+    ].map(([id,label,kind])=>A('format_extended',id,label,SOURCE.UNSUPPORTED,'requires_format_specific_model',{kind})),
   ];
 
   const ALL=Object.freeze([...ADJUST,...ADVANCE]);
