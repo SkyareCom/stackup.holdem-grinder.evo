@@ -15,7 +15,7 @@ const code=await readFile('core/stackup-solved-spot-contract.js','utf8');
 const sb={globalThis:{}};vm.createContext(sb);vm.runInContext(code,sb);
 const C=sb.globalThis.StackUpSolvedSpotContract;
 if(!C)throw new Error('contract_missing');
-const byBank=new Map(),seen=new Set(),canonicalDecisions=new Set();
+const byBank=new Map(),seen=new Set(),canonicalDecisions=new Set(),decisionMetadata=new Map();
 for(const m of manifests){
  if(!m.bankName||byBank.has(m.bankName)||!/^([a-f0-9]{64})$/.test(m.sha256))throw new Error('invalid_manifest');
  const gz=await readFile('.solved-core/'+m.bankName+'.gz');
@@ -31,6 +31,7 @@ for(const m of manifests){
    const canonicalKey=JSON.stringify([v.scenarioFingerprint,String(entry.hand||'').trim().toUpperCase()]);
    if(canonicalDecisions.has(canonicalKey))throw new Error('canonical_scenario_hand_duplicate:'+m.bankName);
    canonicalDecisions.add(canonicalKey);
+   decisionMetadata.set(v.id,{bankName:m.bankName,hand:String(entry.hand||'').trim(),scenarioFingerprint:v.scenarioFingerprint,solverRef:String(spot.solveId||spot.id||'').trim()});
    seen.add(v.id);count++;
  }
  if(count!==m.decisionCount)throw new Error('decision_count_mismatch:'+m.bankName);
@@ -40,6 +41,8 @@ if(catalog.length!==seen.size)throw new Error('catalog_size_mismatch');
 const catalogIds=new Set();
 for(const row of catalog){
  const m=byBank.get(row.bank_name);
+ const expected=decisionMetadata.get(row.solve_id);
+ if(!expected||expected.bankName!==row.bank_name||expected.hand!==row.hand_key||expected.solverRef!==row.solver_ref||row.provenance?.scenario_fingerprint!==expected.scenarioFingerprint)throw new Error('catalog_decision_metadata_mismatch:'+row.solve_id);
  if(!m||row.manifest_sha256!==m.sha256||row.object_path!==m.objectPath||!seen.has(row.solve_id)||catalogIds.has(row.solve_id)||row.audit_status!=='PENDING'||row.published!==false)throw new Error('catalog_mismatch:'+row.solve_id);
  catalogIds.add(row.solve_id);
 }
