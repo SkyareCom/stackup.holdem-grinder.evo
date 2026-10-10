@@ -10,7 +10,6 @@ on:
       - "data/solver/solved-spot-policy.json"
   push:
     branches:
-      - main
       - expand-targeted-checkback-bases-v1
     paths:
       - ".github/workflows/build-line-bank.yml"
@@ -20,7 +19,7 @@ on:
       - "data/solver/solved-spot-policy.json"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: strict-solved-line-bank-${{ github.ref }}
@@ -230,12 +229,3 @@ jobs:
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
           node scripts/route-solve-queue.mjs
-
-      - name: Commit bank, coverage and queue safely
-        if: github.ref == 'refs/heads/main'
-        run: |
-          git config user.name "StackUp Solved Spot Bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add data/solver/line-bank.json
-          git commit -m "Generate strict solved postflop line bank"
-          bash scripts/persist-solver-artifacts.sh data/solver/line-bank.json
