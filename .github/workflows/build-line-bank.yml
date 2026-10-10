@@ -11,9 +11,11 @@ on:
   push:
     branches:
       - main
+      - expand-targeted-checkback-bases-v1
     paths:
       - ".github/workflows/build-line-bank.yml"
       - "scripts/generate-line-bank.mjs"
+      - "scripts/verify-dcfr-line-aggregate.mjs"
       - "core/stackup-solved-spot-contract.js"
       - "data/solver/solved-spot-policy.json"
 
