@@ -51,7 +51,8 @@ for(const m of manifests){
   }
  }
 }
-const report={schemaVersion:1,sourceMode:standalone?'SOURCE_BANKS':'PACKAGED_BANKS',auditMode:'INDEPENDENT_DECK_AND_STRATEGY_INTEGRITY',mathematicalSolverReplay:false,passed:failureCount===0,failureCount,stats,bankEvidence,failures};
+const emptyBanks=bankEvidence.filter(x=>x.empty).map(x=>x.bank);
+const report={schemaVersion:1,emptyBanks,packagingReady:emptyBanks.length===0&&failureCount===0,sourceMode:standalone?'SOURCE_BANKS':'PACKAGED_BANKS',auditMode:'INDEPENDENT_DECK_AND_STRATEGY_INTEGRITY',mathematicalSolverReplay:false,passed:failureCount===0,failureCount,stats,bankEvidence,failures};
 await mkdir('.solved-core',{recursive:true});
 await writeFile('.solved-core/card-integrity-audit.json',JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report));
