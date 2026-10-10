@@ -33,5 +33,16 @@ const report={
 report.certified=false; // Fail closed until independently verified solver replay is implemented.
 await mkdir('data/solver',{recursive:true});
 await writeFile('data/solver/certification-evidence.json',JSON.stringify(report,null,2)+'\n');
+const queue=deficits.map(d=>({
+ key:d.key,solver:d.solver,verifiedUniqueDecisions:d.validatedSolvedSpots,
+ minimumRequired:1500,additionalVerifiedDecisionsNeeded:d.missing,
+ status:d.solver==='UNSUPPORTED'?'ENGINE_REQUIRED':'SOLVE_REQUIRED'
+})).sort((a,b)=>b.additionalVerifiedDecisionsNeeded-a.additionalVerifiedDecisionsNeeded||a.key.localeCompare(b.key));
+await writeFile('data/solver/certification-deficit-queue.json',JSON.stringify({
+ schemaVersion:1,sourceCoverageSha256:report.coverageSha256,
+ generatedAt:report.generatedAt,totalDeficitFilters:queue.length,
+ totalAdditionalDecisionsNeeded:queue.reduce((n,x)=>n+x.additionalVerifiedDecisionsNeeded,0),
+ queue
+},null,2)+'\n');
 console.log(JSON.stringify({catalogCount:report.catalogCount,filtersWithDeficits:report.filtersWithDeficits,replayEvidencePresent:report.replayEvidencePresent,certified:report.certified,coverageSha256:report.coverageSha256}));
 if(!report.certified)process.exitCode=2;
