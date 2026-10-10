@@ -35,6 +35,8 @@ for(const row of catalog){
 }
 for(const m of manifests){
  const body=await readFile('.solved-core/'+m.bankName+'.gz');
+ const localSha=createHash('sha256').update(body).digest('hex');
+ if(localSha!==m.sha256)throw new Error('local_bank_sha_mismatch:'+m.bankName);
  const u=base+'/storage/v1/object/'+bucket+'/'+m.objectPath;
  const res=await fetch(u,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/gzip','x-upsert':'false'},body});
  if(!res.ok && res.status!==409) throw new Error('upload_failed:'+m.bankName+':'+res.status+':'+await res.text());
@@ -50,6 +52,7 @@ for(const m of manifests){
 const manifestRows=await fetch(base+'/rest/v1/solved_spot_manifests?select=id,sha256',{headers:{authorization:'Bearer '+key,apikey:key}});
 if(!manifestRows.ok)throw new Error('manifest_lookup_failed:'+manifestRows.status+':'+await manifestRows.text());
 const manifestBySha=new Map((await manifestRows.json()).map(x=>[x.sha256,x.id]));
+for(const m of manifests)if(!manifestBySha.has(m.sha256))throw new Error('remote_manifest_missing:'+m.bankName);
 const batchSize=500;
 for(let i=0;i<catalog.length;i+=batchSize){
  const batch=catalog.slice(i,i+batchSize).map(x=>{
@@ -62,4 +65,10 @@ for(let i=0;i<catalog.length;i+=batchSize){
  if(!wr.ok)throw new Error('catalog_failed:'+i+':'+wr.status+':'+await wr.text());
  console.log('catalog_batch',i,batch.length);
 }
-console.log('catalog_complete',catalog.length);
+const countUrl=base+'/rest/v1/solved_spot_catalog?select=solve_id&published=eq.true&provenance->>approval_sha256=eq.'+encodeURIComponent(approvalSha256);
+const verify=await fetch(countUrl,{headers:{authorization:'Bearer '+key,apikey:key,prefer:'count=exact'},method:'HEAD'});
+if(!verify.ok)throw new Error('catalog_parity_lookup_failed:'+verify.status);
+const range=verify.headers.get('content-range')||'';
+const remoteCount=Number(range.split('/').pop());
+if(!Number.isSafeInteger(remoteCount)||remoteCount!==catalog.length)throw new Error('catalog_parity_mismatch:'+remoteCount+':'+catalog.length);
+console.log('catalog_complete_verified',catalog.length);
