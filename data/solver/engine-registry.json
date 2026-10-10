@@ -151,6 +151,21 @@
         "post_special/postflop_multiway"
       ],
       "strict": true
+    },
+    {
+      "id": "UNSUPPORTED_EXTENDED_SCENARIOS",
+      "status": "ENGINE_REQUIRED",
+      "workflow": null,
+      "generator": null,
+      "handles": [
+        "game_special/*",
+        "pot_special/*",
+        "pre_extended/*",
+        "line_extended/*",
+        "format_extended/*"
+      ],
+      "strict": false,
+      "notes": "No validated solver exists for these new scenario families. Do not route as READY_TO_SOLVE or publish decisions."
     }
   ]
 }
