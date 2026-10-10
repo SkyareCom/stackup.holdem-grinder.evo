@@ -220,7 +220,7 @@ jobs:
           ];
           const byTagCanonical=Object.fromEntries([...tagUnique].map(([tag,keys])=>[tag,keys.size]));
           const audit={schemaVersion:1,certification:'NOT_CERTIFIED',rootNodes:bank.spots.length,validatedSolvedDecisions:valid,canonicalUniqueDecisions:canonicalSeen.size,canonicalDuplicates,byTag,byTagCanonical,failures:bank.failures?.length||0,requiredMinimum:1500,deficits:required.map(tag=>({tag,solved:byTagCanonical[tag]||0,deficit:Math.max(0,1500-(byTagCanonical[tag]||0))})).filter(x=>x.deficit>0)};
-          fs.writeFileSync('line-family-audit.json',JSON.stringify(audit,null,2)+'\\n');
+          fs.writeFileSync('line-family-audit.json',JSON.stringify(audit,null,2)+'\n');
           console.log(audit);
           if(valid<6000)throw new Error('line bank has fewer than 6000 validated solved decisions: '+valid);
           const deficits=required.filter(tag=>(byTagCanonical[tag]||0)<1500).map(tag=>({tag,solved:byTagCanonical[tag]||0,deficit:1500-(byTagCanonical[tag]||0)}));
