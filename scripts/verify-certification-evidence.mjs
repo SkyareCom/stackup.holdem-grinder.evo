@@ -58,6 +58,8 @@ await writeFile('data/solver/certification-deficit-queue.json',JSON.stringify({
  schemaVersion:1,sourceCoverageSha256:report.coverageSha256,
  generatedAt:report.generatedAt,totalDeficitFilters:queue.length,
  totalAdditionalDecisionsNeeded:queue.reduce((n,x)=>n+x.additionalVerifiedDecisionsNeeded,0),
+ solverRequiredAdditionalDecisions:queue.filter(x=>x.status==='SOLVE_REQUIRED').reduce((n,x)=>n+x.additionalVerifiedDecisionsNeeded,0),
+ engineRequiredAdditionalDecisions:queue.filter(x=>x.status==='ENGINE_REQUIRED').reduce((n,x)=>n+x.additionalVerifiedDecisionsNeeded,0),
  engineRequiredCount:queue.filter(x=>x.status==='ENGINE_REQUIRED').length,
  solveRequiredCount:queue.filter(x=>x.status==='SOLVE_REQUIRED').length,
  queue
