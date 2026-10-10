@@ -18,17 +18,19 @@ const deficits=catalog.ALL.map(x=>{
 }).filter(x=>!x.eligible);
 let replay=null;
 try{replay=JSON.parse(await readFile('.solved-core/independent-replay-certificate.json','utf8'))}catch{}
-const replayPassed=Boolean(replay?.status==='PASSED'&&replay?.audit_mode==='INDEPENDENT_SOLVER_REPLAY'&&/^[a-f0-9]{64}$/i.test(replay?.report_sha256||'')&&/^[a-f0-9]{40}$/i.test(replay?.verifier_commit||'')&&replay?.coverage_sha256===sha(raw));
+// A metadata-only certificate is not a mathematical replay. This gate cannot independently verify solver optimality.
+const replayMetadataPresent=Boolean(replay?.status==='PASSED'&&replay?.audit_mode==='INDEPENDENT_SOLVER_REPLAY'&&/^[a-f0-9]{64}$/i.test(replay?.report_sha256||'')&&/^[a-f0-9]{40}$/i.test(replay?.verifier_commit||'')&&replay?.coverage_sha256===sha(raw));
 const report={
  schemaVersion:1,mode:'FAIL_CLOSED_CERTIFICATION',generatedAt:new Date().toISOString(),
  catalogCount:catalog.ALL.length,coverageCount:coverage.cards?.length??0,
  coverageSha256:sha(raw),minUniqueSolvedDecisionsPerFilter:1500,
  filtersWithDeficits:deficits.length,deficits,
- replayEvidencePresent:replayPassed,
+ replayMetadataPresent,
+ replayEvidencePresent:false, // Only an actual independent solver replay can set this true.
  coverageComplete:catalog.ALL.length===coverage.cards?.length&&deficits.length===0,
  certified:false
 };
-report.certified=report.coverageComplete&&report.replayEvidencePresent;
+report.certified=false; // Fail closed until independently verified solver replay is implemented.
 await mkdir('data/solver',{recursive:true});
 await writeFile('data/solver/certification-evidence.json',JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify({catalogCount:report.catalogCount,filtersWithDeficits:report.filtersWithDeficits,replayEvidencePresent:report.replayEvidencePresent,certified:report.certified,coverageSha256:report.coverageSha256}));
