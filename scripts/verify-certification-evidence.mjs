@@ -19,6 +19,7 @@ for(const card of coverage.cards||[]){
 const catalogKeys=new Set(catalog.ALL.map(x=>x.section+':'+x.id));
 if(catalogKeys.size!==catalog.ALL.length)throw Error('duplicate_catalog_filter');
 const unknownCoverageKeys=[...byKey.keys()].filter(key=>!catalogKeys.has(key));
+const missingCoverageKeys=[...catalogKeys].filter(key=>!byKey.has(key));
 const deficits=catalog.ALL.map(x=>{
  const card=byKey.get(x.section+':'+x.id);
  const count=Number(card?.validatedSolvedSpots??0);
@@ -32,12 +33,12 @@ const replayMetadataPresent=Boolean(replay?.status==='PASSED'&&replay?.audit_mod
 const report={
  schemaVersion:1,mode:'FAIL_CLOSED_CERTIFICATION',generatedAt:new Date().toISOString(),
  catalogCount:catalog.ALL.length,coverageCount:coverage.cards?.length??0,
- unknownCoverageKeys,
+ unknownCoverageKeys,missingCoverageKeys,
  coverageSha256:sha(raw),minUniqueSolvedDecisionsPerFilter:1500,
  filtersWithDeficits:deficits.length,deficits,
  replayMetadataPresent,
  replayEvidencePresent:false, // Only an actual independent solver replay can set this true.
- coverageComplete:catalog.ALL.length===coverage.cards?.length&&unknownCoverageKeys.length===0&&deficits.length===0,
+ coverageComplete:catalog.ALL.length===coverage.cards?.length&&unknownCoverageKeys.length===0&&missingCoverageKeys.length===0&&deficits.length===0,
  certified:false
 };
 report.certified=false; // Fail closed until independently verified solver replay is implemented.
