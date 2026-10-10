@@ -3,7 +3,7 @@ import {readFile,mkdir,writeFile} from 'node:fs/promises';
 import {gzipSync} from 'node:zlib';
 import {createHash} from 'node:crypto';
 import vm from 'node:vm';
-const BANKS=['preflop.json','postflop.json','tournament.json','reentry.json','opponent-profile.json','multiway-tournament.json','multiway-postflop.json','preflop-decisions.json','preflop-9max.json','preflop-multistack.json','preflop-hu.json','texture-sizing.json'];
+const BANKS=['preflop.json','postflop.json','tournament.json','reentry.json','opponent-profile.json','multiway-tournament.json','multiway-postflop.json','preflop-decisions.json','preflop-9max.json','preflop-multistack.json','preflop-hu.json','texture-sizing.json','pushfold-hu-v1.json','line-bank.json'];
 const registry=JSON.parse(await readFile('data/solver/engine-registry.json','utf8'));
 const allowedEngines=new Set(registry.engines.filter(x=>x.strict===true).map(x=>x.id));
 const legacySolverMap=new Map([['DCFR_SOLVER','DCFR_POSTFLOP_GENERAL'],['STACKUP_ICM','STACKUP_ICM_PKO'],['STACKUP_REENTRY_ICM','STACKUP_REENTRY_UTILITY'],['STACKUP_PROFILE_BR','STACKUP_OPPONENT_BR'],['STACKUP_MULTIWAY_BR','STACKUP_MULTIWAY_ICM'],['STACKUP_MULTIWAY_RIVER_BR','STACKUP_MULTIWAY_POSTFLOP']]);
