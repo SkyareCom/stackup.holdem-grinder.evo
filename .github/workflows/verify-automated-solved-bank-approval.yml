@@ -4,6 +4,7 @@ on:
     branches:
       - feat/automated-solved-bank-approval-v1
     paths:
+      - 'scripts/audit-solved-card-integrity.mjs'
       - 'scripts/approve-solved-core-automatically.mjs'
       - 'scripts/upload-solved-core-banks.mjs'
       - 'scripts/package-solved-core-banks.mjs'
@@ -30,6 +31,7 @@ jobs:
           node-version: '22'
       - name: Verify approval and uploader JavaScript syntax
         run: |
+          node --check scripts/audit-solved-card-integrity.mjs
           node --check scripts/approve-solved-core-automatically.mjs
           node --check scripts/upload-solved-core-banks.mjs
           node --check scripts/package-solved-core-banks.mjs
