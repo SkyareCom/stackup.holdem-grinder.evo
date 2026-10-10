@@ -6,6 +6,8 @@ on:
     paths:
       - 'scripts/approve-solved-core-automatically.mjs'
       - 'scripts/upload-solved-core-banks.mjs'
+      - 'scripts/package-solved-core-banks.mjs'
+      - 'scripts/build-solved-core-catalog.mjs'
       - '.github/workflows/verify-automated-solved-bank-approval.yml'
   pull_request:
     paths:
@@ -26,6 +28,9 @@ jobs:
         run: |
           node --check scripts/approve-solved-core-automatically.mjs
           node --check scripts/upload-solved-core-banks.mjs
+          node --check scripts/package-solved-core-banks.mjs
+          node --check scripts/build-solved-core-catalog.mjs
+          node --check scripts/audit-solved-core-migration.mjs
       - name: Verify upload fails closed without server credentials
         run: |
           if env -u SOLVED_SPOT_SUPABASE_URL -u SOLVED_SPOT_SUPABASE_SERVICE_KEY node scripts/upload-solved-core-banks.mjs; then
