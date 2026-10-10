@@ -27,7 +27,16 @@ jobs:
         run: node scripts/package-solved-core-banks.mjs
       - name: Build deterministic decision catalog
         run: node scripts/build-solved-core-catalog.mjs
-      - name: Automated strict contract audit and approval
+      - name: Automated strict contract audit (not solver certification)
         run: node scripts/approve-solved-core-automatically.mjs
+      - name: Require independent solver replay certificate
+        run: |
+          node - <<'NODE'
+          const fs=require('node:fs');
+          const a=JSON.parse(fs.readFileSync('.solved-core/approval.json','utf8'));
+          if(a.audit_mode!=='INDEPENDENT_SOLVER_REPLAY'||a.solver_replay?.status!=='PASSED'||!a.solver_replay?.report_sha256||!a.solver_replay?.verifier_commit){
+            throw new Error('Production blocked: independent solver replay certificate is missing');
+          }
+          NODE
       - name: Upload and verify parity
         run: node scripts/upload-solved-core-banks.mjs
