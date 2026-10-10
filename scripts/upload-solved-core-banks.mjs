@@ -20,6 +20,19 @@ if(approved.size!==manifests.length) throw new Error('approval_manifest_count_mi
 for(const m of manifests){
  if(approved.get(m.bankName)!==m.sha256) throw new Error('approval_hash_mismatch:'+m.bankName);
 }
+// Complete approval preflight before the first remote write.
+const catalogBytes=await readFile('.solved-core/catalog.json');
+const catalog=JSON.parse(catalogBytes.toString('utf8'));
+const catalogSha=createHash('sha256').update(catalogBytes).digest('hex');
+if(String(approval?.catalog_sha256||'')!==catalogSha) throw new Error('approval_catalog_hash_mismatch');
+if(!Array.isArray(catalog)||catalog.length!==approval.decision_count)throw new Error('approval_catalog_count_mismatch');
+const approvedManifests=new Map(manifests.map(m=>[m.bankName,m]));
+const uniqueIds=new Set();
+for(const row of catalog){
+ const m=approvedManifests.get(row.bank_name);
+ if(!m||row.manifest_sha256!==m.sha256||row.object_path!==m.objectPath||!row.solve_id||uniqueIds.has(row.solve_id))throw new Error('approval_catalog_row_mismatch');
+ uniqueIds.add(row.solve_id);
+}
 for(const m of manifests){
  const body=await readFile('.solved-core/'+m.bankName+'.gz');
  const u=base+'/storage/v1/object/'+bucket+'/'+m.objectPath;
@@ -34,9 +47,6 @@ for(const m of manifests){
  console.log('verified',m.bankName,m.decisionCount,m.sha256);
 }
 
-const catalog=JSON.parse(await readFile('.solved-core/catalog.json','utf8'));
-const catalogSha=createHash('sha256').update(await readFile('.solved-core/catalog.json')).digest('hex');
-if(String(approval?.catalog_sha256||'')!==catalogSha) throw new Error('approval_catalog_hash_mismatch');
 const manifestRows=await fetch(base+'/rest/v1/solved_spot_manifests?select=id,sha256',{headers:{authorization:'Bearer '+key,apikey:key}});
 if(!manifestRows.ok)throw new Error('manifest_lookup_failed:'+manifestRows.status+':'+await manifestRows.text());
 const manifestBySha=new Map((await manifestRows.json()).map(x=>[x.sha256,x.id]));
