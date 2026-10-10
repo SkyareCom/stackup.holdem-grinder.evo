@@ -159,12 +159,22 @@ jobs:
           if(!Array.isArray(bank.spots)||bank.spots.length<40)throw new Error('line bank too small');
           let valid=0;
           const byTag={};
+          const canonicalSeen=new Set();
+          const tagUnique=new Map();
+          let canonicalDuplicates=0;
           for(const spot of bank.spots){
             let spotValid=0;
             for(const entry of spot.strategy||[]){
               const result=contract.validateSolvedDecision(spot,entry);
               if(!result.ok)throw new Error(spot.id+'/'+entry.hand+': '+result.errors.join(','));
               valid++;spotValid++;
+              const key=JSON.stringify([result.scenarioFingerprint,String(entry.hand||'').trim().toUpperCase()]);
+              if(canonicalSeen.has(key))canonicalDuplicates++;
+              else canonicalSeen.add(key);
+              for(const tag of spot.scenario?.tags||[]){
+                if(!tagUnique.has(tag))tagUnique.set(tag,new Set());
+                tagUnique.get(tag).add(key);
+              }
             }
             for(const tag of spot.scenario?.tags||[])byTag[tag]=(byTag[tag]||0)+spotValid;
           }
@@ -175,9 +185,11 @@ jobs:
             'block_bet_20_25','river_bluff_catch','river_check_raise','bet_fold',
             'vs_overbet'
           ];
-          console.log({rootNodes:bank.spots.length,validatedSolvedDecisions:valid,byTag,failures:bank.failures?.length||0});
+          const byTagCanonical=Object.fromEntries([...tagUnique].map(([tag,keys])=>[tag,keys.size]));
+          console.log({rootNodes:bank.spots.length,validatedSolvedDecisions:valid,canonicalUniqueDecisions:canonicalSeen.size,canonicalDuplicates,byTag,byTagCanonical,failures:bank.failures?.length||0});
           if(valid<6000)throw new Error('line bank has fewer than 6000 validated solved decisions: '+valid);
-          const deficits=required.filter(tag=>(byTag[tag]||0)<1500).map(tag=>({tag,solved:byTag[tag]||0,deficit:1500-(byTag[tag]||0)}));
+          const deficits=required.filter(tag=>(byTagCanonical[tag]||0)<1500).map(tag=>({tag,solved:byTagCanonical[tag]||0,deficit:1500-(byTagCanonical[tag]||0)}));
+          if(canonicalDuplicates)throw new Error('duplicate canonical scenario+hand decisions: '+canonicalDuplicates);
           if(deficits.length)throw new Error('strict line-family deficits '+JSON.stringify(deficits));
           NODE
 
