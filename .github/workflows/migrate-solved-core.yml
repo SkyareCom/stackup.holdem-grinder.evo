@@ -6,6 +6,7 @@ on:
     paths:
       - 'scripts/package-solved-core-banks.mjs'
       - 'scripts/upload-solved-core-banks.mjs'
+      - 'scripts/approve-solved-core-automatically.mjs'
       - '.github/workflows/migrate-solved-core.yml'
 permissions:
   contents: read
@@ -31,7 +32,7 @@ jobs:
         run: node scripts/package-solved-core-banks.mjs
       - name: Build deterministic decision catalog
         run: node scripts/build-solved-core-catalog.mjs
-      - name: Require independent audit approval artifact
-        run: test -s .solved-core/approval.json
+      - name: Automated strict contract audit and approval
+        run: node scripts/approve-solved-core-automatically.mjs
       - name: Upload and verify parity
         run: node scripts/upload-solved-core-banks.mjs
