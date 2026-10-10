@@ -613,8 +613,8 @@ for(const runout of RUNOUTS){
   // One 75% sizing keeps the tree stable while maxRaises=2 preserves the
   // actual check-raise option at the response nodes.
   // -----------------------------------------------------------------------
-  try{
-    const base=callerOopBases[0];
+  for(const [baseIndex,base] of callerOopBases.entries())try{
+    const targetKey="base"+baseIndex;
     const oop0=parseRange(base.scenario.heroRange);
     const ip0=parseRange(base.scenario.villainRange);
     const pot0=normalizeBb(Number(base.scenario.pot));
@@ -683,6 +683,20 @@ for(const runout of RUNOUTS){
     }));
 
     const turnAfterCheck=findNode(turnRaw,[{kind:"check"}]);
+    // Genuine delayed c-bet decision: original preflop aggressor IP
+    // checked the flop, then faces an OOP check on the turn.
+    // Reuse the actual solved turn check node, not a synthetic action label.
+    if(turnAfterCheck){
+      addSpot(spots,materialize({
+        id:"delayed-target-"+targetKey+"-"+runout.id,
+        raw:turnRaw,node:turnAfterCheck,
+        tags:["delayed_cbet","sequential_lines"],
+        base,
+        oopRange:conditionRange(oopTurn,turnRoot,{kind:"check"}),
+        ipRange:ipTurn,potBb:pot0,stackBb:stack0,
+        history:[...hist,checkEvent(base.scenario.heroPosition,"TURN")]
+      }));
+    }
     const turnIpBet=chooseBet(ipTurn,turnAfterCheck,{minPct:70,maxPct:80});
     if(turnIpBet){
       const response=findNode(turnRaw,[{kind:"check"},{label:turnIpBet.label}]);
