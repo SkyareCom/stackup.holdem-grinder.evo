@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only SHA-256 and JSON audit of the 13 solver banks. NOT mathematical certification."""
+"""Read-only SHA-256 and JSON audit of the 13 solver banks. NOT mathematical certification.\nAudit trigger marker: 2026-10-10.\n"""
 import hashlib, json, pathlib, sys
 EXPECTED = dict(line.split() for line in """preflop.json 5e21f400c070abb02dc2afa907acfe117f15b22090f92e826efc9b39074b620b
 postflop.json 8610e60ce7b9c1134b90b6c2562b29b730e515ffa551a423703e55ae91e02511
