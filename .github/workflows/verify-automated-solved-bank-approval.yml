@@ -37,6 +37,10 @@ jobs:
           node --check scripts/package-solved-core-banks.mjs
           node --check scripts/build-solved-core-catalog.mjs
           node --check scripts/audit-solved-core-migration.mjs
+      - name: Package solved banks and audit deck integrity
+        run: |
+          node scripts/package-solved-core-banks.mjs
+          node scripts/audit-solved-card-integrity.mjs
       - name: Verify upload fails closed without server credentials
         run: |
           if env -u SOLVED_SPOT_SUPABASE_URL -u SOLVED_SPOT_SUPABASE_SERVICE_KEY node scripts/upload-solved-core-banks.mjs; then
