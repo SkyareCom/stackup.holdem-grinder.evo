@@ -224,6 +224,18 @@ jobs:
           if(deficits.length)throw new Error('strict line-family deficits '+JSON.stringify(deficits));
           NODE
 
+      - name: Save line-family audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcfr-line-audit-${{ github.run_id }}
+          path: |
+            line-bank-provenance.json
+            line-bank.sha256
+            data/solver/line-bank.json
+          retention-days: 90
+          if-no-files-found: warn
+
       - name: Recompute strict coverage and deficit queue
         run: |
           node scripts/audit-scenario-coverage.mjs
