@@ -1,0 +1,27 @@
+name: Validate Pio real-only safety gates
+on:
+  push:
+    branches: [feat/cinematic-premium-ui]
+    paths:
+      - 'core/solver/**'
+      - 'core/validate-solver.js'
+      - 'core/generate-gto-certified.js'
+      - 'core/stackup-scenario-catalog-CERTIFIED.js'
+      - 'core/stackup-scenario-catalog-MATH-CERTIFIED.js'
+      - 'scripts/test-pio-certification.cjs'
+      - '.github/workflows/validate-pio-no-mock.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test blocking behavior only (no GTO claim)
+        run: node --test scripts/test-pio-certification.cjs
+      - name: Check structural catalog
+        run: node scripts/audit-scenario-catalog-structure.cjs

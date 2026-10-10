@@ -1,7 +1,8 @@
 import {readFile,writeFile} from "node:fs/promises";
 import {resolve,join} from "node:path";
 
-// Coverage audit trigger marker: 2026-10-10\nconst ROOT=resolve(process.cwd());
+// Coverage audit trigger marker: 2026-10-10
+const ROOT=resolve(process.cwd());
 const SOLVER_DIR=join(ROOT,"data","solver");
 const catalogCode=await readFile(join(ROOT,"core","stackup-scenario-catalog.js"),"utf8");
 const contractCode=await readFile(join(ROOT,"core","stackup-solved-spot-contract.js"),"utf8");

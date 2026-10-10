@@ -59,7 +59,7 @@ try{
   new Function('window',catalog)(fakeWindow);
   const counts=fakeWindow.StackUpScenarioCatalog?.count?.();
   if(counts?.adjust!==58)failures.push('scenario catalog must contain exactly 58 AJUSTES cards, found '+String(counts?.adjust));
-  if(counts?.advance!==104)failures.push('scenario catalog must contain exactly 104 ADVANCE cards, found '+String(counts?.advance));
+  if(counts?.advance!==136)failures.push('scenario catalog must contain exactly 136 ADVANCE cards, found '+String(counts?.advance));
   if(fakeWindow.StackUpScenarioCatalog?.MIN_SPOTS!==1500)failures.push('scenario catalog minimum must be 1500 spots per card');
 }catch(error){failures.push('scenario catalog syntax/runtime error: '+error.message);}
 try{
