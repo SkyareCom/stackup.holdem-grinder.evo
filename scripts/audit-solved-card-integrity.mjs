@@ -12,8 +12,9 @@ const cardsFromHand=h=>{
  return m?[m[1],m[2]]:null;
 };
 const manifests=JSON.parse(await readFile('.solved-core/manifests.json','utf8'));
+let failureCount=0;
 const failures=[],stats={banks:0,spots:0,decisions:0,exactHandDecisions:0,classHandDecisions:0};
-const reject=(bank,id,reason)=>{if(failures.length<100)failures.push({bank,id,reason});};
+const reject=(bank,id,reason)=>{failureCount++;if(failures.length<100)failures.push({bank,id,reason});};
 for(const m of manifests){
  stats.banks++;
  const gz=await readFile('.solved-core/'+m.bankName+'.gz');
@@ -47,7 +48,7 @@ for(const m of manifests){
   }
  }
 }
-const report={schemaVersion:1,auditMode:'INDEPENDENT_DECK_AND_STRATEGY_INTEGRITY',mathematicalSolverReplay:false,passed:failures.length===0,stats,failures};
+const report={schemaVersion:1,auditMode:'INDEPENDENT_DECK_AND_STRATEGY_INTEGRITY',mathematicalSolverReplay:false,passed:failureCount===0,failureCount,stats,failures};
 await mkdir('.solved-core',{recursive:true});
 await writeFile('.solved-core/card-integrity-audit.json',JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report));
