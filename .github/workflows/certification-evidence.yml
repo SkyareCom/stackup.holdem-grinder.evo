@@ -1,0 +1,28 @@
+name: Certification Evidence Gate
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - scripts/verify-certification-evidence.mjs
+      - .github/workflows/certification-evidence.yml
+permissions:
+  contents: read
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Recompute exact solved decision coverage
+        run: node scripts/audit-scenario-coverage.mjs
+      - name: Require 1500 unique decisions for each catalog filter and independent solver replay
+        run: node scripts/verify-certification-evidence.mjs
+      - name: Preserve evidence even when certification fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: certification-evidence
+          path: data/solver/certification-evidence.json
+          if-no-files-found: warn
