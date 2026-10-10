@@ -14,7 +14,8 @@ const bankEngineOverride=new Map([
  ['preflop-9max.json','DCFR_PREFLOP_9MAX'],
  ['preflop-hu.json','DCFR_HEADS_UP_MULTISTACK'],
  ['postflop.json','DCFR_POSTFLOP_GENERAL'],
- ['texture-sizing.json','DCFR_TEXTURE_SIZING']
+ ['texture-sizing.json','DCFR_TEXTURE_SIZING'],
+ ['line-bank.json','DCFR_POSTFLOP_LINES']
 ]);
 for(const bank of BANKS){
  const payload=JSON.parse(await readFile('data/solver/'+bank,'utf8')); const spots=Array.isArray(payload)?payload:(payload.spots??[]);
