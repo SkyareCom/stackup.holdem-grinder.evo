@@ -9,7 +9,10 @@ const approval=JSON.parse(approvalBytes.toString('utf8'));
 const sourceCommit=String(process.env.GITHUB_SHA||'').trim();
 if(!/^[0-9a-f]{40}$/i.test(sourceCommit)) throw new Error('verified_source_commit_required');
 if(approval?.status!=='APPROVED') throw new Error('audit_approval_required');
-if(approval?.audit_mode!=='AUTOMATED_STRICT_CONTRACT') throw new Error('automated_audit_mode_required');
+// Contract checks prove structural integrity, not independent mathematical replay.
+// Production publication is blocked until a separate solver replay certifies the package.
+if(approval?.audit_mode!=='INDEPENDENT_SOLVER_REPLAY') throw new Error('independent_solver_replay_required');
+if(approval?.solver_replay?.status!=='PASSED'||!approval?.solver_replay?.report_sha256||!approval?.solver_replay?.verifier_commit) throw new Error('independent_solver_replay_evidence_required');
 if(approval?.source_commit!==sourceCommit) throw new Error('approval_source_commit_mismatch');
 const auditRef=String(approval?.audit_ref||'').trim();
 if(!auditRef) throw new Error('audit_reference_required');
