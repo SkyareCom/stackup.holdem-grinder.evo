@@ -31,7 +31,7 @@ for(const m of manifests){
    const canonicalKey=JSON.stringify([v.scenarioFingerprint,String(entry.hand||'').trim().toUpperCase()]);
    if(canonicalDecisions.has(canonicalKey))throw new Error('canonical_scenario_hand_duplicate:'+m.bankName);
    canonicalDecisions.add(canonicalKey);
-   decisionMetadata.set(v.id,{bankName:m.bankName,hand:String(entry.hand||'').trim(),scenarioFingerprint:v.scenarioFingerprint,solverRef:String(spot.solveId||spot.id||'').trim()});
+   decisionMetadata.set(v.id,{bankName:m.bankName,hand:String(entry.hand||'').trim(),scenarioFingerprint:v.scenarioFingerprint,solverRef:String(spot.solveId||spot.id||'').trim(),solver:String(spot.solver||'').trim()});
    seen.add(v.id);count++;
  }
  if(count!==m.decisionCount)throw new Error('decision_count_mismatch:'+m.bankName);
@@ -42,7 +42,7 @@ const catalogIds=new Set();
 for(const row of catalog){
  const m=byBank.get(row.bank_name);
  const expected=decisionMetadata.get(row.solve_id);
- if(!expected||expected.bankName!==row.bank_name||expected.hand!==row.hand_key||expected.solverRef!==row.solver_ref||row.provenance?.scenario_fingerprint!==expected.scenarioFingerprint)throw new Error('catalog_decision_metadata_mismatch:'+row.solve_id);
+ if(!expected||expected.bankName!==row.bank_name||expected.hand!==row.hand_key||expected.solverRef!==row.solver_ref||expected.solver!==row.provenance?.source_solver||row.provenance?.scenario_fingerprint!==expected.scenarioFingerprint)throw new Error('catalog_decision_metadata_mismatch:'+row.solve_id);
  if(!m||row.manifest_sha256!==m.sha256||row.object_path!==m.objectPath||!seen.has(row.solve_id)||catalogIds.has(row.solve_id)||row.audit_status!=='PENDING'||row.published!==false)throw new Error('catalog_mismatch:'+row.solve_id);
  catalogIds.add(row.solve_id);
 }
@@ -53,7 +53,7 @@ for(const row of catalog){
  const scenarioHash=shaObject(JSON.stringify(C.stable({contractVersion:C.VERSION,scenarioFingerprint:expected.scenarioFingerprint})));
  const decisionHash=shaObject(JSON.stringify(C.stable({
    contractVersion:C.VERSION,solveId:row.solve_id,scenarioHash,
-   hand:expected.hand,solver:String(row.provenance?.source_solver||'').trim(),
+   hand:expected.hand,solver:expected.solver,
    solverRef:expected.solverRef
  })));
  if(row.scenario_hash!==scenarioHash||row.decision_hash!==decisionHash)throw new Error('catalog_cryptographic_binding_mismatch:'+row.solve_id);
