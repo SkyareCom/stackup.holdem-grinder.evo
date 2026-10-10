@@ -22,8 +22,9 @@ const unknownCoverageKeys=[...byKey.keys()].filter(key=>!catalogKeys.has(key));
 const missingCoverageKeys=[...catalogKeys].filter(key=>!byKey.has(key));
 const deficits=catalog.ALL.map(x=>{
  const card=byKey.get(x.section+':'+x.id);
- const count=Number(card?.validatedSolvedSpots??0);
+ const count=card ? Number(card.validatedSolvedSpots) : 0;
  if(!Number.isSafeInteger(count)||count<0)throw Error('invalid_solved_count:'+x.section+':'+x.id);
+ if(card&&card.publishable===true&&count<1500)throw Error('inconsistent_publishable_flag:'+x.section+':'+x.id);
  return {key:x.section+':'+x.id,solver:x.source,validatedSolvedSpots:count,missing:Math.max(0,1500-count),eligible:count>=1500&&card?.publishable===true};
 }).filter(x=>!x.eligible);
 let replay=null;
