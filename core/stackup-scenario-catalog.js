@@ -130,7 +130,7 @@
       ['reverse_implied_odds','REVERSE IMPLIED ODDS','reverse_implied_odds'],['mdf','MDF','mdf'],
       ['breakeven_bluff','BREAK-EVEN BLUFF','breakeven_bluff'],['breakeven_call','BREAK-EVEN CALL','breakeven_call'],
       ['combos','COMBOS','combos'],['blockers','BLOCKERS','blockers'],['equity_realization','EQUITY REALIZATION','equity_realization']
-    ].map(([id,label,focus])=>A('math_special',id,label,SOURCE.MATH,'math_focus',{focus}))
+    ].map(([id,label,focus])=>A('math_special',id,label,SOURCE.MATH,'math_focus',{focus})),
     // Additional real poker decision families. Catalogued only: no synthetic solver certification.
     ...[
       ['straddle_pot','STRADDLE POT','straddle_pot'],
