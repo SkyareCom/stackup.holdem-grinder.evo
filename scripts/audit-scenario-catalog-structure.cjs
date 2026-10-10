@@ -1,0 +1,21 @@
+/* Structural catalog audit. Does NOT certify solver output or 1,500 spots per filter. */
+'use strict';
+const fs = require('node:fs');
+const vm = require('node:vm');
+const path = require('node:path');
+const src = fs.readFileSync(path.join(__dirname,'../core/stackup-scenario-catalog.js'),'utf8');
+const context = {window:{}};
+vm.runInNewContext(src,context,{filename:'stackup-scenario-catalog.js'});
+const catalog = context.window.StackUpScenarioCatalog;
+if (!catalog || !Array.isArray(catalog.ALL)) throw Error('Catalog runtime missing');
+const filters = catalog.ALL;
+const keys = filters.map(f=>f.section+':'+f.id);
+const sections = new Set(filters.map(f=>f.section));
+const errors = [];
+if(filters.length!==194) errors.push('Expected 194 filters, got '+filters.length);
+if(sections.size!==26) errors.push('Expected 26 sections, got '+sections.size);
+if(new Set(keys).size!==keys.length) errors.push('Duplicate filter keys');
+for(const f of filters) if(!f.section||!f.id||!f.label) errors.push('Incomplete filter: '+JSON.stringify(f));
+const result={kind:'STRUCTURAL_ONLY',filters:filters.length,sections:sections.size,uniqueKeys:new Set(keys).size,solverCertified:false,minSpotsPerFilter:catalog.MIN_SPOTS,errors};
+console.log(JSON.stringify(result,null,2));
+if(errors.length) process.exitCode=1;
