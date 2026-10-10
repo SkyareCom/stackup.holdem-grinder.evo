@@ -6,14 +6,14 @@ import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 const source=process.argv[2]||'.stackup/line-in';
 const destination=process.argv[3]||'.stackup';
-const files=(await readdir(source)).filter(x=>/^line-[a-t]\\.json$/.test(x)).sort();
+const files=(await readdir(source)).filter(x=>/^line-[a-t]\.json$/.test(x)).sort();
 if(files.length!==20)throw Error('expected_20_shards:'+files.length);
 const ids=new Set(),runouts=[],spots=[],failures=[],shardHashes=[];
 let upstream,iterations=Infinity,baseMatchups;
 for(const file of files){
  const raw=await readFile(join(source,file));
  const d=JSON.parse(raw);
- const runout=file.match(/^line-([a-t])\\.json$/)[1];
+ const runout=file.match(/^line-([a-t])\.json$/)[1];
  if(runouts.includes(runout))throw Error('duplicate_runout:'+runout);
  runouts.push(runout);
  if(!upstream){upstream=d.upstream;baseMatchups=d.baseMatchups;}
@@ -36,5 +36,5 @@ const raw=Buffer.from(JSON.stringify(bank));
 const provenance={schemaVersion:1,sourceRunId:process.env.SOURCE_RUN_ID||null,upstreamCommit:upstream.commit,sha256:createHash('sha256').update(raw).digest('hex'),shardHashes,spots:spots.length,decisions:spots.reduce((n,s)=>n+(s.strategy||[]).length,0),failures:failures.length,certification:'NOT_CERTIFIED'};
 await mkdir(destination,{recursive:true});
 await writeFile(join(destination,'recovered-line-bank.json'),raw);
-await writeFile(join(destination,'recovered-line-provenance.json'),JSON.stringify(provenance,null,2)+'\\n');
+await writeFile(join(destination,'recovered-line-provenance.json'),JSON.stringify(provenance,null,2)+'\n');
 console.log(JSON.stringify({status:'RECOVERED_NOT_CERTIFIED',...provenance,shardHashes:undefined},null,2));
