@@ -46,6 +46,18 @@ for(const row of catalog){
  if(!m||row.manifest_sha256!==m.sha256||row.object_path!==m.objectPath||!seen.has(row.solve_id)||catalogIds.has(row.solve_id)||row.audit_status!=='PENDING'||row.published!==false)throw new Error('catalog_mismatch:'+row.solve_id);
  catalogIds.add(row.solve_id);
 }
+// Recompute the catalog cryptographic bindings; do not trust stored hashes alone.
+const shaObject=value=>hash(JSON.stringify(value));
+for(const row of catalog){
+ const expected=decisionMetadata.get(row.solve_id);
+ const scenarioHash=shaObject(JSON.stringify(C.stable({contractVersion:C.VERSION,scenarioFingerprint:expected.scenarioFingerprint})));
+ const decisionHash=shaObject(JSON.stringify(C.stable({
+   contractVersion:C.VERSION,solveId:row.solve_id,scenarioHash,
+   hand:expected.hand,solver:String(row.provenance?.source_solver||'').trim(),
+   solverRef:expected.solverRef
+ })));
+ if(row.scenario_hash!==scenarioHash||row.decision_hash!==decisionHash)throw new Error('catalog_cryptographic_binding_mismatch:'+row.solve_id);
+}
 const approval={
  schema_version:1,status:'APPROVED',audit_ref:'github-actions-automated-contract-audit:'+String(process.env.GITHUB_RUN_ID||'local'),
  audit_mode:'AUTOMATED_STRICT_CONTRACT',audited_at:new Date().toISOString(),
