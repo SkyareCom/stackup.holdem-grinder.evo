@@ -8,11 +8,15 @@ on:
       - 'scripts/upload-solved-core-banks.mjs'
       - 'scripts/package-solved-core-banks.mjs'
       - 'scripts/build-solved-core-catalog.mjs'
+      - 'scripts/audit-solved-core-migration.mjs'
       - '.github/workflows/verify-automated-solved-bank-approval.yml'
   pull_request:
     paths:
       - 'scripts/approve-solved-core-automatically.mjs'
       - 'scripts/upload-solved-core-banks.mjs'
+      - 'scripts/package-solved-core-banks.mjs'
+      - 'scripts/build-solved-core-catalog.mjs'
+      - 'scripts/audit-solved-core-migration.mjs'
       - '.github/workflows/verify-automated-solved-bank-approval.yml'
 permissions:
   contents: read
