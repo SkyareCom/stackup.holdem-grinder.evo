@@ -5,11 +5,20 @@ const {execFileSync}=require('node:child_process');
 const {sha256}=require('./pio-adapter.js');
 const ROOT=path.resolve(__dirname,'../..');
 function rejectMock(value) {
-  if(typeof value==='string'&&/mock|simulated|synthetic|placeholder/i.test(value))throw Error('Report contém mock/dados simulados. Nenhuma certificação GTO será emitida');
+  const blocked=()=>{throw Error('BLOQUEADO: relatório com dados simulados. GTO só com evidência real.');};
+  if(typeof value==='string'&&/mock|simulated|synthetic|placeholder/i.test(value))blocked();
   if(value&&typeof value==='object')for(const [key,item]of Object.entries(value)){
-    if(/^(?:is[_-]?)?(mock|simulated|synthetic)(?:[_-]?solver)?$/i.test(key))throw Error('Report contém mock/simulated marker');
+    if(/^(?:is[_-]?)?(mock|simulated|synthetic)(?:[_-]?solver)?$/i.test(key)&&item!==false)blocked();
     rejectMock(item);
   }
+}
+function mathFilters() {
+  const source=fs.readFileSync(path.join(ROOT,'core/stackup-scenario-catalog-MATH-CERTIFIED.js'),'utf8');
+  const match=source.match(/export const SCENARIO_FILTERS = (\[[\s\S]*?\n\]);/);
+  if(!match)throw Error('Projeção matemática ausente');
+  const list=JSON.parse(match[1]);
+  if(JSON.stringify(list.map(f=>f.key))!==JSON.stringify(filters().map(f=>f.key)))throw Error('Chaves matemáticas divergentes');
+  return list;
 }
 function filters() {
   const source=fs.readFileSync(path.join(ROOT,'core/stackup-scenario-catalog-CERTIFIED.js'),'utf8');
@@ -22,7 +31,7 @@ function filters() {
 function sourceIdentity() {
   const git=args=>execFileSync('git',args,{cwd:ROOT,encoding:'utf8'}).trim();
   const files=['core/solver/pio-adapter.js','core/solver/certification-evidence.js','core/validate-solver.js','core/generate-gto-certified.js',
-    'core/stackup-scenario-catalog.js','core/stackup-solved-spot-contract.js','core/stackup-solved-spot-classifier.js'];
+    'core/stackup-scenario-catalog.js','core/stackup-scenario-catalog-MATH-CERTIFIED.js','core/stackup-solved-spot-contract.js','core/stackup-solved-spot-classifier.js'];
   const implementation=files.map(file=>({file,sha256:sha256(fs.readFileSync(path.join(ROOT,file)))}));
   return {source_commit:git(['rev-parse','HEAD']),source_catalog_blob:git(['hash-object','core/stackup-scenario-catalog.js']),
     implementation_sha256:sha256(JSON.stringify(implementation)),
@@ -30,7 +39,7 @@ function sourceIdentity() {
 }
 function validateOutput(output) {
   const invalid=()=>{throw Error('Evidência numérica/protocolo incompleta ou inválida');};
-  if(!output||output.solver!=='PioSolver'||output.real_solver!==true||output.model!=='chipEV'||
+  if(!output||output.solver!=='PioSolver'||output.real_solver!==true||output.is_mock!==false||output.model!=='chipEV'||
     typeof output.solver_version!=='string'||!output.solver_version.trim()||typeof output.ev_nash!=='number'||!Number.isFinite(output.ev_nash)||
     typeof output.equity!=='number'||!Number.isFinite(output.equity)||output.equity<0||output.equity>1)invalid();
   if(!Array.isArray(output.strategy)||!output.strategy.length||output.strategy.some(v=>typeof v!=='number'||!Number.isFinite(v)||v<0||v>1)||Math.abs(output.strategy.reduce((a,b)=>a+b,0)-1)>1e-5)invalid();
@@ -63,6 +72,6 @@ function compare(job,output) {
   const strategyDiff=sameActions?Math.max(...job.expectedStrategy.map((v,i)=>Math.abs(v-output.strategy[i]))):null;
   const exploitabilityPct=100*output.convergence.exploitability/job.pot.reduce((a,b)=>a+b,0);
   return {evDiff,evDiffPct,strategyDiff,exploitabilityPct,
-    pass:sameActions&&evDiffPct<=0.5&&strategyDiff<=0.005&&exploitabilityPct<=0.5};
+    pass:sameActions&&evDiffPct<0.5&&strategyDiff<=0.005&&exploitabilityPct<=0.5};
 }
-module.exports={ROOT,rejectMock,filters,sourceIdentity,compare,validateFilterJob,physicalHash,validateOutput,requireCoverage};
+module.exports={ROOT,rejectMock,filters,mathFilters,sourceIdentity,compare,validateFilterJob,physicalHash,validateOutput,requireCoverage};

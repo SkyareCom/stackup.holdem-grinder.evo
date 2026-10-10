@@ -9,12 +9,12 @@ async function main() {
   const report=JSON.parse(fs.readFileSync(reportPath,'utf8'));rejectMock(report);
   if(!Array.isArray(report.results)||!report.results.length)throw Error('Report vazio: nenhuma evidência GTO');
   const identity=sourceIdentity();
-  if(report.version!==2||report.solver!=='PioSolver'||Object.keys(identity).some(k=>report[k]!==identity[k]))throw Error('Report sem evidência real ou com fonte divergente');
+  if(report.version!==3||report.solver!=='piosolver_edge_real'||report.is_mock!==false||Object.keys(identity).some(k=>report[k]!==identity[k]))throw Error('Report sem evidência real ou com fonte divergente');
   const catalog=filters(),groups=new Map(catalog.map(f=>[f.key,[]]));
   const inputHashes=new Map(catalog.map(f=>[f.key,new Set()]));const ids=new Set();
   const evidenceList=[];
   for(const result of report.results) {
-    if(result.status!=='REAL_SOLVER_VALIDATED'||result.real_solver!==true||result.solver!=='PioSolver'||!result.ev_check?.pass)throw Error('Resultado sem evidência real aprovada');
+    if(result.status!=='SOLVER_CERTIFIED'||result.real_solver!==true||result.is_mock!==false||result.solver!=='piosolver_edge_real'||!result.ev_check?.pass)throw Error('Resultado sem evidência real aprovada');
     if(!groups.has(result.key)||typeof result.spot_id!=='string'||!result.spot_id.trim())throw Error('Filtro/spot inválido');
     const id=result.key+':'+result.spot_id;if(ids.has(id))throw Error('Spots duplicados');ids.add(id);
     if(typeof result.evidence_file!=='string'||path.isAbsolute(result.evidence_file))throw Error('Caminho de evidência inválido');
@@ -25,6 +25,7 @@ async function main() {
     const {job,output}=evidence;
     if(!job||!output||job.filterKey!==result.key||job.spotId!==result.spot_id||output.real_solver!==true||output.solver!=='PioSolver'||sha256(JSON.stringify(job))!==result.input_sha256||output.input_sha256!==result.input_sha256||sha256(JSON.stringify(output.transcript))!==output.transcript_sha256)throw Error('Evidência não corresponde ao spot');
     validateOutput(output);
+    if(result.solver_hash!==output.hash)throw Error('Hash do solver diverge da evidência real');
     if(!compare(job,output).pass)throw Error('Evidência histórica não passa a comparação real');
     validateFilterJob(job);
     if(inputHashes.get(result.key).has(output.input_sha256))throw Error('Entradas de solve duplicadas no filtro');
@@ -43,7 +44,8 @@ async function main() {
   }
   if(JSON.stringify(sourceIdentity())!==JSON.stringify(identity))throw Error('Código de origem mudou durante a reexecução; emissão bloqueada');
   const outputPath=path.resolve(option('output')||path.join(ROOT,'core/stackup-scenario-catalog-GTO-CERTIFIED.js'));
-  const entries=catalog.map(f=>({...f,gto_certification:'GTO_CERTIFIED',validated_unique_spots:groups.get(f.key).length}));
+  const entries=catalog.map(f=>({...f,gto_certification:'GTO_CERTIFIED',solver_validated:true,is_mock:false,
+    solver_hash:sha256(JSON.stringify(evidenceList.filter(e=>e.job.filterKey===f.key).map(e=>e.output.hash).sort())),validated_unique_spots:groups.get(f.key).length}));
   const content='// Re-executed with real PioSolver; scope is the supplied explicit game trees.\nexport const GTO_SOURCE = '+JSON.stringify(identity)+';\nexport const SCENARIO_FILTERS = '+JSON.stringify(entries,null,2)+';\n';
   fs.writeFileSync(outputPath,content,{flag:'wx'});
   console.log('GTO_CERTIFIED: 194 filtros com pelo menos 1500 solves reais únicos cada');

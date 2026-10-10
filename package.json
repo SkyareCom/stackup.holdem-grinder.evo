@@ -1,0 +1,11 @@
+{
+  "name": "stackup-holdem-grinder-evo",
+  "private": true,
+  "scripts": {
+    "test": "node --test scripts/test-pio-certification.cjs",
+    "validate:solver:icm": "node core/validate-solver.js --section=icm_special",
+    "validate:solver:pko": "node core/validate-solver.js --section=pko_special",
+    "validate:solver:all": "node core/validate-solver.js --all",
+    "certify:gto": "node core/generate-gto-certified.js"
+  }
+}

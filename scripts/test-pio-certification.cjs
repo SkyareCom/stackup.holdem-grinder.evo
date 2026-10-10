@@ -6,14 +6,18 @@ const os = require('node:os');
 const path = require('node:path');
 const {spawnSync} = require('node:child_process');
 const root = path.resolve(__dirname,'..');
-const missing = 'PIO_PATH não configurado. Nenhuma certificação GTO será emitida';
+const missing = 'PIO_PATH não configurado. Nenhuma certificação GTO será emitida com dados simulados. Main intocada.';
 function run(file,args=[],env={}) {
   const cleanEnv={...process.env}; delete cleanEnv.PIO_PATH;
   return spawnSync(process.execPath,[path.join(root,file),...args],{cwd:root,env:{...cleanEnv,...env},encoding:'utf8'});
 }
+async function withPioPath(file,fn) {
+  const before=process.env.PIO_PATH;process.env.PIO_PATH=file;
+  try{return await fn();}finally{if(before===undefined)delete process.env.PIO_PATH;else process.env.PIO_PATH=before;}
+}
 test('validator rejects unset PIO_PATH with the exact required error',()=>{
   const r=run('core/validate-solver.js',['--section=icm_special']);
-  assert.equal(r.status,1); assert.match(r.stderr,new RegExp(missing));
+  assert.equal(r.status,1); assert.equal(r.stderr.trim(),missing);
 });
 test('validator rejects an absent Pio installation',()=>{
   const r=run('core/validate-solver.js',['--section=icm_special'],{PIO_PATH:'/definitely-absent-pio'});
@@ -23,8 +27,10 @@ test('adapter does not invent results for unsupported multi-player ICM',async()=
   const adapterPath=path.join(root,'core/solver/pio-adapter.js');
   assert.ok(fs.existsSync(adapterPath),'real adapter must exist');
   const {PioAdapter}=require(adapterPath);
-  const adapter=new PioAdapter(process.execPath);
-  await assert.rejects(adapter.solve({model:'icm',stacks:[15,12,20],payouts:[.5,.3,.2]}),/ICM.*não suportado/);
+  await withPioPath(process.execPath,async()=>{
+    const adapter=new PioAdapter(process.execPath);assert.equal(adapter.isRealSolver,true);
+    await assert.rejects(adapter.solve({model:'icm',stacks:[15,12,20],payouts:[.5,.3,.2]}),/ICM.*não suportado/);
+  });
 });
 for (const report of [
  {solver:'mock',results:[]},
@@ -39,7 +45,7 @@ for (const report of [
     fs.writeFileSync(input,JSON.stringify(report));
     const r=run('core/generate-gto-certified.js',['--report='+input,'--output='+output]);
     assert.equal(r.status,1);
-    assert.match(r.stderr,/mock|evidência|vazio/i);
+    assert.match(r.stderr,/simulados|evidência|vazio/i);
     assert.equal(fs.existsSync(output),false,'no certified artifact on failure');
   } finally {fs.rmSync(dir,{recursive:true,force:true});}
 });
@@ -72,9 +78,15 @@ test('EV tolerance remains 0.5 percent even when nash EV is below one chip',()=>
   const r=compare({expectedEv:0.104,expectedStrategy:[1],pot:[0,0,10]}, {ev_nash:0.1,strategy:[1],convergence:{exploitability:0}});
   assert.equal(r.pass,false);assert.ok(r.evDiffPct>0.5);
 });
+test('EV difference must be strictly below 0.5 percent',()=>{
+  const {compare}=require('../core/solver/certification-evidence.js');
+  const r=compare({expectedEv:100.5,expectedStrategy:[1],pot:[0,0,10]},{ev_nash:100,strategy:[1],convergence:{exploitability:0}});
+  assert.equal(r.pass,false);
+});
 test('all representations of nested mock markers block reports',()=>{
   const {rejectMock}=require('../core/solver/certification-evidence.js');
-  for(const value of [{MoCk:1},{simulated:'yes'},{isMock:true},{nested:{mock:'false'}}])assert.throws(()=>rejectMock(value),/mock/i);
+  for(const value of [{MoCk:1},{simulated:'yes'},{isMock:true},{nested:{mock:'false'}}])assert.throws(()=>rejectMock(value),/BLOQUEADO/);
+  assert.doesNotThrow(()=>rejectMock({is_mock:false}));
 });
 test('source identity includes current implementation bytes',()=>{
   const {sourceIdentity}=require('../core/solver/certification-evidence.js');
@@ -108,6 +120,7 @@ test('a silent process ignoring SIGTERM is killed within a bounded timeout',asyn
   const script=path.join(dir,'silent-process'),pidFile=path.join(dir,'pid');
   fs.writeFileSync(script,'#!/usr/bin/env node\nrequire("node:fs").writeFileSync('+JSON.stringify(pidFile)+',String(process.pid));\nprocess.on("SIGTERM",()=>{});\nprocess.stdin.resume();\nsetInterval(()=>{},1000);\n',{mode:0o755});
   let pid;
+  const priorPio=process.env.PIO_PATH;process.env.PIO_PATH=script;
   try {
     const adapter=new PioAdapter(script,{timeoutMs:250});
     const started=Date.now();
@@ -116,6 +129,7 @@ test('a silent process ignoring SIGTERM is killed within a bounded timeout',asyn
     pid=Number(fs.readFileSync(pidFile,'utf8'));
     assert.throws(()=>process.kill(pid,0),/ESRCH/,'child must already be gone when solve rejects');
   } finally {
+    if(priorPio===undefined)delete process.env.PIO_PATH;else process.env.PIO_PATH=priorPio;
     if(pid)try{process.kill(pid,'SIGKILL');}catch{}
     fs.rmSync(dir,{recursive:true,force:true});
   }
@@ -130,4 +144,47 @@ test('coverage auditor initializes its root before loading actual bank files',()
 test('app validation accepts the approved complete 194-filter catalog',()=>{
   const r=run('scripts/validate-app.mjs');
   assert.equal(r.status,0,r.stderr||r.stdout);
+});
+test('npm exposes the four requested real solver commands',()=>{
+  const file=path.join(root,'package.json');assert.ok(fs.existsSync(file),'package.json must exist');
+  const scripts=JSON.parse(fs.readFileSync(file,'utf8')).scripts;
+  assert.equal(scripts['validate:solver:icm'],'node core/validate-solver.js --section=icm_special');
+  assert.equal(scripts['validate:solver:pko'],'node core/validate-solver.js --section=pko_special');
+  assert.equal(scripts['validate:solver:all'],'node core/validate-solver.js --all');
+  assert.equal(scripts['certify:gto'],'node core/generate-gto-certified.js');
+});
+test('math projection requires real solver for exactly 11 ICM and 7 PKO filters',()=>{
+  const text=fs.readFileSync(path.join(root,'core/stackup-scenario-catalog-MATH-CERTIFIED.js'),'utf8');
+  const list=JSON.parse(text.match(/export const SCENARIO_FILTERS = (\[[\s\S]*?\n\]);/)[1]);
+  const pending=list.filter(f=>f.requires_solver_validation);
+  assert.equal(pending.length,18);assert.equal(pending.filter(f=>f.section==='icm_special').length,11);assert.equal(pending.filter(f=>f.section==='pko_special').length,7);
+  assert.ok(list.every(f=>Array.isArray(f.math_checks)&&f.math_checks.length));
+});
+test('explicit binary argument does not bypass missing environment configuration',()=>{
+  const {PioAdapter}=require('../core/solver/pio-adapter.js');
+  const before=process.env.PIO_PATH;delete process.env.PIO_PATH;
+  try{assert.throws(()=>new PioAdapter(process.execPath),/PIO_PATH não configurado/);}finally{if(before!==undefined)process.env.PIO_PATH=before;}
+});
+test('is_mock true receives the exact security block and creates no certificate',()=>{
+  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'pio-forged-'));
+  try {
+    const file=path.join(dir,'forged.json'),output=path.join(dir,'certificate.js');
+    fs.writeFileSync(file,JSON.stringify({is_mock:true,results:[]}));
+    const r=run('core/generate-gto-certified.js',['--report='+file,'--output='+output]);
+    assert.match(r.stderr,/BLOQUEADO: relatório com dados simulados\. GTO só com evidência real\./);
+    assert.equal(r.status,1);assert.equal(fs.existsSync(output),false);
+  }finally{fs.rmSync(dir,{recursive:true,force:true});}
+});
+test('calcICM also refuses a missing PIO_PATH and never returns a placeholder',async()=>{
+  const {PioAdapter}=require('../core/solver/pio-adapter.js');
+  await withPioPath(process.execPath,async()=>{
+    const adapter=new PioAdapter(process.execPath);delete process.env.PIO_PATH;
+    await assert.rejects(adapter.calcICM({stacks:[15,15,12,20,8,25,10,18,5],payouts:[.5,.3,.2]}),/PIO_PATH não configurado/);
+  });
+});
+test('recovery report exposes missing mathematics rather than invented completion',()=>{
+  const report=JSON.parse(fs.readFileSync(path.join(root,'reports/stackup-MATH-CERTIFICATION-REPORT.json'),'utf8'));
+  assert.equal(report.validations.length,194);assert.equal(report.summary.requires_solver_validation,18);
+  assert.equal(report.layers.structural.verified,194);assert.equal(report.layers.mathematical.verified,0);
+  assert.equal(report.layers.gto.certificates_issued,0);
 });

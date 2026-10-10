@@ -8,6 +8,8 @@ on:
       - 'core/generate-gto-certified.js'
       - 'core/stackup-scenario-catalog-CERTIFIED.js'
       - 'core/stackup-scenario-catalog-MATH-CERTIFIED.js'
+      - 'reports/stackup-MATH-CERTIFICATION-REPORT.json'
+      - 'package.json'
       - 'scripts/test-pio-certification.cjs'
       - '.github/workflows/validate-pio-no-mock.yml'
   workflow_dispatch:

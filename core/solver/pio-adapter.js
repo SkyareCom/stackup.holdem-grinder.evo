@@ -5,7 +5,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const {spawn} = require('node:child_process');
 const readline = require('node:readline');
-const MISSING_PIO = 'PIO_PATH não configurado. Nenhuma certificação GTO será emitida';
+const MISSING_PIO = 'PIO_PATH não configurado. Nenhuma certificação GTO será emitida com dados simulados. Main intocada.';
 const sha256 = value => crypto.createHash('sha256').update(value).digest('hex');
 
 function executable(pioPath) {
@@ -65,7 +65,7 @@ function parseResults(response) {
 class UpiSession {
   constructor(file,timeoutMs) {
     this.marker='STACKUP_END_'+crypto.randomBytes(12).toString('hex');
-    this.timeoutMs=timeoutMs; this.transcript=[]; this.pending=null; this.lines=[]; this.update=false; this.failure=null; this.banner=false;
+    this.timeoutMs=timeoutMs; this.transcript=[]; this.pending=null; this.lines=[]; this.update=false; this.failure=null; this.banner=false;this.edge=false;
     this.child=spawn(file,[],{cwd:path.dirname(file),shell:false,stdio:['pipe','pipe','pipe'],windowsHide:true});
     const fail=error=>{
       this.failure=error;
@@ -78,6 +78,7 @@ class UpiSession {
     this.reader=readline.createInterface({input:this.child.stdout});
     this.reader.on('line',line=>{
       if(/PioSOLVER/i.test(line)) this.banner=true;
+      if(/PioSOLVER[- ]edge/i.test(line))this.edge=true;
       if(/activation key|license.*(?:invalid|error)|ERROR(?:\s|:)/i.test(line)) {fail(Error('PioSolver: erro UPI/licença; nenhuma certificação será emitida'));return;}
       if(/^SOLVER:/.test(line)) {this.update=line.trim()==='SOLVER:';return;}
       if(this.update) {if(line===this.marker)this.update=false;return;}
@@ -122,12 +123,17 @@ class UpiSession {
 
 class PioAdapter {
   constructor(pioPath=process.env.PIO_PATH,{timeoutMs=120000,steps=5000}={}) {
+    if(!process.env.PIO_PATH?.trim())throw Error(MISSING_PIO);
     this.path=executable(pioPath);
+    this.isRealSolver=true;
     assertFinite(timeoutMs,'timeoutMs',1);assertFinite(steps,'steps',1);
     if(!Number.isSafeInteger(steps))throw Error('steps deve ser inteiro');
     this.timeoutMs=timeoutMs;this.steps=steps;
   }
-  async calcICM() {throw Error('ICM multiway não suportado: calcular equidade matemática isolada não certifica uma estratégia GTO');}
+  async calcICM() {
+    executable(process.env.PIO_PATH);
+    throw Error('ICM multiway não suportado: calcular equidade matemática isolada não certifica uma estratégia GTO');
+  }
   async solve(job) {
     validateJob(job);
     const binaryHash=sha256(fs.readFileSync(this.path));
@@ -136,7 +142,7 @@ class PioAdapter {
       await session.ok('set_end_string '+session.marker);
       await session.ok('is_ready');
       const version=(await session.command('show_version')).trim();
-      if(!session.banner||!version||/mock|simulat|fake/i.test(version))throw Error('Processo não identificou PioSolver real');
+      if(!session.banner||!session.edge||!version||/mock|simulat|fake/i.test(version))throw Error('Processo não identificou PioSolver Edge real');
       const handOrder=(await session.command('show_hand_order')).trim().split(/\s+/);
       if(handOrder.length!==1326||new Set(handOrder).size!==1326||handOrder.some(h=>!/^([2-9TJQKA][cdhs]){2}$/.test(h)))throw Error('Ordem de combos inválida');
       const comboIndex=handOrder.findIndex(h=>h===job.hand||h===job.hand.slice(2)+job.hand.slice(0,2));
@@ -169,7 +175,7 @@ class PioAdapter {
       assertFinite(eq,'equity',0,1);
       if(sha256(fs.readFileSync(this.path))!==binaryHash)throw Error('Executável mudou durante o solve');
       const inputHash=sha256(JSON.stringify(job));
-      return {solver:'PioSolver',solver_version:version,real_solver:true,model:'chipEV',
+      return {solver:'PioSolver',solver_version:version,real_solver:true,is_mock:false,model:'chipEV',
         ev_nash:ev[0][comboIndex],equity:eq,strategy,convergence,
         input_sha256:inputHash,executable_sha256:binaryHash,
         transcript:session.transcript,transcript_sha256:sha256(JSON.stringify(session.transcript)),

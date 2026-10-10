@@ -1,4 +1,4 @@
-// Pending projection: original mathematical source was not supplied. No math/GTO evidence invented.
+// Recovered projection. Mathematical source evidence unavailable; no certification invented.
 export const SCENARIO_CATALOG_CERTIFICATION = "NOT_CERTIFIED";
 export const SCENARIO_FILTERS = [
   {
@@ -11,10 +11,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 2,
@@ -26,10 +33,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 3,
@@ -41,10 +55,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 4,
@@ -56,10 +77,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 5,
@@ -71,10 +99,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 6,
@@ -86,10 +121,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 7,
@@ -101,10 +143,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 8,
@@ -116,10 +165,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 9,
@@ -131,10 +187,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 10,
@@ -146,10 +209,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 11,
@@ -161,10 +231,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 12,
@@ -176,10 +253,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 13,
@@ -191,10 +275,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 14,
@@ -206,10 +297,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 15,
@@ -221,10 +319,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 16,
@@ -236,10 +341,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 17,
@@ -251,10 +363,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 18,
@@ -266,10 +385,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 19,
@@ -281,10 +407,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 20,
@@ -296,10 +429,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 21,
@@ -311,10 +451,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 22,
@@ -326,10 +473,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 23,
@@ -341,10 +495,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 24,
@@ -356,10 +517,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 25,
@@ -371,10 +539,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 26,
@@ -386,10 +561,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 27,
@@ -401,10 +583,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 28,
@@ -416,10 +605,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 29,
@@ -431,10 +627,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 30,
@@ -446,10 +649,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 31,
@@ -461,10 +671,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 32,
@@ -476,10 +693,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 33,
@@ -491,10 +715,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 34,
@@ -506,10 +737,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 35,
@@ -521,10 +759,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 36,
@@ -536,10 +781,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 37,
@@ -551,10 +803,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 38,
@@ -566,10 +825,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 39,
@@ -581,10 +847,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 40,
@@ -596,10 +869,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 41,
@@ -611,10 +891,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 42,
@@ -626,10 +913,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 43,
@@ -641,10 +935,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 44,
@@ -656,10 +957,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 45,
@@ -671,10 +979,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 46,
@@ -686,10 +1001,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 47,
@@ -701,10 +1023,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 48,
@@ -716,10 +1045,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 49,
@@ -731,10 +1067,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 50,
@@ -746,10 +1089,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 51,
@@ -761,10 +1111,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 52,
@@ -776,10 +1133,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 53,
@@ -791,10 +1155,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 54,
@@ -806,10 +1177,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 55,
@@ -821,10 +1199,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 56,
@@ -836,10 +1221,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 57,
@@ -851,10 +1243,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 58,
@@ -866,10 +1265,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 59,
@@ -881,10 +1287,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 60,
@@ -896,10 +1309,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 61,
@@ -911,10 +1331,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 62,
@@ -926,10 +1353,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 63,
@@ -941,10 +1375,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 64,
@@ -956,10 +1397,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 65,
@@ -971,10 +1419,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 66,
@@ -986,10 +1441,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 67,
@@ -1001,10 +1463,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 68,
@@ -1016,10 +1485,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 69,
@@ -1031,10 +1507,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 70,
@@ -1046,10 +1529,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 71,
@@ -1061,10 +1551,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 72,
@@ -1076,10 +1573,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 73,
@@ -1091,10 +1595,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 74,
@@ -1106,10 +1617,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 75,
@@ -1121,10 +1639,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 76,
@@ -1136,10 +1661,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 77,
@@ -1151,10 +1683,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 78,
@@ -1166,10 +1705,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 79,
@@ -1181,10 +1727,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 80,
@@ -1196,10 +1749,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 81,
@@ -1211,10 +1771,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 82,
@@ -1226,10 +1793,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 83,
@@ -1241,10 +1815,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 84,
@@ -1256,10 +1837,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 85,
@@ -1271,10 +1859,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 86,
@@ -1286,10 +1881,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 87,
@@ -1301,10 +1903,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 88,
@@ -1316,10 +1925,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 89,
@@ -1331,10 +1947,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 90,
@@ -1346,10 +1969,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 91,
@@ -1361,10 +1991,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 92,
@@ -1376,10 +2013,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 93,
@@ -1391,10 +2035,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 94,
@@ -1406,10 +2057,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 95,
@@ -1421,10 +2079,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 96,
@@ -1436,10 +2101,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 97,
@@ -1451,10 +2123,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 98,
@@ -1466,10 +2145,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 99,
@@ -1481,10 +2167,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 100,
@@ -1496,10 +2189,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 101,
@@ -1511,10 +2211,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 102,
@@ -1526,10 +2233,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 103,
@@ -1541,10 +2255,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 104,
@@ -1556,10 +2277,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 105,
@@ -1571,10 +2299,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 106,
@@ -1586,10 +2321,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 107,
@@ -1601,10 +2343,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 108,
@@ -1616,10 +2365,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 109,
@@ -1631,10 +2387,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 110,
@@ -1646,10 +2409,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 111,
@@ -1661,10 +2431,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 112,
@@ -1676,10 +2453,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 113,
@@ -1691,10 +2475,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 114,
@@ -1706,10 +2497,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 115,
@@ -1721,10 +2519,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 116,
@@ -1736,10 +2541,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
     "requires_solver_validation": true,
-    "math_checks": []
+    "math_checks": [
+      {
+        "check": "STRATEGY_SOLVER_VALIDATION",
+        "status": "NEEDS_REAL_SOLVER",
+        "requires_solver": true
+      }
+    ]
   },
   {
     "ordinal": 117,
@@ -1751,10 +2563,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 118,
@@ -1766,10 +2585,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 119,
@@ -1781,10 +2607,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 120,
@@ -1796,10 +2629,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 121,
@@ -1811,10 +2651,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 122,
@@ -1826,10 +2673,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 123,
@@ -1841,10 +2695,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 124,
@@ -1856,10 +2717,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 125,
@@ -1871,10 +2739,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 126,
@@ -1886,10 +2761,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 127,
@@ -1901,10 +2783,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 128,
@@ -1916,10 +2805,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 129,
@@ -1931,10 +2827,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 130,
@@ -1946,10 +2849,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 131,
@@ -1961,10 +2871,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 132,
@@ -1976,10 +2893,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 133,
@@ -1991,10 +2915,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 134,
@@ -2006,10 +2937,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 135,
@@ -2021,10 +2959,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 136,
@@ -2036,10 +2981,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 137,
@@ -2051,10 +3003,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 138,
@@ -2066,10 +3025,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 139,
@@ -2081,10 +3047,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 140,
@@ -2096,10 +3069,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 141,
@@ -2111,10 +3091,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 142,
@@ -2126,10 +3113,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 143,
@@ -2141,10 +3135,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 144,
@@ -2156,10 +3157,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 145,
@@ -2171,10 +3179,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 146,
@@ -2186,10 +3201,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 147,
@@ -2201,10 +3223,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 148,
@@ -2216,10 +3245,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 149,
@@ -2231,10 +3267,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 150,
@@ -2246,10 +3289,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 151,
@@ -2261,10 +3311,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 152,
@@ -2276,10 +3333,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 153,
@@ -2291,10 +3355,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 154,
@@ -2306,10 +3377,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 155,
@@ -2321,10 +3399,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 156,
@@ -2336,10 +3421,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 157,
@@ -2351,10 +3443,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 158,
@@ -2366,10 +3465,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 159,
@@ -2381,10 +3487,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 160,
@@ -2396,10 +3509,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 161,
@@ -2411,10 +3531,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 162,
@@ -2426,10 +3553,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 163,
@@ -2441,10 +3575,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 164,
@@ -2456,10 +3597,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 165,
@@ -2471,10 +3619,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 166,
@@ -2486,10 +3641,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 167,
@@ -2501,10 +3663,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 168,
@@ -2516,10 +3685,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 169,
@@ -2531,10 +3707,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 170,
@@ -2546,10 +3729,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 171,
@@ -2561,10 +3751,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 172,
@@ -2576,10 +3773,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 173,
@@ -2591,10 +3795,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 174,
@@ -2606,10 +3817,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 175,
@@ -2621,10 +3839,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 176,
@@ -2636,10 +3861,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 177,
@@ -2651,10 +3883,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 178,
@@ -2666,10 +3905,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 179,
@@ -2681,10 +3927,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 180,
@@ -2696,10 +3949,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 181,
@@ -2711,10 +3971,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 182,
@@ -2726,10 +3993,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 183,
@@ -2741,10 +4015,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 184,
@@ -2756,10 +4037,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 185,
@@ -2771,10 +4059,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 186,
@@ -2786,10 +4081,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 187,
@@ -2801,10 +4103,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 188,
@@ -2816,10 +4125,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 189,
@@ -2831,10 +4147,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 190,
@@ -2846,10 +4169,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 191,
@@ -2861,10 +4191,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 192,
@@ -2876,10 +4213,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 193,
@@ -2891,10 +4235,17 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   },
   {
     "ordinal": 194,
@@ -2906,9 +4257,16 @@ export const SCENARIO_FILTERS = [
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
     "mathematical_certification": "NOT_CERTIFIED",
     "gto_certification": "NOT_CERTIFIED",
-    "requires_solver_validation": true,
-    "math_checks": []
+    "requires_solver_validation": false,
+    "math_checks": [
+      {
+        "check": "MATHEMATICAL_EVIDENCE",
+        "status": "NOT_VERIFIED",
+        "requires_solver": false
+      }
+    ]
   }
 ];

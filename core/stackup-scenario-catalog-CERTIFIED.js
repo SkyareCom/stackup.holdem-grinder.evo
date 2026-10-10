@@ -32,7 +32,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 2,
@@ -43,7 +44,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 3,
@@ -54,7 +56,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 4,
@@ -65,7 +68,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 5,
@@ -76,7 +80,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 6,
@@ -87,7 +92,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 7,
@@ -98,7 +104,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 8,
@@ -109,7 +116,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 9,
@@ -120,7 +128,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 10,
@@ -131,7 +140,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 11,
@@ -142,7 +152,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 12,
@@ -153,7 +164,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 13,
@@ -164,7 +176,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 14,
@@ -175,7 +188,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 15,
@@ -186,7 +200,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 16,
@@ -197,7 +212,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 17,
@@ -208,7 +224,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 18,
@@ -219,7 +236,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 19,
@@ -230,7 +248,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 20,
@@ -241,7 +260,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 21,
@@ -252,7 +272,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 22,
@@ -263,7 +284,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 23,
@@ -274,7 +296,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 24,
@@ -285,7 +308,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 25,
@@ -296,7 +320,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 26,
@@ -307,7 +332,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 27,
@@ -318,7 +344,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 28,
@@ -329,7 +356,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 29,
@@ -340,7 +368,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 30,
@@ -351,7 +380,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 31,
@@ -362,7 +392,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 32,
@@ -373,7 +404,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 33,
@@ -384,7 +416,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 34,
@@ -395,7 +428,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 35,
@@ -406,7 +440,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 36,
@@ -417,7 +452,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 37,
@@ -428,7 +464,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 38,
@@ -439,7 +476,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 39,
@@ -450,7 +488,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 40,
@@ -461,7 +500,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 41,
@@ -472,7 +512,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 42,
@@ -483,7 +524,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 43,
@@ -494,7 +536,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 44,
@@ -505,7 +548,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 45,
@@ -516,7 +560,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 46,
@@ -527,7 +572,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 47,
@@ -538,7 +584,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 48,
@@ -549,7 +596,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 49,
@@ -560,7 +608,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 50,
@@ -571,7 +620,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 51,
@@ -582,7 +632,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 52,
@@ -593,7 +644,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 53,
@@ -604,7 +656,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 54,
@@ -615,7 +668,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 55,
@@ -626,7 +680,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 56,
@@ -637,7 +692,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 57,
@@ -648,7 +704,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 58,
@@ -659,7 +716,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 59,
@@ -670,7 +728,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 60,
@@ -681,7 +740,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 61,
@@ -692,7 +752,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 62,
@@ -703,7 +764,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 63,
@@ -714,7 +776,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 64,
@@ -725,7 +788,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 65,
@@ -736,7 +800,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 66,
@@ -747,7 +812,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 67,
@@ -758,7 +824,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 68,
@@ -769,7 +836,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 69,
@@ -780,7 +848,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 70,
@@ -791,7 +860,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 71,
@@ -802,7 +872,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 72,
@@ -813,7 +884,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 73,
@@ -824,7 +896,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 74,
@@ -835,7 +908,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 75,
@@ -846,7 +920,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 76,
@@ -857,7 +932,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 77,
@@ -868,7 +944,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 78,
@@ -879,7 +956,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 79,
@@ -890,7 +968,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 80,
@@ -901,7 +980,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 81,
@@ -912,7 +992,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 82,
@@ -923,7 +1004,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 83,
@@ -934,7 +1016,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 84,
@@ -945,7 +1028,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 85,
@@ -956,7 +1040,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 86,
@@ -967,7 +1052,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 87,
@@ -978,7 +1064,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 88,
@@ -989,7 +1076,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 89,
@@ -1000,7 +1088,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 90,
@@ -1011,7 +1100,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 91,
@@ -1022,7 +1112,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 92,
@@ -1033,7 +1124,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 93,
@@ -1044,7 +1136,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 94,
@@ -1055,7 +1148,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 95,
@@ -1066,7 +1160,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 96,
@@ -1077,7 +1172,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 97,
@@ -1088,7 +1184,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 98,
@@ -1099,7 +1196,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 99,
@@ -1110,7 +1208,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 100,
@@ -1121,7 +1220,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 101,
@@ -1132,7 +1232,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 102,
@@ -1143,7 +1244,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 103,
@@ -1154,7 +1256,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 104,
@@ -1165,7 +1268,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 105,
@@ -1176,7 +1280,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 106,
@@ -1187,7 +1292,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 107,
@@ -1198,7 +1304,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 108,
@@ -1209,7 +1316,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 109,
@@ -1220,7 +1328,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 110,
@@ -1231,7 +1340,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 111,
@@ -1242,7 +1352,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 112,
@@ -1253,7 +1364,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 113,
@@ -1264,7 +1376,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 114,
@@ -1275,7 +1388,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 115,
@@ -1286,7 +1400,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 116,
@@ -1297,7 +1412,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 117,
@@ -1308,7 +1424,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 118,
@@ -1319,7 +1436,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 119,
@@ -1330,7 +1448,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 120,
@@ -1341,7 +1460,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 121,
@@ -1352,7 +1472,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 122,
@@ -1363,7 +1484,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 123,
@@ -1374,7 +1496,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 124,
@@ -1385,7 +1508,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 125,
@@ -1396,7 +1520,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 126,
@@ -1407,7 +1532,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 127,
@@ -1418,7 +1544,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 128,
@@ -1429,7 +1556,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 129,
@@ -1440,7 +1568,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 130,
@@ -1451,7 +1580,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 131,
@@ -1462,7 +1592,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 132,
@@ -1473,7 +1604,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 133,
@@ -1484,7 +1616,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 134,
@@ -1495,7 +1628,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 135,
@@ -1506,7 +1640,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 136,
@@ -1517,7 +1652,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 137,
@@ -1528,7 +1664,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 138,
@@ -1539,7 +1676,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 139,
@@ -1550,7 +1688,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 140,
@@ -1561,7 +1700,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 141,
@@ -1572,7 +1712,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 142,
@@ -1583,7 +1724,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 143,
@@ -1594,7 +1736,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 144,
@@ -1605,7 +1748,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 145,
@@ -1616,7 +1760,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 146,
@@ -1627,7 +1772,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 147,
@@ -1638,7 +1784,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 148,
@@ -1649,7 +1796,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 149,
@@ -1660,7 +1808,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 150,
@@ -1671,7 +1820,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 151,
@@ -1682,7 +1832,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 152,
@@ -1693,7 +1844,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 153,
@@ -1704,7 +1856,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 154,
@@ -1715,7 +1868,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 155,
@@ -1726,7 +1880,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 156,
@@ -1737,7 +1892,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 157,
@@ -1748,7 +1904,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 158,
@@ -1759,7 +1916,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 159,
@@ -1770,7 +1928,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 160,
@@ -1781,7 +1940,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 161,
@@ -1792,7 +1952,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 162,
@@ -1803,7 +1964,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 163,
@@ -1814,7 +1976,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 164,
@@ -1825,7 +1988,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 165,
@@ -1836,7 +2000,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 166,
@@ -1847,7 +2012,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 167,
@@ -1858,7 +2024,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 168,
@@ -1869,7 +2036,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 169,
@@ -1880,7 +2048,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 170,
@@ -1891,7 +2060,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 171,
@@ -1902,7 +2072,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 172,
@@ -1913,7 +2084,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 173,
@@ -1924,7 +2096,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 174,
@@ -1935,7 +2108,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 175,
@@ -1946,7 +2120,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 176,
@@ -1957,7 +2132,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 177,
@@ -1968,7 +2144,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 178,
@@ -1979,7 +2156,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 179,
@@ -1990,7 +2168,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 180,
@@ -2001,7 +2180,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 181,
@@ -2012,7 +2192,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 182,
@@ -2023,7 +2204,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 183,
@@ -2034,7 +2216,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 184,
@@ -2045,7 +2228,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 185,
@@ -2056,7 +2240,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 186,
@@ -2067,7 +2252,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 187,
@@ -2078,7 +2264,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 188,
@@ -2089,7 +2276,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 189,
@@ -2100,7 +2288,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 190,
@@ -2111,7 +2300,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 191,
@@ -2122,7 +2312,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 192,
@@ -2133,7 +2324,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 193,
@@ -2144,7 +2336,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   },
   {
     "ordinal": 194,
@@ -2155,7 +2348,8 @@ export const SCENARIO_FILTERS = [
     "certification": "CERTIFIED",
     "certified_at": "2026-10-10",
     "certified_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33",
-    "source_verified": true
+    "source_verified": true,
+    "source_sha": "d89775abd6860b74bceab36fe5a751536ff0ca33"
   }
 ];
 

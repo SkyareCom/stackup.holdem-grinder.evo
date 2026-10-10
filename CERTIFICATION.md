@@ -7,11 +7,14 @@ commit and catalog blob.
 
 ## Current scope and source files
 
-The supplied structural catalog was recovered verbatim: 194 filters in 26 sections.
+The supplied structural catalog was recovered: 194 filters in 26 sections, with
+the requested `source_sha` added to every entry.
 Its existing `CERTIFIED` fields mean structural validation only. They do not prove
 GTO or 1,500 solved spots per filter. The original mathematical catalog, adapter,
 generator and documentation were unavailable in this session. The mathematical
-projection therefore explicitly remains `NOT_CERTIFIED`; no checks are invented.
+projection and `reports/stackup-MATH-CERTIFICATION-REPORT.json` therefore remain
+`NOT_CERTIFIED`/`PENDING_EVIDENCE`. Exactly 18 filters require solver validation:
+11 ICM and 7 PKO. Every `math_checks` entry states its pending status.
 The supplied validator's constant mock EVs and incomplete ICM approximation have
 been removed.
 
@@ -59,7 +62,7 @@ node --test scripts/test-pio-certification.cjs
 ```
 
 Without `PIO_PATH`, exit code is 1 and the message is exactly:
-`PIO_PATH não configurado. Nenhuma certificação GTO será emitida`.
+`PIO_PATH não configurado. Nenhuma certificação GTO será emitida com dados simulados. Main intocada.`
 
 ## Real job schema
 
@@ -81,8 +84,14 @@ The JSON document must contain a nonempty `jobs` array. Each job must contain:
 | `expectedStrategy` | Engine action probabilities, in Pio child order, adding to one |
 
 No example ranges or placeholder jobs are installed. Missing jobs fail.
-`--section` narrows execution; `--all` means all supplied jobs, not implicit solves
-for every catalog filter. A filtered run cannot certify the entire catalog.
+By default only the 18 ICM/PKO filters with `requires_solver_validation=true`
+are selected. They remain blocked without complete real solver inputs and a
+compatible model. `--section` narrows execution; `--all` means all supplied jobs
+for those pending filters. `--full-solve` permits explicitly supplied supported
+postflop jobs. A filtered run cannot certify the entire catalog.
+
+The following npm commands are available: `validate:solver:icm`,
+`validate:solver:pko`, `validate:solver:all`, and `certify:gto`.
 
 ## Evidence and certification gate
 
@@ -92,7 +101,7 @@ identity is excluded from saved command responses. Evidence is written into a
 unique run directory. Reports always remain `NOT_CERTIFIED` until the separate
 certification gate succeeds.
 
-EV difference must be at most 0.5%, action probabilities within 0.5 percentage
+EV difference must be strictly below 0.5%, action probabilities within 0.5 percentage
 points, and exploitability at most 0.5% of the root pot. A passing check validates
 only the supplied game tree and combo, not unrestricted poker.
 
@@ -110,7 +119,7 @@ Official protocol references:
 
 ## Verification in this session
 
-- 21 automated failure/regression tests passed, including process timeout termination.
+- 28 automated failure/regression tests passed, including process timeout termination.
 - Structural audit passed: 194 unique filters, 26 sections, no GTO claim.
 - All 13 existing bank byte hashes matched; no bank contents changed.
 - `validate-app.mjs` passed after correcting its outdated ADVANCE count to 136.
