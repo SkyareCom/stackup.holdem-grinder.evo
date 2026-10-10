@@ -28,6 +28,5 @@ for(const bank of BANKS){
  const out='.solved-core/'+bank+'.gz'; await writeFile(out,gz);
  manifests.push({schemaVersion:1,bankName:bank,engine:solver,family:'bank',solverVersion:String(payload.version??payload.modelVersion??payload.schemaVersion??'v1'),sha256:sha,decisionCount:audit.uniqueSolvedSpots,objectPath,compression:'gzip',validated:true,contractVersion:C.VERSION});
 }
-await writeFile('.solved-core/manifests.json',JSON.stringify(manifests,null,2)+'
-');
+await writeFile('.solved-core/manifests.json',JSON.stringify(manifests,null,2)+'\n');
 console.log(JSON.stringify({banks:manifests.length,decisions:manifests.reduce((n,x)=>n+x.decisionCount,0)},null,2));
