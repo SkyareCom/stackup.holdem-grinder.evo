@@ -125,7 +125,7 @@ function renderSettings(){
  }).join('');
 }
 function chooseFilter(gid,opt){
- const g=FILTER_DEFS.find(x=>x.id===gid);if(!g)return;
+ const g=[...FILTER_DEFS,...ADV_FILTER_DEFS].find(x=>x.id===gid);if(!g)return;
  const S=filterState[gid];if(filterDisabled(gid,opt))return;
  if(g.toggle){S.has(opt)?S.delete(opt):S.add(opt)}
  else if(g.multi){if(opt==='all'){S.clear();S.add('all')}else{S.delete('all');S.has(opt)?S.delete(opt):S.add(opt);if(!S.size)S.add('all')}}
