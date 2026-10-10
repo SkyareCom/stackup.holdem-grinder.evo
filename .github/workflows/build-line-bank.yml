@@ -193,6 +193,33 @@ jobs:
           if(deficits.length)throw new Error('strict line-family deficits '+JSON.stringify(deficits));
           NODE
 
+      - name: Record aggregate provenance and SHA-256
+        run: |
+          sha256sum data/solver/line-bank.json | tee line-bank.sha256
+          node - <<'NODE'
+          const fs=require('fs');
+          const crypto=require('crypto');
+          const p='data/solver/line-bank.json';
+          const raw=fs.readFileSync(p);
+          const bank=JSON.parse(raw);
+          if(!Array.isArray(bank.runouts)||bank.runouts.length!==20)throw Error('aggregate_runouts_incomplete');
+          if(!Array.isArray(bank.spots)||bank.spots.length===0)throw Error('aggregate_empty');
+          if(bank.upstream?.commit!=='4ade6a9e15a841c41867afde1258b9d110cd6fb1')throw Error('upstream_pin_drift');
+          const evidence={schemaVersion:1,runId:process.env.GITHUB_RUN_ID,sourceCommit:process.env.GITHUB_SHA,upstreamCommit:bank.upstream.commit,iterations:bank.iterations,runouts:bank.runouts,spots:bank.spots.length,sha256:crypto.createHash('sha256').update(raw).digest('hex'),certification:'NOT_CERTIFIED'};
+          fs.writeFileSync('line-bank-provenance.json',JSON.stringify(evidence,null,2)+'\n');
+          NODE
+
+      - name: Preserve aggregated solver output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dcfr-line-bank-aggregate-${{ github.run_id }}
+          path: |
+            data/solver/line-bank.json
+            line-bank.sha256
+            line-bank-provenance.json
+          retention-days: 90
+          if-no-files-found: error
+
       - name: Recompute strict coverage and deficit queue
         run: |
           node scripts/audit-scenario-coverage.mjs
