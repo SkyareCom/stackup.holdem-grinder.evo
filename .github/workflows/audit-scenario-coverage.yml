@@ -46,7 +46,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Audit 162 training cards with strict solved-spot contract
+      - name: Audit catalog training cards with strict solved-spot contract
         run: |
           node scripts/audit-scenario-coverage.mjs
           node scripts/plan-solved-spot-growth.mjs
@@ -61,10 +61,10 @@ jobs:
           if(c.minSpots!==1500)throw new Error('coverage floor must remain 1500');
           if(c.currentGoal!==2000)throw new Error('current solved-spot goal must be 2000');
           if(c.longTermTarget!==20000)throw new Error('long-term solved-spot target must be 20000');
-          if(c.counts.adjust!==58||c.counts.advance!==104||c.counts.total!==162){
+          if(c.counts.adjust!==58||c.counts.advance!==136||c.counts.total!==194){
             throw new Error('scenario catalog count drift: '+JSON.stringify(c.counts));
           }
-          if(!Array.isArray(c.cards)||c.cards.length!==162)throw new Error('coverage card list must have 162 entries');
+          if(!Array.isArray(c.cards)||c.cards.length!==c.counts.total)throw new Error('coverage card count differs from catalog');
           for(const card of c.cards){
             if(card.available!==card.validatedSolvedSpots)throw new Error('presentation inflation detected: '+card.section+'/'+card.id);
             if(card.targetSpots!==2000)throw new Error('card target drift: '+card.section+'/'+card.id);
