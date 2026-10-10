@@ -69,6 +69,7 @@ const countUrl=base+'/rest/v1/solved_spot_catalog?select=solve_id&published=eq.t
 const verify=await fetch(countUrl,{headers:{authorization:'Bearer '+key,apikey:key,prefer:'count=exact'},method:'HEAD'});
 if(!verify.ok)throw new Error('catalog_parity_lookup_failed:'+verify.status);
 const range=verify.headers.get('content-range')||'';
+if(!/^\d+-\d+\/\d+$/.test(range))throw new Error('catalog_parity_content_range_invalid:'+range);
 const remoteCount=Number(range.split('/').pop());
 if(!Number.isSafeInteger(remoteCount)||remoteCount!==catalog.length)throw new Error('catalog_parity_mismatch:'+remoteCount+':'+catalog.length);
 console.log('catalog_complete_verified',catalog.length);
