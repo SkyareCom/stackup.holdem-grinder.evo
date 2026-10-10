@@ -1,0 +1,34 @@
+name: Verify Automated Solved Bank Approval
+on:
+  push:
+    branches:
+      - feat/automated-solved-bank-approval-v1
+    paths:
+      - 'scripts/approve-solved-core-automatically.mjs'
+      - 'scripts/upload-solved-core-banks.mjs'
+      - '.github/workflows/verify-automated-solved-bank-approval.yml'
+  pull_request:
+    paths:
+      - 'scripts/approve-solved-core-automatically.mjs'
+      - 'scripts/upload-solved-core-banks.mjs'
+      - '.github/workflows/verify-automated-solved-bank-approval.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify approval and uploader JavaScript syntax
+        run: |
+          node --check scripts/approve-solved-core-automatically.mjs
+          node --check scripts/upload-solved-core-banks.mjs
+      - name: Verify upload fails closed without server credentials
+        run: |
+          if env -u SOLVED_SPOT_SUPABASE_URL -u SOLVED_SPOT_SUPABASE_SERVICE_KEY node scripts/upload-solved-core-banks.mjs; then
+            echo "FAIL: uploader accepted missing credentials" >&2
+            exit 1
+          fi
