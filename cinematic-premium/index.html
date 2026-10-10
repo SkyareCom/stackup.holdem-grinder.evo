@@ -114,7 +114,7 @@ function renderAdvance(){
  const root=document.getElementById('advanceReal');if(!root)return;
  const off=!isTournament();
  root.innerHTML=ADV_FILTER_DEFS.map(g=>{
-   const buttons=g.opts.map(([o,label])=>{const selected=filterState[g.id].has(o);const disabled=off||g.locked||(!selected&&filterDisabled(g.id,o));return '<button class="chip'+(selected?' on':'')+'" data-filter-group="'+g.id+'" data-filter-option="'+o+'"'+(disabled?' disabled':'')+'>'+label+'</button>'}).join('');
+   const buttons=g.opts.map(([o,label])=>{const selected=filterState[g.id].has(o);const disabled=off||(g.locked&&o!=='all')||(!selected&&filterDisabled(g.id,o));return '<button class="chip'+(selected?' on':'')+'" data-filter-group="'+g.id+'" data-filter-option="'+o+'"'+(disabled?' disabled':'')+'>'+label+'</button>'}).join('');
    return '<div class="filtergroup'+(off?' filter-disabled':'')+'"><label>'+g.label+(off?' · SOMENTE TORNEIOS':'')+'</label><div class="chips" style="--cols:'+(g.opts.length%4===0?4:(g.opts.length%3===0?3:4))+'">'+buttons+'</div></div>';
  }).join('');
 
@@ -132,7 +132,7 @@ function renderSettings(){
  }).join('');
 }
 function chooseFilter(gid,opt){
- const g=[...FILTER_DEFS,...ADV_FILTER_DEFS].find(x=>x.id===gid);if(!g)return;
+ const g=[...FILTER_DEFS,...ADV_FILTER_DEFS].find(x=>x.id===gid);if(!g||g.locked)return;
  const S=filterState[gid];if(filterDisabled(gid,opt))return;
  if(g.toggle){S.has(opt)?S.delete(opt):S.add(opt)}
  else if(g.multi){if(opt==='all'){S.clear();S.add('all')}else{S.delete('all');S.has(opt)?S.delete(opt):S.add(opt);if(!S.size)S.add('all')}}
