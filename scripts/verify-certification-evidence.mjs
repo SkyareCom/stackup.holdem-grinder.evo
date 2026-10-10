@@ -10,10 +10,19 @@ const catalogCode=await readFile('core/stackup-scenario-catalog.js','utf8');
 const sandbox={window:{}};vm.createContext(sandbox);vm.runInContext(catalogCode,sandbox);
 const catalog=sandbox.window.StackUpScenarioCatalog;
 if(!catalog)throw Error('scenario_catalog_missing');
-const byKey=new Map((coverage.cards||[]).map(x=>[x.section+':'+x.id,x]));
+const byKey=new Map();
+for(const card of coverage.cards||[]){
+ const key=card.section+':'+card.id;
+ if(byKey.has(key))throw Error('duplicate_coverage_filter:'+key);
+ byKey.set(key,card);
+}
+const catalogKeys=new Set(catalog.ALL.map(x=>x.section+':'+x.id));
+if(catalogKeys.size!==catalog.ALL.length)throw Error('duplicate_catalog_filter');
+const unknownCoverageKeys=[...byKey.keys()].filter(key=>!catalogKeys.has(key));
 const deficits=catalog.ALL.map(x=>{
  const card=byKey.get(x.section+':'+x.id);
  const count=Number(card?.validatedSolvedSpots??0);
+ if(!Number.isSafeInteger(count)||count<0)throw Error('invalid_solved_count:'+x.section+':'+x.id);
  return {key:x.section+':'+x.id,solver:x.source,validatedSolvedSpots:count,missing:Math.max(0,1500-count),eligible:count>=1500&&card?.publishable===true};
 }).filter(x=>!x.eligible);
 let replay=null;
@@ -23,11 +32,12 @@ const replayMetadataPresent=Boolean(replay?.status==='PASSED'&&replay?.audit_mod
 const report={
  schemaVersion:1,mode:'FAIL_CLOSED_CERTIFICATION',generatedAt:new Date().toISOString(),
  catalogCount:catalog.ALL.length,coverageCount:coverage.cards?.length??0,
+ unknownCoverageKeys,
  coverageSha256:sha(raw),minUniqueSolvedDecisionsPerFilter:1500,
  filtersWithDeficits:deficits.length,deficits,
  replayMetadataPresent,
  replayEvidencePresent:false, // Only an actual independent solver replay can set this true.
- coverageComplete:catalog.ALL.length===coverage.cards?.length&&deficits.length===0,
+ coverageComplete:catalog.ALL.length===coverage.cards?.length&&unknownCoverageKeys.length===0&&deficits.length===0,
  certified:false
 };
 report.certified=false; // Fail closed until independently verified solver replay is implemented.
