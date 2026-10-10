@@ -163,6 +163,9 @@ jobs:
           fs.writeFileSync('line-bank-provenance.json',JSON.stringify(evidence,null,2)+'\n');
           NODE
 
+      - name: Verify aggregate provenance
+        run: node scripts/verify-dcfr-line-aggregate.mjs
+
       - name: Preserve aggregated solver output
         uses: actions/upload-artifact@v4
         with:
