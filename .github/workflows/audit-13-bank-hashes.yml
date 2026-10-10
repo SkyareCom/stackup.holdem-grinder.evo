@@ -1,0 +1,25 @@
+name: Audit 13 solver bank hashes (read-only)
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/cinematic-premium-ui]
+    paths:
+      - 'data/solver/**'
+      - 'scripts/audit-13-bank-hashes.py'
+      - '.github/workflows/audit-13-bank-hashes.yml'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check original bank bytes and JSON
+        run: python3 scripts/audit-13-bank-hashes.py
+      - name: Preserve audit evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-13-bank-hashes
+          path: audit-13-banks-result.json
+          if-no-files-found: error
