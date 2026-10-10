@@ -49,9 +49,15 @@ for(const m of manifests){
  console.log('verified',m.bankName,m.decisionCount,m.sha256);
 }
 
-const manifestRows=await fetch(base+'/rest/v1/solved_spot_manifests?select=id,sha256',{headers:{authorization:'Bearer '+key,apikey:key}});
-if(!manifestRows.ok)throw new Error('manifest_lookup_failed:'+manifestRows.status+':'+await manifestRows.text());
-const manifestBySha=new Map((await manifestRows.json()).map(x=>[x.sha256,x.id]));
+const manifestBySha=new Map();
+for(const m of manifests){
+ const manifestUrl=base+'/rest/v1/solved_spot_manifests?select=id,sha256&sha256=eq.'+encodeURIComponent(m.sha256);
+ const manifestRows=await fetch(manifestUrl,{headers:{authorization:'Bearer '+key,apikey:key}});
+ if(!manifestRows.ok)throw new Error('manifest_lookup_failed:'+m.bankName+':'+manifestRows.status+':'+await manifestRows.text());
+ const rows=await manifestRows.json();
+ if(!Array.isArray(rows)||rows.length!==1||!rows[0].id||rows[0].sha256!==m.sha256)throw new Error('manifest_lookup_ambiguous:'+m.bankName);
+ manifestBySha.set(m.sha256,rows[0].id);
+}
 for(const m of manifests)if(!manifestBySha.has(m.sha256))throw new Error('remote_manifest_missing:'+m.bankName);
 const batchSize=500;
 for(let i=0;i<catalog.length;i+=batchSize){
