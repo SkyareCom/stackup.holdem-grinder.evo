@@ -15,7 +15,7 @@ const code=await readFile('core/stackup-solved-spot-contract.js','utf8');
 const sb={globalThis:{}};vm.createContext(sb);vm.runInContext(code,sb);
 const C=sb.globalThis.StackUpSolvedSpotContract;
 if(!C)throw new Error('contract_missing');
-const byBank=new Map(),seen=new Set();
+const byBank=new Map(),seen=new Set(),canonicalDecisions=new Set();
 for(const m of manifests){
  if(!m.bankName||byBank.has(m.bankName)||!/^([a-f0-9]{64})$/.test(m.sha256))throw new Error('invalid_manifest');
  const gz=await readFile('.solved-core/'+m.bankName+'.gz');
@@ -28,6 +28,9 @@ for(const m of manifests){
  for(const spot of spots)for(const entry of spot.strategy||[]){
    const v=C.validateSolvedDecision(spot,entry);
    if(!v.ok||seen.has(v.id))throw new Error('invalid_or_duplicate_decision:'+m.bankName+':'+v.id);
+   const canonicalKey=JSON.stringify([v.scenarioFingerprint,String(entry.hand||'').trim().toUpperCase()]);
+   if(canonicalDecisions.has(canonicalKey))throw new Error('canonical_scenario_hand_duplicate:'+m.bankName);
+   canonicalDecisions.add(canonicalKey);
    seen.add(v.id);count++;
  }
  if(count!==m.decisionCount)throw new Error('decision_count_mismatch:'+m.bankName);
