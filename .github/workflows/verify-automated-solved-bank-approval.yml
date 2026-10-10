@@ -39,6 +39,13 @@ jobs:
           node --check scripts/audit-solved-core-migration.mjs
       - name: Audit source banks independently (including empty banks)
         run: node scripts/audit-solved-card-integrity.mjs --source-banks
+      - name: Upload integrity evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: solved-card-integrity-${{ github.run_id }}
+          path: .solved-core/card-integrity-audit.json
+          if-no-files-found: warn
       - name: Verify upload fails closed without server credentials
         run: |
           if env -u SOLVED_SPOT_SUPABASE_URL -u SOLVED_SPOT_SUPABASE_SERVICE_KEY node scripts/upload-solved-core-banks.mjs; then
