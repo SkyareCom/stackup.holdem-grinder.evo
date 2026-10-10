@@ -11,15 +11,17 @@ const cardsFromHand=h=>{
  const m=s.match(/^([2-9TJQKA][CDHS])([2-9TJQKA][CDHS])$/);
  return m?[m[1],m[2]]:null;
 };
-const manifests=JSON.parse(await readFile('.solved-core/manifests.json','utf8'));
+const standalone=process.argv.includes('--source-banks');
+const sourceBanks=['preflop.json','postflop.json','tournament.json','reentry.json','opponent-profile.json','multiway-tournament.json','multiway-postflop.json','preflop-decisions.json','preflop-9max.json','preflop-multistack.json','preflop-hu.json','texture-sizing.json','line-bank.json'];
+const manifests=standalone?sourceBanks.map(bankName=>({bankName})):JSON.parse(await readFile('.solved-core/manifests.json','utf8'));
 let failureCount=0;
 const failures=[],stats={banks:0,spots:0,decisions:0,exactHandDecisions:0,classHandDecisions:0};
 const reject=(bank,id,reason)=>{failureCount++;if(failures.length<100)failures.push({bank,id,reason});};
 for(const m of manifests){
  stats.banks++;
- const gz=await readFile('.solved-core/'+m.bankName+'.gz');
- if(hash(gz)!==m.sha256)throw Error('bank_sha_mismatch:'+m.bankName);
- const payload=JSON.parse(gunzipSync(gz));
+ const payload=standalone
+  ? JSON.parse(await readFile('data/solver/'+m.bankName,'utf8'))
+  : await (async()=>{const gz=await readFile('.solved-core/'+m.bankName+'.gz');if(hash(gz)!==m.sha256)throw Error('bank_sha_mismatch:'+m.bankName);return JSON.parse(gunzipSync(gz));})();
  const spots=Array.isArray(payload)?payload:payload.spots||[];
  for(const spot of spots){
   stats.spots++;
@@ -48,7 +50,7 @@ for(const m of manifests){
   }
  }
 }
-const report={schemaVersion:1,auditMode:'INDEPENDENT_DECK_AND_STRATEGY_INTEGRITY',mathematicalSolverReplay:false,passed:failureCount===0,failureCount,stats,failures};
+const report={schemaVersion:1,sourceMode:standalone?'SOURCE_BANKS':'PACKAGED_BANKS',auditMode:'INDEPENDENT_DECK_AND_STRATEGY_INTEGRITY',mathematicalSolverReplay:false,passed:failureCount===0,failureCount,stats,failures};
 await mkdir('.solved-core',{recursive:true});
 await writeFile('.solved-core/card-integrity-audit.json',JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report));
